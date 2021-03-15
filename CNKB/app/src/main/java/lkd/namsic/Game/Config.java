@@ -3,12 +3,17 @@ package lkd.namsic.Game;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Base64;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.Game.Class.GameClass;
 import lkd.namsic.Game.Enum.Id;
@@ -17,13 +22,40 @@ import lkd.namsic.Setting.Logger;
 
 public class Config {
 
+    public static final Map<Id, Long> ID_MAP = new ConcurrentHashMap<>();
+
     public static final int MIN_MAP_X = 0;
     public static final int MAX_MAP_X = 10;
     public static final int MIN_MAP_Y = 0;
     public static final int MAX_MAP_Y = 10;
 
+    public static final int MIN_HANDLE_LV = 1;
+    public static final int MAX_HANDLE_LV = 20;
     public static final int MIN_LV = 1;
     public static final int MAX_LV = 999;
+
+    public static JSONObject createConfig() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+
+        JSONObject idObject = new JSONObject();
+        for(Id id : Id.values()) {
+            ID_MAP.put(id, 1L);
+            idObject.put(id.toString(), 1L);
+        }
+        jsonObject.put("id", idObject);
+
+        return jsonObject;
+    }
+
+    public static void parseConfig(JSONObject jsonObject) throws JSONException {
+        JSONObject idObject = jsonObject.getJSONObject("id");
+
+        String idName;
+        for(Id id : Id.values()) {
+            idName = id.toString();
+            idObject.put(idName, idObject.getLong(idName));
+        }
+    }
 
     @Nullable
     public static <T extends GameClass> String serialize(@NonNull T t) {

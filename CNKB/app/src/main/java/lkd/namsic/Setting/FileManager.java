@@ -5,6 +5,8 @@ import android.os.Environment;
 
 import androidx.annotation.NonNull;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,6 +14,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashMap;
 
+import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Id;
 
 public class FileManager extends Application {
@@ -39,6 +42,17 @@ public class FileManager extends Application {
                 path = DATA_PATH + "/" + id.toString();
                 DATA_PATH_MAP.put(id, path + "/");
                 new File(path).mkdir();
+            }
+
+            String filePath = PATH + "/" + "config.json";
+            String config = read(filePath);
+            Logger.i("test", config);
+            if(config.equals("")) {
+                JSONObject configObject = Config.createConfig();
+                save(filePath, configObject.toString());
+            } else {
+                JSONObject jsonObject = new JSONObject(config);
+                Config.parseConfig(jsonObject);
             }
 
             Logger.i("FileManager", "Init complete");
