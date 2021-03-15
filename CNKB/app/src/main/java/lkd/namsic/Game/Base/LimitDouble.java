@@ -1,6 +1,7 @@
 package lkd.namsic.Game.Base;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import lkd.namsic.Game.Exception.ValueRangeException;
 
@@ -57,11 +58,13 @@ public class LimitDouble {
         return returnValue;
     }
 
-    public void set(Double setValue) {
-        if(minValue != null && setValue < minValue && throwMin) {
-            throw new ValueRangeException(this);
-        } else if(maxValue != null && setValue > maxValue && throwMax) {
-            throw new ValueRangeException(this);
+    public void set(@Nullable Double setValue) {
+        if(setValue != null) {
+            if (minValue != null && setValue < minValue && throwMin) {
+                throw new ValueRangeException(this);
+            } else if (maxValue != null && setValue > maxValue && throwMax) {
+                throw new ValueRangeException(this);
+            }
         }
 
         this.value = setValue;

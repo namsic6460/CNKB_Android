@@ -1,9 +1,15 @@
 package lkd.namsic.Game.Base;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import lkd.namsic.Game.Exception.ValueRangeException;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class LimitInteger {
 
     private Integer minValue;
@@ -11,6 +17,8 @@ public class LimitInteger {
     private Integer maxValue;
     private boolean throwMax;
 
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
     private Integer value;
 
     public LimitInteger() {
@@ -57,11 +65,13 @@ public class LimitInteger {
         return returnValue;
     }
 
-    public void set(Integer setValue) {
-        if(minValue != null && setValue < minValue && throwMin) {
-            throw new ValueRangeException(this);
-        } else if(maxValue != null && setValue > maxValue && throwMax) {
-            throw new ValueRangeException(this);
+    public void set(@Nullable Integer setValue) {
+        if(setValue != null) {
+            if (minValue != null && setValue < minValue && throwMin) {
+                throw new ValueRangeException(this);
+            } else if (maxValue != null && setValue > maxValue && throwMax) {
+                throw new ValueRangeException(this);
+            }
         }
 
         this.value = setValue;
