@@ -2,9 +2,16 @@ package lkd.namsic.Game.Enum;
 
 public enum Id {
 
-    PLAYER,
-    MONSTER,
+    ACHIEVE,
+    BUILDING,
+    CHAT,
+    EQUIPMENT,
     ITEM,
-    EQUIPMENT
+    MONSTER,
+    NPC,
+    PLAYER,
+    QUEST,
+    RESEARCH,
+    SKILL
 
 }

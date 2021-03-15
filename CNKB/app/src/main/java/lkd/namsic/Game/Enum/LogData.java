@@ -1,0 +1,26 @@
+package lkd.namsic.Game.Enum;
+
+public enum LogData {
+
+    CHAT,
+    QUEST_RECEIVED,
+    QUEST_CLEARED,
+    MAX_MONEY,
+    MAX_PAYMENT,
+    EXPLORED,
+    MINED,
+    GATHERED,
+    ATE,
+    BOUGHT,
+    TOTAL_ITEM,
+    TOTAL_ITEM_USED,
+    REINFORCE_TRIED,
+    REINFORCE_SUCCEED,
+    TOTAL_EXP,
+    BUFF_RECEIVED,
+    MAX_CLOSERATE,
+    TOTAL_CLOSERATE,
+    STAT_UPDATED,
+    PLAYED_DAY
+
+}

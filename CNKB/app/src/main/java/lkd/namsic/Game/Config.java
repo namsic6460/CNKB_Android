@@ -17,6 +17,11 @@ import lkd.namsic.Setting.Logger;
 
 public class Config {
 
+    public static final int MIN_MAP_X = 0;
+    public static final int MAX_MAP_X = 10;
+    public static final int MIN_MAP_Y = 0;
+    public static final int MAX_MAP_Y = 10;
+
     public static final int MIN_LV = 1;
     public static final int MAX_LV = 999;
 
