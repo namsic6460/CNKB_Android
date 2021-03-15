@@ -22,6 +22,7 @@ import java.util.TimerTask;
 
 import lkd.namsic.Setting.FileManager;
 import lkd.namsic.Service.ForcedTerminationService;
+import lkd.namsic.Setting.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Logger.activity = this;
 
         String[] permissions = { Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                  Manifest.permission.READ_EXTERNAL_STORAGE };

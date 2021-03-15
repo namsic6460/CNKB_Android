@@ -17,8 +17,8 @@ import lkd.namsic.Game.Enum.Id;
 public class FileManager extends Application {
 
     private final static String PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CNKB";
-    public final static String LOG_PATH = PATH + "/logs/";
-    public final static String DATA_PATH = PATH + "/data/";
+    public final static String LOG_PATH = PATH + "/logs";
+    public final static String DATA_PATH = PATH + "/data";
     public final static HashMap<Id, String> DATA_PATH_MAP = new HashMap<>();
 
     @Override
@@ -36,10 +36,12 @@ public class FileManager extends Application {
 
             String path;
             for(Id id : Id.values()) {
-                path = DATA_PATH + id.toString() + "/";
-                DATA_PATH_MAP.put(id, path);
+                path = DATA_PATH + "/" + id.toString();
+                DATA_PATH_MAP.put(id, path + "/");
                 new File(path).mkdir();
             }
+
+            Logger.i("FileManager", "Init complete");
         } catch (Exception e) {
             Logger.e("FileManager", e);
         }

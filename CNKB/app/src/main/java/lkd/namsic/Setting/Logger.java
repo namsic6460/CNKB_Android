@@ -1,5 +1,6 @@
 package lkd.namsic.Setting;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,9 @@ public class Logger {
     private static final int SAVE_COUNT = 100;
     private static int logCount = 0;
     private static String logs = "";
+
+    @SuppressLint("StaticFieldLeak")
+    public static MainActivity activity;
 
     public static void i(String title, String text) {
         log(title, text, "INFO");
@@ -51,10 +55,15 @@ public class Logger {
 
         String timeText = "\n[" + time.format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS")) + "]\n";
 
-        String logText = timeText + "[" + prefix + "] : " + title + " - " + text + "\n";
+        final String logText = timeText + "[" + prefix + "] : " + title + " - " + text + "\n";
         logs += logText;
 
-        MainActivity.textView.append(logText);
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MainActivity.textView.append(logText);
+            }
+        });
 
         logCount++;
         lastLogDay = time.getDayOfMonth();
@@ -65,7 +74,7 @@ public class Logger {
     }
 
     public static void saveLog(LocalDateTime date) {
-        String fileName = FileManager.LOG_PATH + "Log - " + date.format(DateTimeFormatter.BASIC_ISO_DATE) + ".txt";
+        String fileName = FileManager.LOG_PATH + "/Log - " + date.format(DateTimeFormatter.BASIC_ISO_DATE) + ".txt";
 
         FileManager.append(fileName, logs);
         logCount = 0;
