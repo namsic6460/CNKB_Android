@@ -3,6 +3,8 @@ package lkd.namsic.Setting;
 import android.app.Application;
 import android.os.Environment;
 
+import androidx.annotation.NonNull;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,9 +19,7 @@ public class FileManager extends Application {
     private final static String PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CNKB";
     public final static String LOG_PATH = PATH + "/logs/";
     public final static String DATA_PATH = PATH + "/data/";
-    public final static HashMap<Id, String> DATA_PATH_MAP = new HashMap<Id, String>(){{
-        put(Id.PLAYER, DATA_PATH + "players/");
-    }};
+    public final static HashMap<Id, String> DATA_PATH_MAP = new HashMap<>();
 
     @Override
     public void onCreate(){
@@ -62,7 +62,7 @@ public class FileManager extends Application {
         }
     }
 
-    public static void append(String path, String data) {
+    public static void append(String path, @NonNull String data) {
         String readData = read(path);
         if(!readData.equals("")) {
             data = readData + "\n" + data;
@@ -71,7 +71,7 @@ public class FileManager extends Application {
         save(path, data);
     }
 
-    public static void save(String path, String data) {
+    public static void save(String path, @NonNull String data) {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(path)));
             bufferedWriter.write(data);
