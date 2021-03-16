@@ -8,8 +8,8 @@ import lombok.Getter;
 @Getter
 public class Location {
 
-    private final LimitInteger x = new LimitInteger(0, Config.MIN_MAP_X, true, Config.MAX_MAP_X, true);
-    private final LimitInteger y = new LimitInteger(0, Config.MIN_MAP_Y, true, Config.MAX_MAP_Y, true);
+    private final LimitInteger x = new LimitInteger(0, Config.MIN_MAP_X, Config.MAX_MAP_X);
+    private final LimitInteger y = new LimitInteger(0, Config.MIN_MAP_Y, Config.MAX_MAP_Y);
 
     public Location() {}
 

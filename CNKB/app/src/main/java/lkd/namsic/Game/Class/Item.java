@@ -29,28 +29,22 @@ public class Item implements GameClass {
     @Setter(AccessLevel.PRIVATE)
     List<Map<Long, Integer>> recipe = new ArrayList<>();
 
-    @Setter(AccessLevel.PRIVATE)
-    Map<StatType, Integer> stat;
-
     protected Item() {}
 
     public Item(String name) {
         new Item(name, "", 1);
     }
 
-    public Item(String Name, String description, int handleLv) {
-        new Item(name, "", 1, null,
-                new ArrayList<Map<Long, Integer>>(), new HashMap<StatType, Integer>());
+    public Item(String name, String description, int handleLv) {
+        new Item(name, description, handleLv, null, new ArrayList<Map<Long, Integer>>());
     }
 
-    public Item(String name, String description, int handleLv, Use use,
-                List<Map<Long, Integer>> recipe, Map<StatType, Integer> stat) {
+    public Item(String name, String description, int handleLv, Use use, List<Map<Long, Integer>> recipe) {
         this.name = name;
         this.description = description;
-        this.handleLv = new LimitInteger(handleLv, Config.MIN_HANDLE_LV, true, Config.MAX_HANDLE_LV, true);
+        this.handleLv = new LimitInteger(handleLv, Config.MIN_HANDLE_LV, Config.MAX_HANDLE_LV);
         this.use = use;
         this.recipe = recipe;
-        this.stat = stat;
     }
 
     public void addRecipe(Map<Long, Integer> recipe) {

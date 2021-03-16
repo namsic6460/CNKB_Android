@@ -4,49 +4,40 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import lkd.namsic.Game.Exception.ValueRangeException;
+import lombok.Getter;
+import lombok.Setter;
 
 public class LimitDouble {
 
+    @Getter
+    @Setter
     private Double minValue;
-    private boolean throwMin;
-    private Double maxValue;
-    private boolean throwMax;
 
-    private Double value;
+    @Getter
+    @Setter
+    private Double maxValue;
+
+    private double value;
 
     public LimitDouble() {
-        new LimitDouble(null);
+        new LimitDouble(0);
     }
 
-    public LimitDouble(Double value) {
-        new LimitDouble(value, null, null);
+    public LimitDouble(double value) {
+        new LimitDouble(value, 0D, 0D);
     }
 
-    public LimitDouble(Double value, Double minValue, Double maxValue) {
-        new LimitDouble(value, minValue, false, maxValue, false);
-    }
-
-    public LimitDouble(Double value, Double minValue, boolean throwMin, Double maxValue, boolean throwMax) {
+    public LimitDouble(double value, @Nullable Double minValue, @Nullable Double maxValue) {
         if(minValue != null && maxValue != null && minValue > maxValue) {
             throw new RuntimeException("minValue can't be bigger than maxValue");
-        } else if(minValue == null && throwMin) {
-            throw new RuntimeException("throwMin can't be true if minValue is null");
-        } else if(maxValue == null && throwMax) {
-            throw new RuntimeException("throwMax can't be true if maxValue is null");
         }
 
         this.value = value;
         this.minValue = minValue;
-        this.throwMin = throwMin;
         this.maxValue = maxValue;
-        this.throwMax = throwMax;
     }
 
-    public Double get() {
-        if(value == null) {
-            return value;
-        }
-
+    public double get() {
         double returnValue = value;
 
         if(minValue != null && returnValue < minValue) {
@@ -58,13 +49,11 @@ public class LimitDouble {
         return returnValue;
     }
 
-    public void set(@Nullable Double setValue) {
-        if(setValue != null) {
-            if (minValue != null && setValue < minValue && throwMin) {
-                throw new ValueRangeException(this);
-            } else if (maxValue != null && setValue > maxValue && throwMax) {
-                throw new ValueRangeException(this);
-            }
+    public void set(double setValue) {
+        if (minValue != null && setValue < minValue) {
+            throw new ValueRangeException(this);
+        } else if (maxValue != null && setValue > maxValue) {
+            throw new ValueRangeException(this);
         }
 
         this.value = setValue;
@@ -73,8 +62,7 @@ public class LimitDouble {
     @NonNull
     @Override
     public String toString() {
-        return "Value: " + this.value + ", Min: " + this.minValue + "(" + this.throwMin +
-                "), Max: " + this.maxValue + "(" + this.throwMax + ")";
+        return "Value: " + this.value + ", Min: " + this.minValue + ", Max: " + this.maxValue ;
     }
 
 }
