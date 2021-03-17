@@ -55,14 +55,17 @@ public class Quest implements GameObject {
     Map<StatType, Integer> rewardStat;
     Map<Long, Integer> rewardCloseRate;
 
+    @Setter
+    long npcId;
+
     public Quest(@NonNull String name, boolean isRepeatable) {
-        new Quest(name, isRepeatable, Config.MIN_LV, Config.MAX_LV, new HashMap<Long, Integer>(), new HashMap<Long, Integer>(),
+        new Quest(name, isRepeatable, 0, Config.MIN_LV, Config.MAX_LV, new HashMap<Long, Integer>(), new HashMap<Long, Integer>(),
                 new HashMap<StatType, Integer>(), new HashMap<StatType, Integer>(), 0, 0, 0,
                 new HashMap<Long, Integer>(), new HashMap<StatType, Integer>(), new HashMap<Long, Integer>(), 0,
                 0, 0, new HashMap<Long, Integer>(), new HashMap<StatType, Integer>(), new HashMap<Long, Integer>());
     }
 
-    public Quest(@NonNull String name, boolean isRepeatable, int minLimitLv, int maxLimitLv,
+    public Quest(@NonNull String name, boolean isRepeatable, long npcId, int minLimitLv, int maxLimitLv,
                  @NonNull Map<Long, Integer> minLimitCloseRate, @NonNull Map<Long, Integer> maxLimitCloseRate,
                  @NonNull Map<StatType, Integer> minLimitStat, @NonNull Map<StatType, Integer> maxLimitStat,
                  int needMoney, int needExp, int needAdv, @NonNull Map<Long, Integer> needItem,
@@ -73,6 +76,8 @@ public class Quest implements GameObject {
 
         this.name = name;
         this.isRepeatable = isRepeatable;
+
+        this.npcId = npcId;
 
         this.limitLv.set(minLimitLv, maxLimitLv);
         this.limitCloseRate.set(minLimitCloseRate, maxLimitCloseRate);
