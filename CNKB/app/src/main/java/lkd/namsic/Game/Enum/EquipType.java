@@ -30,7 +30,7 @@ public enum EquipType {
     /**
      * 귀걸이 - 스텟 강화1
      */
-    EARING,
+    EARRING,
 
     /**
      * 목걸이 - 스텟 강화2

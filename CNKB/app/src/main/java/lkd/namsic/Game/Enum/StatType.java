@@ -17,6 +17,7 @@ public enum StatType {
     CD,
     SPD,
     EVA,
-    ACC
+    ACC,
+    ADV
 
 }

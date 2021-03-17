@@ -21,4 +21,8 @@ public class ValueRangeException extends RuntimeException {
         super(limitDouble.toString());
     }
 
+    public ValueRangeException(Object key, Integer minValue, Integer maxValue) {
+        super(key.toString() + ": {Min: " + minValue + ", Max: " + maxValue + "}");
+    }
+
 }

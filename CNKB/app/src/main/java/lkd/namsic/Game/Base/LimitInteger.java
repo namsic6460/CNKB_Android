@@ -11,44 +11,40 @@ public class LimitInteger {
 
     @Getter
     @Setter
-    private Integer minValue;
+    private Integer min;
 
     @Getter
     @Setter
-    private Integer maxValue;
+    private Integer max;
 
     private int value;
 
-    public LimitInteger() {
-        new LimitInteger(0, 0, 0);
-    }
-
-    public LimitInteger(int value, @Nullable Integer minValue, @Nullable Integer maxValue) {
-        if(minValue != null && maxValue != null && minValue > maxValue) {
+    public LimitInteger(int value, @Nullable Integer min, @Nullable Integer max) {
+        if(min != null && max != null && min > max) {
             throw new RuntimeException("minValue can't be bigger than maxValue");
         }
 
-        this.minValue = minValue;
-        this.maxValue = maxValue;
+        this.min = min;
+        this.max = max;
         this.set(value);
     }
 
     public int get() {
         int returnValue = value;
 
-        if(minValue != null && returnValue < minValue) {
-            returnValue = minValue;
-        } else if(maxValue != null && returnValue > maxValue) {
-            returnValue = maxValue;
+        if(min != null && returnValue < min) {
+            returnValue = min;
+        } else if(max != null && returnValue > max) {
+            returnValue = max;
         }
 
         return returnValue;
     }
 
     public void set(int setValue) {
-        if (minValue != null && setValue < minValue) {
+        if (min != null && setValue < min) {
             throw new ValueRangeException(this);
-        } else if (maxValue != null && setValue > maxValue) {
+        } else if (max != null && setValue > max) {
             throw new ValueRangeException(this);
         }
 
@@ -58,7 +54,7 @@ public class LimitInteger {
     @NonNull
     @Override
     public String toString() {
-        return "Value: " + this.value + ", Min: " + this.minValue + ", Max: " + this.maxValue;
+        return "Value: " + this.value + ", Min: " + this.min + ", Max: " + this.max;
     }
 
 }
