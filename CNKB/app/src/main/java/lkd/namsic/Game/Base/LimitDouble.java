@@ -20,11 +20,7 @@ public class LimitDouble {
     private double value;
 
     public LimitDouble() {
-        new LimitDouble(0);
-    }
-
-    public LimitDouble(double value) {
-        new LimitDouble(value, 0D, 0D);
+        new LimitDouble(0, 0D, 0D);
     }
 
     public LimitDouble(double value, @Nullable Double minValue, @Nullable Double maxValue) {
@@ -32,9 +28,9 @@ public class LimitDouble {
             throw new RuntimeException("minValue can't be bigger than maxValue");
         }
 
-        this.value = value;
         this.minValue = minValue;
         this.maxValue = maxValue;
+        this.set(value);
     }
 
     public double get() {
@@ -62,7 +58,7 @@ public class LimitDouble {
     @NonNull
     @Override
     public String toString() {
-        return "Value: " + this.value + ", Min: " + this.minValue + ", Max: " + this.maxValue ;
+        return "Value: " + this.value + ", Min: " + this.minValue + ", Max: " + this.maxValue;
     }
 
 }

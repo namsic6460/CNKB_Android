@@ -20,11 +20,7 @@ public class LimitInteger {
     private int value;
 
     public LimitInteger() {
-        new LimitInteger(0);
-    }
-
-    public LimitInteger(int value) {
-        new LimitInteger(value, 0, 0);
+        new LimitInteger(0, 0, 0);
     }
 
     public LimitInteger(int value, @Nullable Integer minValue, @Nullable Integer maxValue) {
@@ -32,9 +28,9 @@ public class LimitInteger {
             throw new RuntimeException("minValue can't be bigger than maxValue");
         }
 
-        this.value = value;
         this.minValue = minValue;
         this.maxValue = maxValue;
+        this.set(value);
     }
 
     public int get() {
@@ -62,7 +58,7 @@ public class LimitInteger {
     @NonNull
     @Override
     public String toString() {
-        return "Value: " + this.value + ", Min: " + this.minValue + ", Max: " + this.maxValue ;
+        return "Value: " + this.value + ", Min: " + this.minValue + ", Max: " + this.maxValue;
     }
 
 }
