@@ -15,7 +15,6 @@ import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lkd.namsic.Game.Exception.ValueRangeException;
-import lkd.namsic.Setting.FileManager;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,9 +25,11 @@ public class Equipment extends Item {
     @NonNull
     EquipType equipType;
 
-    LimitInteger reinforceCount;
-    LimitInteger limitLv;
-    LimitInteger lvDown;
+    LimitInteger reinforceCount = new LimitInteger(Config.MIN_REINFORCE_COUNT, Config.MIN_REINFORCE_COUNT, Config.MAX_REINFORCE_COUNT);
+    LimitInteger limitLv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
+
+    @Setter
+    int lvDown = 0;
 
     Map<StatType, Integer> limitStat;
     Map<StatType, Integer> basicStat;
@@ -55,14 +56,27 @@ public class Equipment extends Item {
                      int limitLv, int lvDown, @NonNull Map<StatType, Integer> limitStat,
                      @NonNull Map<StatType, Integer> basicStat, @NonNull Map<StatType, Integer> reinforceStat) {
         super(name, description, handleLv, use, recipe);
+        this.id.setId(Id.EQUIPMENT);
 
         this.equipType = equipType;
         this.reinforceCount.setMaxValue(maxReinforceCount);
         this.reinforceCount.set(reinforceCount);
         this.limitLv.set(limitLv);
-        this.lvDown.set(lvDown);
+        this.lvDown = lvDown;
         this.setLimitStat(limitStat);
         this.setBasicStat(basicStat).setReinforceStat(reinforceStat).revalidateStat();
+    }
+
+    public int getTotalLimitLv() {
+        int lvDown = this.limitLv.get() - this.lvDown;
+
+        if(lvDown < Config.MIN_LV) {
+            lvDown = Config.MIN_LV;
+        } else if(lvDown > Config.MAX_LV) {
+            lvDown = Config.MAX_LV;
+        }
+
+        return lvDown;
     }
 
     public void setLimitStat(@NonNull Map<StatType, Integer> limitStat) {
@@ -190,12 +204,6 @@ public class Equipment extends Item {
 
             this.stat.put(statType, this.getBasicStat(statType) + this.getReinforceStat(statType));
         }
-    }
-
-    @Override
-    @NonNull
-    public String getPath() {
-        return FileManager.DATA_PATH_MAP.get(Id.EQUIPMENT) + this.id + ".txt";
     }
 
 }

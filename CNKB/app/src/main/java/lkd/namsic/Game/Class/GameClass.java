@@ -1,14 +1,11 @@
 package lkd.namsic.Game.Class;
 
-import androidx.annotation.NonNull;
-
 import java.io.Serializable;
 
-public interface GameClass extends Serializable {
+import lkd.namsic.Game.Base.IdClass;
 
-    long id = 0;
+public interface GameClass extends Serializable, Cloneable {
 
-    @NonNull
-    String getPath();
+    IdClass id = new IdClass();
 
 }

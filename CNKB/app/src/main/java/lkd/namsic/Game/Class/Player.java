@@ -7,10 +7,10 @@ import lkd.namsic.Setting.FileManager;
 
 public class Player implements Entity {
 
-    @Override
     @NonNull
+    @Override
     public String getPath() {
-        return FileManager.DATA_PATH_MAP.get(Id.PLAYER) + this.id + ".txt";
+        return FileManager.DATA_PATH_MAP.get(Id.PLAYER) + this.objectId + ".txt";
     }
 
 }

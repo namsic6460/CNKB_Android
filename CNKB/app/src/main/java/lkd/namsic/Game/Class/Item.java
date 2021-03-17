@@ -11,7 +11,6 @@ import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Exception.ListAddFailedException;
-import lkd.namsic.Setting.FileManager;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,6 +46,8 @@ public class Item implements GameClass {
 
     public Item(@NonNull String name, @NonNull String description, int handleLv,
                 @Nullable Use use, @NonNull List<Map<Long, Integer>> recipe) {
+        this.id.setId(Id.ITEM);
+
         this.name = name;
         this.description = description;
         this.handleLv.set(handleLv);
@@ -71,12 +72,6 @@ public class Item implements GameClass {
         }
 
         this.recipe.add(recipe);
-    }
-
-    @Override
-    @NonNull
-    public String getPath() {
-        return FileManager.DATA_PATH_MAP.get(Id.ITEM) + this.id + ".txt";
     }
 
 }
