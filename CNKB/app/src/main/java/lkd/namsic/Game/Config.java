@@ -11,18 +11,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.AbstractMap;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.Game.Class.GameClass;
+import lkd.namsic.Game.Class.GameObject;
 import lkd.namsic.Game.Enum.Id;
+import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Setting.FileManager;
 import lkd.namsic.Setting.Logger;
 
 public class Config {
 
-    public static final Map<Id, Map<Long, GameClass>> CURRENT_OBJECT = new ConcurrentHashMap<>();
+    public static final Map<Id, Map<Long, GameObject>> CURRENT_OBJECT = new ConcurrentHashMap<>();
     public static final Map<Id, Map<Long, Long>> CURRENT_OBJECT_COUNT = new ConcurrentHashMap<>();
     public static final Map<Id, Long> ID_MAP = new ConcurrentHashMap<>();
 
@@ -44,7 +47,7 @@ public class Config {
         }
 
         for(Id id : Id.values()) {
-            CURRENT_OBJECT.put(id, new ConcurrentHashMap<Long, GameClass>());
+            CURRENT_OBJECT.put(id, new ConcurrentHashMap<Long, GameObject>());
             CURRENT_OBJECT_COUNT.put(id, new ConcurrentHashMap<Long, Long>());
             ID_MAP.put(id, 1L);
         }
@@ -72,12 +75,30 @@ public class Config {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
+    public static <T extends GameObject> T newObject(@NonNull T t) {
+        Id id = t.id.getId();
+        long objectId = ID_MAP.get(id);
+
+        t.id.setObjectId(objectId);
+        ID_MAP.put(id, objectId + 1);
+
+        return t;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public static void checkId(Id id, long objectId) throws NumberRangeException {
+        if(objectId < 1 || ID_MAP.get(id) < objectId) {
+            throw new NumberRangeException(objectId, 1, ID_MAP.get(id));
+        }
+    }
+
     @Nullable
-    public static <T extends GameClass> String serialize(@NonNull T t) {
+    public static String serialize(@NonNull GameObject gameObject) {
         byte[] serialized;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(t);
+            oos.writeObject(gameObject);
             serialized = baos.toByteArray();
         } catch (IOException e) {
             Logger.e("serialize", e);
@@ -88,7 +109,7 @@ public class Config {
     }
 
     @Nullable
-    public static <T extends GameClass> T deserialize(String byteStr) {
+    public static <T extends GameObject> T deserialize(String byteStr) {
         byte[] serialized = Base64.getDecoder().decode(byteStr);
         try (ByteArrayInputStream bais = new ByteArrayInputStream(serialized)) {
             ObjectInputStream ois = new ObjectInputStream(bais);
@@ -100,15 +121,16 @@ public class Config {
         }
     }
 
-    public static <T extends GameClass> void saveObject(T t) {
-        Id id = t.id.getId();
-        long objectId = t.id.getObjectId();
+    @SuppressWarnings("ConstantConditions")
+    public static void saveObject(GameObject gameObject) {
+        Id id = gameObject.id.getId();
+        long objectId = gameObject.id.getObjectId();
         Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
 
         if(objectCount != 1) {
             CURRENT_OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
         } else {
-            String serialized = serialize(t);
+            String serialized = serialize(gameObject);
             String path = getPath(id, objectId);
             if (serialized == null) {
                 Logger.e("saveObject", new RuntimeException("Failed to save object - " + path));
@@ -121,8 +143,9 @@ public class Config {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Nullable
-    public static <T extends GameClass> T getObject(Id id, long objectId) {
+    public static <T extends GameObject> T getObject(Id id, long objectId) {
         Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
 
         if(objectCount == null) {
@@ -142,8 +165,57 @@ public class Config {
         }
     }
 
+    @NonNull
+    public static String mapsToString(@NonNull Map<?, ?> map1, @NonNull Map<?, ?> map2) {
+        String str1, str2;
+
+        if(map1 instanceof AbstractMap) {
+            str1 = map1.toString();
+        } else {
+            str1 = new HashMap<>(map1).toString();
+        }
+
+        if(map2 instanceof AbstractMap) {
+            str2 = map2.toString();
+        } else {
+            str2 = new HashMap<>(map2).toString();
+        }
+
+        return str1 + ", " + str2;
+    }
+
+    public static <T> boolean compareMap(Map<T, Integer> map1, Map<T, Integer> map2, boolean firstIsBig) {
+        Integer value;
+        for(Map.Entry<T, Integer> entry : map1.entrySet()) {
+            if((value = map2.get(entry.getKey())) != null) {
+                if(firstIsBig) {
+                    if(entry.getValue() < value) {
+                        return false;
+                    }
+                } else if(entry.getValue() > value) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     private static String getPath(Id id, long objectId) {
         return FileManager.DATA_PATH_MAP.get(id) + objectId + ".txt";
+    }
+
+    public static String errorString(Throwable throwable) {
+        StringBuilder builder = new StringBuilder(throwable.getClass().getName());
+        builder.append(": ");
+        builder.append(throwable.getMessage());
+        builder.append("\n");
+        for(StackTraceElement element : throwable.getStackTrace()) {
+            builder.append("\tat");
+            builder.append(element.toString());
+        }
+
+        return builder.toString();
     }
 
 }

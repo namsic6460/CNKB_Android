@@ -3,7 +3,7 @@ package lkd.namsic.Game.Base;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import lkd.namsic.Game.Exception.ValueRangeException;
+import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -43,9 +43,9 @@ public class LimitDouble {
 
     public void set(double setValue) {
         if (min != null && setValue < min) {
-            throw new ValueRangeException(this);
+            throw new NumberRangeException(this);
         } else if (max != null && setValue > max) {
-            throw new ValueRangeException(this);
+            throw new NumberRangeException(this);
         }
 
         this.value = setValue;

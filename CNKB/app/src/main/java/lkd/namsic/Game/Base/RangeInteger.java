@@ -19,4 +19,9 @@ public class RangeInteger {
         return value >= this.min && value <= this.max;
     }
 
+    public void set(int min, int max) {
+        this.min = min;
+        this.max = max;
+    }
+
 }
