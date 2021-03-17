@@ -1,5 +1,5 @@
 package lkd.namsic.Game.Class;
 
-public class Skill implements GameClass {
+public class Skill implements GameObject {
 
 }

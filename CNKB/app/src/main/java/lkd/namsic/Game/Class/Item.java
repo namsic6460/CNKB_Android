@@ -11,28 +11,27 @@ import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Exception.ListAddFailedException;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
-public class Item implements GameClass {
+public class Item implements GameObject {
 
+    @Setter
     @NonNull
     String name;
 
+    @Setter
     @NonNull
-    String description = "";
+    String description;
 
+    @Setter
     @Nullable
-    Use use = null;
+    Use use;
 
-    @Setter(AccessLevel.PRIVATE)
     LimitInteger handleLv = new LimitInteger(Config.MIN_HANDLE_LV, Config.MIN_HANDLE_LV, Config.MAX_HANDLE_LV);
 
-    @Setter(AccessLevel.PRIVATE)
-    List<Map<Long, Integer>> recipe = new ArrayList<>();
+    List<Map<Long, Integer>> recipe;
 
     protected Item() {}
 
@@ -56,11 +55,11 @@ public class Item implements GameClass {
     }
 
     public void addRecipe(@NonNull Map<Long, Integer> recipe) {
-        Integer value;
+        int value;
         for(Map.Entry<Long, Integer> entry : recipe.entrySet()) {
             value = entry.getValue();
 
-            if(value == null || value < 1) {
+            if(value < 1) {
                 throw new ListAddFailedException("Recipe count cannot lower than 1 - " + entry.getKey() + ", " + value);
             }
         }

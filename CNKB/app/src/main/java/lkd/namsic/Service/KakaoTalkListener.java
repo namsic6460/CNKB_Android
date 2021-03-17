@@ -62,14 +62,19 @@ public class KakaoTalkListener extends NotificationListenerService {
 
 
     private void onChat(final String sender, final String msg, final String room, final boolean isGroupChat, final Notification.Action session) {
+        sessions.put(room, session);
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Logger.i("chatLog", "sender : " + sender + "\nmsg : " + msg + "\nroom : " + room + "\nisGroupChat : " + isGroupChat);
-                sessions.put(room, session);
+                try {
+                    Logger.i("chatLog", "sender : " + sender + "\nmsg : " + msg + "\nroom : " + room + "\nisGroupChat : " + isGroupChat);
 
-                if(msg.equals("namsicTest")) {
-                    reply(session, "reply");
+                    if (msg.equals("namsicTest")) {
+                        reply(session, "reply");
+                    }
+                } catch (Exception e) {
+                    Logger.e("onChat", e);
                 }
             }
         });
@@ -91,6 +96,12 @@ public class KakaoTalkListener extends NotificationListenerService {
             session.actionIntent.send(this, 0, intent);
         } catch (PendingIntent.CanceledException e) {
             Logger.e("KakaoTalkListener", e);
+        }
+    }
+
+    private void replyAll(String msg) {
+        for(Notification.Action session : sessions.values()) {
+            reply(session, msg);
         }
     }
 

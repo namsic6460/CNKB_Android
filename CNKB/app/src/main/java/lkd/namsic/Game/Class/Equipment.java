@@ -13,8 +13,9 @@ import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.EquipType;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
+import lkd.namsic.Game.Exception.MapSetterException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
-import lkd.namsic.Game.Exception.ValueRangeException;
+import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -59,7 +60,7 @@ public class Equipment extends Item {
         this.id.setId(Id.EQUIPMENT);
 
         this.equipType = equipType;
-        this.reinforceCount.setMaxValue(maxReinforceCount);
+        this.reinforceCount.setMax(maxReinforceCount);
         this.reinforceCount.set(reinforceCount);
         this.limitLv.set(limitLv);
         this.lvDown = lvDown;
@@ -88,7 +89,7 @@ public class Equipment extends Item {
             }
         } catch (Exception e) {
             this.limitStat = copy;
-            throw e;
+            throw new MapSetterException(copy, limitStat, e);
         }
     }
 
@@ -98,7 +99,7 @@ public class Equipment extends Item {
         }
 
         if(stat < 0) {
-            throw new ValueRangeException(stat, 0, Integer.MAX_VALUE);
+            throw new NumberRangeException(stat, 0);
         }
 
         if(stat == 0) {
@@ -127,7 +128,7 @@ public class Equipment extends Item {
             }
         } catch (Exception e) {
             this.basicStat = copy;
-            throw e;
+            throw new MapSetterException(copy, basicStat, e);
         }
 
         return this;
@@ -166,7 +167,7 @@ public class Equipment extends Item {
             }
         } catch (Exception e) {
             this.basicStat = copy;
-            throw e;
+            throw new MapSetterException(copy, reinforceStat, e);
         }
 
         return this;

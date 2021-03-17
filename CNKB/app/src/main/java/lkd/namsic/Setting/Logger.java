@@ -6,6 +6,7 @@ import android.util.Log;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import lkd.namsic.Game.Config;
 import lkd.namsic.MainActivity;
 
 public class Logger {
@@ -15,8 +16,8 @@ public class Logger {
     public static Integer lastLogDay = null;
 
     private static final int SAVE_COUNT = 100;
-    private static int logCount = 0;
-    private static String logs = "";
+    static int logCount = 0;
+    static String logs = "";
 
     @SuppressLint("StaticFieldLeak")
     public static MainActivity activity;
@@ -32,17 +33,11 @@ public class Logger {
     }
 
     public static void e(String title, Throwable e) {
-        StringBuilder builder = new StringBuilder(e.getClass().getName());
-        builder.append(": ");
-        builder.append(e.getMessage());
-        builder.append("\n");
-        for(StackTraceElement element : e.getStackTrace()) {
-           builder.append("\tat");
-           builder.append(element.toString());
-        }
+        String errorString = Config.errorString(e);
+        log(title, errorString, "ERR");
+        Log.e(title, errorString);
 
-        log(title, builder.toString(), "ERR");
-        Log.e(title, builder.toString());
+        MainActivity.toast("ERROR!\n" + e.getMessage());
     }
 
     private static void log(String title, String text, String prefix) {
@@ -74,13 +69,15 @@ public class Logger {
     }
 
     public static void saveLog(LocalDateTime date) {
-        String fileName = FileManager.LOG_PATH + "/Log - " + date.format(DateTimeFormatter.BASIC_ISO_DATE) + ".txt";
+        if(!logs.equals("")) {
+            String fileName = FileManager.LOG_PATH + "/Log - " + date.format(DateTimeFormatter.BASIC_ISO_DATE) + ".txt";
+            FileManager.append(fileName, logs);
 
-        FileManager.append(fileName, logs);
+            MainActivity.toast("로그 저장 완료 - " + fileName);
+        }
+
         logCount = 0;
         logs = "";
-
-        MainActivity.toast("로그 저장 완료 - " + fileName);
     }
 
 }
