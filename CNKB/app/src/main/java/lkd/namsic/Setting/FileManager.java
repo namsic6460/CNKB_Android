@@ -25,7 +25,7 @@ public class FileManager extends Application {
     public final static HashMap<Id, String> DATA_PATH_MAP = new HashMap<>();
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
     }
 
@@ -38,7 +38,7 @@ public class FileManager extends Application {
             new File(DATA_PATH).mkdir();
 
             String path;
-            for(Id id : Id.values()) {
+            for (Id id : Id.values()) {
                 path = DATA_PATH + "/" + id.toString();
                 DATA_PATH_MAP.put(id, path + "/");
                 new File(path).mkdir();
@@ -46,8 +46,7 @@ public class FileManager extends Application {
 
             String filePath = PATH + "/" + "config.json";
             String config = read(filePath);
-            Logger.i("test", config);
-            if(config.equals("")) {
+            if (config.equals("")) {
                 JSONObject configObject = Config.createConfig();
                 save(filePath, configObject.toString());
             } else {
@@ -69,7 +68,7 @@ public class FileManager extends Application {
             }
 
             BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            char[] c = new char[(int)file.length()];
+            char[] c = new char[(int) file.length()];
             bufferedReader.read(c);
             return new String(c);
         } catch (Exception e) {
@@ -80,7 +79,7 @@ public class FileManager extends Application {
 
     public static void append(String path, @NonNull String data) {
         String readData = read(path);
-        if(!readData.equals("")) {
+        if (!readData.equals("")) {
             data = readData + "\n" + data;
         }
 
@@ -98,11 +97,11 @@ public class FileManager extends Application {
         }
     }
 
-    public static void delete(String path){
+    public static void delete(String path) {
         try {
             File file = new File(path);
-            if(file.exists()) {
-                if(file.delete()) {
+            if (file.exists()) {
+                if (file.delete()) {
                     Logger.i("FileManager", "delete - " + path);
                 } else {
                     throw new Exception("Failed to delete file - " + path);

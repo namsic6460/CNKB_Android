@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import lkd.namsic.Game.Config;
 import lkd.namsic.Setting.FileManager;
 import lkd.namsic.Service.ForcedTerminationService;
 import lkd.namsic.Setting.Logger;
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         context = this;
         switchBtn = findViewById(R.id.switchBtn);
 
+        Config.init();
         FileManager.initDir();
         threadCleaner.scheduleAtFixedRate(new TimerTask() {
             @Override

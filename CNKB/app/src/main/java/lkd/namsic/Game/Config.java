@@ -22,6 +22,8 @@ import lkd.namsic.Setting.Logger;
 
 public class Config {
 
+    public static final Map<Id, Map<Long, GameClass>> CURRENT_OBJECT = new ConcurrentHashMap<>();
+    public static final Map<Id, Map<Long, Long>> CURRENT_OBJECT_COUNT = new ConcurrentHashMap<>();
     public static final Map<Id, Long> ID_MAP = new ConcurrentHashMap<>();
 
     public static final int MIN_MAP_X = 0;
@@ -36,12 +38,23 @@ public class Config {
     public static final int MIN_LV = 1;
     public static final int MAX_LV = 999;
 
+    public static void init() {
+        if(!CURRENT_OBJECT.isEmpty()) {
+            return;
+        }
+
+        for(Id id : Id.values()) {
+            CURRENT_OBJECT.put(id, new ConcurrentHashMap<Long, GameClass>());
+            CURRENT_OBJECT_COUNT.put(id, new ConcurrentHashMap<Long, Long>());
+            ID_MAP.put(id, 1L);
+        }
+    }
+
     public static JSONObject createConfig() throws JSONException {
         JSONObject jsonObject = new JSONObject();
 
         JSONObject idObject = new JSONObject();
         for(Id id : Id.values()) {
-            ID_MAP.put(id, 1L);
             idObject.put(id.toString(), 1L);
         }
         jsonObject.put("id", idObject);
@@ -88,24 +101,49 @@ public class Config {
     }
 
     public static <T extends GameClass> void saveObject(T t) {
-        String serialized = serialize(t);
-        if(serialized == null) {
-            Logger.e("saveObject", new RuntimeException("Failed to save object - " + t.getPath()));
-            return;
-        }
+        Id id = t.id.getId();
+        long objectId = t.id.getObjectId();
+        Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
 
-        FileManager.save(t.getPath(), serialized);
+        if(objectCount != 1) {
+            CURRENT_OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
+        } else {
+            String serialized = serialize(t);
+            String path = getPath(id, objectId);
+            if (serialized == null) {
+                Logger.e("saveObject", new RuntimeException("Failed to save object - " + path));
+                return;
+            }
+
+            FileManager.save(path, serialized);
+            CURRENT_OBJECT.get(id).remove(objectId);
+            CURRENT_OBJECT_COUNT.get(id).remove(objectId);
+        }
     }
 
     @Nullable
     public static <T extends GameClass> T getObject(Id id, long objectId) {
-        String serialized = FileManager.read(FileManager.DATA_PATH_MAP.get(id) + objectId + ".txt");
-        if(serialized.equals("")) {
-            Logger.e("getObject", new RuntimeException("Failed to get object - " + id + ", " + objectId));
-            return null;
-        }
+        Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
 
-        return deserialize(serialized);
+        if(objectCount == null) {
+            String serialized = FileManager.read(getPath(id, objectId));
+            if (serialized.equals("")) {
+                Logger.e("getObject", new RuntimeException("Failed to get object - " + id + ", " + objectId));
+                return null;
+            }
+
+            T t = deserialize(serialized);
+            CURRENT_OBJECT.get(id).put(objectId, t);
+            CURRENT_OBJECT_COUNT.get(id).put(objectId, 1L);
+            return t;
+        } else {
+            CURRENT_OBJECT_COUNT.get(id).put(objectId, objectCount + 1);
+            return (T) CURRENT_OBJECT.get(id).get(objectId);
+        }
+    }
+
+    private static String getPath(Id id, long objectId) {
+        return FileManager.DATA_PATH_MAP.get(id) + objectId + ".txt";
     }
 
 }
