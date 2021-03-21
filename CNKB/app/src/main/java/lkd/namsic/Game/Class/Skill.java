@@ -20,7 +20,7 @@ public class Skill implements GameObject {
     String name;
 
     @Setter
-    boolean isPassive = false;
+    boolean isPassive;
 
     @Nullable
     @Setter

@@ -54,6 +54,12 @@ public class Item implements GameObject {
         this.recipe = recipe;
     }
 
+    public void addRecipe(@NonNull List<Map<Long, Integer>> recipe) {
+        List<Map<Long, Integer>> copy = new ArrayList<>(recipe);
+
+
+    }
+
     public void addRecipe(@NonNull Map<Long, Integer> recipe) {
         int value;
         for(Map.Entry<Long, Integer> entry : recipe.entrySet()) {

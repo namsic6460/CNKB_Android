@@ -5,6 +5,9 @@ import androidx.annotation.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
+import lkd.namsic.Game.Base.LimitId;
+import lkd.namsic.Game.Base.LimitInteger;
+import lkd.namsic.Game.Base.LimitLong;
 import lkd.namsic.Game.Base.RangeInteger;
 import lkd.namsic.Game.Base.RangeIntegerMap;
 import lkd.namsic.Game.Config;
@@ -33,30 +36,23 @@ public class Quest implements GameObject {
             new HashMap<StatType, Integer>(), new HashMap<StatType, Integer>()
     );
 
-    @Setter
-    int needMoney;
-    @Setter
-    int needExp;
-    @Setter
-    int needAdv;
+    LimitLong needMoney = new LimitLong(0, null, Long.MAX_VALUE);
+    LimitInteger needExp = new LimitInteger(0, null, Integer.MAX_VALUE);
+    LimitInteger needAdv = new LimitInteger(0, null, Integer.MAX_VALUE);
 
     Map<Long, Integer> needItem;
     Map<StatType, Integer> needStat;
     Map<Long, Integer> needCloseRate;
 
-    @Setter
-    int rewardMoney;
-    @Setter
-    int rewardExp;
-    @Setter
-    int rewardAdv;
+    LimitLong rewardMoney = new LimitLong(0, null, Long.MAX_VALUE);
+    LimitInteger rewardExp = new LimitInteger(0, null, Integer.MAX_VALUE);
+    LimitInteger rewardAdv = new LimitInteger(0, null, Integer.MAX_VALUE);
 
     Map<Long, Integer> rewardItem;
     Map<StatType, Integer> rewardStat;
     Map<Long, Integer> rewardCloseRate;
 
-    @Setter
-    long npcId;
+    LimitId npcId = new LimitId(0, Id.NPC);
 
     public Quest(@NonNull String name, boolean isRepeatable) {
         new Quest(name, isRepeatable, 0, Config.MIN_LV, Config.MAX_LV, new HashMap<Long, Integer>(), new HashMap<Long, Integer>(),
@@ -68,31 +64,31 @@ public class Quest implements GameObject {
     public Quest(@NonNull String name, boolean isRepeatable, long npcId, int minLimitLv, int maxLimitLv,
                  @NonNull Map<Long, Integer> minLimitCloseRate, @NonNull Map<Long, Integer> maxLimitCloseRate,
                  @NonNull Map<StatType, Integer> minLimitStat, @NonNull Map<StatType, Integer> maxLimitStat,
-                 int needMoney, int needExp, int needAdv, @NonNull Map<Long, Integer> needItem,
+                 long needMoney, int needExp, int needAdv, @NonNull Map<Long, Integer> needItem,
                  @NonNull Map<StatType, Integer> needStat, @NonNull Map<Long, Integer> needCloseRate,
-                 int rewardMoney, int rewardExp, int rewardAdv, @NonNull Map<Long, Integer> rewardItem,
+                 long rewardMoney, int rewardExp, int rewardAdv, @NonNull Map<Long, Integer> rewardItem,
                  @NonNull Map<StatType, Integer> rewardStat, @NonNull Map<Long, Integer> rewardCloseRate) {
         this.id.setId(Id.QUEST);
 
         this.name = name;
         this.isRepeatable = isRepeatable;
 
-        this.npcId = npcId;
+        this.npcId.set(npcId);
 
         this.limitLv.set(minLimitLv, maxLimitLv);
         this.limitCloseRate.set(minLimitCloseRate, maxLimitCloseRate);
         this.limitStat.set(minLimitStat, maxLimitStat);
 
-        this.needMoney = needMoney;
-        this.needExp = needExp;
-        this.needAdv = needAdv;
+        this.needMoney.set(needMoney);
+        this.needExp.set(needExp);
+        this.needAdv.set(needAdv);
         this.setNeedItem(needItem);
         this.setNeedStat(needStat);
         this.setNeedCloseRate(needCloseRate);
 
-        this.rewardMoney = rewardMoney;
-        this.rewardExp = rewardExp;
-        this.rewardAdv = rewardAdv;
+        this.rewardMoney.set(rewardMoney);
+        this.rewardExp.set(rewardExp);
+        this.rewardAdv.set(rewardAdv);
         this.setRewardItem(rewardItem);
         this.setRewardStat(rewardStat);
         this.setRewardCloseRate(rewardCloseRate);
