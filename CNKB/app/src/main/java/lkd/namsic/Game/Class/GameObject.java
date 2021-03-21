@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import lkd.namsic.Game.Base.IdClass;
 
-public interface GameObject extends Serializable, Cloneable {
+public interface GameObject extends Serializable {
 
     IdClass id = new IdClass();
 

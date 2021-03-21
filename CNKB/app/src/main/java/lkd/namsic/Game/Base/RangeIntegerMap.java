@@ -2,6 +2,7 @@ package lkd.namsic.Game.Base;
 
 import androidx.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import lkd.namsic.Game.Config;
@@ -9,7 +10,7 @@ import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 
 @Getter
-public class RangeIntegerMap<T> {
+public class RangeIntegerMap<T> implements Serializable {
 
     @NonNull
     Map<T, Integer> min;

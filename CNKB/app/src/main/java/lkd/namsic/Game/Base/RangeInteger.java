@@ -1,11 +1,13 @@
 package lkd.namsic.Game.Base;
 
+import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class RangeInteger {
+public class RangeInteger implements Serializable {
 
     int min;
     int max;
