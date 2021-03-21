@@ -11,9 +11,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.AbstractCollection;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -179,6 +182,24 @@ public class Config {
             str2 = map2.toString();
         } else {
             str2 = new HashMap<>(map2).toString();
+        }
+
+        return str1 + ", " + str2;
+    }
+
+    public static String listsToString(List<?> list1, List<?> list2) {
+        String str1, str2;
+
+        if(list1 instanceof AbstractCollection) {
+            str1 = list1.toString();
+        } else {
+            str1 = new ArrayList<>(list1).toString();
+        }
+
+        if(list2 instanceof AbstractCollection) {
+            str2 = list2.toString();
+        } else {
+            str2 = new ArrayList<>(list2).toString();
         }
 
         return str1 + ", " + str2;
