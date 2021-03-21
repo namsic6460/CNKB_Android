@@ -7,19 +7,19 @@ import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
 
-public class LimitDouble {
+public class LimitLong implements LimitClass<Long> {
 
     @Getter
     @Setter
-    private Double min;
+    private Long min;
 
     @Getter
     @Setter
-    private Double max;
+    private Long max;
 
-    private double value;
+    private long value;
 
-    public LimitDouble(double value, @Nullable Double min, @Nullable Double max) {
+    public LimitLong(long value, @Nullable Long min, @Nullable Long max) {
         if(min != null && max != null && min > max) {
             throw new RuntimeException("minValue can't be bigger than maxValue");
         }
@@ -29,19 +29,14 @@ public class LimitDouble {
         this.set(value);
     }
 
-    public double get() {
-        double returnValue = value;
-
-        if(min != null && returnValue < min) {
-            returnValue = min;
-        } else if(max != null && returnValue > max) {
-            returnValue = max;
-        }
-
-        return returnValue;
+    @NonNull
+    @Override
+    public Long get() {
+        return this.value;
     }
 
-    public void set(double setValue) {
+    @Override
+    public void set(@NonNull Long setValue) {
         if (min != null && setValue < min) {
             throw new NumberRangeException(this);
         } else if (max != null && setValue > max) {
@@ -54,7 +49,7 @@ public class LimitDouble {
     @NonNull
     @Override
     public String toString() {
-        return "Value: " + this.value + ", Min: " + this.min + ", Max: " + this.max;
+        return "Value: " + this.value + "L, Min: " + this.min + "L, Max: " + this.max + "L";
     }
 
 }

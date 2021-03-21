@@ -7,7 +7,7 @@ import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
 
-public class LimitInteger {
+public class LimitInteger implements LimitClass<Integer> {
 
     @Getter
     @Setter
@@ -29,19 +29,14 @@ public class LimitInteger {
         this.set(value);
     }
 
-    public int get() {
-        int returnValue = value;
-
-        if(min != null && returnValue < min) {
-            returnValue = min;
-        } else if(max != null && returnValue > max) {
-            returnValue = max;
-        }
-
-        return returnValue;
+    @NonNull
+    @Override
+    public Integer get() {
+        return this.value;
     }
 
-    public void set(int setValue) {
+    @Override
+    public void set(@NonNull Integer setValue) {
         if (min != null && setValue < min) {
             throw new NumberRangeException(this);
         } else if (max != null && setValue > max) {
