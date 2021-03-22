@@ -14,8 +14,10 @@ import lkd.namsic.Game.Enum.WaitResponse;
 import lkd.namsic.Game.Exception.MapSetterException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class Chat implements GameObject {
 
     LimitLong pauseTime = new LimitLong(0, 0L, Long.MAX_VALUE);

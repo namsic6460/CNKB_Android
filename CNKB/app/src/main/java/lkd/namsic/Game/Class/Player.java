@@ -1,16 +1,10 @@
 package lkd.namsic.Game.Class;
 
-import androidx.annotation.NonNull;
+import lombok.ToString;
 
-import lkd.namsic.Game.Enum.Id;
-import lkd.namsic.Setting.FileManager;
-
+@ToString
 public class Player implements Entity {
 
-    @NonNull
-    @Override
-    public String getPath() {
-        return FileManager.DATA_PATH_MAP.get(Id.PLAYER) + this.objectId + ".txt";
-    }
+
 
 }

@@ -17,8 +17,10 @@ import lkd.namsic.Game.Exception.MapSetterException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class Quest implements GameObject {
 
     @Setter

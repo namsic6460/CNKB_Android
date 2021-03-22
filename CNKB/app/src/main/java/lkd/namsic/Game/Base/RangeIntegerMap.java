@@ -30,7 +30,7 @@ public class RangeIntegerMap<T> implements Serializable {
         this.max = max;
     }
 
-    private void checkKeys(Map<T, Integer> min, Map<T, Integer> max) {
+    private void checkKeys(@NonNull Map<T, Integer> min, @NonNull Map<T, Integer> max) {
         for(T t : min.keySet()) {
             if(t instanceof StatType) {
                 Config.checkStatType((StatType) t);

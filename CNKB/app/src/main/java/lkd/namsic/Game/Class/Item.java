@@ -13,8 +13,10 @@ import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Exception.ListAddFailedException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class Item implements GameObject {
 
     @Setter

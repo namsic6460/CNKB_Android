@@ -18,8 +18,10 @@ import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class Equipment extends Item {
 
     @Setter
