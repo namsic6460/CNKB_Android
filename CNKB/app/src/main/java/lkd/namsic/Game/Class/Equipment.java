@@ -14,8 +14,8 @@ import lkd.namsic.Game.Enum.EquipType;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Exception.MapSetterException;
-import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lkd.namsic.Game.Exception.NumberRangeException;
+import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -94,9 +94,7 @@ public class Equipment extends Item {
     }
 
     public void setLimitStat(@NonNull StatType statType, int stat) {
-        if(statType.equals(StatType.MAXHP) || statType.equals(StatType.MAXMN)) {
-            throw new UnhandledEnumException(statType);
-        }
+        Config.checkStatType(statType);
 
         if(stat < 0) {
             throw new NumberRangeException(stat, 0);
@@ -110,6 +108,7 @@ public class Equipment extends Item {
     }
 
     public int getLimitStat(@NonNull StatType statType) {
+        Config.checkStatType(statType);
         Integer value = this.limitStat.get(statType);
 
         if(value == null) {
@@ -135,9 +134,7 @@ public class Equipment extends Item {
     }
 
     public Equipment setBasicStat(@NonNull StatType statType, int stat) {
-        if(statType.equals(StatType.MAXHP) || statType.equals(StatType.MAXMN)) {
-            throw new UnhandledEnumException(statType);
-        }
+        Config.checkStatType(statType);
 
         if(stat == 0) {
             this.basicStat.remove(statType);
@@ -149,6 +146,7 @@ public class Equipment extends Item {
     }
 
     public int getBasicStat(@NonNull StatType statType) {
+        Config.checkStatType(statType);
         Integer value = this.basicStat.get(statType);
 
         if(value == null) {
@@ -174,9 +172,7 @@ public class Equipment extends Item {
     }
 
     public Equipment setReinforceStat(@NonNull StatType statType, int stat) {
-        if(statType.equals(StatType.MAXHP) || statType.equals(StatType.MAXMN)) {
-            throw new UnhandledEnumException(statType);
-        }
+        Config.checkStatType(statType);
 
         if(stat == 0) {
             this.reinforceStat.remove(statType);
@@ -188,6 +184,7 @@ public class Equipment extends Item {
     }
 
     public int getReinforceStat(@NonNull StatType statType) {
+        Config.checkStatType(statType);
         Integer value = this.reinforceStat.get(statType);
 
         if(value == null) {
@@ -199,7 +196,9 @@ public class Equipment extends Item {
 
     public void revalidateStat() {
         for(StatType statType : StatType.values()) {
-            if(statType.equals(StatType.MAXHP) || statType.equals(StatType.MAXMN)) {
+            try {
+                Config.checkStatType(statType);
+            } catch (UnhandledEnumException e) {
                 continue;
             }
 

@@ -6,43 +6,41 @@ import java.io.Serializable;
 import java.util.Map;
 
 import lkd.namsic.Game.Config;
+import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Exception.NumberRangeException;
-import lombok.Getter;
 
-@Getter
 public class RangeIntegerMap<T> implements Serializable {
 
-    @NonNull
-    Map<T, Integer> min;
+    private Map<T, Integer> min;
 
-    @NonNull
-    Map<T, Integer> max;
+    private Map<T, Integer> max;
 
     public RangeIntegerMap(@NonNull Map<T, Integer> min, @NonNull Map<T, Integer> max) {
-        T key;
-        Integer minValue, maxValue;
-        for(Map.Entry<T, Integer> minEntry : min.entrySet()) {
-            key = minEntry.getKey();
-            minValue = minEntry.getValue();
-            maxValue = max.get(key);
+        this.set(min, max);
+    }
 
-            if(maxValue != null) {
-                if(maxValue < minValue) {
-                    throw new NumberRangeException(key, minValue, maxValue);
-                }
-            }
+    public void set(Map<T, Integer> min, Map<T, Integer> max) {
+        if(Config.compareMap(min, max, false)) {
+            this.checkKeys(min, max);
+        } else {
+            throw new NumberRangeException(min, max);
         }
 
         this.min = min;
         this.max = max;
     }
 
-    public void set(Map<T, Integer> min, Map<T, Integer> max) {
-        if(Config.compareMap(min, max, false)) {
-            this.min = min;
-            this.max = max;
-        } else {
-            throw new NumberRangeException(min, max);
+    private void checkKeys(Map<T, Integer> min, Map<T, Integer> max) {
+        for(T t : min.keySet()) {
+            if(t instanceof StatType) {
+                Config.checkStatType((StatType) t);
+            }
+        }
+
+        for(T t : max.keySet()) {
+            if(t instanceof StatType) {
+                Config.checkStatType((StatType) t);
+            }
         }
     }
 

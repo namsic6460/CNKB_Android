@@ -145,6 +145,8 @@ public class Quest implements GameObject {
     }
 
     public void setNeedStat(StatType statType, int stat) {
+        Config.checkStatType(statType);
+
         if(stat < 0) {
             throw new NumberRangeException(stat, 0);
         }
@@ -157,6 +159,7 @@ public class Quest implements GameObject {
     }
 
     public int getNeedStat(StatType statType) {
+        Config.checkStatType(statType);
         Integer value = this.needStat.get(statType);
 
         if(value == null) {
@@ -240,6 +243,44 @@ public class Quest implements GameObject {
         }
     }
 
+    public void setRewardStat(Map<StatType, Integer> rewardStat) {
+        Map<StatType, Integer> copy = new HashMap<>(this.rewardStat);
+
+        try {
+            for(Map.Entry<StatType, Integer> entry : rewardStat.entrySet()) {
+                this.setRewardStat(entry.getKey(), entry.getValue());
+            }
+        } catch (Exception e) {
+            this.rewardStat = copy;
+            throw new MapSetterException(copy, rewardStat, e);
+        }
+    }
+
+    public void setRewardStat(StatType statType, int stat) {
+        Config.checkStatType(statType);
+
+        if(stat < 0) {
+            throw new NumberRangeException(stat, 0);
+        }
+
+        if(stat == 0) {
+            this.rewardStat.remove(statType);
+        } else {
+            this.rewardStat.put(statType, stat);
+        }
+    }
+
+    public int getRewardStat(StatType statType) {
+        Config.checkStatType(statType);
+        Integer value = this.rewardStat.get(statType);
+
+        if(value == null) {
+            return 0;
+        } else {
+            return value;
+        }
+    }
+
     public void setRewardCloseRate(Map<Long, Integer> rewardCloseRate) {
         Map<Long, Integer> copy = new HashMap<>(this.rewardCloseRate);
 
@@ -269,41 +310,6 @@ public class Quest implements GameObject {
 
     public int getRewardCloseRate(long npcId) {
         Integer value = this.rewardCloseRate.get(npcId);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
-    }
-
-    public void setRewardStat(Map<StatType, Integer> rewardStat) {
-        Map<StatType, Integer> copy = new HashMap<>(this.rewardStat);
-
-        try {
-            for(Map.Entry<StatType, Integer> entry : rewardStat.entrySet()) {
-                this.setRewardStat(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.rewardStat = copy;
-            throw new MapSetterException(copy, rewardStat, e);
-        }
-    }
-
-    public void setRewardStat(StatType statType, int stat) {
-        if(stat < 0) {
-            throw new NumberRangeException(stat, 0);
-        }
-
-        if(stat == 0) {
-            this.rewardStat.remove(statType);
-        } else {
-            this.rewardStat.put(statType, stat);
-        }
-    }
-
-    public int getRewardStat(StatType statType) {
-        Integer value = this.rewardStat.get(statType);
 
         if(value == null) {
             return 0;

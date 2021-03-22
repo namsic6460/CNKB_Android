@@ -22,7 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.Game.Class.GameObject;
 import lkd.namsic.Game.Enum.Id;
+import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Exception.NumberRangeException;
+import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lkd.namsic.Setting.FileManager;
 import lkd.namsic.Setting.Logger;
 
@@ -92,7 +94,13 @@ public class Config {
     @SuppressWarnings("ConstantConditions")
     public static void checkId(Id id, long objectId) throws NumberRangeException {
         if(objectId < 1 || ID_MAP.get(id) < objectId) {
-            throw new NumberRangeException(objectId, 1, ID_MAP.get(id));
+            throw new NumberRangeException(objectId, 1L, ID_MAP.get(id));
+        }
+    }
+
+    public static void checkStatType(StatType statType) throws UnhandledEnumException {
+        if(statType.equals(StatType.HP) || statType.equals(StatType.MN)) {
+            throw new UnhandledEnumException(statType);
         }
     }
 
