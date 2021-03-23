@@ -16,23 +16,23 @@ public class Logger {
     public static Integer lastLogDay = null;
 
     private static final int SAVE_COUNT = 100;
-    static int logCount = 0;
-    static String logs = "";
+    static volatile int logCount = 0;
+    static volatile String logs = "";
 
     @SuppressLint("StaticFieldLeak")
     public static MainActivity activity;
 
-    public static void i(String title, String text) {
+    public static synchronized void i(String title, String text) {
         log(title, text, "INFO");
         Log.i(title, text);
     }
 
-    public static void w(String title, String text) {
+    public static synchronized void w(String title, String text) {
         log(title, text, "WARN");
         Log.w(title, text);
     }
 
-    public static void e(String title, Throwable e) {
+    public static synchronized void e(String title, Throwable e) {
         String errorString = Config.errorString(e);
         log(title, errorString, "ERR");
         Log.e(title, errorString);
@@ -40,7 +40,7 @@ public class Logger {
         MainActivity.toast("ERROR!\n" + e.getMessage());
     }
 
-    private static void log(String title, String text, String prefix) {
+    private static synchronized void log(String title, String text, String prefix) {
         LocalDateTime time = LocalDateTime.now();
         if(lastLogDay != null) {
             if(lastLogDay != time.getDayOfMonth()) {
@@ -68,7 +68,7 @@ public class Logger {
         }
     }
 
-    public static void saveLog(LocalDateTime date) {
+    public static synchronized void saveLog(LocalDateTime date) {
         if(!logs.equals("")) {
             String fileName = FileManager.LOG_PATH + "/Log - " + date.format(DateTimeFormatter.BASIC_ISO_DATE) + ".txt";
             FileManager.append(fileName, logs);
