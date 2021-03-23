@@ -11,6 +11,7 @@ import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Exception.ListAddFailedException;
+import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -53,19 +54,34 @@ public class Item implements GameObject {
         this.description = description;
         this.handleLv.set(handleLv);
         this.use = use;
-        this.recipe = recipe;
+        this.addRecipe(recipe);
     }
 
     public void addRecipe(@NonNull List<Map<Long, Integer>> recipe) {
         List<Map<Long, Integer>> copy = new ArrayList<>(recipe);
 
-
+        try {
+            for (Map<Long, Integer> map : recipe) {
+                this.addRecipe(map);
+            }
+        } catch (Exception e) {
+            this.recipe = copy;
+            throw e;
+        }
     }
 
     public void addRecipe(@NonNull Map<Long, Integer> recipe) {
+        long key;
         int value;
         for(Map.Entry<Long, Integer> entry : recipe.entrySet()) {
+            key = entry.getKey();
             value = entry.getValue();
+
+            try {
+                Config.checkId(Id.ITEM, key);
+            } catch (NumberRangeException e) {
+                Config.checkId(Id.EQUIPMENT, key);
+            }
 
             if(value < 1) {
                 throw new ListAddFailedException("Recipe count cannot lower than 1 - " + entry.getKey() + ", " + value);
