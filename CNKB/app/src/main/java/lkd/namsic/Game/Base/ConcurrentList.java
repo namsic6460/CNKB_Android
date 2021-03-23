@@ -16,6 +16,10 @@ public class ConcurrentList<T> implements List<T> {
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final List<T> list;
 
+    public ConcurrentList() {
+        this.list = new ArrayList<>();
+    }
+
     public ConcurrentList(List<T> list) {
         this.list = list;
     }

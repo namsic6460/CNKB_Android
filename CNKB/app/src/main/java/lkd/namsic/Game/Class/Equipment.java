@@ -3,7 +3,6 @@ package lkd.namsic.Game.Class;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,25 +38,12 @@ public class Equipment extends Item {
     Map<StatType, Integer> reinforceStat;
     Map<StatType, Integer> stat; //basic + reinforce
 
-    public Equipment(@NonNull EquipType equipType, @NonNull String name) {
-        new Equipment(equipType, name, "", Config.MIN_HANDLE_LV);
-    }
-
-    public Equipment(@NonNull EquipType equipType, @NonNull String name, @NonNull String description, int handleLv) {
-        new Equipment(equipType, name, description, handleLv, null, new ArrayList<Map<Long, Integer>>());
-    }
-
     public Equipment(@NonNull EquipType equipType, @NonNull String name, @NonNull String description, int handleLv,
-                     @Nullable Use use, @NonNull List<Map<Long, Integer>> recipe) {
-        new Equipment(equipType, name, description, handleLv, use, recipe, Config.MIN_REINFORCE_COUNT,
-                Config.MAX_REINFORCE_COUNT, Config.MIN_LV, 0, new HashMap<StatType, Integer>(),
-                new HashMap<StatType, Integer>(), new HashMap<StatType, Integer>());
-    }
-
-    public Equipment(@NonNull EquipType equipType, @NonNull String name, @NonNull String description, int handleLv,
-                     @Nullable Use use, @NonNull List<Map<Long, Integer>> recipe, int reinforceCount, int maxReinforceCount,
-                     int limitLv, int lvDown, @NonNull Map<StatType, Integer> limitStat,
-                     @NonNull Map<StatType, Integer> basicStat, @NonNull Map<StatType, Integer> reinforceStat) {
+                     @Nullable Use use, @NonNull List<Map<Long, Integer>> recipe,
+                     int reinforceCount, int maxReinforceCount, int limitLv, int lvDown,
+                     @NonNull Map<StatType, Integer> limitStat,
+                     @NonNull Map<StatType, Integer> basicStat,
+                     @NonNull Map<StatType, Integer> reinforceStat) {
         super(name, description, handleLv, use, recipe);
         this.id.setId(Id.EQUIPMENT);
 

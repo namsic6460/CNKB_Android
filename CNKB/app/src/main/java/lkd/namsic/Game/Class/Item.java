@@ -38,14 +38,6 @@ public class Item implements GameObject {
 
     protected Item() {}
 
-    public Item(@NonNull String name) {
-        new Item(name, "", Config.MIN_HANDLE_LV);
-    }
-
-    public Item(@NonNull String name, @NonNull String description, int handleLv) {
-        new Item(name, description, handleLv, null, new ArrayList<Map<Long, Integer>>());
-    }
-
     public Item(@NonNull String name, @NonNull String description, int handleLv,
                 @Nullable Use use, @NonNull List<Map<Long, Integer>> recipe) {
         this.id.setId(Id.ITEM);
@@ -58,7 +50,7 @@ public class Item implements GameObject {
     }
 
     public void addRecipe(@NonNull List<Map<Long, Integer>> recipe) {
-        List<Map<Long, Integer>> copy = new ArrayList<>(recipe);
+        List<Map<Long, Integer>> copy = new ArrayList<>(this.recipe);
 
         try {
             for (Map<Long, Integer> map : recipe) {
