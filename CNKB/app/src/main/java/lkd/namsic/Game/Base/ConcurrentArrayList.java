@@ -16,16 +16,16 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-public class ConcurrentList<T> implements List<T> {
+public class ConcurrentArrayList<T> implements List<T> {
 
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final List<T> list;
 
-    public ConcurrentList() {
+    public ConcurrentArrayList() {
         this.list = new ArrayList<>();
     }
 
-    public ConcurrentList(List<T> list) {
+    public ConcurrentArrayList(List<T> list) {
         this.list = list;
     }
 

@@ -13,16 +13,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class ConcurrentSet<T> implements Set<T> {
+public class ConcurrentHashSet<T> implements Set<T> {
 
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Set<T> set;
 
-    public ConcurrentSet() {
+    public ConcurrentHashSet() {
         this.set = new HashSet<>();
     }
 
-    public ConcurrentSet(Set<T> set) {
+    public ConcurrentHashSet(Set<T> set) {
         this.set = set;
     }
 
