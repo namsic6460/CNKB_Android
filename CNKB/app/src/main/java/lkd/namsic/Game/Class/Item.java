@@ -10,7 +10,7 @@ import java.util.Set;
 import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Id;
-import lkd.namsic.Game.Exception.ListAddFailedException;
+import lkd.namsic.Game.Exception.CollectionAddFailedException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,8 +35,6 @@ public class Item implements GameObject {
     LimitInteger handleLv = new LimitInteger(Config.MIN_HANDLE_LV, Config.MIN_HANDLE_LV, Config.MAX_HANDLE_LV);
 
     Set<Map<Long, Integer>> recipe;
-
-    protected Item() {}
 
     public Item(@NonNull String name, @NonNull String description, int handleLv,
                 @Nullable Use use, @NonNull Set<Map<Long, Integer>> recipe) {
@@ -76,7 +74,7 @@ public class Item implements GameObject {
             }
 
             if(value < 1) {
-                throw new ListAddFailedException("Recipe count cannot lower than 1 - " + entry.getKey() + ", " + value);
+                throw new CollectionAddFailedException("Recipe count cannot be lower than 1 - " + entry.getKey() + ", " + value);
             }
         }
 
