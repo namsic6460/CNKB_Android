@@ -1,6 +1,5 @@
 package lkd.namsic.Game.Class;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +10,6 @@ import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Enum.WaitResponse;
-import lkd.namsic.Game.Exception.MapSetterException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 import lombok.ToString;
@@ -64,15 +62,8 @@ public class Chat implements GameObject {
     }
 
     public void setResponseChat(Map<WaitResponse, Long> responseChat) {
-        Map<WaitResponse, Long> copy = new HashMap<>(this.responseChat);
-
-        try {
-            for(Map.Entry<WaitResponse, Long> entry : responseChat.entrySet()) {
-                this.setResponseChat(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.responseChat = copy;
-            throw new MapSetterException(copy, responseChat, e);
+        for(Map.Entry<WaitResponse, Long> entry : responseChat.entrySet()) {
+            this.setResponseChat(entry.getKey(), entry.getValue());
         }
     }
 
@@ -97,15 +88,8 @@ public class Chat implements GameObject {
     }
 
     public void setAnyResponseChat(Map<String, Long> anyResponseChat) {
-        Map<String, Long> copy = new HashMap<>(this.anyResponseChat);
-
-        try {
-            for(Map.Entry<String, Long> entry : anyResponseChat.entrySet()) {
-                this.setAnyResponseChat(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.anyResponseChat = copy;
-            throw new MapSetterException(copy, anyResponseChat, e);
+        for(Map.Entry<String, Long> entry : anyResponseChat.entrySet()) {
+            this.setAnyResponseChat(entry.getKey(), entry.getValue());
         }
     }
 
@@ -130,15 +114,8 @@ public class Chat implements GameObject {
     }
 
     public void setNeedStat(Map<StatType, Integer> needStat) {
-        Map<StatType, Integer> copy = new HashMap<>(this.needStat);
-
-        try {
-            for(Map.Entry<StatType, Integer> entry : needStat.entrySet()) {
-                this.setNeedStat(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.needStat = copy;
-            throw new MapSetterException(copy, needStat, e);
+        for(Map.Entry<StatType, Integer> entry : needStat.entrySet()) {
+            this.setNeedStat(entry.getKey(), entry.getValue());
         }
     }
 
@@ -167,15 +144,8 @@ public class Chat implements GameObject {
     }
 
     public void setNeedItem(Map<Long, Integer> needItem) {
-        Map<Long, Integer> copy = new HashMap<>(this.needItem);
-
-        try {
-            for(Map.Entry<Long, Integer> entry : needItem.entrySet()) {
-                this.setNeedItem(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.needItem = copy;
-            throw new MapSetterException(copy, needItem, e);
+        for(Map.Entry<Long, Integer> entry : needItem.entrySet()) {
+            this.setNeedItem(entry.getKey(), entry.getValue());
         }
     }
 
@@ -202,15 +172,8 @@ public class Chat implements GameObject {
     }
 
     public void setRewardStat(Map<StatType, Integer> rewardStat) {
-        Map<StatType, Integer> copy = new HashMap<>(this.rewardStat);
-
-        try {
-            for(Map.Entry<StatType, Integer> entry : rewardStat.entrySet()) {
-                this.setRewardStat(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.rewardStat = copy;
-            throw new MapSetterException(copy, rewardStat, e);
+        for(Map.Entry<StatType, Integer> entry : rewardStat.entrySet()) {
+            this.setRewardStat(entry.getKey(), entry.getValue());
         }
     }
 
@@ -239,15 +202,8 @@ public class Chat implements GameObject {
     }
 
     public void setRewardItem(Map<Long, Integer> rewardItem) {
-        Map<Long, Integer> copy = new HashMap<>(this.rewardItem);
-
-        try {
-            for(Map.Entry<Long, Integer> entry : rewardItem.entrySet()) {
-                this.setRewardItem(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.rewardItem = copy;
-            throw new MapSetterException(copy, rewardItem, e);
+        for(Map.Entry<Long, Integer> entry : rewardItem.entrySet()) {
+            this.setRewardItem(entry.getKey(), entry.getValue());
         }
     }
 

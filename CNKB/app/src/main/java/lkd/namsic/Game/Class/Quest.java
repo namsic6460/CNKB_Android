@@ -13,7 +13,6 @@ import lkd.namsic.Game.Base.RangeIntegerMap;
 import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
-import lkd.namsic.Game.Exception.MapSetterException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +27,7 @@ public class Quest implements GameObject {
     String name;
 
     @Setter
-    boolean isRepeatable = false;
+    boolean isRepeatable;
 
     RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);
     RangeIntegerMap<Long> limitCloseRate = new RangeIntegerMap<>(
@@ -55,13 +54,6 @@ public class Quest implements GameObject {
     Map<Long, Integer> rewardCloseRate;
 
     LimitId npcId = new LimitId(0, Id.NPC);
-
-    public Quest(@NonNull String name, boolean isRepeatable) {
-        new Quest(name, isRepeatable, 0, Config.MIN_LV, Config.MAX_LV, new HashMap<Long, Integer>(), new HashMap<Long, Integer>(),
-                new HashMap<StatType, Integer>(), new HashMap<StatType, Integer>(), 0, 0, 0,
-                new HashMap<Long, Integer>(), new HashMap<StatType, Integer>(), new HashMap<Long, Integer>(), 0,
-                0, 0, new HashMap<Long, Integer>(), new HashMap<StatType, Integer>(), new HashMap<Long, Integer>());
-    }
 
     public Quest(@NonNull String name, boolean isRepeatable, long npcId, int minLimitLv, int maxLimitLv,
                  @NonNull Map<Long, Integer> minLimitCloseRate, @NonNull Map<Long, Integer> maxLimitCloseRate,
@@ -97,15 +89,8 @@ public class Quest implements GameObject {
     }
 
     public void setNeedItem(Map<Long, Integer> needItem) {
-        Map<Long, Integer> copy = new HashMap<>(this.needItem);
-
-        try {
-            for(Map.Entry<Long, Integer> entry : needItem.entrySet()) {
-                this.setNeedItem(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.needItem = copy;
-            throw new MapSetterException(copy, needItem, e);
+        for(Map.Entry<Long, Integer> entry : needItem.entrySet()) {
+            this.setNeedItem(entry.getKey(), entry.getValue());
         }
     }
 
@@ -134,15 +119,8 @@ public class Quest implements GameObject {
     }
 
     public void setNeedStat(Map<StatType, Integer> needStat) {
-        Map<StatType, Integer> copy = new HashMap<>(this.needStat);
-
-        try {
-            for(Map.Entry<StatType, Integer> entry : needStat.entrySet()) {
-                this.setNeedStat(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.needStat = copy;
-            throw new MapSetterException(copy, needStat, e);
+        for(Map.Entry<StatType, Integer> entry : needStat.entrySet()) {
+            this.setNeedStat(entry.getKey(), entry.getValue());
         }
     }
 
@@ -172,15 +150,8 @@ public class Quest implements GameObject {
     }
 
     public void setNeedCloseRate(Map<Long, Integer> needCloseRate) {
-        Map<Long, Integer> copy = new HashMap<>(this.needCloseRate);
-
-        try {
-            for(Map.Entry<Long, Integer> entry : needCloseRate.entrySet()) {
-                this.setNeedCloseRate(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.needCloseRate = copy;
-            throw new MapSetterException(copy, needCloseRate, e);
+        for(Map.Entry<Long, Integer> entry : needCloseRate.entrySet()) {
+            this.setNeedCloseRate(entry.getKey(), entry.getValue());
         }
     }
 
@@ -209,15 +180,8 @@ public class Quest implements GameObject {
     }
 
     public void setRewardItem(Map<Long, Integer> rewardItem) {
-        Map<Long, Integer> copy = new HashMap<>(this.rewardItem);
-
-        try {
-            for(Map.Entry<Long, Integer> entry : rewardItem.entrySet()) {
-                this.setRewardItem(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.rewardItem = copy;
-            throw new MapSetterException(copy, rewardItem, e);
+        for(Map.Entry<Long, Integer> entry : rewardItem.entrySet()) {
+            this.setRewardItem(entry.getKey(), entry.getValue());
         }
     }
 
@@ -246,15 +210,8 @@ public class Quest implements GameObject {
     }
 
     public void setRewardStat(Map<StatType, Integer> rewardStat) {
-        Map<StatType, Integer> copy = new HashMap<>(this.rewardStat);
-
-        try {
-            for(Map.Entry<StatType, Integer> entry : rewardStat.entrySet()) {
-                this.setRewardStat(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.rewardStat = copy;
-            throw new MapSetterException(copy, rewardStat, e);
+        for(Map.Entry<StatType, Integer> entry : rewardStat.entrySet()) {
+            this.setRewardStat(entry.getKey(), entry.getValue());
         }
     }
 
@@ -284,15 +241,8 @@ public class Quest implements GameObject {
     }
 
     public void setRewardCloseRate(Map<Long, Integer> rewardCloseRate) {
-        Map<Long, Integer> copy = new HashMap<>(this.rewardCloseRate);
-
-        try {
-            for(Map.Entry<Long, Integer> entry : rewardCloseRate.entrySet()) {
-                this.setRewardCloseRate(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.rewardCloseRate = copy;
-            throw new MapSetterException(copy, rewardCloseRate, e);
+        for(Map.Entry<Long, Integer> entry : rewardCloseRate.entrySet()) {
+            this.setRewardCloseRate(entry.getKey(), entry.getValue());
         }
     }
 

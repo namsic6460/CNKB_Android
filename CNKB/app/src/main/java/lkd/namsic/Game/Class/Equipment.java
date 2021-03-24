@@ -3,7 +3,6 @@ package lkd.namsic.Game.Class;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,7 +11,6 @@ import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.EquipType;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
-import lkd.namsic.Game.Exception.MapSetterException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lombok.Getter;
@@ -69,15 +67,8 @@ public class Equipment extends Item {
     }
 
     public void setLimitStat(@NonNull Map<StatType, Integer> limitStat) {
-        Map<StatType, Integer> copy = new HashMap<>(this.limitStat);
-
-        try {
-            for(Map.Entry<StatType, Integer> entry : limitStat.entrySet()) {
-                this.setLimitStat(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.limitStat = copy;
-            throw new MapSetterException(copy, limitStat, e);
+        for(Map.Entry<StatType, Integer> entry : limitStat.entrySet()) {
+            this.setLimitStat(entry.getKey(), entry.getValue());
         }
     }
 
@@ -107,15 +98,8 @@ public class Equipment extends Item {
     }
 
     public Equipment setBasicStat(@NonNull Map<StatType, Integer> basicStat) {
-        Map<StatType, Integer> copy = new HashMap<>(this.basicStat);
-
-        try {
-            for(Map.Entry<StatType, Integer> entry : basicStat.entrySet()) {
-                this.setBasicStat(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.basicStat = copy;
-            throw new MapSetterException(copy, basicStat, e);
+        for(Map.Entry<StatType, Integer> entry : basicStat.entrySet()) {
+            this.setBasicStat(entry.getKey(), entry.getValue());
         }
 
         return this;
@@ -145,15 +129,8 @@ public class Equipment extends Item {
     }
 
     public Equipment setReinforceStat(@NonNull Map<StatType, Integer> reinforceStat) {
-        Map<StatType, Integer> copy = new HashMap<>(this.reinforceStat);
-
-        try {
-            for(Map.Entry<StatType, Integer> entry : reinforceStat.entrySet()) {
-                this.setReinforceStat(entry.getKey(), entry.getValue());
-            }
-        } catch (Exception e) {
-            this.basicStat = copy;
-            throw new MapSetterException(copy, reinforceStat, e);
+        for(Map.Entry<StatType, Integer> entry : reinforceStat.entrySet()) {
+            this.setReinforceStat(entry.getKey(), entry.getValue());
         }
 
         return this;
@@ -183,6 +160,8 @@ public class Equipment extends Item {
     }
 
     public void revalidateStat() {
+        this.stat.clear();
+
         for(StatType statType : StatType.values()) {
             try {
                 Config.checkStatType(statType);
