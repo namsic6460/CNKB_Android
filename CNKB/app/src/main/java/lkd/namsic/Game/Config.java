@@ -15,15 +15,19 @@ import java.util.AbstractCollection;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.Game.Class.GameObject;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Exception.NumberRangeException;
+import lkd.namsic.Game.Exception.ObjectNotFoundException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lkd.namsic.Setting.FileManager;
 import lkd.namsic.Setting.Logger;
@@ -155,15 +159,18 @@ public class Config {
     }
 
     @SuppressWarnings("ConstantConditions")
-    @Nullable
+    @NonNull
     public static <T extends GameObject> T getObject(Id id, long objectId) {
+        checkId(id, objectId);
+
         Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
 
         if(objectCount == null) {
-            String serialized = FileManager.read(getPath(id, objectId));
+            String path = getPath(id, objectId);
+            String serialized = FileManager.read(path);
             if (serialized.equals("")) {
                 Logger.e("getObject", new RuntimeException("Failed to get object - " + id + ", " + objectId));
-                return null;
+                throw new ObjectNotFoundException(path);
             }
 
             T t = deserialize(serialized);
@@ -195,35 +202,43 @@ public class Config {
         return str1 + ", " + str2;
     }
 
-    public static String listsToString(List<?> list1, List<?> list2) {
-        String str1, str2;
-
-        if(list1 instanceof AbstractCollection) {
-            str1 = list1.toString();
-        } else {
-            str1 = new ArrayList<>(list1).toString();
+    @NonNull
+    public static String collectionToString(Collection<?> collection) {
+        if(collection instanceof AbstractCollection) {
+            return collection.toString();
         }
 
-        if(list2 instanceof AbstractCollection) {
-            str2 = list2.toString();
+        if(collection instanceof List) {
+            return new ArrayList<>(collection).toString();
+        } else if(collection instanceof Set) {
+            return new HashSet<>(collection).toString();
         } else {
-            str2 = new ArrayList<>(list2).toString();
+            return "Unsupported type (" + collection.toString() + ")";
         }
-
-        return str1 + ", " + str2;
     }
 
     public static <T> boolean compareMap(Map<T, Integer> map1, Map<T, Integer> map2, boolean firstIsBig) {
+        return compareMap(map1, map2, firstIsBig, true);
+    }
+
+    public static <T> boolean compareMap(Map<T, Integer> map1, Map<T, Integer> map2, boolean firstIsBig, boolean regardZero) {
         Integer value;
         for(Map.Entry<T, Integer> entry : map1.entrySet()) {
-            if((value = map2.get(entry.getKey())) != null) {
-                if(firstIsBig) {
-                    if(entry.getValue() < value) {
-                        return false;
-                    }
-                } else if(entry.getValue() > value) {
+            value = map2.get(entry.getKey());
+            if(value == null) {
+                if(regardZero) {
+                    value = 0;
+                } else {
                     return false;
                 }
+            }
+
+            if(firstIsBig) {
+                if(entry.getValue() < value) {
+                    return false;
+                }
+            } else if(entry.getValue() > value) {
+                return false;
             }
         }
 
