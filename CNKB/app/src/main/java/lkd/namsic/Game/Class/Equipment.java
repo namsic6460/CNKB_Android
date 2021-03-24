@@ -4,8 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Config;
@@ -39,7 +39,7 @@ public class Equipment extends Item {
     Map<StatType, Integer> stat; //basic + reinforce
 
     public Equipment(@NonNull EquipType equipType, @NonNull String name, @NonNull String description, int handleLv,
-                     @Nullable Use use, @NonNull List<Map<Long, Integer>> recipe,
+                     @Nullable Use use, @NonNull Set<Map<Long, Integer>> recipe,
                      int reinforceCount, int maxReinforceCount, int limitLv, int lvDown,
                      @NonNull Map<StatType, Integer> limitStat,
                      @NonNull Map<StatType, Integer> basicStat,

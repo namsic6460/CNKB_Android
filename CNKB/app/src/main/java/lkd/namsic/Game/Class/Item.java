@@ -3,9 +3,9 @@ package lkd.namsic.Game.Class;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Config;
@@ -34,12 +34,12 @@ public class Item implements GameObject {
 
     LimitInteger handleLv = new LimitInteger(Config.MIN_HANDLE_LV, Config.MIN_HANDLE_LV, Config.MAX_HANDLE_LV);
 
-    List<Map<Long, Integer>> recipe;
+    Set<Map<Long, Integer>> recipe;
 
     protected Item() {}
 
     public Item(@NonNull String name, @NonNull String description, int handleLv,
-                @Nullable Use use, @NonNull List<Map<Long, Integer>> recipe) {
+                @Nullable Use use, @NonNull Set<Map<Long, Integer>> recipe) {
         this.id.setId(Id.ITEM);
 
         this.name = name;
@@ -49,8 +49,8 @@ public class Item implements GameObject {
         this.addRecipe(recipe);
     }
 
-    public void addRecipe(@NonNull List<Map<Long, Integer>> recipe) {
-        List<Map<Long, Integer>> copy = new ArrayList<>(this.recipe);
+    public void addRecipe(@NonNull Set<Map<Long, Integer>> recipe) {
+        Set<Map<Long, Integer>> copy = new HashSet<>(this.recipe);
 
         try {
             for (Map<Long, Integer> map : recipe) {
@@ -77,12 +77,6 @@ public class Item implements GameObject {
 
             if(value < 1) {
                 throw new ListAddFailedException("Recipe count cannot lower than 1 - " + entry.getKey() + ", " + value);
-            }
-        }
-
-        for(Map<Long, Integer> anotherRecipe : this.recipe) {
-            if(anotherRecipe.equals(recipe)) {
-                throw new ListAddFailedException("Recipe already exists - " + recipe.toString());
             }
         }
 
