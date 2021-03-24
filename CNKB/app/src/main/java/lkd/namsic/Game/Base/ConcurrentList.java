@@ -5,11 +5,16 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Spliterator;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 public class ConcurrentList<T> implements List<T> {
 
@@ -282,4 +287,74 @@ public class ConcurrentList<T> implements List<T> {
             readWriteLock.readLock().unlock();
         }
     }
+
+    @Override
+    public void replaceAll(@NonNull UnaryOperator<T> operator) {
+        readWriteLock.writeLock().lock();
+
+        try {
+            list.replaceAll(operator);
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void sort(@Nullable Comparator<? super T> c) {
+        readWriteLock.writeLock().lock();
+
+        try {
+            list.sort(c);
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+    }
+
+    @NonNull
+    @Override
+    public Spliterator<T> spliterator() {
+        readWriteLock.readLock().lock();
+
+        try {
+            return new ArrayList<>(list).spliterator();
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public boolean removeIf(@NonNull Predicate<? super T> filter) {
+        readWriteLock.writeLock().lock();
+
+        try {
+            return list.removeIf(filter);
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+    }
+
+    @NonNull
+    @Override
+    public Stream<T> stream() {
+        readWriteLock.readLock().lock();
+
+        try {
+            return new ArrayList<>(list).stream();
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    @NonNull
+    @Override
+    public Stream<T> parallelStream() {
+        readWriteLock.readLock().lock();
+
+        try {
+            return new ArrayList<>(list).parallelStream();
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
 }
