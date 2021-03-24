@@ -3,6 +3,6 @@ package lkd.namsic.Game.Class;
 import lombok.ToString;
 
 @ToString
-public class Npc implements Entity {
+public class Npc extends Entity {
 
 }
