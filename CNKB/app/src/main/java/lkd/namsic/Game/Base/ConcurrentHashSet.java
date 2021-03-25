@@ -3,6 +3,7 @@ package lkd.namsic.Game.Base;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,7 +14,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class ConcurrentHashSet<T> implements Set<T> {
+public class ConcurrentHashSet<T> implements Set<T>, Serializable {
 
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Set<T> set;

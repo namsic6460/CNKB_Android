@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lkd.namsic.Game.Base.ConcurrentArrayList;
 import lkd.namsic.Game.Base.ConcurrentHashSet;
 import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Base.LimitLong;
@@ -18,9 +19,14 @@ import lkd.namsic.Game.Enum.EquipType;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Event.DeathEvent;
+import lkd.namsic.Game.Event.EarnEvent;
+import lkd.namsic.Game.Event.Event;
+import lkd.namsic.Game.Event.MoveEvent;
 import lkd.namsic.Game.Exception.CollectionAddFailedException;
+import lkd.namsic.Game.Exception.InvalidNumberException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -59,7 +65,7 @@ public abstract class Entity implements GameObject {
 
     ConcurrentHashMap<Integer, Integer> variable;
 
-    DeathEvent deathEvent;
+    ConcurrentHashMap<String, ConcurrentArrayList<Event>> events;
 
     protected Entity(@NonNull String name, int lv, long money, @NonNull Location location,
                      @NonNull Doing doing, @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
@@ -68,7 +74,7 @@ public abstract class Entity implements GameObject {
                      @NonNull ConcurrentHashMap<Long, Integer> inventory,
                      @NonNull ConcurrentHashSet<Long> equipInventory,
                      @NonNull ConcurrentHashMap<Integer, Integer> variable,
-                     @NonNull DeathEvent deathEvent) {
+                     @NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events) {
         this.name = name;
         this.lv.set(lv);
         this.money.set(money);
@@ -85,7 +91,30 @@ public abstract class Entity implements GameObject {
 
         this.variable = variable;
 
-        this.deathEvent = deathEvent;
+        this.events = events;
+    }
+
+    public boolean setMoney(long money) {
+        boolean isCancelled = false;
+
+        long gap = money - this.getMoney();
+        if(gap > 0) {
+            isCancelled = EarnEvent.handleEvent(this.events.get(EarnEvent.getName()), new Object[]{gap});
+        }
+
+        if (!isCancelled) {
+            this.money.set(this.getMoney() + money);
+        }
+
+        return isCancelled;
+    }
+
+    public long getMoney() {
+        return this.money.get();
+    }
+
+    public boolean addMoney(long money) {
+        return this.setMoney(this.getMoney() + money);
     }
 
     public <T extends Entity> T setBasicStat(@NonNull Map<StatType, Integer> basicStat) {
@@ -185,7 +214,7 @@ public abstract class Entity implements GameObject {
         }
     }
 
-    public void setStat(StatType statType, int stat) {
+    public boolean setStat(StatType statType, int stat) {
         boolean flag = false;
 
         try {
@@ -198,19 +227,29 @@ public abstract class Entity implements GameObject {
             throw new UnhandledEnumException(statType);
         }
 
-        if(statType == StatType.HP) {
+        boolean isCancelled = false;
+
+        if(statType.equals(StatType.HP)) {
             int maxHp = this.getStat(StatType.MAXHP);
 
             if(stat > maxHp) {
                 stat = maxHp;
             } else if(stat <= 0) {
-                flag = this.deathEvent.onDeath(this.getStat(StatType.HP), stat);
+                isCancelled = DeathEvent.handleEvent(this.events.get(DeathEvent.getName()), new Object[]{this.getStat(StatType.HP), stat});
+            }
+        } else if(statType.equals(StatType.MN)) {
+            int maxMn = this.getStat(StatType.MAXMN);
+
+            if(stat > maxMn) {
+                stat = maxMn;
             }
         }
 
-        if(flag) {
+        if(!isCancelled) {
             this.stat.put(statType, stat);
         }
+
+        return isCancelled;
     }
 
     public int getStat(StatType statType) {
@@ -292,8 +331,11 @@ public abstract class Entity implements GameObject {
     @SuppressWarnings("ConstantConditions")
     public void addBuff(long time, StatType statType, int stat) {
         long currentTime = System.currentTimeMillis();
+
         if(time < currentTime) {
-            return;
+            throw new NumberRangeException(time, currentTime);
+        } else if(stat == 0) {
+            throw new InvalidNumberException(stat);
         }
 
         revalidateBuff();
@@ -394,6 +436,32 @@ public abstract class Entity implements GameObject {
 
             this.stat.put(statType, this.getBasicStat(statType) + this.getEquipStat(statType) + this.getBuffStat(statType));
         }
+    }
+
+    public void moveField(int fieldX, int fieldY) {
+        this.setField(this.location.getFieldX().get() + fieldX,
+                this.location.getFieldY().get() + fieldY, Math.abs(fieldX) + Math.abs(fieldY));
+    }
+
+    public void setField(int fieldX, int fieldY) {
+        int xDis = Math.abs(this.location.getFieldX().get() - fieldX);
+        int yDis = Math.abs(this.location.getFieldY().get() - fieldX);
+        setField(fieldX, fieldY, xDis + yDis);
+    }
+
+    public boolean setField(int fieldX, int fieldY, int distance) {
+        if(distance <= 0) {
+            throw new NumberRangeException(distance, 1);
+        }
+
+        boolean isCancelled = MoveEvent.handleEvent(this.events.get(MoveEvent.getName()), new Object[]{distance, true});
+
+        if(!isCancelled) {
+            this.location.getFieldX().set(fieldX);
+            this.location.getFieldY().set(fieldY);
+        }
+
+        return isCancelled;
     }
 
 }
