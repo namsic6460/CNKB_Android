@@ -7,12 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Base64;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
@@ -23,7 +21,8 @@ import lkd.namsic.MainActivity;
 
 public class KakaoTalkListener extends NotificationListenerService {
 
-    Map<String, Notification.Action> sessions = new ConcurrentHashMap<>();
+    Map<String, Notification.Action> groupSessions = new ConcurrentHashMap<>();
+    Map<String, Notification.Action> soloSessions = new ConcurrentHashMap<>();
     Context context;
 
     @Override
@@ -93,21 +92,22 @@ public class KakaoTalkListener extends NotificationListenerService {
 
     private void onChat(final String sender, final String image, final String msg, final String room,
                         final boolean isGroupChat, final Notification.Action session) {
-        sessions.put(room, session);
+        if(isGroupChat) {
+            groupSessions.put(room, session);
+        } else {
+            soloSessions.put(room, session);
+        }
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Logger.i("chatLog", "sender: " + sender + "\nimage: " + image +
-                            "\nmsg: " + msg + "\nroom: " + room + "\nisGroupChat: " + isGroupChat);
+        Thread thread = new Thread(() -> {
+            try {
+                Logger.i("chatLog", "sender: " + sender + "\nimage: " + image +
+                        "\nmsg: " + msg + "\nroom: " + room + "\nisGroupChat: " + isGroupChat);
 
-                    if (msg.equals("namsicTest")) {
-                        reply(session, "reply");
-                    }
-                } catch (Exception e) {
-                    Logger.e("onChat", e);
+                if (msg.equals("namsicTest")) {
+                    reply(session, "reply");
                 }
+            } catch (Exception e) {
+                Logger.e("onChat", e);
             }
         });
 
@@ -131,8 +131,16 @@ public class KakaoTalkListener extends NotificationListenerService {
         }
     }
 
+    private void replyGroup(String msg) {
+        for(Notification.Action session : groupSessions.values()) {
+            reply(session, msg);
+        }
+    }
+
     private void replyAll(String msg) {
-        for(Notification.Action session : sessions.values()) {
+        replyGroup(msg);
+
+        for(Notification.Action session : soloSessions.values()) {
             reply(session, msg);
         }
     }
