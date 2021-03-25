@@ -7,7 +7,10 @@ public enum LogData {
     BUFF_RECEIVED,
     CHAT,
     EXPLORED,
+    FIELD_MOVE_DISTANCE,
     GATHERED,
+    LOG_COUNT,
+    MAP_MOVE_DISTANCE,
     MAX_CLOSERATE,
     MAX_MONEY,
     MAX_PAYMENT,
@@ -21,7 +24,7 @@ public enum LogData {
     TOTAL_CLOSERATE,
     TOTAL_EXP,
     TOTAL_ITEM,
-    TOTAL_ITEM_USED
-
+    TOTAL_ITEM_USED,
+    TOTAL_MONEY
 
 }

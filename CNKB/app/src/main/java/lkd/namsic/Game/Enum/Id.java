@@ -3,7 +3,7 @@ package lkd.namsic.Game.Enum;
 public enum Id {
 
     ACHIEVE,
-    BUILDING,
+    BOSS,
     CHAT,
     EQUIPMENT,
     ITEM,

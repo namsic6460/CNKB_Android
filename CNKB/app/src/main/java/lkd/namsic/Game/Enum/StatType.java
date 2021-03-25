@@ -8,6 +8,7 @@ public enum StatType {
     MN,
     ATK,
     MATK,
+    AGI,
     DEF,
     MDEF,
     BRE,
