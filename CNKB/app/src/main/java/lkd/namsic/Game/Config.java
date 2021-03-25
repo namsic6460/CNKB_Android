@@ -142,7 +142,7 @@ public class Config {
         long objectId = gameObject.id.getObjectId();
         Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
 
-        if(objectCount != 1) {
+        if(objectCount > 1) {
             CURRENT_OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
         } else {
             String serialized = serialize(gameObject);
@@ -153,6 +153,23 @@ public class Config {
             }
 
             FileManager.save(path, serialized);
+
+            if(objectCount == 1) {
+                CURRENT_OBJECT.get(id).remove(objectId);
+                CURRENT_OBJECT_COUNT.get(id).remove(objectId);
+            }
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public static void discardObject(GameObject gameObject) {
+        Id id = gameObject.id.getId();
+        long objectId = gameObject.id.getObjectId();
+        Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
+
+        if(objectCount > 1) {
+            CURRENT_OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
+        } else {
             CURRENT_OBJECT.get(id).remove(objectId);
             CURRENT_OBJECT_COUNT.get(id).remove(objectId);
         }

@@ -11,11 +11,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import lkd.namsic.Game.Base.ConcurrentHashSet;
 import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Base.LimitLong;
+import lkd.namsic.Game.Base.Location;
 import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Doing;
 import lkd.namsic.Game.Enum.EquipType;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
+import lkd.namsic.Game.Event.DeathEvent;
 import lkd.namsic.Game.Exception.CollectionAddFailedException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
@@ -37,6 +39,8 @@ public abstract class Entity implements GameObject {
     LimitInteger lv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
     LimitLong money = new LimitLong(0, 0L, Long.MAX_VALUE);
 
+    Location location;
+
     @Setter
     @NonNull
     Doing doing;
@@ -53,15 +57,22 @@ public abstract class Entity implements GameObject {
     ConcurrentHashMap<Long, Integer> inventory;
     ConcurrentHashSet<Long> equipInventory;
 
-    protected Entity(@NonNull String name, int lv, long money, @NonNull Doing doing,
-                     @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
+    ConcurrentHashMap<Integer, Integer> variable;
+
+    DeathEvent deathEvent;
+
+    protected Entity(@NonNull String name, int lv, long money, @NonNull Location location,
+                     @NonNull Doing doing, @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
                      @NonNull ConcurrentHashSet<Long> equip,
                      @NonNull ConcurrentHashMap<Long, ConcurrentHashMap<StatType, Integer>> buff,
                      @NonNull ConcurrentHashMap<Long, Integer> inventory,
-                     @NonNull ConcurrentHashSet<Long> equipInventory) {
+                     @NonNull ConcurrentHashSet<Long> equipInventory,
+                     @NonNull ConcurrentHashMap<Integer, Integer> variable,
+                     @NonNull DeathEvent deathEvent) {
         this.name = name;
         this.lv.set(lv);
         this.money.set(money);
+        this.location = location;
         this.doing = doing;
 
         this.setBasicStat(basicStat);
@@ -71,6 +82,10 @@ public abstract class Entity implements GameObject {
 
         this.setInventory(inventory);
         this.setEquipInventory(equipInventory);
+
+        this.variable = variable;
+
+        this.deathEvent = deathEvent;
     }
 
     public <T extends Entity> T setBasicStat(@NonNull Map<StatType, Integer> basicStat) {
@@ -170,11 +185,46 @@ public abstract class Entity implements GameObject {
         }
     }
 
-    public boolean canEquip(long equipId) {
-        Equipment equipment = Config.getObject(Id.EQUIPMENT, equipId);
+    public void setStat(StatType statType, int stat) {
+        boolean flag = false;
 
-        return equipment.getTotalLimitLv() <= this.lv.get() &&
-                Config.compareMap(equipment.getLimitStat(), this.basicStat, false);
+        try {
+            Config.checkStatType(statType);
+        } catch (UnhandledEnumException e) {
+            flag = true;
+        }
+
+        if(!flag) {
+            throw new UnhandledEnumException(statType);
+        }
+
+        if(statType == StatType.HP) {
+            int maxHp = this.getStat(StatType.MAXHP);
+
+            if(stat > maxHp) {
+                stat = maxHp;
+            } else if(stat <= 0) {
+                flag = this.deathEvent.onDeath(this.getStat(StatType.HP), stat);
+            }
+        }
+
+        if(flag) {
+            this.stat.put(statType, stat);
+        }
+    }
+
+    public int getStat(StatType statType) {
+        Integer value = this.stat.get(statType);
+
+        if(value == null) {
+            return 0;
+        } else {
+            return value;
+        }
+    }
+
+    public void addStat(StatType statType, int stat) {
+        this.setStat(statType, this.getStat(statType) + stat);
     }
 
     public void equip(Set<Long> equip) {
@@ -307,7 +357,7 @@ public abstract class Entity implements GameObject {
 
     public void addEquipInventory(long equipId) {
         Config.checkId(Id.EQUIPMENT, equipId);
-        
+
         this.equipInventory.add(equipId);
     }
 

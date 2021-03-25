@@ -159,6 +159,17 @@ public class Equipment extends Item {
         }
     }
 
+    public int getStat(@NonNull StatType statType) {
+        Config.checkStatType(statType);
+        Integer value = this.stat.get(statType);
+
+        if(value == null) {
+            return 0;
+        } else {
+            return value;
+        }
+    }
+
     public void revalidateStat() {
         this.stat.clear();
 

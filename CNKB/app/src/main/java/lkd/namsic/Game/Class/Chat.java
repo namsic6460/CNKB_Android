@@ -22,7 +22,7 @@ public class Chat implements GameObject {
 
     LimitId questId = new LimitId(0, Id.QUEST);
 
-    Location teleportLoc;
+    Location tpLocation;
 
     List<String> text;
 
@@ -37,7 +37,7 @@ public class Chat implements GameObject {
     Map<StatType, Integer> rewardStat;
     Map<Long, Integer> rewardItem;
 
-    public Chat(long pauseTime, long questId, Location teleportLoc, List<String> text,
+    public Chat(long pauseTime, long questId, Location tpLocation, List<String> text,
                 Map<WaitResponse, Long> responseChat, Map<String, Long> anyResponseChat,
                 long needMoney, Map<StatType, Integer> needStat, Map<Long, Integer> needItem,
                 long rewardMoney, Map<StatType, Integer> rewardStat, Map<Long, Integer> rewardItem) {
@@ -45,7 +45,7 @@ public class Chat implements GameObject {
 
         this.pauseTime.set(pauseTime);
         this.questId.set(questId);
-        this.teleportLoc = teleportLoc;
+        this.tpLocation = tpLocation;
 
         this.text = text;
 
