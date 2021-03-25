@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.Game.Class.GameObject;
+import lkd.namsic.Game.Class.MapClass;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Exception.NumberRangeException;
@@ -34,6 +36,15 @@ import lkd.namsic.Setting.Logger;
 
 public class Config {
 
+    /*
+    TODO
+    1. moveMap - load, unload map
+    2. save player count on a map
+    3. create/parse config
+     */
+
+    public static final Map<String, MapClass> MAP = new ConcurrentHashMap<>();
+
     public static final Map<Id, Map<Long, GameObject>> CURRENT_OBJECT = new ConcurrentHashMap<>();
     public static final Map<Id, Map<Long, Long>> CURRENT_OBJECT_COUNT = new ConcurrentHashMap<>();
     public static final Map<Id, Long> ID_MAP = new ConcurrentHashMap<>();
@@ -42,6 +53,10 @@ public class Config {
     public static final int MAX_MAP_X = 10;
     public static final int MIN_MAP_Y = 0;
     public static final int MAX_MAP_Y = 10;
+    public static final int MIN_FIELD_X = 1;
+    public static final int MAX_FIELD_X = 64;
+    public static final int MIN_FIELD_Y = 1;
+    public static final int MAX_FIELD_Y = 64;
 
     public static final int MIN_HANDLE_LV = 1;
     public static final int MAX_HANDLE_LV = 20;
@@ -49,6 +64,8 @@ public class Config {
     public static final int MAX_REINFORCE_COUNT = 19;
     public static final int MIN_LV = 1;
     public static final int MAX_LV = 999;
+    public static final int MIN_SP = 0;
+    public static final int MAX_SP = 100;
 
     public static void init() {
         if(!CURRENT_OBJECT.isEmpty()) {
@@ -56,8 +73,8 @@ public class Config {
         }
 
         for(Id id : Id.values()) {
-            CURRENT_OBJECT.put(id, new ConcurrentHashMap<Long, GameObject>());
-            CURRENT_OBJECT_COUNT.put(id, new ConcurrentHashMap<Long, Long>());
+            CURRENT_OBJECT.put(id, new ConcurrentHashMap<>());
+            CURRENT_OBJECT_COUNT.put(id, new ConcurrentHashMap<>());
             ID_MAP.put(id, 1L);
         }
     }
@@ -84,7 +101,6 @@ public class Config {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     public static <T extends GameObject> T newObject(@NonNull T t) {
         Id id = t.id.getId();
         long objectId = ID_MAP.get(id);
@@ -95,25 +111,24 @@ public class Config {
         return t;
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public static void checkId(Id id, long objectId) throws NumberRangeException {
+    public static void checkId(@NonNull Id id, long objectId) throws NumberRangeException {
         if(objectId < 1 || ID_MAP.get(id) < objectId) {
             throw new NumberRangeException(objectId, 1L, ID_MAP.get(id));
         }
     }
 
-    public static void checkStatType(StatType statType) throws UnhandledEnumException {
+    public static void checkStatType(@NonNull StatType statType) throws UnhandledEnumException {
         if(statType.equals(StatType.HP) || statType.equals(StatType.MN)) {
             throw new UnhandledEnumException(statType);
         }
     }
 
     @Nullable
-    public static String serialize(@NonNull GameObject gameObject) {
+    public static <T extends Serializable> String serialize(@NonNull T t) {
         byte[] serialized;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(gameObject);
+            oos.writeObject(t);
             serialized = baos.toByteArray();
         } catch (IOException e) {
             Logger.e("serialize", e);
@@ -124,7 +139,7 @@ public class Config {
     }
 
     @Nullable
-    public static <T extends GameObject> T deserialize(String byteStr) {
+    public static <T extends Serializable> T deserialize(@NonNull String byteStr) {
         byte[] serialized = Base64.getDecoder().decode(byteStr);
         try (ByteArrayInputStream bais = new ByteArrayInputStream(serialized)) {
             ObjectInputStream ois = new ObjectInputStream(bais);
@@ -136,8 +151,7 @@ public class Config {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public static void saveObject(GameObject gameObject) {
+    public static void saveObject(@NonNull GameObject gameObject) {
         Id id = gameObject.id.getId();
         long objectId = gameObject.id.getObjectId();
         Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
@@ -161,13 +175,21 @@ public class Config {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public static void discardObject(GameObject gameObject) {
+    public static void unloadMap(@NonNull MapClass map) {
+        String serialized = serialize(map);
+        String locStr = map.getLocation().getFileName();
+        String path = FileManager.MAP_PATH + "/" + locStr;
+
+        FileManager.save(path, serialized);
+        MAP.remove(locStr);
+    }
+
+    public static void discardObject(@NonNull GameObject gameObject) {
         Id id = gameObject.id.getId();
         long objectId = gameObject.id.getObjectId();
         Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
 
-        if(objectCount > 1) {
+        if (objectCount > 1) {
             CURRENT_OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
         } else {
             CURRENT_OBJECT.get(id).remove(objectId);
@@ -175,9 +197,8 @@ public class Config {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static <T extends GameObject> T getObject(Id id, long objectId) {
+    public static <T extends GameObject> T getObject(@NonNull Id id, long objectId) {
         checkId(id, objectId);
 
         Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
@@ -200,6 +221,24 @@ public class Config {
         }
     }
 
+    public static MapClass loadMap(@NonNull String locStr) {
+        MapClass map = MAP.get(locStr);
+
+        if(map == null) {
+            String path = FileManager.MAP_PATH + "/" + locStr;
+            String serialized = FileManager.read(path);
+            if (serialized.equals("")) {
+                Logger.e("getObject", new RuntimeException("Failed to load map - " + locStr));
+                throw new ObjectNotFoundException(path);
+            }
+
+            map = deserialize(serialized);
+            MAP.put(locStr, map);
+        }
+
+        return map;
+    }
+
     @NonNull
     public static String mapsToString(@NonNull Map<?, ?> map1, @NonNull Map<?, ?> map2) {
         String str1, str2;
@@ -220,7 +259,7 @@ public class Config {
     }
 
     @NonNull
-    public static String collectionToString(Collection<?> collection) {
+    public static String collectionToString(@NonNull Collection<?> collection) {
         if(collection instanceof AbstractCollection) {
             return collection.toString();
         }
@@ -234,11 +273,12 @@ public class Config {
         }
     }
 
-    public static <T> boolean compareMap(Map<T, Integer> map1, Map<T, Integer> map2, boolean firstIsBig) {
+    public static <T> boolean compareMap(@NonNull Map<T, Integer> map1, @NonNull Map<T, Integer> map2, boolean firstIsBig) {
         return compareMap(map1, map2, firstIsBig, true);
     }
 
-    public static <T> boolean compareMap(Map<T, Integer> map1, Map<T, Integer> map2, boolean firstIsBig, boolean regardZero) {
+    public static <T> boolean compareMap(@NonNull Map<T, Integer> map1, @NonNull Map<T, Integer> map2,
+                                         boolean firstIsBig, boolean regardZero) {
         Integer value;
         for(Map.Entry<T, Integer> entry : map1.entrySet()) {
             value = map2.get(entry.getKey());
@@ -262,11 +302,11 @@ public class Config {
         return true;
     }
 
-    private static String getPath(Id id, long objectId) {
+    private static String getPath(@NonNull Id id, long objectId) {
         return FileManager.DATA_PATH_MAP.get(id) + objectId + ".txt";
     }
 
-    public static String errorString(Throwable throwable) {
+    public static String errorString(@NonNull Throwable throwable) {
         StringBuilder builder = new StringBuilder(throwable.getClass().getName());
         builder.append(": ");
         builder.append(throwable.getMessage());
