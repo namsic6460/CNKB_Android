@@ -22,6 +22,7 @@ public class FileManager extends Application {
     private final static String PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CNKB";
     public final static String LOG_PATH = PATH + "/logs";
     public final static String DATA_PATH = PATH + "/data";
+    public final static String MAP_PATH = DATA_PATH + "/map";
     public final static HashMap<Id, String> DATA_PATH_MAP = new HashMap<>();
 
     @Override
@@ -43,6 +44,8 @@ public class FileManager extends Application {
                 DATA_PATH_MAP.put(id, path + "/");
                 new File(path).mkdir();
             }
+
+            new File(MAP_PATH).mkdir();
 
             String filePath = PATH + "/" + "config.json";
             String config = read(filePath);
