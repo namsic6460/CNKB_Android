@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lkd.namsic.Game.Base.LimitInteger;
+import lkd.namsic.Game.Base.RangeInteger;
 import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.EquipType;
 import lkd.namsic.Game.Enum.Id;
@@ -26,7 +27,7 @@ public class Equipment extends Item {
     EquipType equipType;
 
     LimitInteger reinforceCount = new LimitInteger(Config.MIN_REINFORCE_COUNT, Config.MIN_REINFORCE_COUNT, Config.MAX_REINFORCE_COUNT);
-    LimitInteger limitLv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
+    RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);
 
     @Setter
     int lvDown = 0;
@@ -37,8 +38,8 @@ public class Equipment extends Item {
     Map<StatType, Integer> stat; //basic + reinforce
 
     public Equipment(@NonNull EquipType equipType, @NonNull String name, @NonNull String description, int handleLv,
-                     @Nullable Use use, @NonNull Set<Map<Long, Integer>> recipe,
-                     int reinforceCount, int maxReinforceCount, int limitLv, int lvDown,
+                     @Nullable Use use, @NonNull Set<Map<Long, Integer>> recipe, int reinforceCount,
+                     int maxReinforceCount, int minLimitLv, int maxLimitLv, int lvDown,
                      @NonNull Map<StatType, Integer> limitStat,
                      @NonNull Map<StatType, Integer> basicStat,
                      @NonNull Map<StatType, Integer> reinforceStat) {
@@ -48,22 +49,23 @@ public class Equipment extends Item {
         this.equipType = equipType;
         this.reinforceCount.setMax(maxReinforceCount);
         this.reinforceCount.set(reinforceCount);
-        this.limitLv.set(limitLv);
+        this.limitLv.set(minLimitLv, maxLimitLv);
         this.lvDown = lvDown;
         this.setLimitStat(limitStat);
         this.setBasicStat(basicStat).setReinforceStat(reinforceStat).revalidateStat();
     }
 
-    public int getTotalLimitLv() {
-        int lvDown = this.limitLv.get() - this.lvDown;
+    public RangeInteger getTotalLimitLv() {
+        int minLv = this.limitLv.getMin() - this.getLvDown();
+        int maxLv = this.limitLv.getMax() - this.getLvDown();
 
-        if(lvDown < Config.MIN_LV) {
-            lvDown = Config.MIN_LV;
-        } else if(lvDown > Config.MAX_LV) {
-            lvDown = Config.MAX_LV;
+        if(minLv < Config.MIN_LV) {
+            minLv = Config.MIN_LV;
+        } else if(maxLv > Config.MAX_LV) {
+            maxLv = Config.MAX_LV;
         }
 
-        return lvDown;
+        return new RangeInteger(minLv, maxLv);
     }
 
     public void setLimitStat(@NonNull Map<StatType, Integer> limitStat) {

@@ -3,6 +3,7 @@ package lkd.namsic.Game.Class;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +27,6 @@ import lkd.namsic.Game.Exception.CollectionAddFailedException;
 import lkd.namsic.Game.Exception.InvalidNumberException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -63,7 +63,7 @@ public abstract class Entity implements GameObject {
     ConcurrentHashMap<Long, Integer> inventory;
     ConcurrentHashSet<Long> equipInventory;
 
-    ConcurrentHashMap<Integer, Integer> variable;
+    ConcurrentHashMap<Id, ConcurrentHashSet<Long>> enemies;
 
     ConcurrentHashMap<String, ConcurrentArrayList<Event>> events;
 
@@ -73,7 +73,7 @@ public abstract class Entity implements GameObject {
                      @NonNull ConcurrentHashMap<Long, ConcurrentHashMap<StatType, Integer>> buff,
                      @NonNull ConcurrentHashMap<Long, Integer> inventory,
                      @NonNull ConcurrentHashSet<Long> equipInventory,
-                     @NonNull ConcurrentHashMap<Integer, Integer> variable,
+                     @NonNull ConcurrentHashMap<Id, ConcurrentHashSet<Long>> enemies,
                      @NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events) {
         this.name = name;
         this.lv.set(lv);
@@ -89,9 +89,8 @@ public abstract class Entity implements GameObject {
         this.setInventory(inventory);
         this.setEquipInventory(equipInventory);
 
-        this.variable = variable;
-
-        this.events = events;
+        this.addEnemies(enemies);
+        this.addEvents(events);
     }
 
     public boolean setMoney(long money) {
@@ -115,6 +114,60 @@ public abstract class Entity implements GameObject {
 
     public boolean addMoney(long money) {
         return this.setMoney(this.getMoney() + money);
+    }
+
+    public void moveField(int fieldX, int fieldY) {
+        this.setField(this.location.getFieldX().get() + fieldX,
+                this.location.getFieldY().get() + fieldY, Math.abs(fieldX) + Math.abs(fieldY));
+    }
+
+    public void setField(int fieldX, int fieldY) {
+        int xDis = Math.abs(this.location.getFieldX().get() - fieldX);
+        int yDis = Math.abs(this.location.getFieldY().get() - fieldX);
+        setField(fieldX, fieldY, xDis + yDis);
+    }
+
+    public boolean setField(int fieldX, int fieldY, int distance) {
+        if(distance <= 0) {
+            throw new NumberRangeException(distance, 1);
+        }
+
+        boolean isCancelled = MoveEvent.handleEvent(this.events.get(MoveEvent.getName()), new Object[]{distance, true});
+
+        if(!isCancelled) {
+            this.location.getFieldX().set(fieldX);
+            this.location.getFieldY().set(fieldY);
+        }
+
+        return isCancelled;
+    }
+
+    public void moveMap(int worldX, int worldY) {
+        this.setMap(this.location.getX().get() + worldX, this.location.getY().get() + worldY,
+                Math.abs(worldX) + Math.abs(worldY));
+    }
+
+    public void setMap(int worldX, int worldY) {
+        int xDis = Math.abs(this.location.getX().get() - worldX);
+        int yDis = Math.abs(this.location.getY().get() - worldY);
+        setMap(worldX, worldY, xDis + yDis);
+    }
+
+    public boolean setMap(int worldX, int worldY, int distance) {
+        if(distance <= 0) {
+            throw new NumberRangeException(distance, 1);
+        }
+
+        boolean isCancelled = MoveEvent.handleEvent(this.events.get(MoveEvent.getName()), new Object[]{distance, false});
+
+        if(!isCancelled) {
+            if()
+
+            this.location.getFieldX().set(worldX);
+            this.location.getFieldY().set(worldY);
+        }
+
+        return isCancelled;
     }
 
     public <T extends Entity> T setBasicStat(@NonNull Map<StatType, Integer> basicStat) {
@@ -184,7 +237,7 @@ public abstract class Entity implements GameObject {
     }
 
     public <T extends Entity> T setBuffStat(@NonNull Map<StatType, Integer> buffStat) {
-        for(Map.Entry<StatType, Integer> entry : basicStat.entrySet()) {
+        for(Map.Entry<StatType, Integer> entry : buffStat.entrySet()) {
             this.setBuffStat(entry.getKey(), entry.getValue());
         }
 
@@ -328,7 +381,6 @@ public abstract class Entity implements GameObject {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     public void addBuff(long time, StatType statType, int stat) {
         long currentTime = System.currentTimeMillis();
 
@@ -349,7 +401,7 @@ public abstract class Entity implements GameObject {
                 this.buff.get(time).put(statType, buffStat + stat);
             }
         } else {
-            this.buff.put(time, new ConcurrentHashMap<StatType, Integer>());
+            this.buff.put(time, new ConcurrentHashMap<>());
             this.buff.get(time).put(statType, stat);
 
             this.setBuffStat(statType, this.getBuffStat(statType) + stat);
@@ -438,30 +490,106 @@ public abstract class Entity implements GameObject {
         }
     }
 
-    public void moveField(int fieldX, int fieldY) {
-        this.setField(this.location.getFieldX().get() + fieldX,
-                this.location.getFieldY().get() + fieldY, Math.abs(fieldX) + Math.abs(fieldY));
+    public void addEnemies(@NonNull Map<Id, ConcurrentHashSet<Long>> enemies) {
+        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : enemies.entrySet()) {
+            this.addEnemies(entry.getKey(), entry.getValue());
+        }
     }
 
-    public void setField(int fieldX, int fieldY) {
-        int xDis = Math.abs(this.location.getFieldX().get() - fieldX);
-        int yDis = Math.abs(this.location.getFieldY().get() - fieldX);
-        setField(fieldX, fieldY, xDis + yDis);
+    public void addEnemies(@NonNull Id id, @NonNull ConcurrentHashSet<Long> enemies) {
+        for(long enemyId : enemies) {
+            this.addEnemy(id, enemyId);
+        }
     }
 
-    public boolean setField(int fieldX, int fieldY, int distance) {
-        if(distance <= 0) {
-            throw new NumberRangeException(distance, 1);
+    public void addEnemy(@NonNull Id id, long enemyId) {
+        if(!(id.equals(Id.BOSS) || id.equals(Id.MONSTER) || id.equals(Id.PLAYER) || id.equals(Id.NPC))) {
+            throw new UnhandledEnumException(id);
         }
 
-        boolean isCancelled = MoveEvent.handleEvent(this.events.get(MoveEvent.getName()), new Object[]{distance, true});
+        Config.checkId(id, enemyId);
 
-        if(!isCancelled) {
-            this.location.getFieldX().set(fieldX);
-            this.location.getFieldY().set(fieldY);
+        this.enemies.get(id).add(enemyId);
+    }
+
+    @NonNull
+    public Set<Long> getEnemies(@NonNull Id id) {
+        Set<Long> enemies = this.enemies.get(id);
+
+        if(enemies == null) {
+            return new HashSet<>();
+        } else {
+            return new HashSet<>(enemies);
+        }
+    }
+
+    public void addEvents(@NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events) {
+        for(Map.Entry<String, ConcurrentArrayList<Event>> entry : events.entrySet()) {
+            this.addEvents(entry.getKey(), entry.getValue());
+        }
+    }
+
+    public void addEvents(@NonNull String eventName, @NonNull ConcurrentArrayList<Event> events) {
+        for(Event event : events) {
+            this.addEvent(eventName, event);
+        }
+    }
+
+    public void addEvent(@NonNull String eventName, @NonNull Event event) {
+        if(this.events.containsKey(eventName)) {
+            this.events.get(eventName).add(event);
+        } else {
+            ConcurrentArrayList<Event> list = new ConcurrentArrayList<>();
+            list.add(event);
+
+            this.events.put(eventName, list);
+        }
+    }
+
+    public boolean canFight(Entity enemy) {
+        if(enemy instanceof Player) {
+            if(!((Player) enemy).isPvp()) {
+                return false;
+            }
         }
 
-        return isCancelled;
+        List<Doing> doingList = new ArrayList<>();
+        doingList.add(Doing.BUY);
+        doingList.add(Doing.CHAT);
+        doingList.add(Doing.REINFORCE);
+
+        if(this instanceof Player) {
+            if(!((Player) this).isPvp()) {
+                return false;
+            }
+
+            doingList.add(Doing.FIGHT);
+        }
+
+        return !doingList.contains(this.getDoing());
+    }
+
+    public boolean startFight(Set<Entity> enemies) {
+        for(Entity enemy : enemies) {
+            if(!enemy.canFight(enemy)) {
+                return false;
+            }
+        }
+
+        this.setDoing(Doing.FIGHT);
+
+        Id id = this.id.getId();
+        long objectId = this.id.getObjectId();
+
+        //noinspection SimplifyStreamApiCallChains
+        enemies.stream().forEach(enemy -> {
+            enemy.setDoing(Doing.FIGHT);
+            this.addEnemy(enemy.id.getId(), enemy.id.getObjectId());
+
+            enemy.addEnemy(id, objectId);
+        });
+
+        return true;
     }
 
 }

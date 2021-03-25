@@ -16,7 +16,7 @@ import lombok.ToString;
 @ToString
 public class Npc extends Entity {
 
-    public Npc(@NonNull String name, int lv, long money, @NonNull Location location,
+    public Npc(@NonNull String name, int lv, long money, boolean canFight, @NonNull Location location,
                 @NonNull Doing doing, @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
                 @NonNull ConcurrentHashSet<Long> equip,
                 @NonNull ConcurrentHashMap<Long, ConcurrentHashMap<StatType, Integer>> buff,
@@ -24,7 +24,7 @@ public class Npc extends Entity {
                 @NonNull ConcurrentHashSet<Long> equipInventory,
                 @NonNull ConcurrentHashMap<Integer, Integer> variable,
                 @NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events) {
-        super(name, lv, money, location, doing, basicStat, equip, buff, inventory, equipInventory, variable, events);
+        super(name, lv, money, canFight, location, doing, basicStat, equip, buff, inventory, equipInventory, variable, events);
 
         this.id.setId(Id.NPC);
     }

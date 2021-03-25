@@ -2,13 +2,15 @@ package lkd.namsic.Game.Class;
 
 import androidx.annotation.NonNull;
 
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.Game.Base.ConcurrentArrayList;
 import lkd.namsic.Game.Base.ConcurrentHashSet;
+import lkd.namsic.Game.Base.LimitInteger;
+import lkd.namsic.Game.Base.LimitLong;
 import lkd.namsic.Game.Base.Location;
 import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Doing;
@@ -18,13 +20,34 @@ import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Event.Event;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
 @ToString
 public class Player extends Entity {
 
-    HashMap<LogData, Long> log;
+    @Setter
+    String nickName;
+    @Setter
+    String image;
+    @Setter
+    String currentTitle;
+    @Setter
+    String recentRoom;
+
+    @Setter
+    boolean pvp;
+
+    long lastTime;
+
+    LimitInteger sp = new LimitInteger(0, Config.MIN_SP, Config.MAX_SP);
+    LimitInteger adv = new LimitInteger(0, 0, Integer.MAX_VALUE);
+    LimitLong exp = new LimitLong(0, 0L, Long.MAX_VALUE);
+
+    LocalDateTime lastDateTime;
+
+    ConcurrentHashMap<LogData, Long> log = new ConcurrentHashMap<>();
 
     public Player(@NonNull String name, int lv, long money, @NonNull Location location,
                   @NonNull Doing doing, @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
@@ -32,15 +55,23 @@ public class Player extends Entity {
                   @NonNull ConcurrentHashMap<Long, ConcurrentHashMap<StatType, Integer>> buff,
                   @NonNull ConcurrentHashMap<Long, Integer> inventory,
                   @NonNull ConcurrentHashSet<Long> equipInventory,
-                  @NonNull ConcurrentHashMap<Integer, Integer> variable,
+                  @NonNull ConcurrentHashMap<Id, ConcurrentHashSet<Long>> enemies,
                   @NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events,
-                  @NonNull HashMap<LogData, Long> log) {
-        super(name, lv, money, location, doing, basicStat, equip, buff, inventory, equipInventory, variable, events);
+                  @NonNull ConcurrentHashMap<LogData, Long> log) {
+        super(name, lv, money, location, doing, basicStat, equip, buff, inventory, equipInventory, enemies, events);
 
         this.id.setId(Id.PLAYER);
 
+        this.log.put(LogData.LOG_COUNT, 0L);
         this.setLog(log);
-        this.log = log;
+    }
+
+    public boolean checkChat() {
+        long currentTime = System.currentTimeMillis();
+        long diffTime = currentTime - this.lastTime;
+        this.lastTime = currentTime;
+
+        return diffTime >= 500;
     }
 
     public void setLog(Map<LogData, Long> log) {
@@ -79,7 +110,7 @@ public class Player extends Entity {
     public boolean canEquip(long equipId) {
         Equipment equipment = Config.getObject(Id.EQUIPMENT, equipId);
 
-        return equipment.getTotalLimitLv() <= this.lv.get() &&
+        return equipment.getTotalLimitLv().isInRange(this.lv.get()) &&
                 Config.compareMap(equipment.getLimitStat(), this.basicStat, false);
     }
 
@@ -106,6 +137,28 @@ public class Player extends Entity {
     }
 
     @Override
+    public boolean setField(int fieldX, int fieldY, int distance) {
+        boolean isCancelled = super.setField(fieldX, fieldY, distance);
+
+        if(!isCancelled) {
+            this.addLog(LogData.FIELD_MOVE_DISTANCE, distance);
+        }
+
+        return isCancelled;
+    }
+
+    @Override
+    public boolean setMap(int worldX, int worldY, int distance) {
+        boolean isCancelled = super.setField(worldX, worldY, distance);
+
+        if(!isCancelled) {
+            this.addLog(LogData.MAP_MOVE_DISTANCE, distance);
+        }
+
+        return isCancelled;
+    }
+
+    @Override
     public void addBuff(long time, StatType statType, int stat) {
         super.addBuff(time, statType, stat);
         this.addLog(LogData.BUFF_RECEIVED, 1);
@@ -117,15 +170,13 @@ public class Player extends Entity {
         this.addLog(LogData.STAT_UPDATED, 1);
     }
 
-    @Override
-    public boolean setField(int fieldX, int fieldY, int distance) {
-        boolean isCancelled = super.setField(fieldX, fieldY, distance);
+    public String getFileName() {
+        return this.getName() + "-" + this.getImage();
+    }
 
-        if(!isCancelled) {
-            this.addLog(LogData.FIELD_MOVE_DISTANCE, distance);
-        }
-
-        return isCancelled;
+    //[테스트 칭호] 남식(Lv.123)
+    public String getDisplayName() {
+        return "[" + this.getCurrentTitle() + "] " + this.getNickName() + "(Lv." + this.getLv() + ")";
     }
 
 }
