@@ -1,6 +1,7 @@
 package lkd.namsic.Game;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -126,7 +127,8 @@ public class Config {
         }
     }
 
-    public static <T extends Serializable> String serialize(@NonNull T t) throws IOException {
+    @Nullable
+    public static <T extends Serializable> String serialize(@NonNull T t) {
         byte[] serialized;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -134,15 +136,14 @@ public class Config {
             serialized = baos.toByteArray();
         } catch (IOException e) {
             Logger.e("serialize", e);
-            throw e;
+            return null;
         }
 
         return Base64.getEncoder().encodeToString(serialized);
     }
 
-    @NonNull
-    public static <T extends Serializable> T deserialize(@NonNull String byteStr)
-            throws IOException, ClassNotFoundException {
+    @Nullable
+    public static <T extends Serializable> T deserialize(@NonNull String byteStr) {
         byte[] serialized = Base64.getDecoder().decode(byteStr);
         try (ByteArrayInputStream bais = new ByteArrayInputStream(serialized)) {
             ObjectInputStream ois = new ObjectInputStream(bais);
@@ -150,12 +151,12 @@ public class Config {
             return (T) object;
         } catch (IOException | ClassNotFoundException e) {
             Logger.e("deserialize", e);
-            throw e;
+            return null;
         }
     }
 
     @SuppressWarnings("ConstantConditions")
-    public static void saveObject(@NonNull GameObject gameObject) throws IOException {
+    public static void saveObject(@NonNull GameObject gameObject) {
         Id id = gameObject.id.getId();
         long objectId = gameObject.id.getObjectId();
         Long objectCount = OBJECT_COUNT.get(id).get(objectId);
@@ -180,7 +181,7 @@ public class Config {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public static void unloadMap(@NonNull MapClass map) throws IOException {
+    public static void unloadMap(@NonNull MapClass map) {
         String fileName = getMapFileName(map);
         Long playerCount = PLAYER_COUNT.get(fileName);
 
@@ -219,8 +220,7 @@ public class Config {
 
     @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static <T extends GameObject> T getObject(@NonNull Id id, long objectId)
-            throws IOException, ClassNotFoundException {
+    public static <T extends GameObject> T getObject(@NonNull Id id, long objectId) {
         checkId(id, objectId);
 
         Long objectCount = OBJECT_COUNT.get(id).get(objectId);
@@ -245,7 +245,7 @@ public class Config {
 
     @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static MapClass loadMap(int x, int y) throws IOException, ClassNotFoundException {
+    public static MapClass loadMap(int x, int y) {
         String fileName = getMapFileName(x, y);
         Long playerCount = PLAYER_COUNT.get(fileName);
 
