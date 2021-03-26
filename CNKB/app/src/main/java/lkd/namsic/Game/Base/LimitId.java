@@ -30,7 +30,7 @@ public class LimitId implements LimitClass<Long> {
 
     @Override
     public void set(@NonNull Long setValue) {
-        long maxValue = Objects.requireNonNull(Config.ID_MAP.get(id));
+        long maxValue = Objects.requireNonNull(Config.ID_COUNT.get(id));
 
         if(setValue < 0 || value >= maxValue) {
             throw new NumberRangeException(this);

@@ -25,11 +25,6 @@ public class Location implements Serializable {
     }
 
     @NonNull
-    public String getFileName() {
-        return x.get() + "," + y.get();
-    }
-
-    @NonNull
     @Override
     public String toString() {
         return "x: " + x.get() + ", y: " + y.get() + ", fieldX: " + fieldX.get() + ", fieldY: " + fieldY.get();

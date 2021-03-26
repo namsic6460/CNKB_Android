@@ -1,7 +1,6 @@
 package lkd.namsic.Game;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,15 +38,17 @@ public class Config {
     /*
     TODO
     1. moveMap - load, unload map
-    2. save player count on a map
+    2. save player count on a map - DONE
     3. create/parse config
      */
 
-    public static final Map<String, MapClass> MAP = new ConcurrentHashMap<>();
+    public static final Map<Id, Long> ID_COUNT = new ConcurrentHashMap<>();
 
-    public static final Map<Id, Map<Long, GameObject>> CURRENT_OBJECT = new ConcurrentHashMap<>();
-    public static final Map<Id, Map<Long, Long>> CURRENT_OBJECT_COUNT = new ConcurrentHashMap<>();
-    public static final Map<Id, Long> ID_MAP = new ConcurrentHashMap<>();
+    public static final Map<Id, ConcurrentHashMap<Long, GameObject>> OBJECT = new ConcurrentHashMap<>();
+    public static final Map<Id, ConcurrentHashMap<Long, Long>> OBJECT_COUNT = new ConcurrentHashMap<>();
+
+    public static final Map<String, MapClass> MAP = new ConcurrentHashMap<>();
+    public static final Map<String, Long> PLAYER_COUNT = new ConcurrentHashMap<>();
 
     public static final int MIN_MAP_X = 0;
     public static final int MAX_MAP_X = 10;
@@ -68,14 +69,14 @@ public class Config {
     public static final int MAX_SP = 100;
 
     public static void init() {
-        if(!CURRENT_OBJECT.isEmpty()) {
+        if(!OBJECT.isEmpty()) {
             return;
         }
 
         for(Id id : Id.values()) {
-            CURRENT_OBJECT.put(id, new ConcurrentHashMap<>());
-            CURRENT_OBJECT_COUNT.put(id, new ConcurrentHashMap<>());
-            ID_MAP.put(id, 1L);
+            OBJECT.put(id, new ConcurrentHashMap<>());
+            OBJECT_COUNT.put(id, new ConcurrentHashMap<>());
+            ID_COUNT.put(id, 1L);
         }
     }
 
@@ -101,19 +102,21 @@ public class Config {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static <T extends GameObject> T newObject(@NonNull T t) {
         Id id = t.id.getId();
-        long objectId = ID_MAP.get(id);
+        long objectId = ID_COUNT.get(id);
 
         t.id.setObjectId(objectId);
-        ID_MAP.put(id, objectId + 1);
+        ID_COUNT.put(id, objectId + 1);
 
         return t;
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static void checkId(@NonNull Id id, long objectId) throws NumberRangeException {
-        if(objectId < 1 || ID_MAP.get(id) < objectId) {
-            throw new NumberRangeException(objectId, 1L, ID_MAP.get(id));
+        if(objectId < 1 || ID_COUNT.get(id) < objectId) {
+            throw new NumberRangeException(objectId, 1L, ID_COUNT.get(id));
         }
     }
 
@@ -123,8 +126,7 @@ public class Config {
         }
     }
 
-    @Nullable
-    public static <T extends Serializable> String serialize(@NonNull T t) {
+    public static <T extends Serializable> String serialize(@NonNull T t) throws IOException {
         byte[] serialized;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -132,14 +134,15 @@ public class Config {
             serialized = baos.toByteArray();
         } catch (IOException e) {
             Logger.e("serialize", e);
-            return null;
+            throw e;
         }
 
         return Base64.getEncoder().encodeToString(serialized);
     }
 
-    @Nullable
-    public static <T extends Serializable> T deserialize(@NonNull String byteStr) {
+    @NonNull
+    public static <T extends Serializable> T deserialize(@NonNull String byteStr)
+            throws IOException, ClassNotFoundException {
         byte[] serialized = Base64.getDecoder().decode(byteStr);
         try (ByteArrayInputStream bais = new ByteArrayInputStream(serialized)) {
             ObjectInputStream ois = new ObjectInputStream(bais);
@@ -147,17 +150,18 @@ public class Config {
             return (T) object;
         } catch (IOException | ClassNotFoundException e) {
             Logger.e("deserialize", e);
-            return null;
+            throw e;
         }
     }
 
-    public static void saveObject(@NonNull GameObject gameObject) {
+    @SuppressWarnings("ConstantConditions")
+    public static void saveObject(@NonNull GameObject gameObject) throws IOException {
         Id id = gameObject.id.getId();
         long objectId = gameObject.id.getObjectId();
-        Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
+        Long objectCount = OBJECT_COUNT.get(id).get(objectId);
 
         if(objectCount > 1) {
-            CURRENT_OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
+            OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
         } else {
             String serialized = serialize(gameObject);
             String path = getPath(id, objectId);
@@ -169,74 +173,98 @@ public class Config {
             FileManager.save(path, serialized);
 
             if(objectCount == 1) {
-                CURRENT_OBJECT.get(id).remove(objectId);
-                CURRENT_OBJECT_COUNT.get(id).remove(objectId);
+                OBJECT.get(id).remove(objectId);
+                OBJECT_COUNT.get(id).remove(objectId);
             }
         }
     }
 
-    public static void unloadMap(@NonNull MapClass map) {
-        String serialized = serialize(map);
-        String locStr = map.getLocation().getFileName();
-        String path = FileManager.MAP_PATH + "/" + locStr;
+    @SuppressWarnings("ConstantConditions")
+    public static void unloadMap(@NonNull MapClass map) throws IOException {
+        String fileName = getMapFileName(map);
+        Long playerCount = PLAYER_COUNT.get(fileName);
 
-        FileManager.save(path, serialized);
-        MAP.remove(locStr);
-    }
-
-    public static void discardObject(@NonNull GameObject gameObject) {
-        Id id = gameObject.id.getId();
-        long objectId = gameObject.id.getObjectId();
-        Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
-
-        if (objectCount > 1) {
-            CURRENT_OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
+        if(playerCount > 1) {
+            PLAYER_COUNT.put(fileName, playerCount - 1);
         } else {
-            CURRENT_OBJECT.get(id).remove(objectId);
-            CURRENT_OBJECT_COUNT.get(id).remove(objectId);
+            String serialized = serialize(map);
+            String path = getMapPath(fileName);
+            if (serialized == null) {
+                Logger.e("saveObject", new RuntimeException("Failed to unload map - " + path));
+                return;
+            }
+
+            FileManager.save(path, serialized);
+
+            if(playerCount == 1) {
+                MAP.remove(fileName);
+                PLAYER_COUNT.remove(fileName);
+            }
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
+    public static void discardObject(@NonNull GameObject gameObject) {
+        Id id = gameObject.id.getId();
+        long objectId = gameObject.id.getObjectId();
+        Long objectCount = OBJECT_COUNT.get(id).get(objectId);
+
+        if (objectCount > 1) {
+            OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
+        } else {
+            OBJECT.get(id).remove(objectId);
+            OBJECT_COUNT.get(id).remove(objectId);
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static <T extends GameObject> T getObject(@NonNull Id id, long objectId) {
+    public static <T extends GameObject> T getObject(@NonNull Id id, long objectId)
+            throws IOException, ClassNotFoundException {
         checkId(id, objectId);
 
-        Long objectCount = CURRENT_OBJECT_COUNT.get(id).get(objectId);
+        Long objectCount = OBJECT_COUNT.get(id).get(objectId);
 
         if(objectCount == null) {
             String path = getPath(id, objectId);
             String serialized = FileManager.read(path);
             if (serialized.equals("")) {
-                Logger.e("getObject", new RuntimeException("Failed to get object - " + id + ", " + objectId));
+                Logger.e("getObject", new RuntimeException("Failed to get object - " + path));
                 throw new ObjectNotFoundException(path);
             }
 
             T t = deserialize(serialized);
-            CURRENT_OBJECT.get(id).put(objectId, t);
-            CURRENT_OBJECT_COUNT.get(id).put(objectId, 1L);
+            OBJECT.get(id).put(objectId, t);
+            OBJECT_COUNT.get(id).put(objectId, 1L);
             return t;
         } else {
-            CURRENT_OBJECT_COUNT.get(id).put(objectId, objectCount + 1);
-            return (T) CURRENT_OBJECT.get(id).get(objectId);
+            OBJECT_COUNT.get(id).put(objectId, objectCount + 1);
+            return (T) OBJECT.get(id).get(objectId);
         }
     }
 
-    public static MapClass loadMap(@NonNull String locStr) {
-        MapClass map = MAP.get(locStr);
+    @SuppressWarnings("ConstantConditions")
+    @NonNull
+    public static MapClass loadMap(int x, int y) throws IOException, ClassNotFoundException {
+        String fileName = getMapFileName(x, y);
+        Long playerCount = PLAYER_COUNT.get(fileName);
 
-        if(map == null) {
-            String path = FileManager.MAP_PATH + "/" + locStr;
+        if(playerCount == null) {
+            String path = getMapPath(fileName);
             String serialized = FileManager.read(path);
             if (serialized.equals("")) {
-                Logger.e("getObject", new RuntimeException("Failed to load map - " + locStr));
+                Logger.e("getObject", new RuntimeException("Failed to load map - " + path));
                 throw new ObjectNotFoundException(path);
             }
 
-            map = deserialize(serialized);
-            MAP.put(locStr, map);
+            MapClass map = deserialize(serialized);
+            MAP.put(fileName, map);
+            PLAYER_COUNT.put(fileName, 1L);
+            return map;
+        } else {
+            PLAYER_COUNT.put(fileName, playerCount + 1);
+            return MAP.get(fileName);
         }
-
-        return map;
     }
 
     @NonNull
@@ -302,8 +330,30 @@ public class Config {
         return true;
     }
 
+    @NonNull
     private static String getPath(@NonNull Id id, long objectId) {
         return FileManager.DATA_PATH_MAP.get(id) + objectId + ".txt";
+    }
+
+    @NonNull
+    public static String getMapFileName(int x, int y) {
+        String path = x + "-" + y + ".txt";
+
+        if(x >= MIN_MAP_X && x <= MAX_MAP_X && y >= MIN_MAP_X && y <= MAX_MAP_Y) {
+            return path;
+        }
+
+        throw new ObjectNotFoundException(path);
+    }
+
+    @NonNull
+    public static String getMapFileName(MapClass map) {
+        return getMapFileName(map.getLocation().getX().get(), map.getLocation().getY().get());
+    }
+
+    @NonNull
+    private static String getMapPath(String fileName) {
+        return FileManager.MAP_PATH + "/" + fileName;
     }
 
     public static String errorString(@NonNull Throwable throwable) {
