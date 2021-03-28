@@ -38,7 +38,7 @@ public class Config {
 
     /*
     TODO
-    1. moveMap - load, unload map
+    1. moveMap - load, unload map - Made logic(abstract method) - DONE
     2. save player count on a map - DONE
     3. create/parse config
      */

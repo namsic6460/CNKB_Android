@@ -154,6 +154,10 @@ public abstract class Entity implements GameObject {
     }
 
     public boolean setMap(int worldX, int worldY, int distance) {
+        return this.setMap(worldX, worldY, this.location.getFieldX().get(), this.location.getFieldY().get(), distance);
+    }
+
+    public boolean setMap(int worldX, int worldY, int fieldX, int fieldY, int distance) {
         if(distance <= 0) {
             throw new NumberRangeException(distance, 1);
         }
@@ -161,14 +165,17 @@ public abstract class Entity implements GameObject {
         boolean isCancelled = MoveEvent.handleEvent(this.events.get(MoveEvent.getName()), new Object[]{distance, false});
 
         if(!isCancelled) {
-            if()
-
             this.location.getFieldX().set(worldX);
             this.location.getFieldY().set(worldY);
+            this.setField(fieldX, fieldY);
+
+            this.loadOnSetMap(worldX, worldY, fieldX, fieldY);
         }
 
         return isCancelled;
     }
+
+    public abstract void loadOnSetMap(int worldX, int worldY, int fieldX, int fieldY);
 
     public <T extends Entity> T setBasicStat(@NonNull Map<StatType, Integer> basicStat) {
         for(Map.Entry<StatType, Integer> entry : basicStat.entrySet()) {
@@ -392,17 +399,20 @@ public abstract class Entity implements GameObject {
 
         revalidateBuff();
 
-        if(this.buff.containsKey(time)) {
-            Integer buffStat = this.buff.get(time).get(statType);
+        ConcurrentHashMap<StatType, Integer> buffTimeMap = this.buff.get(time);
+        if(buffTimeMap != null) {
+            Integer buffStat = buffTimeMap.get(statType);
 
             if(buffStat == null) {
-                this.buff.get(time).put(statType, stat);
+                buffTimeMap.put(statType, stat);
             } else {
-                this.buff.get(time).put(statType, buffStat + stat);
+                buffTimeMap.put(statType, buffStat + stat);
             }
         } else {
-            this.buff.put(time, new ConcurrentHashMap<>());
-            this.buff.get(time).put(statType, stat);
+            buffTimeMap = new ConcurrentHashMap<>();
+            buffTimeMap.put(statType, stat);
+
+            this.buff.put(time, buffTimeMap);
 
             this.setBuffStat(statType, this.getBuffStat(statType) + stat);
         }
@@ -509,7 +519,15 @@ public abstract class Entity implements GameObject {
 
         Config.checkId(id, enemyId);
 
-        this.enemies.get(id).add(enemyId);
+        ConcurrentHashSet<Long> enemySet = this.enemies.get(id);
+        if(enemySet == null) {
+            enemySet = new ConcurrentHashSet<>();
+            enemySet.add(enemyId);
+
+            this.enemies.put(id, enemySet);
+        } else {
+            enemySet.add(enemyId);
+        }
     }
 
     @NonNull

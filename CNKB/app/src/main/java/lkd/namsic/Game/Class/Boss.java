@@ -17,16 +17,21 @@ import lombok.ToString;
 public class Boss extends Entity {
 
     public Boss(@NonNull String name, int lv, long money, @NonNull Location location,
-                     @NonNull Doing doing, @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
-                     @NonNull ConcurrentHashSet<Long> equip,
-                     @NonNull ConcurrentHashMap<Long, ConcurrentHashMap<StatType, Integer>> buff,
-                     @NonNull ConcurrentHashMap<Long, Integer> inventory,
-                     @NonNull ConcurrentHashSet<Long> equipInventory,
-                     @NonNull ConcurrentHashMap<Integer, Integer> variable,
-                     @NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events) {
-        super(name, lv, money, location, doing, basicStat, equip, buff, inventory, equipInventory, variable, events);
+                @NonNull Doing doing, @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
+                @NonNull ConcurrentHashSet<Long> equip,
+                @NonNull ConcurrentHashMap<Long, ConcurrentHashMap<StatType, Integer>> buff,
+                @NonNull ConcurrentHashMap<Long, Integer> inventory,
+                @NonNull ConcurrentHashSet<Long> equipInventory,
+                @NonNull ConcurrentHashMap<Id, ConcurrentHashSet<Long>> enemies,
+                @NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events) {
+        super(name, lv, money, location, doing, basicStat, equip, buff, inventory, equipInventory, enemies, events);
 
         this.id.setId(Id.BOSS);
+    }
+
+    @Override
+    public void loadOnSetMap(int worldX, int worldY, int fieldX, int fieldY) {
+        //TODO : load map and save data. last, unload.
     }
 
 }

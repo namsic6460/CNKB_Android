@@ -148,14 +148,19 @@ public class Player extends Entity {
     }
 
     @Override
-    public boolean setMap(int worldX, int worldY, int distance) {
-        boolean isCancelled = super.setField(worldX, worldY, distance);
+    public boolean setMap(int worldX, int worldY, int fieldX, int fieldY, int distance) {
+        boolean isCancelled = super.setMap(worldX, worldY, fieldX, fieldY, distance);
 
         if(!isCancelled) {
             this.addLog(LogData.MAP_MOVE_DISTANCE, distance);
         }
 
         return isCancelled;
+    }
+
+    @Override
+    public void loadOnSetMap(int worldX, int worldY, int fieldX, int fieldY) {
+        //TODO : load map and save player
     }
 
     @Override
@@ -170,11 +175,13 @@ public class Player extends Entity {
         this.addLog(LogData.STAT_UPDATED, 1);
     }
 
+    @NonNull
     public String getFileName() {
         return this.getName() + "-" + this.getImage();
     }
 
     //[테스트 칭호] 남식(Lv.123)
+    @NonNull
     public String getDisplayName() {
         return "[" + this.getCurrentTitle() + "] " + this.getNickName() + "(Lv." + this.getLv() + ")";
     }
