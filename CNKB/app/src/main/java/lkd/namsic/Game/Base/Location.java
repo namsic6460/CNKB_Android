@@ -1,6 +1,7 @@
 package lkd.namsic.Game.Base;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.io.Serializable;
 
@@ -22,6 +23,28 @@ public class Location implements Serializable {
         this.y.set(y);
         this.fieldX.set(fieldX);
         this.fieldY.set(fieldY);
+    }
+
+    public boolean equalsMap(@NonNull Location location) {
+        return this.x.equals(location.x) && this.y.equals(location.y);
+    }
+
+    public boolean equalsField(@NonNull Location location) {
+        return this.fieldX.equals(location.fieldX) && this.fieldY.equals(location.fieldY);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(obj == null) {
+            return false;
+        }
+
+        if(obj instanceof Location) {
+            Location location = (Location) obj;
+            return this.equalsMap(location) && this.equalsField(location);
+        } else {
+            return false;
+        }
     }
 
     @NonNull

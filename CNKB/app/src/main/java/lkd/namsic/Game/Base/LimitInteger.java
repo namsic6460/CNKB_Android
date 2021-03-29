@@ -46,6 +46,19 @@ public class LimitInteger implements LimitClass<Integer> {
         this.value = setValue;
     }
 
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(obj == null) {
+            return false;
+        }
+
+        if(obj instanceof LimitInteger) {
+            return this.get().equals(((LimitInteger) obj).get());
+        } else {
+            return false;
+        }
+    }
+
     @NonNull
     @Override
     public String toString() {
