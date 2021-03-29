@@ -108,7 +108,7 @@ public class Player extends Entity {
     }
 
     public boolean canEquip(long equipId) {
-        Equipment equipment = Config.getObject(Id.EQUIPMENT, equipId);
+        Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
 
         return equipment.getTotalLimitLv().isInRange(this.lv.get()) &&
                 Config.compareMap(equipment.getLimitStat(), this.basicStat, false);
@@ -164,8 +164,8 @@ public class Player extends Entity {
     }
 
     @Override
-    public void addBuff(long time, StatType statType, int stat) {
-        super.addBuff(time, statType, stat);
+    public void setBuff(long time, StatType statType, int stat) {
+        super.setBuff(time, statType, stat);
         this.addLog(LogData.BUFF_RECEIVED, 1);
     }
 

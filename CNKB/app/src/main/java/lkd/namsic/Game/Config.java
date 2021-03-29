@@ -34,13 +34,15 @@ import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lkd.namsic.Setting.FileManager;
 import lkd.namsic.Setting.Logger;
 
+//Consider using GSON instead of serializing for debugging and error checking
+
 public class Config {
 
     /*
     TODO
     1. moveMap - load, unload map - Made logic(abstract method) - DONE
     2. save player count on a map - DONE
-    3. create/parse config
+    3. create/parse config - This will be a huge work....
      */
 
     public static final Map<Id, Long> ID_COUNT = new ConcurrentHashMap<>();
@@ -156,7 +158,7 @@ public class Config {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public static void saveObject(@NonNull GameObject gameObject) {
+    public static void unloadObject(@NonNull GameObject gameObject) {
         Id id = gameObject.id.getId();
         long objectId = gameObject.id.getObjectId();
         Long objectCount = OBJECT_COUNT.get(id).get(objectId);
@@ -220,7 +222,7 @@ public class Config {
 
     @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static <T extends GameObject> T getObject(@NonNull Id id, long objectId) {
+    public static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
         checkId(id, objectId);
 
         Long objectCount = OBJECT_COUNT.get(id).get(objectId);
@@ -265,6 +267,14 @@ public class Config {
             PLAYER_COUNT.put(fileName, playerCount + 1);
             return MAP.get(fileName);
         }
+    }
+
+    @NonNull
+    public static <T extends GameObject> T getData(@NonNull Id id, long objectId) {
+        T t = loadObject(id, objectId);
+        unloadObject(t);
+
+        return t;
     }
 
     @NonNull

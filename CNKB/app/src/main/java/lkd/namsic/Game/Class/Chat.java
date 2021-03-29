@@ -1,5 +1,7 @@
 package lkd.namsic.Game.Class;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 import java.util.Map;
 
@@ -61,13 +63,13 @@ public class Chat implements GameObject {
         this.setRewardItem(rewardItem);
     }
 
-    public void setResponseChat(Map<WaitResponse, Long> responseChat) {
+    public void setResponseChat(@NonNull Map<WaitResponse, Long> responseChat) {
         for(Map.Entry<WaitResponse, Long> entry : responseChat.entrySet()) {
             this.setResponseChat(entry.getKey(), entry.getValue());
         }
     }
 
-    public void setResponseChat(WaitResponse waitResponse, long chatId) {
+    public void setResponseChat(@NonNull WaitResponse waitResponse, long chatId) {
         Config.checkId(Id.CHAT, chatId);
 
         if(chatId == 0) {
@@ -77,7 +79,7 @@ public class Chat implements GameObject {
         }
     }
 
-    public long getResponseChat(WaitResponse waitResponse) {
+    public long getResponseChat(@NonNull WaitResponse waitResponse) {
         Long value = this.responseChat.get(waitResponse);
 
         if(value == null) {
@@ -87,13 +89,13 @@ public class Chat implements GameObject {
         }
     }
 
-    public void setAnyResponseChat(Map<String, Long> anyResponseChat) {
+    public void setAnyResponseChat(@NonNull Map<String, Long> anyResponseChat) {
         for(Map.Entry<String, Long> entry : anyResponseChat.entrySet()) {
             this.setAnyResponseChat(entry.getKey(), entry.getValue());
         }
     }
 
-    public void setAnyResponseChat(String response, long chatId) {
+    public void setAnyResponseChat(@NonNull String response, long chatId) {
         Config.checkId(Id.CHAT, chatId);
 
         if(chatId == 0) {
@@ -103,7 +105,7 @@ public class Chat implements GameObject {
         }
     }
 
-    public long getAnyResponseChat(String response) {
+    public long getAnyResponseChat(@NonNull String response) {
         Long value = this.anyResponseChat.get(response);
 
         if(value == null) {
@@ -113,13 +115,13 @@ public class Chat implements GameObject {
         }
     }
 
-    public void setNeedStat(Map<StatType, Integer> needStat) {
+    public void setNeedStat(@NonNull Map<StatType, Integer> needStat) {
         for(Map.Entry<StatType, Integer> entry : needStat.entrySet()) {
             this.setNeedStat(entry.getKey(), entry.getValue());
         }
     }
 
-    public void setNeedStat(StatType statType, int stat) {
+    public void setNeedStat(@NonNull StatType statType, int stat) {
         Config.checkStatType(statType);
 
         if(stat < 0) {
@@ -133,7 +135,7 @@ public class Chat implements GameObject {
         }
     }
 
-    public int getNeedStat(StatType statType) {
+    public int getNeedStat(@NonNull StatType statType) {
         Integer value = this.needStat.get(statType);
 
         if(value == null) {
@@ -143,7 +145,11 @@ public class Chat implements GameObject {
         }
     }
 
-    public void setNeedItem(Map<Long, Integer> needItem) {
+    public void addNeedStat(@NonNull StatType statType, int stat) {
+        this.setNeedStat(statType, this.getNeedStat(statType) + stat);
+    }
+
+    public void setNeedItem(@NonNull Map<Long, Integer> needItem) {
         for(Map.Entry<Long, Integer> entry : needItem.entrySet()) {
             this.setNeedItem(entry.getKey(), entry.getValue());
         }
@@ -161,7 +167,7 @@ public class Chat implements GameObject {
         }
     }
 
-    public long getNeedItem(long itemId) {
+    public int getNeedItem(long itemId) {
         Integer value = this.needItem.get(itemId);
 
         if(value == null) {
@@ -171,13 +177,17 @@ public class Chat implements GameObject {
         }
     }
 
-    public void setRewardStat(Map<StatType, Integer> rewardStat) {
+    public void addNeedItem(long itemId, int count) {
+        this.setNeedItem(itemId, this.getNeedItem(itemId) + count);
+    }
+
+    public void setRewardStat(@NonNull Map<StatType, Integer> rewardStat) {
         for(Map.Entry<StatType, Integer> entry : rewardStat.entrySet()) {
             this.setRewardStat(entry.getKey(), entry.getValue());
         }
     }
 
-    public void setRewardStat(StatType statType, int stat) {
+    public void setRewardStat(@NonNull StatType statType, int stat) {
         Config.checkStatType(statType);
 
         if(stat < 0) {
@@ -191,7 +201,7 @@ public class Chat implements GameObject {
         }
     }
 
-    public int getRewardStat(StatType statType) {
+    public int getRewardStat(@NonNull StatType statType) {
         Integer value = this.rewardStat.get(statType);
 
         if(value == null) {
@@ -201,7 +211,11 @@ public class Chat implements GameObject {
         }
     }
 
-    public void setRewardItem(Map<Long, Integer> rewardItem) {
+    public void addRewardStat(@NonNull StatType statType, int stat) {
+        this.setRewardStat(statType, this.getRewardStat(statType) + stat);
+    }
+
+    public void setRewardItem(@NonNull Map<Long, Integer> rewardItem) {
         for(Map.Entry<Long, Integer> entry : rewardItem.entrySet()) {
             this.setRewardItem(entry.getKey(), entry.getValue());
         }
@@ -219,7 +233,7 @@ public class Chat implements GameObject {
         }
     }
 
-    public long getRewardItem(long itemId) {
+    public int getRewardItem(long itemId) {
         Integer value = this.rewardItem.get(itemId);
 
         if(value == null) {
@@ -227,6 +241,10 @@ public class Chat implements GameObject {
         } else {
             return value;
         }
+    }
+
+    public void addRewardItem(long itemId, int count) {
+        this.setRewardItem(itemId, this.getRewardItem(itemId) + count);
     }
 
 }

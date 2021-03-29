@@ -29,9 +29,7 @@ public class Skill implements GameObject {
     Use use;
 
     //Only use on getting
-    RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(
-            new HashMap<StatType, Integer>(), new HashMap<StatType, Integer>()
-    );
+    RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(new HashMap<>(), new HashMap<>());
 
     public Skill(@NonNull String name, boolean isPassive, @Nullable Use use,
                  @NonNull Map<StatType, Integer> minLimitStat, @NonNull Map<StatType, Integer> maxLimitStat) {

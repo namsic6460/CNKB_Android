@@ -99,6 +99,10 @@ public class Equipment extends Item {
         }
     }
 
+    public void addLimitStat(@NonNull StatType statType, int stat) {
+        this.setLimitStat(statType, this.getLimitStat(statType) + stat);
+    }
+
     public Equipment setBasicStat(@NonNull Map<StatType, Integer> basicStat) {
         for(Map.Entry<StatType, Integer> entry : basicStat.entrySet()) {
             this.setBasicStat(entry.getKey(), entry.getValue());
@@ -130,6 +134,10 @@ public class Equipment extends Item {
         }
     }
 
+    public Equipment addBasicStat(@NonNull StatType statType, int stat) {
+        return this.setBasicStat(statType, this.getBasicStat(statType) + stat);
+    }
+
     public Equipment setReinforceStat(@NonNull Map<StatType, Integer> reinforceStat) {
         for(Map.Entry<StatType, Integer> entry : reinforceStat.entrySet()) {
             this.setReinforceStat(entry.getKey(), entry.getValue());
@@ -159,6 +167,10 @@ public class Equipment extends Item {
         } else {
             return value;
         }
+    }
+
+    public Equipment addReinforceStat(@NonNull StatType statType, int stat) {
+        return this.setReinforceStat(statType, this.getReinforceStat(statType) + stat);
     }
 
     public int getStat(@NonNull StatType statType) {

@@ -3,7 +3,6 @@ package lkd.namsic.Game.Class;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,14 +82,14 @@ public abstract class Entity implements GameObject {
 
         this.setBasicStat(basicStat);
         this.equip(equip);
-        this.addBuff(buff);
+        this.setBuff(buff);
         this.revalidateStat();
 
         this.setInventory(inventory);
-        this.setEquipInventory(equipInventory);
+        this.addEquip(equipInventory);
 
-        this.addEnemies(enemies);
-        this.addEvents(events);
+        this.addEnemy(enemies);
+        this.addEvent(events);
     }
 
     public boolean setMoney(long money) {
@@ -177,6 +176,22 @@ public abstract class Entity implements GameObject {
 
     public abstract void loadOnSetMap(int worldX, int worldY, int fieldX, int fieldY);
 
+    public void addSkill(@NonNull Set<Long> skill) {
+        for(long skillId : skill) {
+            this.addSkill(skillId);
+        }
+    }
+
+    public void addSkill(long skillId) {
+        Config.checkId(Id.SKILL, skillId);
+        this.skill.add(skillId);
+    }
+
+    public boolean canAddSkill(long skillId) {
+        Config.checkId(Id.SKILL, skillId);
+        return ((Skill) Config.getData(Id.SKILL, skillId)).getLimitStat().isInRange(this.stat);
+    }
+
     public <T extends Entity> T setBasicStat(@NonNull Map<StatType, Integer> basicStat) {
         for(Map.Entry<StatType, Integer> entry : basicStat.entrySet()) {
             this.setBasicStat(entry.getKey(), entry.getValue());
@@ -212,6 +227,10 @@ public abstract class Entity implements GameObject {
         }
     }
 
+    public <T extends Entity> T addBasicStat(@NonNull StatType statType, int stat) {
+        return this.setBasicStat(statType, this.getBasicStat(statType) + stat);
+    }
+
     public <T extends Entity> T setEquipStat(@NonNull Map<StatType, Integer> equipStat) {
         for(Map.Entry<StatType, Integer> entry : equipStat.entrySet()) {
             this.setEquipStat(entry.getKey(), entry.getValue());
@@ -243,6 +262,10 @@ public abstract class Entity implements GameObject {
         }
     }
 
+    public <T extends Entity> T addEquipStat(@NonNull StatType statType, int stat) {
+        return this.setEquipStat(statType, this.getEquipStat(statType) + stat);
+    }
+
     public <T extends Entity> T setBuffStat(@NonNull Map<StatType, Integer> buffStat) {
         for(Map.Entry<StatType, Integer> entry : buffStat.entrySet()) {
             this.setBuffStat(entry.getKey(), entry.getValue());
@@ -272,6 +295,10 @@ public abstract class Entity implements GameObject {
         } else {
             return value;
         }
+    }
+
+    public <T extends Entity> T addBuffStat(@NonNull StatType statType, int stat) {
+        return this.setBuffStat(statType, this.getBuffStat(statType) + stat);
     }
 
     public boolean setStat(StatType statType, int stat) {
@@ -312,7 +339,7 @@ public abstract class Entity implements GameObject {
         return isCancelled;
     }
 
-    public int getStat(StatType statType) {
+    public int getStat(@NonNull StatType statType) {
         Integer value = this.stat.get(statType);
 
         if(value == null) {
@@ -322,11 +349,11 @@ public abstract class Entity implements GameObject {
         }
     }
 
-    public void addStat(StatType statType, int stat) {
-        this.setStat(statType, this.getStat(statType) + stat);
+    public boolean addStat(@NonNull StatType statType, int stat) {
+        return this.setStat(statType, this.getStat(statType) + stat);
     }
 
-    public void equip(Set<Long> equip) {
+    public void equip(@NonNull Set<Long> equip) {
         List<EquipType> typeList = new ArrayList<>();
 
         EquipType equipType;
@@ -342,7 +369,7 @@ public abstract class Entity implements GameObject {
     }
 
     public EquipType equip(long equipId) {
-        Equipment equipment = Config.getObject(Id.EQUIPMENT, equipId);
+        Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
         EquipType equipType = equipment.getEquipType();
 
         if(equip.containsKey(equipType)) {
@@ -359,13 +386,13 @@ public abstract class Entity implements GameObject {
         return equipType;
     }
 
-    public void unEquip(EquipType equipType) {
+    public void unEquip(@NonNull EquipType equipType) {
         Long equipId = equip.get(equipType);
         if(equipId == null) {
             return;
         }
 
-        Equipment equipment = Config.getObject(Id.EQUIPMENT, equipId);
+        Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
 
         StatType statType;
         for(Map.Entry<StatType, Integer> entry : equipment.stat.entrySet()) {
@@ -376,19 +403,19 @@ public abstract class Entity implements GameObject {
         this.equip.remove(equipType);
     }
 
-    public void addBuff(Map<Long, ConcurrentHashMap<StatType, Integer>> buff) {
+    public void setBuff(@NonNull Map<Long, ConcurrentHashMap<StatType, Integer>> buff) {
         for(Map.Entry<Long, ConcurrentHashMap<StatType, Integer>> entry : buff.entrySet()) {
-            this.addBuff(entry.getKey(), entry.getValue());
+            this.setBuff(entry.getKey(), entry.getValue());
         }
     }
 
-    public void addBuff(long time, Map<StatType, Integer> buff) {
+    public void setBuff(long time, @NonNull Map<StatType, Integer> buff) {
         for(Map.Entry<StatType, Integer> entry : buff.entrySet()) {
-            this.addBuff(time, entry.getKey(), entry.getValue());
+            this.setBuff(time, entry.getKey(), entry.getValue());
         }
     }
 
-    public void addBuff(long time, StatType statType, int stat) {
+    public void setBuff(long time, @NonNull StatType statType, int stat) {
         long currentTime = System.currentTimeMillis();
 
         if(time < currentTime) {
@@ -418,7 +445,44 @@ public abstract class Entity implements GameObject {
         }
     }
 
-    public void setInventory(Map<Long, Integer> inventory) {
+    public int getBuff(long time, @NonNull StatType statType) {
+        Map<StatType, Integer> buffMap = this.buff.get(time);
+
+        if(buffMap != null) {
+            Integer value = buffMap.get(statType);
+
+            if(value != null) {
+                return value;
+            }
+        }
+
+        return 0;
+    }
+
+    public void addBuff(long time, @NonNull StatType statType, int stat) {
+        this.setBuff(time, statType, this.getBuff(time, statType) + stat);
+    }
+
+    public void revalidateBuff() {
+        long currentTime = System.currentTimeMillis();
+
+        long time;
+        for(Map.Entry<Long, ConcurrentHashMap<StatType, Integer>> entry : this.buff.entrySet()) {
+            time = entry.getKey();
+
+            if(time < currentTime) {
+                StatType statType;
+                for(Map.Entry<StatType, Integer> buffEntry : entry.getValue().entrySet()) {
+                    statType = buffEntry.getKey();
+                    this.setBuffStat(statType, this.getBuffStat(statType) - buffEntry.getValue());
+                }
+
+                this.buff.remove(time);
+            }
+        }
+    }
+
+    public void setInventory(@NonNull Map<Long, Integer> inventory) {
         for(Map.Entry<Long, Integer> entry : inventory.entrySet()) {
             this.setItem(entry.getKey(), entry.getValue());
         }
@@ -453,35 +517,15 @@ public abstract class Entity implements GameObject {
         this.setItem(itemId, this.getItem(itemId) + count);
     }
 
-    public void setEquipInventory(Set<Long> equipInventory) {
+    public void addEquip(@NonNull Set<Long> equipInventory) {
         for(long equipId : equipInventory) {
-            this.addEquipInventory(equipId);
+            this.addEquip(equipId);
         }
     }
 
-    public void addEquipInventory(long equipId) {
+    public void addEquip(long equipId) {
         Config.checkId(Id.EQUIPMENT, equipId);
-
         this.equipInventory.add(equipId);
-    }
-
-    public void revalidateBuff() {
-        long currentTime = System.currentTimeMillis();
-
-        long time;
-        for(Map.Entry<Long, ConcurrentHashMap<StatType, Integer>> entry : this.buff.entrySet()) {
-            time = entry.getKey();
-
-            if(time < currentTime) {
-                StatType statType;
-                for(Map.Entry<StatType, Integer> buffEntry : entry.getValue().entrySet()) {
-                    statType = buffEntry.getKey();
-                    this.setBuffStat(statType, this.getBuffStat(statType) - buffEntry.getValue());
-                }
-
-                this.buff.remove(time);
-            }
-        }
     }
 
     public void revalidateStat() {
@@ -500,14 +544,14 @@ public abstract class Entity implements GameObject {
         }
     }
 
-    public void addEnemies(@NonNull Map<Id, ConcurrentHashSet<Long>> enemies) {
-        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : enemies.entrySet()) {
-            this.addEnemies(entry.getKey(), entry.getValue());
+    public void addEnemy(@NonNull Map<Id, ConcurrentHashSet<Long>> enemy) {
+        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : enemy.entrySet()) {
+            this.addEnemy(entry.getKey(), entry.getValue());
         }
     }
 
-    public void addEnemies(@NonNull Id id, @NonNull ConcurrentHashSet<Long> enemies) {
-        for(long enemyId : enemies) {
+    public void addEnemy(@NonNull Id id, @NonNull ConcurrentHashSet<Long> enemy) {
+        for(long enemyId : enemy) {
             this.addEnemy(id, enemyId);
         }
     }
@@ -530,41 +574,31 @@ public abstract class Entity implements GameObject {
         }
     }
 
-    @NonNull
-    public Set<Long> getEnemies(@NonNull Id id) {
-        Set<Long> enemies = this.enemies.get(id);
-
-        if(enemies == null) {
-            return new HashSet<>();
-        } else {
-            return new HashSet<>(enemies);
+    public void addEvent(@NonNull Map<String, ConcurrentArrayList<Event>> event) {
+        for(Map.Entry<String, ConcurrentArrayList<Event>> entry : event.entrySet()) {
+            this.addEvent(entry.getKey(), entry.getValue());
         }
     }
 
-    public void addEvents(@NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events) {
-        for(Map.Entry<String, ConcurrentArrayList<Event>> entry : events.entrySet()) {
-            this.addEvents(entry.getKey(), entry.getValue());
-        }
-    }
-
-    public void addEvents(@NonNull String eventName, @NonNull ConcurrentArrayList<Event> events) {
-        for(Event event : events) {
-            this.addEvent(eventName, event);
+    public void addEvent(@NonNull String eventName, @NonNull List<Event> event) {
+        for(Event e : event) {
+            this.addEvent(eventName, e);
         }
     }
 
     public void addEvent(@NonNull String eventName, @NonNull Event event) {
-        if(this.events.containsKey(eventName)) {
-            this.events.get(eventName).add(event);
-        } else {
-            ConcurrentArrayList<Event> list = new ConcurrentArrayList<>();
-            list.add(event);
+        ConcurrentArrayList<Event> eventSet = this.events.get(eventName);
 
-            this.events.put(eventName, list);
+        if(eventSet == null) {
+            eventSet = new ConcurrentArrayList<>();
+            eventSet.add(event);
+            this.events.put(eventName, eventSet);
+        } else {
+            eventSet.add(event);
         }
     }
 
-    public boolean canFight(Entity enemy) {
+    public boolean canFight(@NonNull Entity enemy) {
         if(enemy instanceof Player) {
             if(!((Player) enemy).isPvp()) {
                 return false;
@@ -587,7 +621,7 @@ public abstract class Entity implements GameObject {
         return !doingList.contains(this.getDoing());
     }
 
-    public boolean startFight(Set<Entity> enemies) {
+    public boolean startFight(@NonNull Set<Entity> enemies) {
         for(Entity enemy : enemies) {
             if(!enemy.canFight(enemy)) {
                 return false;
