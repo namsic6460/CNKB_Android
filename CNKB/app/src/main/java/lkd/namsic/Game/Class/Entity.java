@@ -3,8 +3,12 @@ package lkd.namsic.Game.Class;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +29,7 @@ import lkd.namsic.Game.Event.MoveEvent;
 import lkd.namsic.Game.Exception.CollectionAddFailedException;
 import lkd.namsic.Game.Exception.InvalidNumberException;
 import lkd.namsic.Game.Exception.NumberRangeException;
+import lkd.namsic.Game.Exception.ObjectNotFoundException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +40,7 @@ import lombok.Setter;
 */
 
 @Getter
-public abstract class Entity implements GameObject {
+public class Entity implements GameObject {
 
     @Setter
     @NonNull
@@ -115,66 +120,83 @@ public abstract class Entity implements GameObject {
         return this.setMoney(this.getMoney() + money);
     }
 
-    public void moveField(int fieldX, int fieldY) {
-        this.setField(this.location.getFieldX().get() + fieldX,
+    public void dropMoney(long money) {
+        long currentMoney = this.getMoney();
+
+        if(money > currentMoney || money < 1) {
+            throw new NumberRangeException(money, 1, currentMoney);
+        }
+
+        this.addMoney(-1 * money);
+        MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+        map.addMoney(this.location, money);
+        Config.unloadMap(map);
+    }
+
+    public boolean moveField(int fieldX, int fieldY) {
+        return this.setField(this.location.getFieldX().get() + fieldX,
                 this.location.getFieldY().get() + fieldY, Math.abs(fieldX) + Math.abs(fieldY));
     }
 
-    public void setField(int fieldX, int fieldY) {
+    public boolean setField(int fieldX, int fieldY) {
         int xDis = Math.abs(this.location.getFieldX().get() - fieldX);
         int yDis = Math.abs(this.location.getFieldY().get() - fieldX);
-        setField(fieldX, fieldY, xDis + yDis);
+        return setField(fieldX, fieldY, xDis + yDis);
     }
 
     public boolean setField(int fieldX, int fieldY, int distance) {
-        if(distance <= 0) {
-            throw new NumberRangeException(distance, 1);
+        if(distance < 0) {
+            throw new NumberRangeException(distance, 0);
         }
 
         boolean isCancelled = MoveEvent.handleEvent(this.events.get(MoveEvent.getName()), new Object[]{distance, true});
 
         if(!isCancelled) {
-            this.location.getFieldX().set(fieldX);
-            this.location.getFieldY().set(fieldY);
+            this.location.setField(fieldX, fieldY);
         }
 
         return isCancelled;
     }
 
-    public void moveMap(int worldX, int worldY) {
-        this.setMap(this.location.getX().get() + worldX, this.location.getY().get() + worldY,
-                Math.abs(worldX) + Math.abs(worldY));
+    public boolean moveMap(int x, int y) {
+        return this.setMap(this.location.getX().get() + x, this.location.getY().get() + y,
+                Math.abs(x) + Math.abs(y));
     }
 
-    public void setMap(int worldX, int worldY) {
-        int xDis = Math.abs(this.location.getX().get() - worldX);
-        int yDis = Math.abs(this.location.getY().get() - worldY);
-        setMap(worldX, worldY, xDis + yDis);
+    public boolean setMap(int x, int y) {
+        int xDis = Math.abs(this.location.getX().get() - x);
+        int yDis = Math.abs(this.location.getY().get() - y);
+        return setMap(x, y, xDis + yDis);
     }
 
     public boolean setMap(int worldX, int worldY, int distance) {
         return this.setMap(worldX, worldY, this.location.getFieldX().get(), this.location.getFieldY().get(), distance);
     }
 
-    public boolean setMap(int worldX, int worldY, int fieldX, int fieldY, int distance) {
+    public boolean setMap(int x, int y, int fieldX, int fieldY, int distance) {
         if(distance <= 0) {
             throw new NumberRangeException(distance, 1);
         }
 
         boolean isCancelled = MoveEvent.handleEvent(this.events.get(MoveEvent.getName()), new Object[]{distance, false});
 
-        if(!isCancelled) {
-            this.location.getFieldX().set(worldX);
-            this.location.getFieldY().set(worldY);
-            this.setField(fieldX, fieldY);
+        if(!isCancelled && !this.setField(fieldX, fieldY)) {
+            MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+            map.removeEntity(this.id.getId(), this.id.getObjectId());
+            Config.unloadMap(map);
 
-            this.loadOnSetMap(worldX, worldY, fieldX, fieldY);
+            this.location.setMap(x, y);
+
+            map = Config.loadMap(x, y);
+            map.addEntity(this.id.getId(), this.id.getObjectId());
+
+            if(this instanceof AiEntity) {
+                Config.unloadMap(map);
+            }
         }
 
         return isCancelled;
     }
-
-    public abstract void loadOnSetMap(int worldX, int worldY, int fieldX, int fieldY);
 
     public void addSkill(@NonNull Set<Long> skill) {
         for(long skillId : skill) {
@@ -315,13 +337,14 @@ public abstract class Entity implements GameObject {
         }
 
         boolean isCancelled = false;
-
+        boolean isDeath = false;
         if(statType.equals(StatType.HP)) {
             int maxHp = this.getStat(StatType.MAXHP);
 
             if(stat > maxHp) {
                 stat = maxHp;
             } else if(stat <= 0) {
+                isDeath = true;
                 isCancelled = DeathEvent.handleEvent(this.events.get(DeathEvent.getName()), new Object[]{this.getStat(StatType.HP), stat});
             }
         } else if(statType.equals(StatType.MN)) {
@@ -333,10 +356,27 @@ public abstract class Entity implements GameObject {
         }
 
         if(!isCancelled) {
+            if(isDeath) {
+                this.death();
+            }
+
             this.stat.put(statType, stat);
         }
 
         return isCancelled;
+    }
+
+    public void death() {
+        Id id;
+        Map<Id, Set<Long>> enemyCopy = new HashMap<>(this.enemies);
+        for(Map.Entry<Id, Set<Long>> entry : enemyCopy.entrySet()) {
+            id = entry.getKey();
+
+            for(long objectId : entry.getValue()) {
+                Entity entity = Config.loadObject(id, objectId);
+                entity.removeEnemy(id, objectId);
+            }
+        }
     }
 
     public int getStat(@NonNull StatType statType) {
@@ -517,6 +557,19 @@ public abstract class Entity implements GameObject {
         this.setItem(itemId, this.getItem(itemId) + count);
     }
 
+    public void dropItem(long itemId, int count) {
+        int itemCount = this.getItem(itemId);
+
+        if(count > itemCount || count < 1) {
+            throw new NumberRangeException(count, 1, itemCount);
+        }
+
+        this.addItem(itemId, -1 * count);
+        MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+        map.addItem(this.location, itemId, count);
+        Config.unloadMap(map);
+    }
+
     public void addEquip(@NonNull Set<Long> equipInventory) {
         for(long equipId : equipInventory) {
             this.addEquip(equipId);
@@ -526,6 +579,21 @@ public abstract class Entity implements GameObject {
     public void addEquip(long equipId) {
         Config.checkId(Id.EQUIPMENT, equipId);
         this.equipInventory.add(equipId);
+    }
+
+    public void removeEquip(long equipId) {
+        if(!this.equipInventory.contains(equipId)) {
+            throw new ObjectNotFoundException(Id.EQUIPMENT, equipId);
+        }
+
+        this.equipInventory.remove(equipId);
+    }
+
+    public void dropEquip(long equipId) {
+        this.removeEquip(equipId);
+        MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+        map.addEquip(this.location, equipId);
+        Config.unloadMap(map);
     }
 
     public void revalidateStat() {
@@ -556,21 +624,30 @@ public abstract class Entity implements GameObject {
         }
     }
 
-    public void addEnemy(@NonNull Id id, long enemyId) {
-        if(!(id.equals(Id.BOSS) || id.equals(Id.MONSTER) || id.equals(Id.PLAYER) || id.equals(Id.NPC))) {
-            throw new UnhandledEnumException(id);
-        }
-
-        Config.checkId(id, enemyId);
+    public void addEnemy(@NonNull Id id, long objectId) {
+        Id.checkEntityId(id);
+        Config.checkId(id, objectId);
 
         ConcurrentHashSet<Long> enemySet = this.enemies.get(id);
         if(enemySet == null) {
             enemySet = new ConcurrentHashSet<>();
-            enemySet.add(enemyId);
+            enemySet.add(objectId);
 
             this.enemies.put(id, enemySet);
         } else {
-            enemySet.add(enemyId);
+            enemySet.add(objectId);
+        }
+    }
+
+    public void removeEnemy(@NonNull Id id, long objectId) {
+        Id.checkEntityId(id);
+        Config.checkId(id, objectId);
+
+        Set<Long> enemySet = Objects.requireNonNull(this.enemies.get(id));
+        enemySet.remove(objectId);
+
+        if(enemySet.isEmpty()) {
+            this.enemies.remove(id);
         }
     }
 
@@ -599,26 +676,7 @@ public abstract class Entity implements GameObject {
     }
 
     public boolean canFight(@NonNull Entity enemy) {
-        if(enemy instanceof Player) {
-            if(!((Player) enemy).isPvp()) {
-                return false;
-            }
-        }
-
-        List<Doing> doingList = new ArrayList<>();
-        doingList.add(Doing.BUY);
-        doingList.add(Doing.CHAT);
-        doingList.add(Doing.REINFORCE);
-
-        if(this instanceof Player) {
-            if(!((Player) this).isPvp()) {
-                return false;
-            }
-
-            doingList.add(Doing.FIGHT);
-        }
-
-        return !doingList.contains(this.getDoing());
+        return !Doing.nonFightDoing().contains(this.getDoing());
     }
 
     public boolean startFight(@NonNull Set<Entity> enemies) {
