@@ -3,8 +3,13 @@ package lkd.namsic.Game.Class;
 import androidx.annotation.NonNull;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.Game.Base.ConcurrentArrayList;
@@ -40,6 +45,8 @@ public class Player extends Entity {
     boolean pvp;
 
     long lastTime;
+
+    Location baseLocation;
 
     LimitInteger sp = new LimitInteger(0, Config.MIN_SP, Config.MAX_SP);
     LimitInteger adv = new LimitInteger(0, 0, Integer.MAX_VALUE);
@@ -148,8 +155,8 @@ public class Player extends Entity {
     }
 
     @Override
-    public boolean setMap(int worldX, int worldY, int fieldX, int fieldY, int distance) {
-        boolean isCancelled = super.setMap(worldX, worldY, fieldX, fieldY, distance);
+    public boolean setMap(int x, int y, int fieldX, int fieldY, int distance) {
+        boolean isCancelled = super.setMap(x, y, fieldX, fieldY, distance);
 
         if(!isCancelled) {
             this.addLog(LogData.MAP_MOVE_DISTANCE, distance);
@@ -159,20 +166,68 @@ public class Player extends Entity {
     }
 
     @Override
-    public void loadOnSetMap(int worldX, int worldY, int fieldX, int fieldY) {
-        //TODO : load map and save player
+    public void setBuff(long time, @NonNull StatType statType, int stat) {
+        super.setBuff(time, statType, stat);
+        this.addLog(LogData.BUFF_RECEIVED, 1);
     }
 
     @Override
-    public void setBuff(long time, StatType statType, int stat) {
-        super.setBuff(time, statType, stat);
-        this.addLog(LogData.BUFF_RECEIVED, 1);
+    public void death() {
+        super.death();
+
+        this.setStat(StatType.HP, 1);
+        this.location.set(((Player) this).baseLocation);
+
+        Random random = new Random();
+        double loseMoneyPercent = random.nextDouble() * 0.1 + 0.05;
+        int dropItem = random.nextInt(4);
+
+        long loseMoney = (long) (this.getMoney() * loseMoneyPercent * 0.5);
+        this.addMoney(loseMoney);
+        this.dropMoney(loseMoney);
+
+        List<Long> keys;
+        long itemId;
+        int count;
+        for(int i = 0; i < dropItem; i++) {
+            keys = new ArrayList<>(this.inventory.keySet());
+            itemId = keys.get(random.nextInt(keys.size()));
+            count = random.nextInt(this.getItem(itemId));
+
+            this.dropItem(itemId, count);
+        }
+
+        this.addLog(LogData.DEATH, 1);
     }
 
     @Override
     public void revalidateStat() {
         super.revalidateStat();
         this.addLog(LogData.STAT_UPDATED, 1);
+    }
+
+    @Override
+    public boolean canFight(@NonNull Entity enemy) {
+        boolean flag = super.canFight(enemy);
+
+        if(flag) {
+            if(this.getDoing().equals(Doing.FIGHT)) {
+                return false;
+            }
+
+            List<Doing> doingList = Doing.nonFightDoing();
+
+            if(enemy instanceof Player) {
+                Player player = (Player) enemy;
+
+                doingList.add(Doing.FIGHT);
+                return player.isPvp() && this.isPvp() && !doingList.contains(player.getDoing());
+            } else {
+                return !doingList.contains(enemy.getDoing());
+            }
+        } else {
+            return false;
+        }
     }
 
     @NonNull

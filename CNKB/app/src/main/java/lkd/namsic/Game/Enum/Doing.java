@@ -1,5 +1,8 @@
 package lkd.namsic.Game.Enum;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum Doing {
 
     IDLE,
@@ -11,6 +14,15 @@ public enum Doing {
     MINE,
     GATHER,
     HARVEST,
-    REINFORCE
+    REINFORCE;
+
+    public static List<Doing> nonFightDoing() {
+        List<Doing> doingList = new ArrayList<>();
+        doingList.add(Doing.BUY);
+        doingList.add(Doing.CHAT);
+        doingList.add(Doing.REINFORCE);
+
+        return doingList;
+    }
 
 }

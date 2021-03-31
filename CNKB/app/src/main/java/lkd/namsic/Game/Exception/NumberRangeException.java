@@ -17,6 +17,10 @@ public class NumberRangeException extends RuntimeException {
         super("Value: " + value + ", Min: " + minValue + ", Max: " + maxValue);
     }
 
+    public NumberRangeException(double value, double minValue, double maxValue) {
+        super("Value: " + value + "D, Min: " + minValue + "D, Max: " + maxValue + "D");
+    }
+
     public NumberRangeException(long value, long minValue) {
         throw new NumberRangeException(value, minValue, Long.MAX_VALUE);
     }

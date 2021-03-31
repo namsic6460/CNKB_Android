@@ -6,6 +6,7 @@ public enum LogData {
     BOUGHT,
     BUFF_RECEIVED,
     CHAT,
+    DEATH,
     EXPLORED,
     FIELD_MOVE_DISTANCE,
     GATHERED,
