@@ -25,6 +25,25 @@ public class Location implements Serializable {
         this.fieldY.set(fieldY);
     }
 
+    public void setMap(int x, int y) {
+        this.x.set(x);
+        this.y.set(y);
+    }
+
+    public void setField(int fieldX, int fieldY) {
+        this.fieldX.set(fieldX);
+        this.fieldY.set(fieldY);
+    }
+
+    public void set(int x, int y, int fieldX, int fieldY) {
+        this.setMap(x, y);
+        this.setField(fieldX, fieldY);
+    }
+
+    public void set(Location location) {
+        this.set(location.getX().get(), location.getY().get(), location.getFieldX().get(), this.getFieldY().get());
+    }
+
     public boolean equalsMap(@NonNull Location location) {
         return this.x.equals(location.x) && this.y.equals(location.y);
     }
