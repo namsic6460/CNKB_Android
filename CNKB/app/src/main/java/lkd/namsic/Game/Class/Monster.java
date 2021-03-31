@@ -14,7 +14,7 @@ import lkd.namsic.Game.Event.Event;
 import lombok.ToString;
 
 @ToString
-public class Monster extends Entity {
+public class Monster extends AiEntity {
 
     public Monster(@NonNull String name, int lv, long money, @NonNull Location location,
                    @NonNull Doing doing, @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
@@ -27,11 +27,6 @@ public class Monster extends Entity {
         super(name, lv, money, location, doing, basicStat, equip, buff, inventory, equipInventory, enemies, events);
 
         this.id.setId(Id.MONSTER);
-    }
-
-    @Override
-    public void loadOnSetMap(int worldX, int worldY, int fieldX, int fieldY) {
-        //TODO : load map and save data. last, unload.
     }
 
 }
