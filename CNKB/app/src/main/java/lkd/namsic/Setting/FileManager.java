@@ -20,6 +20,7 @@ import lkd.namsic.Game.Enum.Id;
 public class FileManager extends Application {
 
     private final static String PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CNKB";
+    public final static String CONFIG_PATH = PATH + "/config.json";
     public final static String LOG_PATH = PATH + "/logs";
     public final static String DATA_PATH = PATH + "/data";
     public final static String MAP_PATH = DATA_PATH + "/map";
@@ -47,11 +48,10 @@ public class FileManager extends Application {
 
             new File(MAP_PATH).mkdir();
 
-            String filePath = PATH + "/" + "config.json";
-            String config = read(filePath);
+            String config = read(CONFIG_PATH);
             if (config.equals("")) {
                 JSONObject configObject = Config.createConfig();
-                save(filePath, configObject.toString());
+                save(CONFIG_PATH, configObject.toString());
             } else {
                 JSONObject jsonObject = new JSONObject(config);
                 Config.parseConfig(jsonObject);

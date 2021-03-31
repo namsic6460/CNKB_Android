@@ -38,13 +38,6 @@ import lkd.namsic.Setting.Logger;
 
 public class Config {
 
-    /*
-    TODO
-    1. moveMap - load, unload map - Made logic(abstract method) - DONE
-    2. save player count on a map - DONE
-    3. create/parse config - This will be a huge work....
-     */
-
     public static final Map<Id, Long> ID_COUNT = new ConcurrentHashMap<>();
 
     public static final Map<Id, ConcurrentHashMap<Long, GameObject>> OBJECT = new ConcurrentHashMap<>();
@@ -77,20 +70,24 @@ public class Config {
         }
 
         for(Id id : Id.values()) {
+            ID_COUNT.put(id, 1L);
+
             OBJECT.put(id, new ConcurrentHashMap<>());
             OBJECT_COUNT.put(id, new ConcurrentHashMap<>());
-            ID_COUNT.put(id, 1L);
         }
     }
 
     public static JSONObject createConfig() throws JSONException {
         JSONObject jsonObject = new JSONObject();
 
-        JSONObject idObject = new JSONObject();
+        JSONObject idJson = new JSONObject();
+        String idName;
         for(Id id : Id.values()) {
-            idObject.put(id.toString(), 1L);
+            idName = id.toString();
+            idJson.put(idName, ID_COUNT.get(id));
         }
-        jsonObject.put("id", idObject);
+
+        jsonObject.put("id", idJson);
 
         return jsonObject;
     }
@@ -101,7 +98,29 @@ public class Config {
         String idName;
         for(Id id : Id.values()) {
             idName = id.toString();
-            idObject.put(idName, idObject.getLong(idName));
+
+            ID_COUNT.put(id, idObject.getLong(idName));
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public static void onTerminate() {
+        try {
+            for(Id id : Id.values()) {
+                List<GameObject> objectCopy = new ArrayList<>(OBJECT.get(id).values());
+                for (GameObject gameObject : objectCopy) {
+                    unloadObject(gameObject);
+                }
+
+                List<MapClass> mapCopy = new ArrayList<>(MAP.values());
+                for(MapClass map : mapCopy) {
+                    unloadMap(map);
+                }
+            }
+
+            FileManager.save(FileManager.CONFIG_PATH, createConfig().toString());
+        } catch (Exception e) {
+            Logger.e("onTerminate", e);
         }
     }
 
@@ -161,7 +180,7 @@ public class Config {
     public static void unloadObject(@NonNull GameObject gameObject) {
         Id id = gameObject.id.getId();
         long objectId = gameObject.id.getObjectId();
-        Long objectCount = OBJECT_COUNT.get(id).get(objectId);
+        long objectCount = OBJECT_COUNT.get(id).get(objectId);
 
         if(objectCount > 1) {
             OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
@@ -185,7 +204,7 @@ public class Config {
     @SuppressWarnings("ConstantConditions")
     public static void unloadMap(@NonNull MapClass map) {
         String fileName = getMapFileName(map);
-        Long playerCount = PLAYER_COUNT.get(fileName);
+        long playerCount = PLAYER_COUNT.get(fileName);
 
         if(playerCount > 1) {
             PLAYER_COUNT.put(fileName, playerCount - 1);
