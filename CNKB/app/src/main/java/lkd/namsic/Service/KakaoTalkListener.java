@@ -1,5 +1,6 @@
 package lkd.namsic.Service;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.RemoteInput;
@@ -23,7 +24,9 @@ public class KakaoTalkListener extends NotificationListenerService {
 
     Map<String, Notification.Action> groupSessions = new ConcurrentHashMap<>();
     Map<String, Notification.Action> soloSessions = new ConcurrentHashMap<>();
-    Context context;
+
+    @SuppressLint("StaticFieldLeak")
+    private static Context context;
 
     @Override
     public void onCreate() {
@@ -114,7 +117,7 @@ public class KakaoTalkListener extends NotificationListenerService {
         MainActivity.startThread(thread);
     }
 
-    private void reply(Notification.Action session, String msg){
+    public static void reply(Notification.Action session, String msg){
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
 
@@ -125,7 +128,7 @@ public class KakaoTalkListener extends NotificationListenerService {
         RemoteInput.addResultsToIntent(session.getRemoteInputs(), intent, bundle);
 
         try {
-            session.actionIntent.send(this, 0, intent);
+            session.actionIntent.send(context, 0, intent);
         } catch (PendingIntent.CanceledException e) {
             Logger.e("KakaoTalkListener", e);
         }

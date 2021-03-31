@@ -37,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("StaticFieldLeak")
     public static TextView textView;
 
+    @SuppressLint("StaticFieldLeak")
+    private TextView threadCount;
+
     private SwitchCompat switchBtn;
 
     @Override
@@ -70,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.text);
         startService(new Intent(this, ForcedTerminationService.class));
 
+        threadCount = findViewById(R.id.thread_count);
+
         context = this;
         switchBtn = findViewById(R.id.switchBtn);
 
@@ -78,7 +83,11 @@ public class MainActivity extends AppCompatActivity {
         threadCleaner.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if(chatThreads.isEmpty()) {
+                int size = chatThreads.size();
+
+                threadCount.setText(size);
+
+                if(size == 0) {
                     return;
                 }
 

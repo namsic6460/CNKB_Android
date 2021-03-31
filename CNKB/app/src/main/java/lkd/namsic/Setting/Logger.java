@@ -53,12 +53,7 @@ public class Logger {
         final String logText = timeText + "[" + prefix + "] : " + title + " - " + text + "\n";
         logs += logText;
 
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                MainActivity.textView.append(logText);
-            }
-        });
+        activity.runOnUiThread(() -> MainActivity.textView.append(logText));
 
         logCount++;
         lastLogDay = time.getDayOfMonth();
