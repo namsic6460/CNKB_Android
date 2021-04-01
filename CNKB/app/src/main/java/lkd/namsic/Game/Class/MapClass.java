@@ -2,7 +2,6 @@ package lkd.namsic.Game.Class;
 
 import androidx.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -23,7 +22,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class MapClass implements Serializable {
+public class MapClass {
 
     @Setter
     @NonNull

@@ -3,19 +3,14 @@ package lkd.namsic.Game;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,8 +19,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lkd.namsic.Game.Class.Achieve;
+import lkd.namsic.Game.Class.Boss;
+import lkd.namsic.Game.Class.Chat;
+import lkd.namsic.Game.Class.Equipment;
 import lkd.namsic.Game.Class.GameObject;
+import lkd.namsic.Game.Class.Item;
 import lkd.namsic.Game.Class.MapClass;
+import lkd.namsic.Game.Class.Monster;
+import lkd.namsic.Game.Class.Npc;
+import lkd.namsic.Game.Class.Player;
+import lkd.namsic.Game.Class.Quest;
+import lkd.namsic.Game.Class.Research;
+import lkd.namsic.Game.Class.Skill;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Exception.NumberRangeException;
@@ -34,11 +40,10 @@ import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lkd.namsic.Setting.FileManager;
 import lkd.namsic.Setting.Logger;
 
-//Consider using GSON instead of serializing for debugging and error checking
-
 public class Config {
 
     public static final Map<Id, Long> ID_COUNT = new ConcurrentHashMap<>();
+    public static final Map<Id, Class<?>> ID_CLASS = new HashMap<>();
 
     public static final Map<Id, ConcurrentHashMap<Long, GameObject>> OBJECT = new ConcurrentHashMap<>();
     public static final Map<Id, ConcurrentHashMap<Long, Long>> OBJECT_COUNT = new ConcurrentHashMap<>();
@@ -65,6 +70,18 @@ public class Config {
     public static final int MAX_SP = 100;
 
     public static void init() {
+        ID_CLASS.put(Id.ACHIEVE, Achieve.class);
+        ID_CLASS.put(Id.BOSS, Boss.class);
+        ID_CLASS.put(Id.CHAT, Chat.class);
+        ID_CLASS.put(Id.EQUIPMENT, Equipment.class);
+        ID_CLASS.put(Id.ITEM, Item.class);
+        ID_CLASS.put(Id.MONSTER, Monster.class);
+        ID_CLASS.put(Id.NPC, Npc.class);
+        ID_CLASS.put(Id.PLAYER, Player.class);
+        ID_CLASS.put(Id.QUEST, Quest.class);
+        ID_CLASS.put(Id.RESEARCH, Research.class);
+        ID_CLASS.put(Id.SKILL, Skill.class);
+
         if(!OBJECT.isEmpty()) {
             return;
         }
@@ -148,32 +165,14 @@ public class Config {
         }
     }
 
-    @Nullable
-    public static <T extends Serializable> String serialize(@NonNull T t) {
-        byte[] serialized;
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(t);
-            serialized = baos.toByteArray();
-        } catch (IOException e) {
-            Logger.e("serialize", e);
-            return null;
-        }
-
-        return Base64.getEncoder().encodeToString(serialized);
+    @NonNull
+    public static <T> String toJson(@NonNull T t) {
+        return new Gson().toJson(t);
     }
 
     @Nullable
-    public static <T extends Serializable> T deserialize(@NonNull String byteStr) {
-        byte[] serialized = Base64.getDecoder().decode(byteStr);
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(serialized)) {
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            Object object = ois.readObject();
-            return (T) object;
-        } catch (IOException | ClassNotFoundException e) {
-            Logger.e("deserialize", e);
-            return null;
-        }
+    public static <T> T fromJson(@NonNull String jsonString, @NonNull Class<?> clazz) {
+        return (T) new Gson().fromJson(jsonString, clazz);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -185,14 +184,10 @@ public class Config {
         if(objectCount > 1) {
             OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
         } else {
-            String serialized = serialize(gameObject);
+            String jsonString = toJson(gameObject);
             String path = getPath(id, objectId);
-            if (serialized == null) {
-                Logger.e("saveObject", new RuntimeException("Failed to save object - " + path));
-                return;
-            }
 
-            FileManager.save(path, serialized);
+            FileManager.save(path, jsonString);
 
             if(objectCount == 1) {
                 OBJECT.get(id).remove(objectId);
@@ -209,14 +204,10 @@ public class Config {
         if(playerCount > 1) {
             PLAYER_COUNT.put(fileName, playerCount - 1);
         } else {
-            String serialized = serialize(map);
+            String jsonString = toJson(map);
             String path = getMapPath(fileName);
-            if (serialized == null) {
-                Logger.e("saveObject", new RuntimeException("Failed to unload map - " + path));
-                return;
-            }
 
-            FileManager.save(path, serialized);
+            FileManager.save(path, jsonString);
 
             if(playerCount == 1) {
                 MAP.remove(fileName);
@@ -248,13 +239,10 @@ public class Config {
 
         if(objectCount == null) {
             String path = getPath(id, objectId);
-            String serialized = FileManager.read(path);
-            if (serialized.equals("")) {
-                Logger.e("getObject", new RuntimeException("Failed to get object - " + path));
-                throw new ObjectNotFoundException(path);
-            }
+            String jsonString = FileManager.read(path);
 
-            T t = deserialize(serialized);
+            T t = fromJson(jsonString, ID_CLASS.get(id));
+
             OBJECT.get(id).put(objectId, t);
             OBJECT_COUNT.get(id).put(objectId, 1L);
             return t;
@@ -272,13 +260,10 @@ public class Config {
 
         if(playerCount == null) {
             String path = getMapPath(fileName);
-            String serialized = FileManager.read(path);
-            if (serialized.equals("")) {
-                Logger.e("getObject", new RuntimeException("Failed to load map - " + path));
-                throw new ObjectNotFoundException(path);
-            }
+            String jsonString = FileManager.read(path);
 
-            MapClass map = deserialize(serialized);
+            MapClass map = fromJson(jsonString, MapClass.class);
+
             MAP.put(fileName, map);
             PLAYER_COUNT.put(fileName, 1L);
             return map;
