@@ -68,6 +68,8 @@ public class Config {
     public static final int MAX_LV = 999;
     public static final int MIN_SP = 0;
     public static final int MAX_SP = 100;
+    public static final long MIN_PAUSE_TIME = 1000;
+    public static final long MAX_PAUSE_TIME = 5000;
 
     public static void init() {
         ID_CLASS.put(Id.ACHIEVE, Achieve.class);

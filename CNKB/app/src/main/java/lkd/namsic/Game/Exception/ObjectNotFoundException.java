@@ -8,8 +8,8 @@ public class ObjectNotFoundException extends RuntimeException {
         super(id.toString() + "-" + objectId);
     }
 
-    public ObjectNotFoundException(String path) {
-        super(path);
+    public ObjectNotFoundException(String string) {
+        super(string);
     }
 
 }

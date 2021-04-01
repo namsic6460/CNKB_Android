@@ -29,45 +29,22 @@ public class MapClass {
     String name;
 
     @Setter
-    boolean pvp;
+    boolean pvp = false;
 
     @Setter
     @NonNull
-    MapType mapType;
+    MapType mapType = MapType.COUNTRY;
 
-    Location location;
+    Location location = new Location();
 
-    ConcurrentHashMap<Location, Long> money;
-    ConcurrentHashMap<Location, ConcurrentHashMap<Long, Integer>> item;
-    ConcurrentHashMap<Location, ConcurrentHashSet<Long>> equip;
+    Map<Location, Long> money = new ConcurrentHashMap<>();
+    Map<Location, ConcurrentHashMap<Long, Integer>> item = new ConcurrentHashMap<>();
+    Map<Location, ConcurrentHashSet<Long>> equip = new ConcurrentHashMap<>();
 
-    ConcurrentHashMap<Id, ConcurrentHashSet<Long>> entity;
+    Map<Id, ConcurrentHashSet<Long>> entity = new ConcurrentHashMap<>();
 
-    public MapClass(@NonNull String name, boolean pvp, @NonNull MapType mapType, @NonNull Location location,
-                    @NonNull ConcurrentHashMap<Location, Long> money,
-                    @NonNull ConcurrentHashMap<Location, ConcurrentHashMap<Long, Integer>> item,
-                    @NonNull ConcurrentHashMap<Location, ConcurrentHashSet<Long>> equip,
-                    @NonNull ConcurrentHashSet<Long> boss, @NonNull ConcurrentHashSet<Long> monster,
-                    @NonNull ConcurrentHashSet<Long> npc, @NonNull ConcurrentHashSet<Long> player) {
+    public MapClass(@NonNull String name) {
         this.name = name;
-        this.pvp = pvp;
-        this.mapType = mapType;
-        this.location = location;
-
-        this.setMoney(money);
-        this.setItem(item);
-        this.addEquip(equip);
-
-        this.entity = new ConcurrentHashMap<>();
-        this.entity.put(Id.BOSS, new ConcurrentHashSet<>());
-        this.entity.put(Id.MONSTER, new ConcurrentHashSet<>());
-        this.entity.put(Id.NPC, new ConcurrentHashSet<>());
-        this.entity.put(Id.PLAYER, new ConcurrentHashSet<>());
-
-        this.addEntity(Id.BOSS, boss);
-        this.addEntity(Id.MONSTER, monster);
-        this.addEntity(Id.NPC, npc);
-        this.addEntity(Id.PLAYER, player);
     }
 
     @NonNull

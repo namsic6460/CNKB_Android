@@ -16,15 +16,8 @@ import lombok.ToString;
 @ToString
 public class Monster extends AiEntity {
 
-    public Monster(@NonNull String name, int lv, long money, @NonNull Location location,
-                   @NonNull Doing doing, @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
-                   @NonNull ConcurrentHashSet<Long> equip,
-                   @NonNull ConcurrentHashMap<Long, ConcurrentHashMap<StatType, Integer>> buff,
-                   @NonNull ConcurrentHashMap<Long, Integer> inventory,
-                   @NonNull ConcurrentHashSet<Long> equipInventory,
-                   @NonNull ConcurrentHashMap<Id, ConcurrentHashSet<Long>> enemies,
-                   @NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events) {
-        super(name, lv, money, location, doing, basicStat, equip, buff, inventory, equipInventory, enemies, events);
+    public Monster(@NonNull String name) {
+        super(name);
 
         this.id.setId(Id.MONSTER);
     }

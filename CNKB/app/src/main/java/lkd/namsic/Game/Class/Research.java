@@ -2,13 +2,13 @@ package lkd.namsic.Game.Class;
 
 import androidx.annotation.NonNull;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Base.LimitLong;
 import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Id;
-import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 import lombok.ToString;
@@ -20,18 +20,11 @@ public class Research extends Achieve {
     LimitInteger limitLv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
     LimitLong needMoney = new LimitLong(0, 0L, Long.MAX_VALUE);
 
-    Map<Long, Integer> needItem;
+    Map<Long, Integer> needItem = new HashMap<>();
 
-    public Research(@NonNull String name, long rewardMoney, int rewardExp, int rewardAdv,
-                    @NonNull Map<Long, Integer> rewardCloseRate,
-                    @NonNull Map<Long, Integer> rewardItem,
-                    @NonNull Map<StatType, Integer> rewardStat,
-                    int limitLv, long needMoney, @NonNull Map<Long, Integer> needItem) {
-        super(name, rewardMoney, rewardExp, rewardAdv, rewardCloseRate, rewardItem, rewardStat);
-
-        this.limitLv.set(limitLv);
-        this.needMoney.set(needMoney);
-        this.setNeedItem(needItem);
+    public Research(@NonNull String name) {
+        super(name);
+        this.id.setId(Id.RESEARCH);
     }
 
     public void setNeedItem(Map<Long, Integer> needItem) {

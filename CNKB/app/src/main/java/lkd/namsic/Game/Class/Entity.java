@@ -38,61 +38,34 @@ import lombok.Setter;
 */
 
 @Getter
-public class Entity implements GameObject {
-
-    @Setter
-    @NonNull
-    String name;
+public class Entity extends NamedObject {
 
     LimitInteger lv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
     LimitLong money = new LimitLong(0, 0L, Long.MAX_VALUE);
 
-    Location location;
+    Location location = new Location();
 
     @Setter
     @NonNull
-    Doing doing;
+    Doing doing = Doing.NONE;
 
-    ConcurrentHashSet<Long> skill;
+    Set<Long> skill = new ConcurrentHashSet<>();
 
-    ConcurrentHashMap<StatType, Integer> stat;
-    ConcurrentHashMap<StatType, Integer> basicStat;
-    ConcurrentHashMap<StatType, Integer> equipStat = new ConcurrentHashMap<>();
-    ConcurrentHashMap<StatType, Integer> buffStat = new ConcurrentHashMap<>();
+    Map<StatType, Integer> stat = new ConcurrentHashMap<>();
+    Map<StatType, Integer> basicStat = new ConcurrentHashMap<>();
+    Map<StatType, Integer> equipStat = new ConcurrentHashMap<>();
+    Map<StatType, Integer> buffStat = new ConcurrentHashMap<>();
 
-    ConcurrentHashMap<EquipType, Long> equip;
-    ConcurrentHashMap<Long, ConcurrentHashMap<StatType, Integer>> buff;
-    ConcurrentHashMap<Long, Integer> inventory;
-    ConcurrentHashSet<Long> equipInventory;
+    Map<EquipType, Long> equip = new ConcurrentHashMap<>();
+    Map<Long, ConcurrentHashMap<StatType, Integer>> buff = new ConcurrentHashMap<>();
+    Map<Long, Integer> inventory = new ConcurrentHashMap<>();
+    Set<Long> equipInventory = new ConcurrentHashSet<>();
 
-    ConcurrentHashMap<Id, ConcurrentHashSet<Long>> enemies;
+    Map<Id, ConcurrentHashSet<Long>> enemies = new ConcurrentHashMap<>();
+    Map<String, ConcurrentArrayList<Event>> events = new ConcurrentHashMap<>();
 
-    ConcurrentHashMap<String, ConcurrentArrayList<Event>> events;
-
-    protected Entity(@NonNull String name, int lv, long money, @NonNull Location location,
-                     @NonNull Doing doing, @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
-                     @NonNull ConcurrentHashSet<Long> equip,
-                     @NonNull ConcurrentHashMap<Long, ConcurrentHashMap<StatType, Integer>> buff,
-                     @NonNull ConcurrentHashMap<Long, Integer> inventory,
-                     @NonNull ConcurrentHashSet<Long> equipInventory,
-                     @NonNull ConcurrentHashMap<Id, ConcurrentHashSet<Long>> enemies,
-                     @NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events) {
-        this.name = name;
-        this.lv.set(lv);
-        this.money.set(money);
-        this.location = location;
-        this.doing = doing;
-
-        this.setBasicStat(basicStat);
-        this.equip(equip);
-        this.setBuff(buff);
-        this.revalidateStat();
-
-        this.setInventory(inventory);
-        this.addEquip(equipInventory);
-
-        this.addEnemy(enemies);
-        this.addEvent(events);
+    protected Entity(@NonNull String name) {
+        super(name);
     }
 
     public boolean setMoney(long money) {
@@ -616,7 +589,7 @@ public class Entity implements GameObject {
         }
     }
 
-    public void addEnemy(@NonNull Id id, @NonNull ConcurrentHashSet<Long> enemy) {
+    public void addEnemy(@NonNull Id id, @NonNull Set<Long> enemy) {
         for(long enemyId : enemy) {
             this.addEnemy(id, enemyId);
         }

@@ -20,15 +20,8 @@ import lkd.namsic.Game.Event.Event;
 
 public class AiEntity extends Entity {
 
-    public AiEntity(@NonNull String name, int lv, long money, @NonNull Location location,
-                @NonNull Doing doing, @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
-                @NonNull ConcurrentHashSet<Long> equip,
-                @NonNull ConcurrentHashMap<Long, ConcurrentHashMap<StatType, Integer>> buff,
-                @NonNull ConcurrentHashMap<Long, Integer> inventory,
-                @NonNull ConcurrentHashSet<Long> equipInventory,
-                @NonNull ConcurrentHashMap<Id, ConcurrentHashSet<Long>> enemies,
-                @NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events) {
-        super(name, lv, money, location, doing, basicStat, equip, buff, inventory, equipInventory, enemies, events);
+    public AiEntity(@NonNull String name) {
+        super(name);
     }
 
     @Override

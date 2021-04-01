@@ -2,6 +2,8 @@ package lkd.namsic.Game.Class;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,47 +22,25 @@ import lombok.ToString;
 @ToString
 public class Chat implements GameObject {
 
-    LimitLong pauseTime = new LimitLong(0, 0L, Long.MAX_VALUE);
-
+    LimitLong pauseTime = new LimitLong(Config.MIN_PAUSE_TIME, Config.MIN_PAUSE_TIME, Config.MAX_PAUSE_TIME);
     LimitId questId = new LimitId(0, Id.QUEST);
+    Location tpLocation = new Location();
 
-    Location tpLocation;
+    List<String> text = new ArrayList<>();
 
-    List<String> text;
-
-    Map<WaitResponse, Long> responseChat;
-    Map<String, Long> anyResponseChat;
+    Map<WaitResponse, Long> responseChat = new HashMap<>();
+    Map<String, Long> anyResponseChat = new HashMap<>();
 
     LimitLong needMoney = new LimitLong(0, 0L, Long.MAX_VALUE);
-    Map<StatType, Integer> needStat;
-    Map<Long, Integer> needItem;
+    Map<StatType, Integer> needStat = new HashMap<>();
+    Map<Long, Integer> needItem = new HashMap<>();
 
     LimitLong rewardMoney = new LimitLong(0, 0L, Long.MAX_VALUE);
-    Map<StatType, Integer> rewardStat;
-    Map<Long, Integer> rewardItem;
+    Map<StatType, Integer> rewardStat = new HashMap<>();
+    Map<Long, Integer> rewardItem = new HashMap<>();
 
-    public Chat(long pauseTime, long questId, Location tpLocation, List<String> text,
-                Map<WaitResponse, Long> responseChat, Map<String, Long> anyResponseChat,
-                long needMoney, Map<StatType, Integer> needStat, Map<Long, Integer> needItem,
-                long rewardMoney, Map<StatType, Integer> rewardStat, Map<Long, Integer> rewardItem) {
+    public Chat() {
         this.id.setId(Id.CHAT);
-
-        this.pauseTime.set(pauseTime);
-        this.questId.set(questId);
-        this.tpLocation = tpLocation;
-
-        this.text = text;
-
-        this.setResponseChat(responseChat);
-        this.setAnyResponseChat(anyResponseChat);
-
-        this.needMoney.set(needMoney);
-        this.setNeedStat(needStat);
-        this.setNeedItem(needItem);
-
-        this.rewardMoney.set(rewardMoney);
-        this.setRewardStat(rewardStat);
-        this.setRewardItem(rewardItem);
     }
 
     public void setResponseChat(@NonNull Map<WaitResponse, Long> responseChat) {

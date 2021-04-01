@@ -2,6 +2,7 @@ package lkd.namsic.Game.Class;
 
 import androidx.annotation.NonNull;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import lkd.namsic.Game.Base.LimitInteger;
@@ -16,33 +17,19 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class Achieve implements GameObject {
-
-    @Setter
-    @NonNull
-    String name;
+public class Achieve extends NamedObject {
 
     LimitLong rewardMoney = new LimitLong(0, 0L, Long.MAX_VALUE);
     LimitInteger rewardExp = new LimitInteger(0, 0, Integer.MAX_VALUE);
     LimitInteger rewardAdv = new LimitInteger(0, 0, Integer.MAX_VALUE);
 
-    Map<Long, Integer> rewardCloseRate;
-    Map<Long, Integer> rewardItem;
-    Map<StatType, Integer> rewardStat;
+    Map<Long, Integer> rewardCloseRate = new HashMap<>();
+    Map<Long, Integer> rewardItem = new HashMap<>();
+    Map<StatType, Integer> rewardStat = new HashMap<>();
 
-    public Achieve(@NonNull String name, long rewardMoney, int rewardExp, int rewardAdv,
-                   @NonNull Map<Long, Integer> rewardCloseRate,
-                   @NonNull Map<Long, Integer> rewardItem,
-                   @NonNull Map<StatType, Integer> rewardStat) {
-        this.name = name;
-
-        this.rewardMoney.set(rewardMoney);
-        this.rewardExp.set(rewardExp);
-        this.rewardAdv.set(rewardAdv);
-
-        this.setRewardCloseRate(rewardCloseRate);
-        this.setRewardItem(rewardItem);
-        this.setRewardStat(rewardStat);
+    public Achieve(@NonNull String name) {
+        super(name);
+        this.id.setId(Id.ACHIEVE);
     }
 
     public void setRewardCloseRate(Map<Long, Integer> rewardCloseRate) {

@@ -4,15 +4,12 @@ import androidx.annotation.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.Game.Base.ConcurrentArrayList;
 import lkd.namsic.Game.Base.ConcurrentHashSet;
 import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Base.LimitLong;
@@ -21,8 +18,8 @@ import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Doing;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.LogData;
+import lkd.namsic.Game.Enum.MagicType;
 import lkd.namsic.Game.Enum.StatType;
-import lkd.namsic.Game.Event.Event;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,44 +30,68 @@ import lombok.ToString;
 public class Player extends Entity {
 
     @Setter
+    @NonNull
     String nickName;
+
     @Setter
+    @NonNull
     String image;
+
+    Set<String> title = new ConcurrentHashSet<String>() {{
+        add("초심자");
+    }};
+
+    @NonNull
+    String currentTitle = "초심자";
+
     @Setter
-    String currentTitle;
-    @Setter
+    @NonNull
     String recentRoom;
 
     @Setter
-    boolean pvp;
+    boolean pvp = false;
 
-    long lastTime;
+    private long lastTime;
 
-    Location baseLocation;
+    Location baseLocation = new Location();
 
     LimitInteger sp = new LimitInteger(0, Config.MIN_SP, Config.MAX_SP);
     LimitInteger adv = new LimitInteger(0, 0, Integer.MAX_VALUE);
     LimitLong exp = new LimitLong(0, 0L, Long.MAX_VALUE);
 
-    LocalDateTime lastDateTime;
+    LocalDateTime lastDateTime = LocalDateTime.now();
 
-    ConcurrentHashMap<LogData, Long> log = new ConcurrentHashMap<>();
+    Set<Long> achieve = new ConcurrentHashSet<>();
+    Set<Long> research = new ConcurrentHashSet<>();
 
-    public Player(@NonNull String name, int lv, long money, @NonNull Location location,
-                  @NonNull Doing doing, @NonNull ConcurrentHashMap<StatType, Integer> basicStat,
-                  @NonNull ConcurrentHashSet<Long> equip,
-                  @NonNull ConcurrentHashMap<Long, ConcurrentHashMap<StatType, Integer>> buff,
-                  @NonNull ConcurrentHashMap<Long, Integer> inventory,
-                  @NonNull ConcurrentHashSet<Long> equipInventory,
-                  @NonNull ConcurrentHashMap<Id, ConcurrentHashSet<Long>> enemies,
-                  @NonNull ConcurrentHashMap<String, ConcurrentArrayList<Event>> events,
-                  @NonNull ConcurrentHashMap<LogData, Long> log) {
-        super(name, lv, money, location, doing, basicStat, equip, buff, inventory, equipInventory, enemies, events);
+    Set<Long> quest = new ConcurrentHashSet<>();
+    Set<Long> questNpc = new ConcurrentHashSet<>();
+    Set<Long> clearedQuest = new ConcurrentHashSet<>();
 
+    Map<MagicType, Integer> magic = new ConcurrentHashMap<>();
+    Map<MagicType, Integer> resist = new ConcurrentHashMap<>();
+
+    Map<Long, Integer> closeRate = new ConcurrentHashMap<>();
+
+    Map<LogData, Long> log = new ConcurrentHashMap<LogData, Long>() {{
+        put(LogData.LOG_COUNT, 0L);
+    }};
+
+    public Player(@NonNull String name, @NonNull String nickName, @NonNull String image,
+                  @NonNull String recentRoom, long lastTime) {
+        super(name);
         this.id.setId(Id.PLAYER);
 
-        this.log.put(LogData.LOG_COUNT, 0L);
-        this.setLog(log);
+        this.nickName = nickName;
+        this.image = image;
+        this.recentRoom = recentRoom;
+        this.lastTime = lastTime;
+    }
+
+    //[테스트 칭호] 남식(Lv.123)
+    @NonNull
+    public String getDisplayName() {
+        return "[" + this.getCurrentTitle() + "] " + this.getNickName() + "(Lv." + this.getLv() + ")";
     }
 
     public boolean checkChat() {
@@ -81,13 +102,15 @@ public class Player extends Entity {
         return diffTime >= 500;
     }
 
-    public void setLog(Map<LogData, Long> log) {
+
+
+    public void setLog(@NonNull Map<LogData, Long> log) {
         for(Map.Entry<LogData, Long> entry : log.entrySet()) {
             this.setLog(entry.getKey(), entry.getValue());
         }
     }
 
-    public void setLog(LogData logData, long count) {
+    public void setLog(@NonNull LogData logData, long count) {
         if(count < 0) {
             throw new NumberRangeException(count, 0);
         }
@@ -99,7 +122,7 @@ public class Player extends Entity {
         }
     }
 
-    public long getLog(LogData logData) {
+    public long getLog(@NonNull LogData logData) {
         Long value = this.log.get(logData);
 
         if(value == null) {
@@ -109,9 +132,9 @@ public class Player extends Entity {
         }
     }
 
-    public void addLog(LogData logData, long count) {
+    public void addLog(@NonNull LogData logData, long count) {
         this.setLog(logData, this.getLog(logData) + count);
-        this.log.put(LogData.LOG_COUNT, Objects.requireNonNull(this.log.get(LogData.LOG_COUNT)) + 1);
+        this.log.put(LogData.LOG_COUNT, this.getLog(LogData.LOG_COUNT) + 1);
     }
 
     public boolean canEquip(long equipId) {
@@ -233,12 +256,6 @@ public class Player extends Entity {
     @NonNull
     public String getFileName() {
         return this.getName() + "-" + this.getImage();
-    }
-
-    //[테스트 칭호] 남식(Lv.123)
-    @NonNull
-    public String getDisplayName() {
-        return "[" + this.getCurrentTitle() + "] " + this.getNickName() + "(Lv." + this.getLv() + ")";
     }
 
 }

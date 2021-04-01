@@ -5,7 +5,7 @@ import java.util.List;
 
 public enum Doing {
 
-    IDLE,
+    NONE,
     MOVE,
     BUY,
     CHAT,

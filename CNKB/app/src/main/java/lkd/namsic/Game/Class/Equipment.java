@@ -3,6 +3,7 @@ package lkd.namsic.Game.Class;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,27 +33,16 @@ public class Equipment extends Item {
     @Setter
     int lvDown = 0;
 
-    Map<StatType, Integer> limitStat;
-    Map<StatType, Integer> basicStat;
-    Map<StatType, Integer> reinforceStat;
-    Map<StatType, Integer> stat; //basic + reinforce
+    Map<StatType, Integer> limitStat = new HashMap<>();
+    Map<StatType, Integer> basicStat = new HashMap<>();
+    Map<StatType, Integer> reinforceStat = new HashMap<>();
+    Map<StatType, Integer> stat = new HashMap<>(); //basic + reinforce
 
-    public Equipment(@NonNull EquipType equipType, @NonNull String name, @NonNull String description, int handleLv,
-                     @Nullable Use use, @NonNull Set<Map<Long, Integer>> recipe, int reinforceCount,
-                     int maxReinforceCount, int minLimitLv, int maxLimitLv, int lvDown,
-                     @NonNull Map<StatType, Integer> limitStat,
-                     @NonNull Map<StatType, Integer> basicStat,
-                     @NonNull Map<StatType, Integer> reinforceStat) {
-        super(name, description, handleLv, use, recipe);
+    public Equipment(@NonNull EquipType equipType, @NonNull String name, @NonNull String description) {
+        super(name, description);
         this.id.setId(Id.EQUIPMENT);
 
         this.equipType = equipType;
-        this.reinforceCount.setMax(maxReinforceCount);
-        this.reinforceCount.set(reinforceCount);
-        this.limitLv.set(minLimitLv, maxLimitLv);
-        this.lvDown = lvDown;
-        this.setLimitStat(limitStat);
-        this.setBasicStat(basicStat).setReinforceStat(reinforceStat).revalidateStat();
     }
 
     public RangeInteger getTotalLimitLv() {

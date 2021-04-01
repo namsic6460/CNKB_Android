@@ -15,30 +15,21 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class Skill implements GameObject {
+public class Skill extends NamedObject {
 
     @Setter
-    @NonNull
-    String name;
-
-    @Setter
-    boolean isPassive;
+    boolean isPassive = false;
 
     @Nullable
     @Setter
-    Use use;
+    Use use = null;
 
     //Only use on getting
     RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(new HashMap<>(), new HashMap<>());
 
-    public Skill(@NonNull String name, boolean isPassive, @Nullable Use use,
-                 @NonNull Map<StatType, Integer> minLimitStat, @NonNull Map<StatType, Integer> maxLimitStat) {
+    public Skill(@NonNull String name) {
+        super(name);
         this.id.setId(Id.SKILL);
-
-        this.name = name;
-        this.isPassive = isPassive;
-        this.use = use;
-        this.limitStat.set(minLimitStat, maxLimitStat);
     }
 
 }

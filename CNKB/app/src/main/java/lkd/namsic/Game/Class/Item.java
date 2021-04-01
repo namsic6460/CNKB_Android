@@ -18,11 +18,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class Item implements GameObject {
-
-    @Setter
-    @NonNull
-    String name;
+public class Item extends NamedObject {
 
     @Setter
     @NonNull
@@ -30,21 +26,17 @@ public class Item implements GameObject {
 
     @Setter
     @Nullable
-    Use use;
+    Use use = null;
 
     LimitInteger handleLv = new LimitInteger(Config.MIN_HANDLE_LV, Config.MIN_HANDLE_LV, Config.MAX_HANDLE_LV);
 
-    Set<Map<Long, Integer>> recipe;
+    Set<Map<Long, Integer>> recipe = new HashSet<>();
 
-    public Item(@NonNull String name, @NonNull String description, int handleLv,
-                @Nullable Use use, @NonNull Set<Map<Long, Integer>> recipe) {
+    public Item(@NonNull String name, @NonNull String description) {
+        super(name);
         this.id.setId(Id.ITEM);
 
-        this.name = name;
         this.description = description;
-        this.handleLv.set(handleLv);
-        this.use = use;
-        this.addRecipe(recipe);
     }
 
     public void addRecipe(@NonNull Set<Map<Long, Integer>> recipe) {
