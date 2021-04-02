@@ -1,4 +1,4 @@
-package lkd.namsic.Game.Class;
+package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 
@@ -34,7 +34,6 @@ public class Quest extends NamedObject {
     );
 
     LimitLong needMoney = new LimitLong(0, null, Long.MAX_VALUE);
-    LimitInteger needExp = new LimitInteger(0, null, Integer.MAX_VALUE);
     LimitInteger needAdv = new LimitInteger(0, null, Integer.MAX_VALUE);
 
     Map<Long, Integer> needItem = new HashMap<>();
@@ -50,10 +49,18 @@ public class Quest extends NamedObject {
     Map<Long, Integer> rewardCloseRate = new HashMap<>();
 
     LimitId npcId = new LimitId(0, Id.NPC);
+    LimitId chatId = new LimitId(0, Id.QUEST);
 
-    public Quest(@NonNull String name) {
+    public Quest(@NonNull String name, long chatId) {
         super(name);
         this.id.setId(Id.QUEST);
+
+        this.setChatId(chatId);
+    }
+
+    public void setChatId(long chatId) {
+        Config.checkId(Id.CHAT, chatId);
+        this.chatId.set(chatId);
     }
 
     public void setNeedItem(Map<Long, Integer> needItem) {

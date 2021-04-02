@@ -1,4 +1,4 @@
-package lkd.namsic.Game.Class;
+package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 
@@ -14,7 +14,6 @@ import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.MapType;
 import lkd.namsic.Game.Exception.NumberRangeException;
-import lkd.namsic.Game.Exception.ObjectNotFoundException;
 import lkd.namsic.Game.Exception.WeirdDataException;
 import lombok.Getter;
 import lombok.Setter;
@@ -288,12 +287,7 @@ public class MapClass {
         Id.checkEntityId(id);
         Config.checkId(id, objectId);
 
-        Set<Long> entitySet = this.getEntity(id);
-        if(entitySet.contains(objectId)) {
-            entitySet.remove(objectId);
-        } else {
-            throw new ObjectNotFoundException(id, objectId);
-        }
+        this.getEntity(id).remove(objectId);
     }
 
 }

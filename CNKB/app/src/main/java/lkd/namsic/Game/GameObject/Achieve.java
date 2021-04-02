@@ -1,4 +1,4 @@
-package lkd.namsic.Game.Class;
+package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 
@@ -12,7 +12,6 @@ import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
@@ -87,9 +86,9 @@ public class Achieve extends NamedObject {
         }
     }
 
-    public int getRewardItem(long npcId) {
-        Config.checkId(Id.NPC, npcId);
-        Integer value = this.rewardItem.get(npcId);
+    public int getRewardItem(long itemId) {
+        Config.checkId(Id.ITEM, itemId);
+        Integer value = this.rewardItem.get(itemId);
 
         if(value != null) {
             return value;

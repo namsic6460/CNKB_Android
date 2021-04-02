@@ -1,4 +1,4 @@
-package lkd.namsic.Game.Class;
+package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

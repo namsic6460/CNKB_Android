@@ -1,10 +1,9 @@
-package lkd.namsic.Game.Class;
+package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import lkd.namsic.Game.Base.RangeIntegerMap;
 import lkd.namsic.Game.Enum.Id;

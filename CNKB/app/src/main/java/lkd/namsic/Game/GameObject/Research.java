@@ -1,12 +1,12 @@
-package lkd.namsic.Game.Class;
+package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Base.LimitLong;
+import lkd.namsic.Game.Base.RangeInteger;
 import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Exception.NumberRangeException;
@@ -17,7 +17,7 @@ import lombok.ToString;
 @ToString
 public class Research extends Achieve {
 
-    LimitInteger limitLv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
+    RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);
     LimitLong needMoney = new LimitLong(0, 0L, Long.MAX_VALUE);
 
     Map<Long, Integer> needItem = new HashMap<>();

@@ -1,18 +1,12 @@
-package lkd.namsic.Game.Class;
+package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.Game.Base.ConcurrentArrayList;
-import lkd.namsic.Game.Base.ConcurrentHashSet;
-import lkd.namsic.Game.Base.Location;
-import lkd.namsic.Game.Enum.Doing;
 import lkd.namsic.Game.Enum.EquipType;
 import lkd.namsic.Game.Enum.Id;
-import lkd.namsic.Game.Enum.StatType;
-import lkd.namsic.Game.Event.Event;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lombok.ToString;
 

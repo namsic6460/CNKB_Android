@@ -1,4 +1,4 @@
-package lkd.namsic.Game.Class;
+package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 
@@ -343,9 +343,16 @@ public class Entity extends NamedObject {
         for(Map.Entry<Id, Set<Long>> entry : enemyCopy.entrySet()) {
             id = entry.getKey();
 
+            Entity entity = null;
             for(long objectId : entry.getValue()) {
-                Entity entity = Config.loadObject(id, objectId);
-                entity.removeEnemy(id, objectId);
+                try {
+                    entity = Config.loadObject(id, objectId);
+                    entity.removeEnemy(id, objectId);
+                } finally {
+                    if(entity != null) {
+                        Config.unloadObject(entity);
+                    }
+                }
             }
         }
     }
@@ -379,21 +386,32 @@ public class Entity extends NamedObject {
         }
     }
 
+    @NonNull
     public EquipType equip(long equipId) {
-        Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
-        EquipType equipType = equipment.getEquipType();
+        Equipment equipment = null;
+        EquipType equipType = null;
 
-        if(equip.containsKey(equipType)) {
-            this.unEquip(equipType);
+        try {
+            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
+            equipType = equipment.getEquipType();
+
+            if (equip.containsKey(equipType)) {
+                this.unEquip(equipType);
+            }
+
+            StatType statType;
+            for (Map.Entry<StatType, Integer> entry : equipment.stat.entrySet()) {
+                statType = entry.getKey();
+                this.setEquipStat(statType, this.getEquipStat(statType) + entry.getValue());
+            }
+
+            this.equip.put(equipType, equipId);
+        } finally {
+            if(equipment != null) {
+                Config.unloadObject(equipment);
+            }
         }
 
-        StatType statType;
-        for(Map.Entry<StatType, Integer> entry : equipment.stat.entrySet()) {
-            statType = entry.getKey();
-            this.setEquipStat(statType,  this.getEquipStat(statType) + entry.getValue());
-        }
-
-        this.equip.put(equipType, equipId);
         return equipType;
     }
 
@@ -403,15 +421,23 @@ public class Entity extends NamedObject {
             return;
         }
 
-        Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
+        Equipment equipment = null;
 
-        StatType statType;
-        for(Map.Entry<StatType, Integer> entry : equipment.stat.entrySet()) {
-            statType = entry.getKey();
-            this.setEquipStat(statType, this.getEquipStat(statType) - entry.getValue());
+        try {
+            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
+
+            StatType statType;
+            for (Map.Entry<StatType, Integer> entry : equipment.stat.entrySet()) {
+                statType = entry.getKey();
+                this.setEquipStat(statType, this.getEquipStat(statType) - entry.getValue());
+            }
+
+            this.equip.remove(equipType);
+        } finally {
+            if(equipment != null) {
+                Config.unloadObject(equipment);
+            }
         }
-
-        this.equip.remove(equipType);
     }
 
     public void setBuff(@NonNull Map<Long, ConcurrentHashMap<StatType, Integer>> buff) {
