@@ -66,6 +66,11 @@ public class Location implements Serializable {
         }
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
     @NonNull
     @Override
     public String toString() {

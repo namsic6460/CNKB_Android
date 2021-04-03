@@ -43,10 +43,12 @@ public class AiEntity extends Entity {
         boolean flag = super.canFight(enemy);
 
         if(flag) {
-            List<Doing> doingList = Doing.nonFightDoing();
+            List<Doing> doingList;
 
             if(enemy instanceof Player) {
-                doingList.add(Doing.FIGHT);
+                doingList = Doing.playerNonFightList();
+            } else {
+                doingList = Doing.nonFightList();
             }
 
             return !doingList.contains(enemy.getDoing());

@@ -673,7 +673,7 @@ public class Entity extends NamedObject {
     }
 
     public boolean canFight(@NonNull Entity enemy) {
-        return !Doing.nonFightDoing().contains(this.getDoing());
+        return !Doing.nonFightList().contains(this.getDoing());
     }
 
     public boolean startFight(@NonNull Set<Entity> enemies) {

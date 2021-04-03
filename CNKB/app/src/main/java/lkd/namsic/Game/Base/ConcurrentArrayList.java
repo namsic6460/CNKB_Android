@@ -111,11 +111,33 @@ public class ConcurrentArrayList<T> implements List<T>, Serializable {
     }
 
     @Override
+    public void add(int index, T element) {
+        readWriteLock.writeLock().lock();
+
+        try {
+            list.add(index, element);
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+    }
+
+    @Override
     public boolean remove(@Nullable Object o) {
         readWriteLock.writeLock().lock();
 
         try {
             return list.remove(o);
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public T remove(int index) {
+        readWriteLock.writeLock().lock();
+
+        try {
+            return list.remove(index);
         } finally {
             readWriteLock.writeLock().unlock();
         }
@@ -204,28 +226,6 @@ public class ConcurrentArrayList<T> implements List<T>, Serializable {
 
         try {
             return list.set(index, element);
-        } finally {
-            readWriteLock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public void add(int index, T element) {
-        readWriteLock.writeLock().lock();
-
-        try {
-            list.add(index, element);
-        } finally {
-            readWriteLock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public T remove(int index) {
-        readWriteLock.writeLock().lock();
-
-        try {
-            return list.remove(index);
         } finally {
             readWriteLock.writeLock().unlock();
         }

@@ -39,7 +39,6 @@ public class LimitId implements LimitClass<Long> {
         this.value = setValue;
     }
 
-
     @NonNull
     @Override
     public String toString() {

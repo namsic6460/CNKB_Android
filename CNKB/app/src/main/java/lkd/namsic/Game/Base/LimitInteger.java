@@ -47,6 +47,11 @@ public class LimitInteger implements LimitClass<Integer> {
     }
 
     @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
     public boolean equals(@Nullable Object obj) {
         if(obj == null) {
             return false;
