@@ -1,9 +1,11 @@
 package lkd.namsic.Game.GameObject;
 
 import lkd.namsic.Game.Base.IdClass;
+import lombok.Getter;
 
-public interface GameObject {
+public abstract class GameObject {
 
+    @Getter
     IdClass id = new IdClass();
 
 }

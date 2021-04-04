@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import lombok.Getter;
 import lombok.Setter;
 
-public class NamedObject implements GameObject {
+public class NamedObject extends GameObject {
 
     @Getter
     @Setter

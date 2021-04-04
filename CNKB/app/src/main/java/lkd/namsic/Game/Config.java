@@ -146,9 +146,11 @@ public class Config {
     @SuppressWarnings("ConstantConditions")
     public static <T extends GameObject> T newObject(@NonNull T t) {
         Id id = t.id.getId();
+        Id id = t.getId().getId();
         long objectId = ID_COUNT.get(id);
 
         t.id.setObjectId(objectId);
+        t.getId().setObjectId(objectId);
         ID_COUNT.put(id, objectId + 1);
 
         return t;
@@ -181,6 +183,8 @@ public class Config {
     public static void unloadObject(@NonNull GameObject gameObject) {
         Id id = gameObject.id.getId();
         long objectId = gameObject.id.getObjectId();
+        Id id = gameObject.getId().getId();
+        long objectId = gameObject.getId().getObjectId();
         long objectCount = OBJECT_COUNT.get(id).get(objectId);
 
         if(objectCount > 1) {

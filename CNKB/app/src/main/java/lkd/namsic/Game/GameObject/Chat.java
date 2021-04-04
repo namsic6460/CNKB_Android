@@ -20,7 +20,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class Chat implements GameObject {
+public class Chat extends GameObject {
 
     LimitLong pauseTime = new LimitLong(Config.MIN_PAUSE_TIME, Config.MIN_PAUSE_TIME, Config.MAX_PAUSE_TIME);
     LimitId questId = new LimitId(0, Id.QUEST);
