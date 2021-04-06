@@ -13,6 +13,10 @@ public class NumberRangeException extends RuntimeException {
         throw new NumberRangeException(value, minValue, Integer.MAX_VALUE);
     }
 
+    public NumberRangeException(Integer value, Integer minValue, int maxValue) {
+        throw new NumberRangeException(value.intValue(), minValue.intValue(), maxValue);
+    }
+
     public NumberRangeException(int value, int minValue, int maxValue) {
         super("Value: " + value + ", Min: " + minValue + ", Max: " + maxValue);
     }
