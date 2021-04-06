@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -338,6 +339,54 @@ public class Player extends Entity {
         this.exp.add(-1 * requiredExp);
     }
 
+    @Nullable
+    public String canStartChat(Chat chat) {
+        String failMsg = "";
+
+        long needMoney = chat.getNeedMoney().get();
+        if(needMoney != 0 && this.getMoney() < needMoney) {
+            failMsg += "보유 골드가 부족합니다(부족한 금액 : " + (needMoney - this.getMoney()) + "G)\n";
+        }
+
+        long questId = chat.getQuestId().get();
+        if (!this.canAddQuest(questId)) {
+            failMsg += "퀘스트 수령이 불가능합니다(상세 내용은 퀘스트 검색(아이디 : " + questId + ")\n";
+        }
+
+        int diff;
+        int missingCount = 0;
+        for (Map.Entry<Long, Integer> entry : chat.getNeedItem().entrySet()) {
+            diff = entry.getValue() - this.getItem(entry.getKey());
+
+            if (diff > 0) {
+                missingCount += diff;
+            }
+        }
+
+        if (missingCount != 0) {
+            failMsg += "보유 아이템이 부족합니다(총 부족한 아이템 개수 : " + missingCount + ")\n";
+        }
+
+        missingCount = 0;
+        for(Map.Entry<StatType, Integer> entry : chat.getNeedStat().entrySet()) {
+            diff = entry.getValue() - this.getStat(entry.getKey());
+
+            if(diff > 0) {
+                missingCount += diff;
+            }
+        }
+
+        if(missingCount != 0) {
+            failMsg += "스텟이 부족합니다(총 부족한 스텟 : " + missingCount + ")";
+        }
+
+        if(failMsg.equals("")) {
+            return null;
+        } else {
+            return failMsg;
+        }
+    }
+
     public void startChat(long chatId) {
         Config.checkId(Id.CHAT, chatId);
 
@@ -346,52 +395,10 @@ public class Player extends Entity {
             chat = Config.loadObject(Id.CHAT, chatId);
 
             Notification.Action session = getSession();
-            boolean canContinue = true;
-            String failMsg = "";
+            String failMsg = canStartChat(chat);
 
-            long needMoney = chat.getNeedMoney().get();
-            if(needMoney != 0 && this.getMoney() < needMoney) {
-                canContinue = false;
-                failMsg += "보유 골드가 부족합니다(부족한 금액 : " + (needMoney - this.getMoney()) + "G)\n";
-            }
-
-            long questId = chat.getQuestId().get();
-            if (!this.canAddQuest(questId)) {
-                canContinue = false;
-                failMsg += "퀘스트 수령이 불가능합니다(상세 내용은 퀘스트 검색(아이디 : " + questId + ")\n";
-            }
-
-            int diff;
-            int missingCount = 0;
-            for (Map.Entry<Long, Integer> entry : chat.getNeedItem().entrySet()) {
-                diff = entry.getValue() - this.getItem(entry.getKey());
-
-                if (diff > 0) {
-                    missingCount += diff;
-                }
-            }
-
-            if (missingCount != 0) {
-                canContinue = false;
-                failMsg += "보유 아이템이 부족합니다(총 부족한 아이템 개수 : " + missingCount + ")\n";
-            }
-
-            missingCount = 0;
-            for(Map.Entry<StatType, Integer> entry : chat.getNeedStat().entrySet()) {
-                diff = entry.getValue() - this.getStat(entry.getKey());
-
-                if(diff > 0) {
-                    missingCount += diff;
-                }
-            }
-
-            if(missingCount != 0) {
-                canContinue = false;
-                failMsg += "스텟이 부족합니다(총 부족한 스텟 : " + missingCount + ")";
-            }
-
-            if(canContinue) {
-                this.addMoney(-1 * needMoney);
+            if(failMsg == null) {
+                this.addMoney(-1 * chat.getNeedMoney().get());
 
                 for(Map.Entry<Long, Integer> entry : chat.getNeedItem().entrySet()) {
                     this.addItem(entry.getKey(), -1 * entry.getValue());
@@ -433,7 +440,7 @@ public class Player extends Entity {
                     }
                 }
 
-                this.addQuest(questId);
+                this.addQuest(finalChat.getQuestId().get());
                 this.setMap(finalChat.getTpLocation(), false);
 
                 if(finalChat.getResponseChat().isEmpty() && finalChat.getAnyResponseChat().isEmpty()) {
