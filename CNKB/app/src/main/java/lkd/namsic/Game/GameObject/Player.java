@@ -116,3 +116,113 @@ public class Player extends Entity {
     public String getName() {
         return "[" + this.getCurrentTitle() + "] " + this.getNickName() + " (Lv." + this.getLv() + ")";
     }
+
+    public void replyPlayer(@NonNull String msg) {
+        KakaoTalk.reply(this.getSession(), this.getName() + "\n" + msg);
+    }
+
+    public void replyPlayer(@NonNull String msg, @NonNull String innerMsg) {
+        KakaoTalk.reply(this.getSession(), this.getName() + "\n" + msg, innerMsg);
+    }
+
+    public boolean useItem(long itemId, @NonNull List<Entity> other) {
+        Config.checkId(Id.ITEM, itemId);
+
+        if(this.getItem(itemId) == 0) {
+            throw new ObjectNotFoundException(Id.ITEM, itemId);
+        }
+
+        Item item = null;
+        boolean isCancelled;
+
+        try {
+            item = Config.loadObject(Id.ITEM, itemId);
+
+            if (item.getUse() != null) {
+                isCancelled = ItemUseEvent.handleEvent(this.events.get(ItemUseEvent.getName()), new Object[]{item});
+
+                if (!isCancelled) {
+                    Use use = item.getUse();
+
+                    if(use != null) {
+                        this.addLog(LogData.TOTAL_ITEM_USED, 1);
+                        use.use(this, other);
+                    }
+                }
+            } else {
+                Config.unloadObject(item);
+                throw new WeirdDataException(Id.ITEM, itemId);
+            }
+        } finally {
+            if(item != null) {
+                Config.unloadObject(item);
+            }
+        }
+
+        return isCancelled;
+    }
+    @NonNull
+    public Notification.Action getSession() {
+        if(this.isGroup) {
+            return KakaoTalk.getGroupSession(this.recentRoom);
+        } else {
+            return KakaoTalk.getSoloSession(this.recentRoom);
+        }
+    }
+
+    @NonNull
+    public String getBattleMsg() {
+        StringBuilder builder = new StringBuilder("---적 목록---\n");
+
+        Id id;
+        Entity enemy;
+
+        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : this.enemies.entrySet()) {
+            id = entry.getKey();
+
+            for(long objectId : entry.getValue()) {
+                builder.append(id.getValue());
+                builder.append(".");
+                builder.append(objectId);
+                builder.append(" - ");
+
+                enemy = Config.getData(id, objectId);
+                builder.append(" (");
+                builder.append(this.getFieldDistance(enemy.getLocation()));
+                builder.append("m) ");
+                builder.append(enemy.getName());
+                builder.append("\n");
+            }
+        }
+
+        builder.append("\n---전투 명령어---\n");
+        builder.append("=공격 [대상] : [\"대상\" 또는 \"가장 가까운 적\"] 에게 기본 공격을 합니다\n");
+        builder.append("=방어 : 다음 피해가 기본 공격일 경우, 공격을 방어하고 체력과 마나를 일부 회복합니다\n");
+        builder.append("=이동 (e/w/s/n) [1~3] : 동/서/남/북의 방향으로 [\"3칸\" 또는 \"지정한 거리\"] 만큼 최대한 이동합니다\n");
+        builder.append("=필드 : 필드 정보를 표시합니다\n");
+        builder.append("=스킬 목록 [o] : [\"보유한 또는 \"사용 가능한\"] 스킬 목록을 확인합니다\n");
+        builder.append("=스킬 사용 (스킬 번호) [대상] : 스킬 번호에 해당하는 스킬을 [\"대상\" 또는 \"가장 가까운 적\"] 에게 사용합니다\n");
+        builder.append("=아이템 사용 (아이템 번호) (대상) : 아이템 번호에 해당하는 아이템을 대상(본인 : \"s\")에게 사용합니다\n");
+        builder.append("=도망 : 거점으로의 도망을 시도합니다. 실패 시 최대 체력의 10%에 해당하는 피해를 입습니다");
+        builder.append("(사망하지는 않습니다)(실패 시 15초간 사용이 불가능해집니다)\n");
+        builder.append("=카운터 [대상] : (보스한정) [\"대상\" 또는 \"가장 가까운 보스\"] 의 스킬(집중 스킬 한정)을 반사합니다");
+
+        return builder.toString();
+    }
+
+    public boolean canEat(long itemId) {
+        if(this.getItem(itemId) > 0) {
+            Item item = null;
+
+            try {
+                item = Config.loadObject(Id.ITEM, itemId);
+                return item.isFood();
+            } finally {
+                if(item != null) {
+                    Config.unloadObject(item);
+                }
+            }
+        } else {
+            return false;
+        }
+    }
