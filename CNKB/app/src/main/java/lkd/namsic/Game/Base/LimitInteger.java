@@ -46,6 +46,10 @@ public class LimitInteger implements LimitClass<Integer> {
         this.value = setValue;
     }
 
+    public void add(int addValue) {
+        this.set(this.get() + addValue);
+    }
+
     @Override
     public int hashCode() {
         return super.hashCode();

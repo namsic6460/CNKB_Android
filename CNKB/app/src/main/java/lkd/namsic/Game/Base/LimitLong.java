@@ -46,6 +46,10 @@ public class LimitLong implements LimitClass<Long> {
         this.value = setValue;
     }
 
+    public void add(long addValue) {
+        this.set(this.get() + addValue);
+    }
+
     @NonNull
     @Override
     public String toString() {

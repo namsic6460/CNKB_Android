@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -219,5 +220,16 @@ public class ConcurrentHashSet<T> implements Set<T>, Serializable {
             readWriteLock.readLock().unlock();
         }
     }
-    
+
+    @Override
+    public void forEach(@NonNull Consumer<? super T> action) {
+        readWriteLock.readLock().lock();
+
+        try {
+            new HashSet<>(set).forEach(action);
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
 }
