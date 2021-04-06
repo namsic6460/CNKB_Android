@@ -1,1 +1,3 @@
 # CNKB_Android
+### Main CodeFactor  　Dev CodeFactor
+[![CodeFactor](https://www.codefactor.io/repository/github/namsic6460/cnkb_android/badge/main)](https://www.codefactor.io/repository/github/namsic6460/cnkb_android/overview/main)　　 　 [![CodeFactor](https://www.codefactor.io/repository/github/namsic6460/cnkb_android/badge/dev)](https://www.codefactor.io/repository/github/namsic6460/cnkb_android/overview/dev)
