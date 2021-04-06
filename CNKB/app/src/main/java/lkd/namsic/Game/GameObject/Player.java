@@ -161,6 +161,29 @@ public class Player extends Entity {
 
         return isCancelled;
     }
+
+    public boolean checkChat() {
+        long currentTime = System.currentTimeMillis();
+        long diffTime = currentTime - this.lastTime;
+        this.lastTime = currentTime;
+
+        boolean flag = this.getDoing().equals(Doing.FIGHT) ? diffTime >= 3000 : diffTime >= 500;
+        if(flag) {
+            LocalDateTime now = LocalDateTime.now();
+
+            if(now.getDayOfMonth() != this.lastDay) {
+                this.lastDay = now.getDayOfMonth();
+                this.newDay();
+            }
+        }
+
+        return flag;
+    }
+
+    public void newDay() {
+        System.out.println("New Day!");
+    }
+
     @NonNull
     public Notification.Action getSession() {
         if(this.isGroup) {
@@ -224,5 +247,126 @@ public class Player extends Entity {
             }
         } else {
             return false;
+        }
+    }
+    public void startChat(long chatId) {
+        Config.checkId(Id.CHAT, chatId);
+
+        Chat chat = null;
+        try {
+            chat = Config.loadObject(Id.CHAT, chatId);
+
+            Notification.Action session = getSession();
+            boolean canContinue = true;
+            String failMsg = "";
+
+            long needMoney = chat.getNeedMoney().get();
+            if(needMoney != 0 && this.getMoney() < needMoney) {
+                canContinue = false;
+                failMsg += "보유 골드가 부족합니다(부족한 금액 : " + (needMoney - this.getMoney()) + "G)\n";
+            }
+
+            long questId = chat.getQuestId().get();
+            if (!this.canAddQuest(questId)) {
+                canContinue = false;
+                failMsg += "퀘스트 수령이 불가능합니다(상세 내용은 퀘스트 검색(아이디 : " + questId + ")\n";
+            }
+
+            int diff;
+            int missingCount = 0;
+            for (Map.Entry<Long, Integer> entry : chat.getNeedItem().entrySet()) {
+                diff = entry.getValue() - this.getItem(entry.getKey());
+
+                if (diff > 0) {
+                    missingCount += diff;
+                }
+            }
+
+            if (missingCount != 0) {
+                canContinue = false;
+                failMsg += "보유 아이템이 부족합니다(총 부족한 아이템 개수 : " + missingCount + ")\n";
+            }
+
+            missingCount = 0;
+            for(Map.Entry<StatType, Integer> entry : chat.getNeedStat().entrySet()) {
+                diff = entry.getValue() - this.getStat(entry.getKey());
+
+                if(diff > 0) {
+                    missingCount += diff;
+                }
+            }
+
+            if(missingCount != 0) {
+                canContinue = false;
+                failMsg += "스텟이 부족합니다(총 부족한 스텟 : " + missingCount + ")";
+            }
+
+            if(canContinue) {
+                this.addMoney(-1 * needMoney);
+
+                for(Map.Entry<Long, Integer> entry : chat.getNeedItem().entrySet()) {
+                    this.addItem(entry.getKey(), -1 * entry.getValue());
+                }
+
+                for(Map.Entry<StatType, Integer> entry : chat.getNeedStat().entrySet()) {
+                    this.addBasicStat(entry.getKey(), -1 * entry.getValue());
+                }
+            } else {
+                this.replyPlayer(failMsg);
+                return;
+            }
+
+            this.setDoing(Doing.CHAT);
+
+            AtomicReference<String> exception = new AtomicReference<>(null);
+            final Chat finalChat = chat;
+            Thread thread = new Thread(() -> {
+                this.addMoney(finalChat.getRewardMoney().get());
+
+                for(Map.Entry<Long, Integer> entry : finalChat.getNeedItem().entrySet()) {
+                    this.addItem(entry.getKey(), entry.getValue());
+                }
+
+                for(Map.Entry<StatType, Integer> entry : finalChat.getNeedStat().entrySet()) {
+                    this.addBasicStat(entry.getKey(), entry.getValue());
+                }
+
+                long pauseTime = finalChat.getPauseTime().get();
+                for(String text : finalChat.getText()) {
+                    KakaoTalk.reply(session, text);
+
+                    try {
+                        Thread.sleep(pauseTime);
+                    } catch (InterruptedException e) {
+                        Log.e("Player.startChat - chat Thread", Config.errorString(e));
+                        exception.set(e.getMessage());
+                        break;
+                    }
+                }
+
+                this.addQuest(questId);
+                this.setMap(finalChat.getTpLocation(), false);
+
+                if(finalChat.getResponseChat().isEmpty() && finalChat.getAnyResponseChat().isEmpty()) {
+                    this.setDoing(Doing.NONE);
+                } else {
+                    this.setDoing(Doing.WAIT_RESPONSE);
+
+                    this.responseChat = new ConcurrentHashMap<>(finalChat.getResponseChat());
+                    this.anyResponseChat = new ConcurrentHashMap<>(finalChat.getAnyResponseChat());
+                }
+            });
+
+            thread.start();
+            this.addLog(LogData.CHAT, 1);
+
+            String exceptionMsg = exception.get();
+            if(exceptionMsg != null) {
+                throw new RuntimeException(exceptionMsg);
+            }
+        } finally {
+            if(chat != null) {
+                Config.unloadObject(chat);
+            }
         }
     }
