@@ -19,11 +19,18 @@ public class AiEntity extends Entity {
 
     @Override
     public void death() {
-        super.death();
+        this.endFight();
 
-        MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
-        map.removeEntity(this.id.getId(), this.id.getObjectId());
-        Config.unloadMap(map);
+        MapClass map = null;
+
+        try {
+            map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+            map.removeEntity(this.id.getId(), this.id.getObjectId());
+        } finally {
+            if(map != null) {
+                Config.unloadMap(map);
+            }
+        }
 
         this.dropMoney(this.getMoney());
 
@@ -36,22 +43,16 @@ public class AiEntity extends Entity {
         for(Long equipId : equipCopy) {
             this.dropEquip(equipId);
         }
+
+        Config.deleteAiEntity(this);
     }
 
     @Override
     public boolean canFight(@NonNull Entity enemy) {
-        boolean flag = super.canFight(enemy);
+        List<Doing> doingList = Doing.fightList();
 
-        if(flag) {
-            List<Doing> doingList;
-
-            if(enemy instanceof Player) {
-                doingList = Doing.playerNonFightList();
-            } else {
-                doingList = Doing.nonFightList();
-            }
-
-            return !doingList.contains(enemy.getDoing());
+        if(doingList.contains(this.doing)) {
+            return doingList.contains(enemy.getDoing());
         } else {
             return false;
         }
