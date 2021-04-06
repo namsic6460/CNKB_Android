@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -135,6 +136,40 @@ public abstract class Entity extends NamedObject {
 
         if(!isCancelled) {
             this.location.setField(fieldX, fieldY);
+
+            MapClass map = null;
+
+            try {
+                map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+
+                long money = map.getMoney(this.location);
+                if(money != 0) {
+                    this.addMoney(money);
+                    map.money.remove(this.location);
+                }
+
+                Map<Long, Integer> item = map.getItem().get(location);
+                if(item != null) {
+                    for(Map.Entry<Long, Integer> entry : item.entrySet()) {
+                        this.addItem(entry.getKey(), entry.getValue());
+                    }
+
+                    map.item.remove(location);
+                }
+
+                Set<Long> equip = map.getEquip().get(location);
+                if(equip != null) {
+                    for (long equipId : equip) {
+                        this.addEquip(equipId);
+                    }
+
+                    map.getEquip().remove(this.location);
+                }
+            } finally {
+                if(map != null) {
+                    Config.unloadMap(map);
+                }
+            }
         }
 
         return isCancelled;
@@ -142,20 +177,38 @@ public abstract class Entity extends NamedObject {
 
     public boolean moveMap(int x, int y) {
         return this.setMap(this.location.getX().get() + x, this.location.getY().get() + y,
-                Math.abs(x) + Math.abs(y));
+    public boolean setMap(int x, int y) {
+        return this.setMap(new Location(x, y),true);
     }
 
     public boolean setMap(int x, int y) {
         int xDis = Math.abs(this.location.getX().get() - x);
         int yDis = Math.abs(this.location.getY().get() - y);
         return setMap(x, y, xDis + yDis);
+    public boolean setMap(int x, int y, int fieldX, int fieldY) {
+        int distance = Math.abs(this.location.getX().get() - x) + Math.abs(this.location.getY().get() - y);
+        return this.setMap(new Location(x, y, fieldX, fieldY), distance, false);
+    }
+
+    public boolean setMap(Location location, boolean isToBase) {
+        int distance = Math.abs(this.location.getX().get() - location.getX().get())
+                + Math.abs(this.location.getY().get() - location.getY().get());
+        return this.setMap(location, distance, isToBase);
     }
 
     public boolean setMap(int worldX, int worldY, int distance) {
         return this.setMap(worldX, worldY, this.location.getFieldX().get(), this.location.getFieldY().get(), distance);
+    public boolean setMap(Location location, int distance, boolean isToBase) {
+        if(isToBase) {
+            return this.setMap(location.getX().get(), this.location.getY().get(), 0, 0, distance,true);
+        } else {
+            return this.setMap(location.getX().get(), location.getY().get(),
+                    location.getFieldX().get(), location.getFieldY().get(), distance, false);
+        }
     }
 
     public boolean setMap(int x, int y, int fieldX, int fieldY, int distance) {
+    public boolean setMap(int x, int y, int fieldX, int fieldY, int distance, boolean isToBase) {
         if(distance <= 0) {
             throw new NumberRangeException(distance, 1);
         }
@@ -164,16 +217,48 @@ public abstract class Entity extends NamedObject {
 
         if(!isCancelled && !this.setField(fieldX, fieldY)) {
             MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
-            map.removeEntity(this.id.getId(), this.id.getObjectId());
-            Config.unloadMap(map);
+        if(!isCancelled) {
+            MapClass moveMap = null;
 
             this.location.setMap(x, y);
+            try {
+                moveMap = Config.loadMap(x, y);
 
             map = Config.loadMap(x, y);
             map.addEntity(this.id.getId(), this.id.getObjectId());
+                if(this.lv.get() < moveMap.getRequireLv().get()) {
+                    throw new NumberRangeException(this.lv.get(), moveMap.getRequireLv().get(), Config.MAX_LV);
+                }
 
             if(this instanceof AiEntity) {
                 Config.unloadMap(map);
+                this.location.setMap(x, y);
+                if(isToBase) {
+                    this.setField(moveMap.getLocation().getFieldX().get(), moveMap.getLocation().getFieldY().get());
+                } else {
+                    this.setField(fieldX, fieldY);
+                }
+
+                MapClass prevMap = null;
+
+                try {
+                    prevMap = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+                    prevMap.removeEntity(this.id.getId(), this.id.getObjectId());
+
+                    if(!this.getId().getId().equals(Id.PLAYER)) {
+                        Config.unloadMap(prevMap);
+                    }
+
+                    moveMap.addEntity(this.id.getId(), this.id.getObjectId());
+                } finally {
+                    if(prevMap != null) {
+                        Config.unloadMap(prevMap);
+                    }
+                }
+            } finally {
+                if(moveMap != null) {
+                    Config.unloadMap(moveMap);
+                }
             }
         }
 
