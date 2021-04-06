@@ -8,18 +8,16 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.AbstractCollection;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lkd.namsic.Game.Base.ConcurrentHashSet;
 import lkd.namsic.Game.GameObject.Achieve;
+import lkd.namsic.Game.GameObject.AiEntity;
 import lkd.namsic.Game.GameObject.Boss;
 import lkd.namsic.Game.GameObject.Chat;
 import lkd.namsic.Game.GameObject.Equipment;
@@ -47,6 +45,7 @@ public class Config {
 
     public static final Map<Id, ConcurrentHashMap<Long, GameObject>> OBJECT = new ConcurrentHashMap<>();
     public static final Map<Id, ConcurrentHashMap<Long, Long>> OBJECT_COUNT = new ConcurrentHashMap<>();
+    public static final Map<Id, ConcurrentHashSet<Long>> DELETE_LIST = new ConcurrentHashMap<>();
 
     public static final Map<String, MapClass> MAP = new ConcurrentHashMap<>();
     public static final Map<String, Long> PLAYER_COUNT = new ConcurrentHashMap<>();
@@ -71,6 +70,15 @@ public class Config {
     public static final long MIN_PAUSE_TIME = 1000;
     public static final long MAX_PAUSE_TIME = 5000;
 
+    public static final double TOTAL_MONEY_LOSE_RANDOM = 0.1;
+    public static final double TOTAL_MONEY_LOSE_MIN = 0.05;
+    public static final double MONEY_DROP_RANDOM = 0.5;
+    public static final double MONEY_DROP_MIN = 0.2;
+    public static final int ITEM_DROP = 4;
+    public static final double ITEM_DROP_PERCENT = 0.95;
+
+    public static final int MAX_EVADE = 95;
+
     public static void init() {
         ID_CLASS.put(Id.ACHIEVE, Achieve.class);
         ID_CLASS.put(Id.BOSS, Boss.class);
@@ -93,6 +101,7 @@ public class Config {
 
             OBJECT.put(id, new ConcurrentHashMap<>());
             OBJECT_COUNT.put(id, new ConcurrentHashMap<>());
+            DELETE_LIST.put(id, new ConcurrentHashSet<>());
         }
     }
 
@@ -145,15 +154,27 @@ public class Config {
 
     @SuppressWarnings("ConstantConditions")
     public static <T extends GameObject> T newObject(@NonNull T t) {
-        Id id = t.id.getId();
         Id id = t.getId().getId();
         long objectId = ID_COUNT.get(id);
 
-        t.id.setObjectId(objectId);
         t.getId().setObjectId(objectId);
         ID_COUNT.put(id, objectId + 1);
 
         return t;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public static void deleteAiEntity(AiEntity entity) {
+        Id id = entity.getId().getId();
+        long objectId = entity.getId().getObjectId();
+
+        long count = OBJECT_COUNT.get(id).get(objectId);
+        if(count == 0) {
+            FileManager.delete(getPath(id, objectId));
+            Logger.w("deleteAiEntity", id + "-" + objectId + " has 0 count");
+        } else {
+            DELETE_LIST.get(entity.getId().getId()).add(entity.getId().getObjectId());
+        }
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -175,14 +196,12 @@ public class Config {
     }
 
     @Nullable
-    public static <T> T fromJson(@NonNull String jsonString, @NonNull Class<?> clazz) {
-        return (T) new Gson().fromJson(jsonString, clazz);
+    public static <T> T fromJson(@NonNull String jsonString, @NonNull Class<?> c) {
+        return (T) new Gson().fromJson(jsonString, c);
     }
 
     @SuppressWarnings("ConstantConditions")
     public static void unloadObject(@NonNull GameObject gameObject) {
-        Id id = gameObject.id.getId();
-        long objectId = gameObject.id.getObjectId();
         Id id = gameObject.getId().getId();
         long objectId = gameObject.getId().getObjectId();
         long objectCount = OBJECT_COUNT.get(id).get(objectId);
@@ -191,14 +210,26 @@ public class Config {
             OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
         } else {
             String jsonString = toJson(gameObject);
-            String path = getPath(id, objectId);
 
-            FileManager.save(path, jsonString);
+            String path;
+            if(id.equals(Id.PLAYER)) {
+                Player player = (Player) gameObject;
+                path = getPlayerPath(player.getSender(), player.getImage());
+            } else {
+                path = getPath(id, objectId);
+            }
 
             if(objectCount == 1) {
                 OBJECT.get(id).remove(objectId);
                 OBJECT_COUNT.get(id).remove(objectId);
+
+                if(DELETE_LIST.get(id).contains(objectId)) {
+                    FileManager.delete(path);
+                    return;
+                }
             }
+
+            FileManager.save(path, jsonString);
         }
     }
 
@@ -213,32 +244,22 @@ public class Config {
             String jsonString = toJson(map);
             String path = getMapPath(fileName);
 
-            FileManager.save(path, jsonString);
-
             if(playerCount == 1) {
                 MAP.remove(fileName);
                 PLAYER_COUNT.remove(fileName);
             }
-        }
-    }
 
-    @SuppressWarnings("ConstantConditions")
-    public static void discardObject(@NonNull GameObject gameObject) {
-        Id id = gameObject.id.getId();
-        long objectId = gameObject.id.getObjectId();
-        Long objectCount = OBJECT_COUNT.get(id).get(objectId);
-
-        if (objectCount > 1) {
-            OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
-        } else {
-            OBJECT.get(id).remove(objectId);
-            OBJECT_COUNT.get(id).remove(objectId);
+            FileManager.save(path, jsonString);
         }
     }
 
     @SuppressWarnings("ConstantConditions")
     @NonNull
     public static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
+        if(id.equals(Id.PLAYER)) {
+            throw new UnhandledEnumException(id);
+        }
+
         checkId(id, objectId);
 
         Long objectCount = OBJECT_COUNT.get(id).get(objectId);
@@ -256,6 +277,26 @@ public class Config {
             OBJECT_COUNT.get(id).put(objectId, objectCount + 1);
             return (T) OBJECT.get(id).get(objectId);
         }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @NonNull
+    public static Player loadPlayer(@NonNull String sender, @NonNull String image) {
+        String path = getPlayerPath(sender, image);
+        String jsonString = FileManager.read(path);
+
+        Player player = fromJson(jsonString, Player.class);
+        long objectId = player.getId().getObjectId();
+        Long objectCount = OBJECT_COUNT.get(Id.PLAYER).get(objectId);
+
+        if(objectCount == null) {
+            OBJECT.get(Id.PLAYER).put(objectId, player);
+            OBJECT_COUNT.get(Id.PLAYER).put(objectId, 1L);
+        } else {
+            OBJECT_COUNT.get(Id.PLAYER).put(objectId, objectCount + 1);
+        }
+
+        return player;
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -306,21 +347,6 @@ public class Config {
         return str1 + ", " + str2;
     }
 
-    @NonNull
-    public static String collectionToString(@NonNull Collection<?> collection) {
-        if(collection instanceof AbstractCollection) {
-            return collection.toString();
-        }
-
-        if(collection instanceof List) {
-            return new ArrayList<>(collection).toString();
-        } else if(collection instanceof Set) {
-            return new HashSet<>(collection).toString();
-        } else {
-            return "Unsupported type (" + collection.toString() + ")";
-        }
-    }
-
     public static <T> boolean compareMap(@NonNull Map<T, Integer> map1, @NonNull Map<T, Integer> map2, boolean firstIsBig) {
         return compareMap(map1, map2, firstIsBig, true);
     }
@@ -352,12 +378,17 @@ public class Config {
 
     @NonNull
     private static String getPath(@NonNull Id id, long objectId) {
-        return FileManager.DATA_PATH_MAP.get(id) + objectId + ".txt";
+        return FileManager.DATA_PATH_MAP.get(id) + objectId + ".json";
+    }
+
+    @NonNull
+    private static String getPlayerPath(@NonNull String sender, @NonNull String image) {
+        return sender + "-" + image + ".json";
     }
 
     @NonNull
     public static String getMapFileName(int x, int y) {
-        String path = x + "-" + y + ".txt";
+        String path = x + "-" + y + ".json";
 
         if(x >= MIN_MAP_X && x <= MAX_MAP_X && y >= MIN_MAP_X && y <= MAX_MAP_Y) {
             return path;
