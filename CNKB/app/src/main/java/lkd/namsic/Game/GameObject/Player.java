@@ -249,6 +249,95 @@ public class Player extends Entity {
             return false;
         }
     }
+
+    public void eat(long itemId) {
+        Item item = null;
+
+        try {
+            item = Config.loadObject(Id.ITEM, itemId);
+
+            if(item.isFood()) {
+                this.addItem(itemId, -1);
+                this.addLog(LogData.EAT, 1);
+
+                this.setSkipRevalidate(true);
+
+                for(Map.Entry<Long, HashMap<StatType, Integer>> entry : item.getEatBuff().entrySet()) {
+                    for(Map.Entry<StatType, Integer> statEntry : entry.getValue().entrySet()) {
+                        this.addBuff(entry.getKey(), statEntry.getKey(), statEntry.getValue());
+                    }
+                }
+
+                this.setSkipRevalidate(false);
+            } else {
+                throw new WeirdDataException(Id.ITEM, itemId);
+            }
+        } finally {
+            if(item != null) {
+                Config.unloadObject(item);
+            }
+        }
+    }
+
+    public void addExp(long exp) {
+        if(exp < 0) {
+            throw new NumberRangeException(0, 0, Long.MAX_VALUE);
+        }
+
+        this.exp.add(exp);
+        this.addLog(LogData.TOTAL_EXP, exp);
+
+        long requiredExp;
+        int startLv = this.lv.get();
+        int endLv;
+
+        if(startLv == Config.MAX_LV) {
+            return;
+        }
+
+        while(true) {
+            requiredExp = this.getRequiredExp();
+
+            if(requiredExp == 0) {
+                this.lvUp(requiredExp);
+            } else {
+                endLv = this.lv.get();
+
+                if(startLv != endLv) {
+                    this.replyPlayer(
+                            "레벨 업!(" + startLv + "->" + endLv + ")",
+                            "현재 경험치 : " + this.exp.get() + "\n현재 스텟 포인트 : " + this.sp.get()
+                    );
+                }
+
+                break;
+            }
+        }
+    }
+
+    public long getRequiredExp() {
+        int lv = this.lv.get();
+
+        long needExp;
+        if(lv <= 100) {
+            needExp =  100 + (lv * 100);
+        } else if(lv <= 500) {
+            needExp =  (long) Math.pow(lv, 3.2);
+        } else if(lv <= 850) {
+            needExp =  lv * 12_000_000 - 5_500_000_000L;
+        } else {
+            needExp =  (long) Math.pow(lv, 3.3) + (lv * 10_000_000) - 7_910_000_000L;
+        }
+
+        return needExp - this.getExp().get();
+    }
+
+    public void lvUp(long requiredExp) {
+        this.lv.add(1);
+        this.sp.add(5);
+        this.exp.add(-1 * requiredExp);
+    }
+
     public void startChat(long chatId) {
         Config.checkId(Id.CHAT, chatId);
 
