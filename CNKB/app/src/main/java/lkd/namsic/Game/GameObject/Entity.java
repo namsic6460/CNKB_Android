@@ -39,6 +39,9 @@ import lombok.Setter;
 
 @Getter
 public class Entity extends NamedObject {
+public abstract class Entity extends NamedObject {
+
+    protected boolean skipRevalidate = false;
 
     LimitInteger lv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
     LimitLong money = new LimitLong(0, 0L, Long.MAX_VALUE);
@@ -66,6 +69,14 @@ public class Entity extends NamedObject {
 
     protected Entity(@NonNull String name) {
         super(name);
+    }
+
+    public void setSkipRevalidate(boolean skipRevalidate) {
+        this.skipRevalidate = skipRevalidate;
+
+        if(!skipRevalidate) {
+            this.revalidateStat();
+        }
     }
 
     public boolean setMoney(long money) {
@@ -186,19 +197,8 @@ public class Entity extends NamedObject {
     }
 
     public <T extends Entity> T setBasicStat(@NonNull Map<StatType, Integer> basicStat) {
-        for(Map.Entry<StatType, Integer> entry : basicStat.entrySet()) {
-            this.setBasicStat(entry.getKey(), entry.getValue());
-        }
-
-        return (T) this;
-    }
-
-    public <T extends Entity> T setBasicStat(@NonNull StatType statType, int stat) {
+    public void setBasicStat(@NonNull StatType statType, int stat) {
         Config.checkStatType(statType);
-
-        if(stat < 0) {
-            throw new NumberRangeException(stat, 0);
-        }
 
         if(stat == 0) {
             this.basicStat.remove(statType);
@@ -207,6 +207,7 @@ public class Entity extends NamedObject {
         }
 
         return (T) this;
+        this.revalidateStat();
     }
 
     public int getBasicStat(@NonNull StatType statType) {
@@ -222,6 +223,8 @@ public class Entity extends NamedObject {
 
     public <T extends Entity> T addBasicStat(@NonNull StatType statType, int stat) {
         return this.setBasicStat(statType, this.getBasicStat(statType) + stat);
+    public void addBasicStat(@NonNull StatType statType, int stat) {
+        this.setBasicStat(statType, this.getBasicStat(statType) + stat);
     }
 
     public <T extends Entity> T setEquipStat(@NonNull Map<StatType, Integer> equipStat) {
@@ -233,6 +236,7 @@ public class Entity extends NamedObject {
     }
 
     public <T extends Entity> T setEquipStat(@NonNull StatType statType, int stat) {
+    public void setEquipStat(@NonNull StatType statType, int stat) {
         Config.checkStatType(statType);
 
         if(stat == 0) {
@@ -242,6 +246,7 @@ public class Entity extends NamedObject {
         }
 
         return (T) this;
+        this.revalidateStat();
     }
 
     public int getEquipStat(@NonNull StatType statType) {
@@ -255,12 +260,10 @@ public class Entity extends NamedObject {
         }
     }
 
-    public <T extends Entity> T addEquipStat(@NonNull StatType statType, int stat) {
-        return this.setEquipStat(statType, this.getEquipStat(statType) + stat);
+    public void addEquipStat(@NonNull StatType statType, int stat) {
+        this.setEquipStat(statType, this.getEquipStat(statType) + stat);
     }
 
-    public <T extends Entity> T setBuffStat(@NonNull Map<StatType, Integer> buffStat) {
-        for(Map.Entry<StatType, Integer> entry : buffStat.entrySet()) {
             this.setBuffStat(entry.getKey(), entry.getValue());
         }
 
@@ -268,6 +271,7 @@ public class Entity extends NamedObject {
     }
 
     public <T extends Entity> T setBuffStat(@NonNull StatType statType, int stat) {
+    public void setBuffStat(@NonNull StatType statType, int stat) {
         Config.checkStatType(statType);
 
         if(stat == 0) {
@@ -277,6 +281,7 @@ public class Entity extends NamedObject {
         }
 
         return (T) this;
+        this.revalidateStat();
     }
 
     public int getBuffStat(@NonNull StatType statType) {
@@ -292,6 +297,8 @@ public class Entity extends NamedObject {
 
     public <T extends Entity> T addBuffStat(@NonNull StatType statType, int stat) {
         return this.setBuffStat(statType, this.getBuffStat(statType) + stat);
+    public void addBuffStat(@NonNull StatType statType, int stat) {
+        this.setBuffStat(statType, this.getBuffStat(statType) + stat);
     }
 
     public boolean setStat(StatType statType, int stat) {
@@ -390,10 +397,13 @@ public class Entity extends NamedObject {
     public EquipType equip(long equipId) {
         Equipment equipment = null;
         EquipType equipType = null;
+        EquipType equipType;
 
         try {
             equipment = Config.loadObject(Id.EQUIPMENT, equipId);
             equipType = equipment.getEquipType();
+
+            this.setSkipRevalidate(true);
 
             if (equip.containsKey(equipType)) {
                 this.unEquip(equipType);
@@ -404,6 +414,8 @@ public class Entity extends NamedObject {
                 statType = entry.getKey();
                 this.setEquipStat(statType, this.getEquipStat(statType) + entry.getValue());
             }
+
+            this.setSkipRevalidate(false);
 
             this.equip.put(equipType, equipId);
         } finally {
@@ -419,6 +431,7 @@ public class Entity extends NamedObject {
         Long equipId = equip.get(equipType);
         if(equipId == null) {
             return;
+            throw new ObjectNotFoundException(equipType);
         }
 
         Equipment equipment = null;
@@ -501,6 +514,10 @@ public class Entity extends NamedObject {
     }
 
     public void revalidateBuff() {
+        if(skipRevalidate) {
+            return;
+        }
+
         long currentTime = System.currentTimeMillis();
 
         long time;
@@ -594,10 +611,15 @@ public class Entity extends NamedObject {
     }
 
     public void revalidateStat() {
+        if(skipRevalidate) {
+            return;
+        }
+
         revalidateBuff();
 
         this.stat.clear();
 
+        int stat;
         for(StatType statType : StatType.values()) {
             try {
                 Config.checkStatType(statType);
@@ -605,19 +627,14 @@ public class Entity extends NamedObject {
                 continue;
             }
 
-            this.stat.put(statType, this.getBasicStat(statType) + this.getEquipStat(statType) + this.getBuffStat(statType));
-        }
-    }
+            stat = this.getBasicStat(statType) + this.getEquipStat(statType) + this.getBuffStat(statType);
+            if(statType.equals(StatType.MAXHP) || statType.equals(StatType.MAXMN)) {
+                stat = Math.max(stat, 1);
+            } else {
+                stat = Math.max(stat, 0);
+            }
 
-    public void addEnemy(@NonNull Map<Id, ConcurrentHashSet<Long>> enemy) {
-        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : enemy.entrySet()) {
-            this.addEnemy(entry.getKey(), entry.getValue());
-        }
-    }
-
-    public void addEnemy(@NonNull Id id, @NonNull Set<Long> enemy) {
-        for(long enemyId : enemy) {
-            this.addEnemy(id, enemyId);
+            this.stat.put(statType, stat);
         }
     }
 
