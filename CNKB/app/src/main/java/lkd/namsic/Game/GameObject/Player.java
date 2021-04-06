@@ -370,3 +370,394 @@ public class Player extends Entity {
             }
         }
     }
+
+    @NonNull
+    public Player addAchieve(long achieveId) {
+        Config.checkId(Id.ACHIEVE, achieveId);
+
+        if(this.achieve.add(achieveId)) {
+            Achieve achieve = null;
+
+            try {
+                achieve = Config.loadObject(Id.ACHIEVE, achieveId);
+
+                this.addMoney(achieve.getRewardMoney().get());
+                this.addExp(achieve.rewardExp.get());
+                this.adv.add(achieve.rewardAdv.get());
+
+                for (long npcId : achieve.getRewardCloseRate().keySet()) {
+                    this.addCloseRate(npcId, achieve.getRewardCloseRate(npcId));
+                }
+
+                for (long itemId : achieve.getRewardItem().keySet()) {
+                    this.addItem(itemId, achieve.getRewardItem(itemId));
+                }
+
+                for (StatType statType : achieve.getRewardStat().keySet()) {
+                    this.addBasicStat(statType, achieve.getRewardStat(statType));
+                }
+            } finally {
+                if(achieve != null) {
+                    Config.unloadObject(achieve);
+                }
+            }
+        }
+
+        return this;
+    }
+
+    public boolean canAddResearch(long researchId) {
+        Config.checkId(Id.RESEARCH, researchId);
+
+        Research research = null;
+        boolean flag;
+
+        try {
+            research = Config.loadObject(Id.RESEARCH, researchId);
+            flag = research.getLimitLv().isInRange(this.lv.get()) && research.getNeedMoney().get() <= this.getMoney()
+                    && Config.compareMap(this.inventory, research.needItem, true);
+        } finally {
+            if(research != null) {
+                Config.unloadObject(research);
+            }
+        }
+
+        Config.unloadObject(research);
+
+        return flag;
+    }
+
+    public void addResearch(long researchId) {
+        if(this.research.add(researchId)) {
+            Research research = null;
+
+            try {
+                research = Config.loadObject(Id.RESEARCH, researchId);
+
+                this.addMoney(-1 * research.getNeedMoney().get());
+
+                this.addExp(research.rewardExp.get());
+                this.adv.add(research.rewardAdv.get());
+
+                for (long npcId : research.getRewardCloseRate().keySet()) {
+                    this.addCloseRate(npcId, research.getRewardCloseRate(npcId));
+                }
+
+                for (long itemId : research.getRewardItem().keySet()) {
+                    this.addItem(itemId, research.getRewardItem(itemId));
+                }
+
+                this.setSkipRevalidate(true);
+
+                for (StatType statType : research.getRewardStat().keySet()) {
+                    this.addBasicStat(statType, research.getRewardStat(statType));
+                }
+
+                this.setSkipRevalidate(false);
+            } finally {
+                if(research != null) {
+                    Config.unloadObject(research);
+                }
+            }
+        }
+    }
+
+    public boolean canAddQuest(long questId) {
+        Quest quest = null;
+        boolean flag;
+
+        try {
+            quest = Config.loadObject(Id.QUEST, questId);
+
+            flag = quest.limitLv.isInRange(this.lv.get()) && quest.limitCloseRate.isInRange(this.closeRate)
+                    && quest.limitStat.isInRange(this.stat);
+
+            if(flag) {
+                if(clearedQuest.containsKey(questId)) {
+                    flag = quest.isRepeatable();
+                }
+            }
+        } finally {
+            if(quest != null) {
+                Config.unloadObject(quest);
+            }
+        }
+
+        return flag;
+    }
+
+    public void addQuest(long questId) {
+        Quest quest = null;
+
+        try {
+            quest = Config.loadObject(Id.QUEST, questId);
+
+            this.quest.put(questId, quest.getChatId().get());
+            this.addLog(LogData.QUEST_RECEIVED, 1);
+
+            long questNpcId = quest.getNpcId().get();
+            if(questNpcId != 0) {
+                ConcurrentHashSet<Long> questNpc = this.questNpc.get(questNpcId);
+
+                if(questNpc == null) {
+                    questNpc = new ConcurrentHashSet<>();
+                    questNpc.add(questId);
+                    this.questNpc.put(questNpcId, questNpc);
+                } else {
+                    questNpc.add(questId);
+                }
+            }
+        } finally {
+            if(quest != null) {
+                Config.unloadObject(quest);
+            }
+        }
+    }
+
+    @NonNull
+    public Player clearQuest(long questId) {
+        Long chatId = this.quest.get(questId);
+
+        if(chatId == null) {
+            throw new ObjectNotFoundException(Id.QUEST, questId);
+        }
+
+        Quest quest = null;
+
+        try {
+            quest = Config.loadObject(Id.QUEST, questId);
+
+            this.addMoney(-1 * quest.getNeedMoney().get());
+            this.adv.add(-1 * quest.getNeedAdv().get());
+
+            for(Map.Entry<Long, Integer> entry : quest.getNeedItem().entrySet()) {
+                this.addItem(entry.getKey(), -1 * entry.getValue());
+            }
+
+            for(Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
+                this.addBasicStat(entry.getKey(), -1 * entry.getValue());
+            }
+
+            for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
+                this.addCloseRate(entry.getKey(), -1 * entry.getValue());
+            }
+
+            this.addMoney(quest.getRewardMoney().get());
+            this.addExp(quest.getRewardExp().get());
+            this.adv.add(quest.getRewardAdv().get());
+
+            for(Map.Entry<Long, Integer> entry : quest.getRewardItem().entrySet()) {
+                this.addItem(entry.getKey(), entry.getValue());
+            }
+
+            for(Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
+                this.addBasicStat(entry.getKey(), -1 * entry.getValue());
+            }
+
+            for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
+                this.addCloseRate(entry.getKey(), -1 * entry.getValue());
+            }
+
+            this.clearedQuest.put(questId, this.getClearedQuest(questId) + 1);
+            this.quest.remove(questId);
+            this.addLog(LogData.QUEST_CLEARED, 1);
+
+            long questNpcId = quest.getNpcId().get();
+            if(questNpcId != 0) {
+                ConcurrentHashSet<Long> questNpc = Objects.requireNonNull(this.questNpc.get(questNpcId));
+
+                if(questNpc.size() == 1) {
+                    this.questNpc.remove(questId);
+                } else {
+                    questNpc.remove(questId);
+                }
+            }
+
+            this.startChat(chatId);
+        } finally {
+            if(quest != null) {
+                Config.unloadObject(quest);
+            }
+        }
+
+        return this;
+    }
+
+    public int getClearedQuest(long questId) {
+        Integer value = this.clearedQuest.get(questId);
+
+        if(value != null) {
+            return value;
+        } else {
+            return 0;
+        }
+    }
+
+    public void setCloseRate(@NonNull Map<Long, Integer> closeRate) {
+        for(Map.Entry<Long, Integer> entry : closeRate.entrySet()) {
+            this.setCloseRate(entry.getKey(), entry.getValue());
+        }
+    }
+
+    public void setCloseRate(long npcId, int closeRate) {
+        Config.checkId(Id.NPC, npcId);
+
+        this.addLog(LogData.TOTAL_CLOSERATE, closeRate - this.getCloseRate(npcId));
+
+        if(closeRate == 0) {
+            this.closeRate.remove(npcId);
+        } else {
+            this.closeRate.put(npcId, closeRate);
+            this.setLog(LogData.MAX_CLOSERATE, Math.max(this.getLog(LogData.MAX_CLOSERATE), closeRate));
+        }
+    }
+
+    public int getCloseRate(long npcId) {
+        Integer value = this.closeRate.get(npcId);
+
+        if(value != null) {
+            return value;
+        } else {
+            return 0;
+        }
+    }
+
+    public void addCloseRate(long npcId, int closeRate) {
+        this.setCloseRate(npcId, this.getCloseRate(npcId) + closeRate);
+    }
+
+    public void setLog(@NonNull LogData logData, long count) {
+        if(count < 0) {
+            throw new NumberRangeException(count, 0);
+        }
+
+        if(count == 0) {
+            this.log.remove(logData);
+        } else {
+            this.log.put(logData, count);
+        }
+    }
+
+    public long getLog(@NonNull LogData logData) {
+        Long value = this.log.get(logData);
+
+        if(value == null) {
+            return 0;
+        } else {
+            return value;
+        }
+    }
+
+    public void addLog(@NonNull LogData logData, long count) {
+        this.setLog(logData, this.getLog(logData) + count);
+        this.log.put(LogData.LOG_COUNT, this.getLog(LogData.LOG_COUNT) + 1);
+    }
+
+    public boolean canEquip(long equipId) {
+        Equipment equipment = null;
+        boolean flag;
+
+        try {
+            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
+            flag = equipment.getTotalLimitLv().isInRange(this.lv.get()) &&
+                    Config.compareMap(equipment.getLimitStat(), this.basicStat, false);
+        } finally {
+            if(equipment != null) {
+                Config.unloadObject(equipment);
+            }
+        }
+
+        return flag;
+    }
+
+    @Override
+    public boolean setMoney(long money) {
+        long gap = money - this.getMoney();
+        boolean isCancelled = super.setMoney(money);
+
+        if(!isCancelled) {
+            this.addLog(LogData.TOTAL_MONEY, gap);
+
+            if(gap > 0) {
+                if (this.getLog(LogData.MAX_MONEY) < money) {
+                    this.setLog(LogData.MAX_MONEY, money);
+                }
+            } else if(gap < 0) {
+                gap *= -1;
+
+                if(this.getLog(LogData.MAX_PAYMENT) < gap) {
+                    this.setLog(LogData.MAX_PAYMENT, gap);
+                }
+            }
+        }
+
+        return isCancelled;
+    }
+
+    @Override
+    public boolean setField(int fieldX, int fieldY, int distance) {
+        boolean isCancelled = super.setField(fieldX, fieldY, distance);
+
+        if(!isCancelled) {
+            this.addLog(LogData.FIELD_MOVE_DISTANCE, distance);
+        }
+
+        return isCancelled;
+    }
+
+    @Override
+    public boolean setMap(int x, int y, int fieldX, int fieldY, int distance, boolean isToBase) {
+        boolean isCancelled = super.setMap(x, y, fieldX, fieldY, distance, isToBase);
+
+        if(!isCancelled) {
+            this.addLog(LogData.MAP_MOVE_DISTANCE, distance);
+        }
+
+        return isCancelled;
+    }
+
+    @Override
+    public void setBuff(long time, @NonNull StatType statType, int stat) {
+        super.setBuff(time, statType, stat);
+        this.addLog(LogData.BUFF_RECEIVED, 1);
+    }
+    @Override
+    public void revalidateStat() {
+        super.revalidateStat();
+        this.addLog(LogData.STAT_UPDATED, 1);
+    }
+
+    @Override
+    public void setItem(long itemId, int count) {
+        int currentItem = this.getItem(itemId);
+        super.setItem(itemId, count);
+
+        this.addLog(LogData.TOTAL_ITEM, count - currentItem);
+    }
+
+    @Override
+    public boolean canFight(@NonNull Entity enemy) {
+        List<Doing> doingList = Doing.fightList();
+
+        if(doingList.contains(this.doing) && this.isPvp()) {
+            if(enemy.getId().getId().equals(Id.PLAYER) && !((Player) enemy).isPvp()) {
+                return false;
+            }
+
+            return doingList.contains(enemy.getDoing());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean startFight(@NonNull Set<Entity> enemies) {
+        if(super.startFight(enemies)) {
+            this.replyPlayer("적 " + enemies.size() + "명 과의 전투가 시작되었습니다", this.getBattleMsg());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+}
