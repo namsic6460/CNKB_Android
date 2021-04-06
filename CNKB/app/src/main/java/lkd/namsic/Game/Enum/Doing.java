@@ -13,20 +13,16 @@ public enum Doing {
     MINE,
     GATHER,
     HARVEST,
-    REINFORCE;
+    REINFORCE,
+    WAIT_RESPONSE;
 
-    public static List<Doing> nonFightList() {
+    public static List<Doing> fightList() {
         List<Doing> doingList = new ArrayList<>();
-        doingList.add(Doing.BUY);
-        doingList.add(Doing.CHAT);
-        doingList.add(Doing.REINFORCE);
-
-        return doingList;
-    }
-
-    public static List<Doing> playerNonFightList() {
-        List<Doing> doingList = nonFightList();
-        doingList.add(Doing.FIGHT);
+        doingList.add(Doing.NONE);
+        doingList.add(Doing.EXPLORE);
+        doingList.add(Doing.MINE);
+        doingList.add(Doing.GATHER);
+        doingList.add(Doing.HARVEST);
 
         return doingList;
     }

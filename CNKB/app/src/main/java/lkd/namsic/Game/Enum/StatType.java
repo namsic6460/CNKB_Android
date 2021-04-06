@@ -15,7 +15,6 @@ public enum StatType {
     MBRE,
     DRA,
     MDRA,
-    CD,
     EVA,
     ACC,
     ADV

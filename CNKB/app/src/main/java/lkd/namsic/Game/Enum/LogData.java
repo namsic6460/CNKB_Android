@@ -2,11 +2,11 @@ package lkd.namsic.Game.Enum;
 
 public enum LogData {
 
-    ATE,
     BOUGHT,
     BUFF_RECEIVED,
     CHAT,
     DEATH,
+    EAT,
     EXPLORED,
     FIELD_MOVE_DISTANCE,
     GATHERED,
