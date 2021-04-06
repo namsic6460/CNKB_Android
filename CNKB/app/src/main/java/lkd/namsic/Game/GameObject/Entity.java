@@ -706,14 +706,112 @@ public abstract class Entity extends NamedObject {
         long objectId = this.id.getObjectId();
 
         //noinspection SimplifyStreamApiCallChains
-        enemies.stream().forEach(enemy -> {
-            enemy.setDoing(Doing.FIGHT);
+        enemies.forEach(enemy -> {
             this.addEnemy(enemy.id.getId(), enemy.id.getObjectId());
 
             enemy.addEnemy(id, objectId);
+            enemy.setDoing(Doing.FIGHT);
+
+            if(enemy.id.getId().equals(Id.PLAYER)) {
+                Player player = (Player) enemy;
+                player.replyPlayer(this.getName() + " 와(과) 의 강제 전투가 시작되었습니다", player.getBattleMsg());
+            }
         });
 
         return true;
+    }
+
+    public void endFight() {
+        Id id;
+        Entity enemy = null;
+
+        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : this.enemies.entrySet()) {
+            id = entry.getKey();
+
+            for(long enemyId : entry.getValue()) {
+                try {
+                    enemy = Config.loadObject(id, enemyId);
+
+                    this.removeEnemy(id, enemyId);
+                    enemy.removeEnemy(this.id.getId(), this.id.getObjectId());
+                    
+                    if(id.equals(Id.PLAYER)) {
+                        ((Player) enemy).replyPlayer("전투가 종료되었습니다");
+                    }
+                } finally {
+                    if(enemy != null) {
+                        Config.unloadObject(enemy);
+                    }
+                }
+            }
+        }
+
+        if(this.id.getId().equals(Id.PLAYER)) {
+            ((Player) this).replyPlayer("전투가 종료되었습니다");
+        }
+    }
+
+    public boolean damage(Entity entity, int physicDmg, int magicDmg, int staticDmg, boolean canEvade) {
+        Random random = new Random();
+
+        boolean evade = true;
+        if(canEvade) {
+            evade = random.nextInt(100) < Math.min(
+                    this.getStat(StatType.ACC) - entity.getStat(StatType.EVA), Config.MAX_EVADE);
+        }
+
+        if(evade) {
+            int def = entity.getStat(StatType.DEF) - this.getStat(StatType.BRE);
+            int mdef = entity.getStat(StatType.MDEF) - this.getStat(StatType.MBRE);
+
+            physicDmg = Math.max(physicDmg - def, 0);
+            magicDmg = Math.max(magicDmg - mdef, 0);
+
+            int dra = physicDmg * this.getStat(StatType.DRA) / 100;
+            int mdra = magicDmg * this.getStat(StatType.MDRA) / 100;
+
+            int totalDmg = physicDmg + magicDmg + staticDmg;
+            int totalDra = dra + mdra;
+
+            entity.addStat(StatType.HP, -1 * totalDmg);
+            this.addStat(StatType.HP, totalDra);
+
+            entity.revalidateStat();
+            this.revalidateStat();
+
+            int hp = entity.getStat(StatType.HP);
+            int selfHp = this.getStat(StatType.HP);
+            String innerMsg = "총 데미지 : " + totalDmg + "\n총 흡수량 : " + totalDra + "\n";
+
+            if(this.id.getId().equals(Id.PLAYER)) {
+                ((Player) this).replyPlayer("공격에 성공했습니다\n적 체력 : " + hp,
+                        innerMsg + "남은 체력 : " + selfHp);
+            }
+
+            if(entity.id.getId().equals(Id.PLAYER)) {
+                ((Player) entity).replyPlayer(this.getName() + " 에게 공격당했습니다!\n남은 체력 : " + hp,
+                        innerMsg + "적 체력 : " + selfHp);
+            }
+
+            return true;
+        } else {
+            if(this.getId().getId().equals(Id.PLAYER)) {
+                ((Player) this).replyPlayer("공격이 빗나갔습니다");
+            }
+
+            return false;
+        }
+    }
+
+    public int getFieldDistance(Location location) {
+        return (int) Math.sqrt(Math.pow(location.getX().get() - this.location.getX().get(), 2) +
+                Math.pow(location.getY().get() - this.location.getY().get(), 2));
+    }
+
+    @NonNull
+    @Override
+    public String getName() {
+        return this.name + " (Lv." + this.getLv() + ")";
     }
 
 }
