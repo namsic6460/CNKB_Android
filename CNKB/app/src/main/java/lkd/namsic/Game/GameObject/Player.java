@@ -721,6 +721,63 @@ public class Player extends Entity {
         super.setBuff(time, statType, stat);
         this.addLog(LogData.BUFF_RECEIVED, 1);
     }
+
+    @Override
+    public void death() {
+        this.endFight();
+
+        this.setStat(StatType.HP, 1);
+        this.location.set(this.baseLocation);
+
+        Random random = new Random();
+        double loseMoneyPercent = random.nextDouble() * Config.TOTAL_MONEY_LOSE_RANDOM + Config.TOTAL_MONEY_LOSE_MIN;
+        double dropPercent = random.nextDouble() * Config.MONEY_DROP_RANDOM + Config.MONEY_DROP_MIN;
+        int dropItem = random.nextInt(Config.ITEM_DROP);
+
+        long totalLoseMoney = (long) (this.getMoney() * loseMoneyPercent);
+        long dropMoney = (long) (totalLoseMoney * dropPercent);
+        long loseMoney = totalLoseMoney - dropMoney;
+
+        this.dropMoney(dropMoney);
+        this.addMoney(loseMoney);
+
+        StringBuilder dropItemBuilder = new StringBuilder("G\n\n---떨어트린 아이템 목록---\n");
+        StringBuilder loseItemBuilder = new StringBuilder("\n---잃어버린 아이템 목록---\n");
+
+        List<Long> keys;
+        long itemId;
+        int count;
+        for(int i = 0; i < dropItem; i++) {
+            keys = new ArrayList<>(this.inventory.keySet());
+            itemId = keys.get(random.nextInt(keys.size()));
+            count = random.nextInt(this.getItem(itemId));
+
+            Item item = Config.getData(Id.ITEM, itemId);
+            String itemName = item.getName();
+
+            if(random.nextDouble() < Config.ITEM_DROP_PERCENT) {
+                this.dropItem(itemId, count);
+
+                dropItemBuilder.append(itemName);
+                dropItemBuilder.append(" ");
+                dropItemBuilder.append(count);
+                dropItemBuilder.append("개\n");
+            } else {
+                this.addItem(itemId, count);
+
+                loseItemBuilder.append(itemName);
+                loseItemBuilder.append(" ");
+                loseItemBuilder.append(count);
+                loseItemBuilder.append("개\n");
+            }
+        }
+
+        String innerMsg = "떨어트린 돈 : " + dropMoney + "G\n잃어버린 돈 : " + loseMoney
+                + dropItemBuilder.toString() + loseItemBuilder.toString();
+        this.replyPlayer("사망했습니다...", innerMsg);
+        this.addLog(LogData.DEATH, 1);
+    }
+
     @Override
     public void revalidateStat() {
         super.revalidateStat();
