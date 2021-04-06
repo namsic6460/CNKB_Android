@@ -23,6 +23,8 @@ public class Skill extends NamedObject {
     @Setter
     Use use = null;
 
+    boolean isWaitSkill = false;
+
     //Only use on getting
     RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(new HashMap<>(), new HashMap<>());
 
