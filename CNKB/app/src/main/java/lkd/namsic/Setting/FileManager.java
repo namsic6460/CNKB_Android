@@ -75,6 +75,9 @@ public class FileManager extends Application {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
             char[] c = new char[(int) file.length()];
             bufferedReader.read(c);
+            bufferedReader.close();
+            Logger.i("FileManger", "read - " + path);
+
             return new String(c);
         } catch (Exception e) {
             Logger.e("FileManager", e);
