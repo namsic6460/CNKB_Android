@@ -21,11 +21,13 @@ public class Boss extends AiEntity {
         this.id.setId(Id.BOSS);
     }
 
+    @NonNull
     @Override
     public EquipType equip(long equipId) {
         return this.equip(equipId, 1);
     }
 
+    @NonNull
     public EquipType equip(long equipId, double dropPercent) {
         EquipType equipType = super.equip(equipId);
         this.setDropPercent(equipType, dropPercent);
