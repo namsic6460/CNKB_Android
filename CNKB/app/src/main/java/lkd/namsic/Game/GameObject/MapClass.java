@@ -2,8 +2,11 @@ package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,6 +17,7 @@ import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.MapType;
 import lkd.namsic.Game.Exception.NumberRangeException;
+import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lkd.namsic.Game.Exception.WeirdDataException;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,10 +42,12 @@ public class MapClass {
 
     Location location = new Location();
 
+    Map<Id, Map<Long, Double>> spawnMonster;
+
+    //This part can be frequently changed
     Map<Location, Long> money = new ConcurrentHashMap<>();
     Map<Location, ConcurrentHashMap<Long, Integer>> item = new ConcurrentHashMap<>();
     Map<Location, ConcurrentHashSet<Long>> equip = new ConcurrentHashMap<>();
-
     Map<Id, ConcurrentHashSet<Long>> entity = new ConcurrentHashMap<>();
 
     public MapClass(@NonNull String name) {
@@ -141,18 +147,75 @@ public class MapClass {
         return Objects.requireNonNull(this.entity.get(id));
     }
 
-    public void addEntity(Id id, long objectId) {
-        Id.checkEntityId(id);
-        Config.checkId(id, objectId);
-
-        this.getEntity(id).add(objectId);
+    public void addEntity(Entity entity) {
+        this.getEntity(entity.id.getId()).add(entity.id.getObjectId());
     }
 
-    public void removeEntity(Id id, long objectId) {
-        Id.checkEntityId(id);
-        Config.checkId(id, objectId);
+    public void removeEntity(Entity entity) {
+        this.getEntity(entity.id.getId()).remove(entity.id.getObjectId());
+    }
 
-        this.getEntity(id).remove(objectId);
+    public void setSpawnMonster(Id id, long monsterId, double percent) {
+        if(!(id.equals(Id.MONSTER) || id.equals(Id.BOSS))) {
+            throw new UnhandledEnumException(id);
+        }
+
+        if(percent < 0 || percent > 1) {
+            throw new NumberRangeException(percent, 0, 1);
+        }
+
+        Config.checkId(id, monsterId);
+
+        Map<Long, Double> spawnMonster = this.spawnMonster.get(id);
+        if(spawnMonster == null) {
+            spawnMonster = new HashMap<>();
+            spawnMonster.put(monsterId, percent);
+            this.spawnMonster.put(id, spawnMonster);
+        } else {
+            spawnMonster.put(monsterId, percent);
+        }
+    }
+
+    public double getSpawnMonster(Id id, long monsterId) {
+        Map<Long, Double> spawnMonster = this.spawnMonster.get(id);
+        if(spawnMonster == null) {
+            return 0;
+        } else {
+            Double value = spawnMonster.get(monsterId);
+
+            if(value != null) {
+                return value;
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    public void spawnMonster() {
+        Random random = new Random();
+
+        Id id;
+        long monsterId;
+        double percent;
+
+        for(Map.Entry<Id, Map<Long, Double>> entry : this.spawnMonster.entrySet()) {
+            id = entry.getKey();
+
+            for(Map.Entry<Long, Double> monsterEntry : entry.getValue().entrySet()) {
+                monsterId = monsterEntry.getKey();
+                percent = monsterEntry.getValue();
+
+                if(random.nextDouble() < percent || percent == 1) {
+                    int x = random.nextInt(Config.MAX_FIELD_X + 1);
+                    int y = random.nextInt(Config.MAX_FIELD_Y + 1);
+
+                    AiEntity entity = Config.newObject(Config.getData(id, monsterId));
+                    entity.setField(x, y);
+                    this.addEntity(entity);
+                    Config.unloadObject(entity);
+                }
+            }
+        }
     }
 
 }
