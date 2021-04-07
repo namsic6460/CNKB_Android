@@ -317,6 +317,10 @@ public class Player extends Entity {
     }
 
     public long getRequiredExp() {
+        return this.getTotalNeedExp() - this.getExp().get();
+    }
+
+    public long getTotalNeedExp() {
         int lv = this.lv.get();
 
         long needExp;
@@ -330,7 +334,7 @@ public class Player extends Entity {
             needExp =  (long) Math.pow(lv, 3.3) + (lv * 10_000_000) - 7_910_000_000L;
         }
 
-        return needExp - this.getExp().get();
+        return needExp;
     }
 
     public void lvUp(long requiredExp) {
@@ -819,11 +823,15 @@ public class Player extends Entity {
     }
 
     @Override
-    public void death() {
+    public void onDeath() {
         this.endFight();
 
         this.setStat(StatType.HP, 1);
         this.location.set(this.baseLocation);
+
+        this.getBuff().clear();
+        this.getBuffStat().clear();
+        this.revalidateStat();
 
         Random random = new Random();
         double loseMoneyPercent = random.nextDouble() * Config.TOTAL_MONEY_LOSE_RANDOM + Config.TOTAL_MONEY_LOSE_MIN;
@@ -872,6 +880,24 @@ public class Player extends Entity {
                 + dropItemBuilder.toString() + loseItemBuilder.toString();
         this.replyPlayer("사망했습니다...", innerMsg);
         this.addLog(LogData.DEATH, 1);
+    }
+
+    @Override
+    public void onKill(Entity entity) {
+        long prevExp = this.exp.get();
+
+        long exp = ;
+        long gap = this.lv.get() - entity.lv.get();
+
+        if(gap > 20) {
+            exp /= 2;
+        } else if(gap < 20) {
+            exp *= 1.5;
+        }
+
+        this.addExp(exp);
+        this.replyPlayer(entity.getName() + "을 처치했습니다!\n경험치 : " + prevExp + " -> " + this.exp.get(),
+                "획득한 경험치 : " + exp);
     }
 
     @Override
