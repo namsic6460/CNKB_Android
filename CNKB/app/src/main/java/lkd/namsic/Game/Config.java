@@ -16,6 +16,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.Game.Base.ConcurrentHashSet;
+import lkd.namsic.Game.Enum.Id;
+import lkd.namsic.Game.Enum.StatType;
+import lkd.namsic.Game.Exception.NumberRangeException;
+import lkd.namsic.Game.Exception.ObjectNotFoundException;
+import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lkd.namsic.Game.GameObject.Achieve;
 import lkd.namsic.Game.GameObject.AiEntity;
 import lkd.namsic.Game.GameObject.Boss;
@@ -30,11 +35,6 @@ import lkd.namsic.Game.GameObject.Player;
 import lkd.namsic.Game.GameObject.Quest;
 import lkd.namsic.Game.GameObject.Research;
 import lkd.namsic.Game.GameObject.Skill;
-import lkd.namsic.Game.Enum.Id;
-import lkd.namsic.Game.Enum.StatType;
-import lkd.namsic.Game.Exception.NumberRangeException;
-import lkd.namsic.Game.Exception.ObjectNotFoundException;
-import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lkd.namsic.Setting.FileManager;
 import lkd.namsic.Setting.Logger;
 
@@ -157,6 +157,7 @@ public class Config {
         Id id = t.getId().getId();
         long objectId = ID_COUNT.get(id);
 
+        t = (T) t.newObject();
         t.getId().setObjectId(objectId);
         ID_COUNT.put(id, objectId + 1);
 
