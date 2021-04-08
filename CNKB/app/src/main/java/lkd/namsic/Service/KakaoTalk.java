@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lkd.namsic.Game.Config;
+import lkd.namsic.Game.GameObject.Player;
 import lkd.namsic.MainActivity;
 import lkd.namsic.Setting.Logger;
 
@@ -40,11 +42,17 @@ public class KakaoTalk {
 
         Thread thread = new Thread(() -> {
             try {
-                Logger.i("chatLog", "sender: " + sender + "\nimage: " + image +
-                        "\nmsg: " + msg + "\nroom: " + room + "\nisGroupChat: " + isGroupChat);
-
+//                Logger.i("chatLog", "sender: " + sender + "\nimage: " + image +
+//                        "\nmsg: " + msg + "\nroom: " + room + "\nisGroupChat: " + isGroupChat);
                 if (msg.equals("namsicTest")) {
                     reply(session, "reply");
+                }
+
+                Player player = Config.loadPlayer(sender, image);
+                if(player == null) {
+
+                } else {
+
                 }
             } catch (Exception e) {
                 Logger.e("onChat", e);

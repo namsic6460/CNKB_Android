@@ -19,9 +19,6 @@ public class Logger {
     static volatile int logCount = 0;
     static volatile String logs = "";
 
-    @SuppressLint("StaticFieldLeak")
-    public static MainActivity activity;
-
     public static synchronized void i(String title, String text) {
         log(title, text, "INFO");
         Log.i(title, text);
@@ -53,7 +50,7 @@ public class Logger {
         final String logText = timeText + "[" + prefix + "] : " + title + " - " + text + "\n";
         logs += logText;
 
-        activity.runOnUiThread(() -> MainActivity.textView.append(logText));
+        MainActivity.mainActivity.runOnUiThread(() -> MainActivity.textView.append(logText));
 
         logCount++;
         lastLogDay = time.getDayOfMonth();

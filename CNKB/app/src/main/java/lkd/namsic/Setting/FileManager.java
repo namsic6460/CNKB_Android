@@ -65,6 +65,7 @@ public class FileManager extends Application {
         }
     }
 
+    @NonNull
     public static String read(String path) {
         try {
             File file = new File(path);
@@ -96,12 +97,17 @@ public class FileManager extends Application {
 
     public static void save(String path, @NonNull String data) {
         try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(path)));
+            File file = new File(path);
+            if(!file.exists()) {
+                file.createNewFile();
+            }
+
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
             bufferedWriter.write(data);
             bufferedWriter.close();
             Logger.i("FileManger", "save - " + path);
         } catch (Exception e) {
-            Logger.e("FileManager", e);
+            Logger.e("FileManager(path : " + path + ")", e);
         }
     }
 

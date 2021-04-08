@@ -84,6 +84,7 @@ public class Config {
 
     public static final int MAX_EVADE = 95;
 
+    private static boolean initialized = false;
     public static void init() {
         ID_CLASS.put(Id.ACHIEVE, Achieve.class);
         ID_CLASS.put(Id.BOSS, Boss.class);
@@ -97,7 +98,8 @@ public class Config {
         ID_CLASS.put(Id.RESEARCH, Research.class);
         ID_CLASS.put(Id.SKILL, Skill.class);
 
-        if(!OBJECT.isEmpty()) {
+        if(initialized) {
+            Logger.i("Config.init", "Returned");
             return;
         }
 
@@ -108,6 +110,8 @@ public class Config {
             OBJECT_COUNT.put(id, new ConcurrentHashMap<>());
             DELETE_LIST.put(id, new ConcurrentHashSet<>());
         }
+
+        initialized = true;
     }
 
     public static JSONObject createConfig() throws JSONException {
@@ -210,7 +214,9 @@ public class Config {
     public static void unloadObject(@NonNull GameObject gameObject) {
         Id id = gameObject.getId().getId();
         long objectId = gameObject.getId().getObjectId();
-        long objectCount = OBJECT_COUNT.get(id).get(objectId);
+
+        Long objectCount = OBJECT_COUNT.get(id).get(objectId);
+        objectCount = objectCount == null ? 0 : objectCount;
 
         if(objectCount > 1) {
             OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
@@ -274,6 +280,10 @@ public class Config {
             String path = getPath(id, objectId);
             String jsonString = FileManager.read(path);
 
+            if(jsonString.equals("")) {
+                throw new ObjectNotFoundException(id, objectId);
+            }
+
             T t = fromJson(jsonString, ID_CLASS.get(id));
 
             OBJECT.get(id).put(objectId, t);
@@ -286,10 +296,14 @@ public class Config {
     }
 
     @SuppressWarnings("ConstantConditions")
-    @NonNull
+    @Nullable
     public static Player loadPlayer(@NonNull String sender, @NonNull String image) {
         String path = getPlayerPath(sender, image);
         String jsonString = FileManager.read(path);
+
+        if(jsonString.equals("")) {
+            return null;
+        }
 
         Player player = fromJson(jsonString, Player.class);
         long objectId = player.getId().getObjectId();
@@ -314,6 +328,10 @@ public class Config {
         if(playerCount == null) {
             String path = getMapPath(fileName);
             String jsonString = FileManager.read(path);
+
+            if(jsonString.equals("")) {
+                throw new ObjectNotFoundException(path);
+            }
 
             MapClass map = fromJson(jsonString, MapClass.class);
             map.spawnMonster();

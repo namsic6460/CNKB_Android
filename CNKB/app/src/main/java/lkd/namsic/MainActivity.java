@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,14 +22,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import lkd.namsic.Game.Config;
+import lkd.namsic.Game.ObjectMaker;
 import lkd.namsic.Setting.FileManager;
 import lkd.namsic.Service.ForcedTerminationService;
-import lkd.namsic.Setting.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
     public static List<Thread> chatThreads = new ArrayList<>();
     public static Timer threadCleaner = new Timer();
+
+    @SuppressLint("StaticFieldLeak")
+    public static MainActivity mainActivity;
 
     @SuppressLint("StaticFieldLeak")
     private static Context context;
@@ -41,11 +45,12 @@ public class MainActivity extends AppCompatActivity {
     private TextView threadCount;
 
     private SwitchCompat switchBtn;
+    private Button initBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Logger.activity = this;
+        mainActivity = this;
 
         String[] permissions = { Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                  Manifest.permission.READ_EXTERNAL_STORAGE };
@@ -80,12 +85,13 @@ public class MainActivity extends AppCompatActivity {
 
         Config.init();
         FileManager.initDir();
+
         threadCleaner.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 int size = chatThreads.size();
 
-                threadCount.setText(size);
+                mainActivity.runOnUiThread(() -> threadCount.setText(String.valueOf(size)));
 
                 if(size == 0) {
                     return;
@@ -111,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             toast("스위치가 꺼졌습니다");
         }
+    }
+
+    public void onInitClick(View view) {
+        ObjectMaker.start();
     }
 
     public static void toast(final String msg) {
