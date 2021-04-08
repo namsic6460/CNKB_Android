@@ -316,6 +316,7 @@ public class Config {
             String jsonString = FileManager.read(path);
 
             MapClass map = fromJson(jsonString, MapClass.class);
+            map.spawnMonster();
 
             MAP.put(fileName, map);
             PLAYER_COUNT.put(fileName, 1L);

@@ -148,6 +148,10 @@ public class MapClass {
     }
 
     public void addEntity(Entity entity) {
+        if(!entity.getLocation().equalsMap(this.location)) {
+            throw new WeirdDataException(this.location, location);
+        }
+
         this.getEntity(entity.id.getId()).add(entity.id.getObjectId());
     }
 
@@ -191,7 +195,15 @@ public class MapClass {
         }
     }
 
+    public void addSpawnMonster(Id id, long monsterId, double percent) {
+        this.setSpawnMonster(id, monsterId, this.getSpawnMonster(id, monsterId) + percent);
+    }
+
     public void spawnMonster() {
+        if(!(this.getEntity(Id.MONSTER).isEmpty() && this.getEntity(Id.BOSS).isEmpty())) {
+            return;
+        }
+
         Random random = new Random();
 
         Id id;
@@ -206,11 +218,11 @@ public class MapClass {
                 percent = monsterEntry.getValue();
 
                 if(random.nextDouble() < percent || percent == 1) {
-                    int x = random.nextInt(Config.MAX_FIELD_X + 1);
-                    int y = random.nextInt(Config.MAX_FIELD_Y + 1);
+                    int fieldX = random.nextInt(Config.MAX_FIELD_X + 1);
+                    int fieldY = random.nextInt(Config.MAX_FIELD_Y + 1);
 
                     AiEntity newEntity = Config.newObject(Config.getData(id, monsterId));
-                    newEntity.setField(x, y);
+                    newEntity.setMap(this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
                     this.addEntity(newEntity);
                     Config.unloadObject(newEntity);
 
