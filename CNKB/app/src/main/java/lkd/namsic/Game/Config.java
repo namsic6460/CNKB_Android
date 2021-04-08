@@ -50,6 +50,9 @@ public class Config {
     public static final Map<String, MapClass> MAP = new ConcurrentHashMap<>();
     public static final Map<String, Long> PLAYER_COUNT = new ConcurrentHashMap<>();
 
+    public static final double MONEY_BOOST = 1;
+    public static final double EXP_BOOST = 1;
+
     public static final int MIN_MAP_X = 0;
     public static final int MAX_MAP_X = 10;
     public static final int MIN_MAP_Y = 0;
@@ -76,6 +79,8 @@ public class Config {
     public static final double MONEY_DROP_MIN = 0.2;
     public static final int ITEM_DROP = 4;
     public static final double ITEM_DROP_PERCENT = 0.95;
+
+    public static final double BASE_INCREASE_PERCENT = 0.05;
 
     public static final int MAX_EVADE = 95;
 

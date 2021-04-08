@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import lkd.namsic.Game.Base.ConcurrentHashSet;
+import lkd.namsic.Game.Base.LimitDouble;
 import lkd.namsic.Game.Base.LimitInteger;
 import lkd.namsic.Game.Base.LimitLong;
 import lkd.namsic.Game.Base.Location;
@@ -72,6 +73,9 @@ public class Player extends Entity {
     LimitLong runTime = new LimitLong(0L, 0L, Long.MAX_VALUE);
 
     Location baseLocation = new Location();
+
+    LimitDouble moneyBoost = new LimitDouble(1, 1D, Double.MAX_VALUE);
+    LimitDouble expBoost = new LimitDouble(1, 1D, Double.MAX_VALUE);
 
     LimitInteger sp = new LimitInteger(0, Config.MIN_SP, Config.MAX_SP);
     LimitInteger adv = new LimitInteger(0, 0, Integer.MAX_VALUE);
@@ -271,6 +275,9 @@ public class Player extends Entity {
         if(exp < 0) {
             throw new NumberRangeException(0, 0, Long.MAX_VALUE);
         }
+
+        exp *= Config.EXP_BOOST;
+        exp *= this.expBoost.get();
 
         this.exp.add(exp);
         this.addLog(LogData.TOTAL_EXP, exp);
@@ -777,6 +784,9 @@ public class Player extends Entity {
 
     @Override
     public boolean setMoney(long money) {
+        money *= Config.MONEY_BOOST;
+        money *= this.moneyBoost.get();
+
         long gap = money - this.getMoney();
         boolean isCancelled = super.setMoney(money);
 

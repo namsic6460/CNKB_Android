@@ -2,9 +2,7 @@ package lkd.namsic.Game.Exception;
 
 import java.util.Map;
 
-import lkd.namsic.Game.Base.LimitId;
-import lkd.namsic.Game.Base.LimitInteger;
-import lkd.namsic.Game.Base.LimitLong;
+import lkd.namsic.Game.Base.LimitClass;
 import lkd.namsic.Game.Config;
 
 public class NumberRangeException extends RuntimeException {
@@ -33,16 +31,8 @@ public class NumberRangeException extends RuntimeException {
         super("Value: " + value + "L, Min: " + minValue + "L, Max: " + maxValue + "L");
     }
 
-    public NumberRangeException(LimitInteger limitInteger) {
-        super(limitInteger.toString());
-    }
-
-    public NumberRangeException(LimitLong limitLong) {
-        super(limitLong.toString());
-    }
-
-    public NumberRangeException(LimitId limitId) {
-        super(limitId.toString());
+    public NumberRangeException(LimitClass<?> limitClass) {
+        super(limitClass.toString());
     }
 
     public NumberRangeException(Object key, Integer minValue, Integer maxValue) {
