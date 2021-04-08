@@ -59,15 +59,14 @@ public class AiEntity extends Entity {
     public void onKill(Entity entity) {
         long gap = this.lv.get() - entity.lv.get();
 
+        this.revalidateBuff();
+        entity.revalidateBuff();
+
         if(gap <= 20) {
             this.lv.add(1);
 
-            this.revalidateStat();
-
-            this.setSkipRevalidate(true);
-
-            this.setStat(StatType.HP, (int) (this.getStat(StatType.MAXHP) * 0.1));
-            this.setStat(StatType.MN, (int) (this.getStat(StatType.MAXMN) * 0.5));
+            this.setBasicStat(StatType.HP, (int) (this.getStat(StatType.MAXHP) * 0.1));
+            this.setBasicStat(StatType.MN, (int) (this.getStat(StatType.MAXMN) * 0.5));
 
             for(StatType statType : StatType.values()) {
                 try {
@@ -76,8 +75,6 @@ public class AiEntity extends Entity {
 
                 this.setBasicStat(statType, (int) (this.getStat(statType) * 0.05));
             }
-
-            this.setSkipRevalidate(false);
         }
     }
 

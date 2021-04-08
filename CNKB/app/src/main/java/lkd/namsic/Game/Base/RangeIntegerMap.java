@@ -8,11 +8,12 @@ import java.util.Map;
 import lkd.namsic.Game.Config;
 import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Exception.NumberRangeException;
+import lombok.Getter;
 
+@Getter
 public class RangeIntegerMap<T> implements Serializable {
 
     private Map<T, Integer> min;
-
     private Map<T, Integer> max;
 
     public RangeIntegerMap(@NonNull Map<T, Integer> min, @NonNull Map<T, Integer> max) {

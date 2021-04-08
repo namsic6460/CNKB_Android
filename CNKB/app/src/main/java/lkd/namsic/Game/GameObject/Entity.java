@@ -37,7 +37,7 @@ import lombok.Setter;
 @Getter
 public abstract class Entity extends NamedObject {
 
-    protected boolean skipRevalidate = false;
+    boolean skipRevalidate = false;
 
     LimitInteger lv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
     LimitLong money = new LimitLong(0, 0L, Long.MAX_VALUE);
@@ -50,7 +50,6 @@ public abstract class Entity extends NamedObject {
 
     Set<Long> skill = new ConcurrentHashSet<>();
 
-    Map<StatType, Integer> stat = new ConcurrentHashMap<>();
     Map<StatType, Integer> basicStat = new ConcurrentHashMap<>();
     Map<StatType, Integer> equipStat = new ConcurrentHashMap<>();
     Map<StatType, Integer> buffStat = new ConcurrentHashMap<>();
@@ -65,14 +64,6 @@ public abstract class Entity extends NamedObject {
 
     protected Entity(@NonNull String name) {
         super(name);
-    }
-
-    public void setSkipRevalidate(boolean skipRevalidate) {
-        this.skipRevalidate = skipRevalidate;
-
-        if(!skipRevalidate) {
-            this.revalidateStat();
-        }
     }
 
     public boolean setMoney(long money) {
@@ -257,104 +248,12 @@ public abstract class Entity extends NamedObject {
 
     public boolean canAddSkill(long skillId) {
         Config.checkId(Id.SKILL, skillId);
-        return ((Skill) Config.getData(Id.SKILL, skillId)).getLimitStat().isInRange(this.stat);
+        Skill skill = Config.getData(Id.SKILL, skillId);
+        return this.checkStatRange(skill.getLimitStat().getMin(), skill.getLimitStat().getMax());
     }
 
-    public void setBasicStat(@NonNull StatType statType, int stat) {
-        Config.checkStatType(statType);
-
-        if(stat == 0) {
-            this.basicStat.remove(statType);
-        } else {
-            this.basicStat.put(statType, stat);
-        }
-
-        this.revalidateStat();
-    }
-
-    public int getBasicStat(@NonNull StatType statType) {
-        Config.checkStatType(statType);
-        Integer value = this.basicStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
-    }
-
-    public void addBasicStat(@NonNull StatType statType, int stat) {
-        this.setBasicStat(statType, this.getBasicStat(statType) + stat);
-    }
-
-    public void setEquipStat(@NonNull StatType statType, int stat) {
-        Config.checkStatType(statType);
-
-        if(stat == 0) {
-            this.equipStat.remove(statType);
-        } else {
-            this.equipStat.put(statType, stat);
-        }
-
-        this.revalidateStat();
-    }
-
-    public int getEquipStat(@NonNull StatType statType) {
-        Config.checkStatType(statType);
-        Integer value = this.equipStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
-    }
-
-    public void addEquipStat(@NonNull StatType statType, int stat) {
-        this.setEquipStat(statType, this.getEquipStat(statType) + stat);
-    }
-
-    public void setBuffStat(@NonNull StatType statType, int stat) {
-        Config.checkStatType(statType);
-
-        if(stat == 0) {
-            this.buffStat.remove(statType);
-        } else {
-            this.buffStat.put(statType, stat);
-        }
-
-        this.revalidateStat();
-    }
-
-    public int getBuffStat(@NonNull StatType statType) {
-        Config.checkStatType(statType);
-        Integer value = this.buffStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
-    }
-
-    public void addBuffStat(@NonNull StatType statType, int stat) {
-        this.setBuffStat(statType, this.getBuffStat(statType) + stat);
-    }
-
-    public boolean setStat(StatType statType, int stat) {
-        boolean flag = false;
-
-        try {
-            Config.checkStatType(statType);
-        } catch (UnhandledEnumException e) {
-            flag = true;
-        }
-
-        if(!flag) {
-            throw new UnhandledEnumException(statType);
-        }
-
-        this.revalidateStat();
+    public boolean setBasicStat(@NonNull StatType statType, int stat) {
+        this.revalidateBuff();
 
         boolean isCancelled = false;
         boolean isDeath = false;
@@ -376,7 +275,7 @@ public abstract class Entity extends NamedObject {
         }
 
         if(!isCancelled) {
-            this.stat.put(statType, stat);
+            this.basicStat.put(statType, stat);
 
             if(isDeath) {
                 this.onDeath();
@@ -386,8 +285,8 @@ public abstract class Entity extends NamedObject {
         return isCancelled;
     }
 
-    public int getStat(@NonNull StatType statType) {
-        Integer value = this.stat.get(statType);
+    public int getBasicStat(@NonNull StatType statType) {
+        Integer value = this.basicStat.get(statType);
 
         if(value == null) {
             return 0;
@@ -396,8 +295,111 @@ public abstract class Entity extends NamedObject {
         }
     }
 
-    public boolean addStat(@NonNull StatType statType, int stat) {
-        return this.setStat(statType, this.getStat(statType) + stat);
+    public void addBasicStat(@NonNull StatType statType, int stat) {
+        this.setBasicStat(statType, this.getBasicStat(statType) + stat);
+    }
+
+    public void setEquipStat(@NonNull StatType statType, int stat) {
+        Config.checkStatType(statType);
+
+        if(stat == 0) {
+            this.equipStat.remove(statType);
+        } else {
+            this.equipStat.put(statType, stat);
+        }
+    }
+
+    public int getEquipStat(@NonNull StatType statType) {
+        Integer value = this.equipStat.get(statType);
+
+        if(value == null) {
+            return 0;
+        } else {
+            return value;
+        }
+    }
+
+    public void addEquipStat(@NonNull StatType statType, int stat) {
+        this.setEquipStat(statType, this.getEquipStat(statType) + stat);
+    }
+
+    public void setBuffStat(@NonNull StatType statType, int stat) {
+        Config.checkStatType(statType);
+
+        if(stat == 0) {
+            this.buffStat.remove(statType);
+        } else {
+            this.buffStat.put(statType, stat);
+        }
+    }
+
+    public int getBuffStat(@NonNull StatType statType) {
+        Integer value = this.buffStat.get(statType);
+
+        if(value == null) {
+            return 0;
+        } else {
+            return value;
+        }
+    }
+
+    public void addBuffStat(@NonNull StatType statType, int stat) {
+        this.setBuffStat(statType, this.getBuffStat(statType) + stat);
+    }
+
+    public int getStat(@NonNull StatType statType) {
+        int value = this.getBasicStat(statType) + this.getEquipStat(statType) + this.getBuffStat(statType);
+
+        if(statType.equals(StatType.MAXHP)) {
+            int hp = this.getStat(StatType.HP);
+
+            if(hp > value) {
+                this.setBasicStat(StatType.HP, value);
+            }
+        } else if(statType.equals(StatType.MAXMN)) {
+            int mn = this.getStat(StatType.MN);
+
+            if(mn > value) {
+                this.setBasicStat(StatType.MN, value);
+            }
+        }
+
+        return value;
+    }
+
+    public boolean checkStatRange(@NonNull Map<StatType, Integer> min, @NonNull Map<StatType, Integer> max) {
+        Integer minValue, maxValue;
+        int value;
+
+        this.revalidateBuff();
+
+        for(StatType statType : StatType.values()) {
+            try {
+                Config.checkStatType(statType);
+            } catch (UnhandledEnumException e) {
+                continue;
+            }
+
+            minValue = min.get(statType);
+            maxValue = max.get(statType);
+            value = this.getStat(statType);
+
+            if(minValue != null && maxValue != null) {
+                if(value > maxValue || value < minValue) {
+                    return false;
+                }
+            }  else if(minValue == null && maxValue != null) {
+                if(value > maxValue) {
+                    return false;
+                }
+            } else if(minValue != null) {
+                if(value < minValue) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public abstract void onDeath();
@@ -413,8 +415,6 @@ public abstract class Entity extends NamedObject {
             equipment = Config.loadObject(Id.EQUIPMENT, equipId);
             equipType = equipment.getEquipType();
 
-            this.setSkipRevalidate(true);
-
             if (equip.containsKey(equipType)) {
                 this.unEquip(equipType);
             }
@@ -424,8 +424,6 @@ public abstract class Entity extends NamedObject {
                 statType = entry.getKey();
                 this.setEquipStat(statType, this.getEquipStat(statType) + entry.getValue());
             }
-
-            this.setSkipRevalidate(false);
 
             this.equip.put(equipType, equipId);
         } finally {
@@ -516,8 +514,6 @@ public abstract class Entity extends NamedObject {
         long time;
         long currentTime = System.currentTimeMillis();
 
-        this.skipRevalidate = true;
-
         for(Map.Entry<Long, ConcurrentHashMap<StatType, Integer>> entry : this.buff.entrySet()) {
             time = entry.getKey();
 
@@ -531,8 +527,6 @@ public abstract class Entity extends NamedObject {
                 this.buff.remove(time);
             }
         }
-
-        this.skipRevalidate = false;
     }
 
     public void setItem(long itemId, int count) {
@@ -611,34 +605,6 @@ public abstract class Entity extends NamedObject {
         MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
         map.addEquip(this.location, equipId);
         Config.unloadMap(map);
-    }
-
-    public void revalidateStat() {
-        if(skipRevalidate) {
-            return;
-        }
-
-        revalidateBuff();
-
-        this.stat.clear();
-
-        int stat;
-        for(StatType statType : StatType.values()) {
-            try {
-                Config.checkStatType(statType);
-            } catch (UnhandledEnumException e) {
-                continue;
-            }
-
-            stat = this.getBasicStat(statType) + this.getEquipStat(statType) + this.getBuffStat(statType);
-            if(statType.equals(StatType.MAXHP) || statType.equals(StatType.MAXMN)) {
-                stat = Math.max(stat, 1);
-            } else {
-                stat = Math.max(stat, 0);
-            }
-
-            this.stat.put(statType, stat);
-        }
     }
 
     public void addEnemy(@NonNull Id id, long objectId) {
@@ -742,8 +708,7 @@ public abstract class Entity extends NamedObject {
     public boolean damage(Entity entity, int physicDmg, int magicDmg, int staticDmg, boolean canEvade) {
         Random random = new Random();
 
-        this.revalidateStat();
-        entity.revalidateStat();
+        this.revalidateBuff();
 
         boolean evade = true;
         if(canEvade) {
@@ -764,11 +729,8 @@ public abstract class Entity extends NamedObject {
             int totalDmg = physicDmg + magicDmg + staticDmg;
             int totalDra = dra + mdra;
 
-            entity.addStat(StatType.HP, -1 * totalDmg);
-            this.addStat(StatType.HP, totalDra);
-
-            entity.revalidateStat();
-            this.revalidateStat();
+            entity.addBasicStat(StatType.HP, -1 * totalDmg);
+            this.addBasicStat(StatType.HP, totalDra);
 
             int hp = entity.getStat(StatType.HP);
             int selfHp = this.getStat(StatType.HP);
@@ -792,6 +754,10 @@ public abstract class Entity extends NamedObject {
         } else {
             if(this.getId().getId().equals(Id.PLAYER)) {
                 ((Player) this).replyPlayer("공격이 빗나갔습니다");
+            }
+
+            if(entity.id.getId().equals(Id.PLAYER)) {
+                ((Player) entity).replyPlayer(this.getName() + " 의 공격을 피했습니다");
             }
 
             return false;

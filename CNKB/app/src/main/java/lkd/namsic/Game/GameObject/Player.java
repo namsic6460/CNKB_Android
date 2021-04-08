@@ -236,16 +236,8 @@ public class Player extends Entity {
 
     public boolean canEat(long itemId) {
         if(this.getItem(itemId) > 0) {
-            Item item = null;
-
-            try {
-                item = Config.loadObject(Id.ITEM, itemId);
-                return item.isFood();
-            } finally {
-                if(item != null) {
-                    Config.unloadObject(item);
-                }
-            }
+            Item item = Config.getData(Id.ITEM, itemId);
+            return item.isFood();
         } else {
             return false;
         }
@@ -261,15 +253,11 @@ public class Player extends Entity {
                 this.addItem(itemId, -1);
                 this.addLog(LogData.EAT, 1);
 
-                this.setSkipRevalidate(true);
-
                 for(Map.Entry<Long, HashMap<StatType, Integer>> entry : item.getEatBuff().entrySet()) {
                     for(Map.Entry<StatType, Integer> statEntry : entry.getValue().entrySet()) {
                         this.addBuff(entry.getKey(), statEntry.getKey(), statEntry.getValue());
                     }
                 }
-
-                this.setSkipRevalidate(false);
             } else {
                 throw new WeirdDataException(Id.ITEM, itemId);
             }
@@ -365,6 +353,8 @@ public class Player extends Entity {
 
     @Nullable
     public String canStartChat(Chat chat) {
+        this.revalidateBuff();
+
         String failMsg = "";
 
         long needMoney = chat.getNeedMoney().get();
@@ -567,13 +557,9 @@ public class Player extends Entity {
                     this.addItem(itemId, research.getRewardItem(itemId));
                 }
 
-                this.setSkipRevalidate(true);
-
                 for (StatType statType : research.getRewardStat().keySet()) {
                     this.addBasicStat(statType, research.getRewardStat(statType));
                 }
-
-                this.setSkipRevalidate(false);
             } finally {
                 if(research != null) {
                     Config.unloadObject(research);
@@ -590,7 +576,7 @@ public class Player extends Entity {
             quest = Config.loadObject(Id.QUEST, questId);
 
             flag = quest.limitLv.isInRange(this.lv.get()) && quest.limitCloseRate.isInRange(this.closeRate)
-                    && quest.limitStat.isInRange(this.stat);
+                    && this.checkStatRange(quest.limitStat.getMin(), quest.limitStat.getMax());
 
             if(flag) {
                 if(clearedQuest.containsKey(questId)) {
@@ -846,12 +832,11 @@ public class Player extends Entity {
     public void onDeath() {
         this.endFight();
 
-        this.setStat(StatType.HP, 1);
+        this.setBasicStat(StatType.HP, 1);
         this.location.set(this.baseLocation);
 
         this.getBuff().clear();
         this.getBuffStat().clear();
-        this.revalidateStat();
 
         Random random = new Random();
         double loseMoneyPercent = random.nextDouble() * Config.TOTAL_MONEY_LOSE_RANDOM + Config.TOTAL_MONEY_LOSE_MIN;
@@ -910,12 +895,6 @@ public class Player extends Entity {
 
         this.replyPlayer(entity.getName() + "을 처치했습니다!\n경험치 : " + prevExp + " -> " + this.exp.get(),
                 "획득한 경험치 : " + exp);
-    }
-
-    @Override
-    public void revalidateStat() {
-        super.revalidateStat();
-        this.addLog(LogData.STAT_UPDATED, 1);
     }
 
     @Override
