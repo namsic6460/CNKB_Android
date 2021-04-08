@@ -151,7 +151,6 @@ public class Player extends Entity {
                     }
                 }
             } else {
-                Config.unloadObject(item);
                 throw new WeirdDataException(Id.ITEM, itemId);
             }
         } finally {

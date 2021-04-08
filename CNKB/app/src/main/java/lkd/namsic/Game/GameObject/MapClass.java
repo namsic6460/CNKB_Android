@@ -209,10 +209,14 @@ public class MapClass {
                     int x = random.nextInt(Config.MAX_FIELD_X + 1);
                     int y = random.nextInt(Config.MAX_FIELD_Y + 1);
 
-                    AiEntity entity = Config.newObject(Config.getData(id, monsterId));
-                    entity.setField(x, y);
-                    this.addEntity(entity);
-                    Config.unloadObject(entity);
+                    AiEntity newEntity = Config.newObject(Config.getData(id, monsterId));
+                    newEntity.setField(x, y);
+                    this.addEntity(newEntity);
+                    Config.unloadObject(newEntity);
+
+                    if(id.equals(Id.BOSS)) {
+                        break;
+                    }
                 }
             }
         }

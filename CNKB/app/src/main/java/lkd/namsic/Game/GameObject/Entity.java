@@ -207,27 +207,21 @@ public abstract class Entity extends NamedObject {
                     this.setField(moveMap.getLocation().getFieldX().get(), moveMap.getLocation().getFieldY().get());
                 } else {
                     this.setField(fieldX, fieldY);
-                }
-
-                MapClass prevMap = null;
-
-                try {
-                    prevMap = Config.loadMap(this.location.getX().get(), this.location.getY().get());
-                    prevMap.removeEntity(this);
-
-                    if(!this.getId().getId().equals(Id.PLAYER)) {
-                        Config.unloadMap(prevMap);
-                    }
-
-                    moveMap.addEntity(this);
-                } finally {
-                    if(prevMap != null) {
-                        Config.unloadMap(prevMap);
-                    }
-                }
+                }    moveMap.addEntity(this);
             } finally {
                 if(moveMap != null) {
                     Config.unloadMap(moveMap);
+                }
+            }
+
+            MapClass prevMap = null;
+
+            try {
+                prevMap = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+                prevMap.removeEntity(this);
+            } finally {
+                if(prevMap != null && !this.id.getId().equals(Id.PLAYER)) {
+                    Config.unloadMap(prevMap);
                 }
             }
         }
@@ -574,22 +568,10 @@ public abstract class Entity extends NamedObject {
     public void addEquip(long equipId) {
         Config.checkId(Id.EQUIPMENT, equipId);
 
-        Equipment equipment = null;
-        long newEquipId;
-
-        try {
-            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
-
-            Equipment newEquip = Config.newObject(equipment);
-            newEquipId = newEquip.getId().getObjectId();
-            Config.unloadObject(newEquip);
-        } finally {
-            if(equipment != null) {
-                Config.unloadObject(equipment);
-            }
-        }
-
+        Equipment newEquip = Config.newObject(Config.getData(Id.EQUIPMENT, equipId));
+        long newEquipId = newEquip.getId().getObjectId();
         this.equipInventory.add(newEquipId);
+        Config.unloadObject(newEquip);
     }
 
     public void removeEquip(long equipId) {
