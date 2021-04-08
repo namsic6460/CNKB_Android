@@ -317,24 +317,44 @@ public class Player extends Entity {
     }
 
     public long getRequiredExp() {
-        return this.getTotalNeedExp() - this.getExp().get();
+        return this.getTotalNeedExp(this.lv.get()) - this.getExp().get();
     }
 
-    public long getTotalNeedExp() {
-        int lv = this.lv.get();
-
+    public long getTotalNeedExp(int lv) {
         long needExp;
-        if(lv <= 100) {
-            needExp =  100 + (lv * 100);
-        } else if(lv <= 500) {
-            needExp =  (long) Math.pow(lv, 3.2);
-        } else if(lv <= 850) {
-            needExp =  lv * 12_000_000 - 5_500_000_000L;
+        if (lv <= 100) {
+            needExp = 10_000 + 5_000 * lv;
+        } else if (lv <= 300) {
+            needExp = -200_000 + (long) (Math.pow(lv - 10, 2.5) * 2) + 10_000 * lv;
+        } else if (lv <= 500) {
+            needExp = -50_000_000 + 200_000 * lv;
+        } else if(lv <= 750) {
+            needExp = -50_000_000 + (long) (Math.pow(lv, 3.1) / 1.5);
+        } else if(lv <= 950) {
+            needExp = 45_000_000L * (lv - 750) + 1_000_000_000L;
         } else {
-            needExp =  (long) Math.pow(lv, 3.3) + (lv * 10_000_000) - 7_910_000_000L;
+            needExp = -30_000_000_000L + (long) Math.pow(lv - 600, 4.2);
         }
 
         return needExp;
+    }
+
+    public long getKillExp(int enemyLv) {
+        int lv = this.lv.get();
+        long exp = 5000 + (long) ((this.getTotalNeedExp(enemyLv) * 0.00001) + (this.getTotalNeedExp(lv) * 0.00001));
+
+        int gap = lv - enemyLv;
+        if(Math.abs(gap) > 10 && lv > 10) {
+            double sqrt = Math.sqrt(lv - 9) - 1;
+
+            if(gap > 0) {
+                exp /= sqrt;
+            } else {
+                exp *= sqrt;
+            }
+        }
+
+        return exp;
     }
 
     public void lvUp(long requiredExp) {
@@ -885,17 +905,9 @@ public class Player extends Entity {
     @Override
     public void onKill(Entity entity) {
         long prevExp = this.exp.get();
-
-        long exp = ;
-        long gap = this.lv.get() - entity.lv.get();
-
-        if(gap > 20) {
-            exp /= 2;
-        } else if(gap < 20) {
-            exp *= 1.5;
-        }
-
+        long exp = getKillExp(entity.lv.get());
         this.addExp(exp);
+
         this.replyPlayer(entity.getName() + "을 처치했습니다!\n경험치 : " + prevExp + " -> " + this.exp.get(),
                 "획득한 경험치 : " + exp);
     }
