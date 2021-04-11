@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CNKB</string>
+    <string name="initBtn">Init files</string>
 </resources>

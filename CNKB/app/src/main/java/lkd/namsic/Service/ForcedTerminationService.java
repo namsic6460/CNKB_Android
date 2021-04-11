@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import java.time.LocalDateTime;
 
+import lkd.namsic.Game.Config;
 import lkd.namsic.Setting.Logger;
 import lkd.namsic.MainActivity;
 
@@ -25,6 +26,7 @@ public class ForcedTerminationService extends Service {
         Logger.saveLog(LocalDateTime.now().withDayOfMonth(Logger.lastLogDay));
 
         MainActivity.threadCleaner.cancel();
+        Config.onTerminate();
         for(Thread thread : MainActivity.chatThreads) {
             if (thread.isAlive()) {
                 thread.interrupt();

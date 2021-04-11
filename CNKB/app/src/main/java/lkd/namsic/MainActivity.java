@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import lkd.namsic.Game.Config;
+import lkd.namsic.Game.ObjectMaker;
 import lkd.namsic.Setting.FileManager;
 import lkd.namsic.Service.ForcedTerminationService;
 
@@ -29,17 +32,25 @@ public class MainActivity extends AppCompatActivity {
     public static Timer threadCleaner = new Timer();
 
     @SuppressLint("StaticFieldLeak")
+    public static MainActivity mainActivity;
+
+    @SuppressLint("StaticFieldLeak")
     private static Context context;
     public static Boolean isOn = false;
 
     @SuppressLint("StaticFieldLeak")
     public static TextView textView;
 
+    @SuppressLint("StaticFieldLeak")
+    private TextView threadCount;
+
     private SwitchCompat switchBtn;
+    private Button initBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mainActivity = this;
 
         String[] permissions = { Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                  Manifest.permission.READ_EXTERNAL_STORAGE };
@@ -67,14 +78,22 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.text);
         startService(new Intent(this, ForcedTerminationService.class));
 
+        threadCount = findViewById(R.id.thread_count);
+
         context = this;
         switchBtn = findViewById(R.id.switchBtn);
 
+        Config.init();
         FileManager.initDir();
+
         threadCleaner.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if(chatThreads.isEmpty()) {
+                int size = chatThreads.size();
+
+                mainActivity.runOnUiThread(() -> threadCount.setText(String.valueOf(size)));
+
+                if(size == 0) {
                     return;
                 }
 
@@ -98,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             toast("스위치가 꺼졌습니다");
         }
+    }
+
+    public void onInitClick(View view) {
+        ObjectMaker.start();
     }
 
     public static void toast(final String msg) {

@@ -3,12 +3,12 @@
     <words>
       <w>bais</w>
       <w>baos</w>
+      <w>cemetry</w>
       <w>chestplate</w>
+      <w>closerate</w>
       <w>cnkb</w>
       <w>debuff</w>
-      <w>deserialized</w>
-      <w>handleable</w>
-      <w>incre</w>
+      <w>gson</w>
       <w>kakao</w>
       <w>matk</w>
       <w>maxhp</w>
@@ -18,7 +18,7 @@
       <w>mdra</w>
       <w>namsic</w>
       <w>noti</w>
-      <w>unhandleable</w>
+      <w>teleport</w>
     </words>
   </dictionary>
 </component>

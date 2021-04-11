@@ -1,10 +1,12 @@
 package lkd.namsic.Setting;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import lkd.namsic.Game.Config;
 import lkd.namsic.MainActivity;
 
 public class Logger {
@@ -14,34 +16,28 @@ public class Logger {
     public static Integer lastLogDay = null;
 
     private static final int SAVE_COUNT = 100;
-    private static int logCount = 0;
-    private static String logs = "";
+    static volatile int logCount = 0;
+    static volatile String logs = "";
 
-    public static void i(String title, String text) {
+    public static synchronized void i(String title, String text) {
         log(title, text, "INFO");
         Log.i(title, text);
     }
 
-    public static void w(String title, String text) {
+    public static synchronized void w(String title, String text) {
         log(title, text, "WARN");
         Log.w(title, text);
     }
 
-    public static void e(String title, Throwable e) {
-        StringBuilder builder = new StringBuilder(e.getClass().getName());
-        builder.append(": ");
-        builder.append(e.getMessage());
-        builder.append("\n");
-        for(StackTraceElement element : e.getStackTrace()) {
-           builder.append("\tat");
-           builder.append(element.toString());
-        }
+    public static synchronized void e(String title, Throwable e) {
+        String errorString = Config.errorString(e);
+        log(title, errorString, "ERR");
+        Log.e(title, errorString);
 
-        log(title, builder.toString(), "ERR");
-        Log.e(title, builder.toString());
+        MainActivity.toast("ERROR!\n" + e.getMessage());
     }
 
-    private static void log(String title, String text, String prefix) {
+    private static synchronized void log(String title, String text, String prefix) {
         LocalDateTime time = LocalDateTime.now();
         if(lastLogDay != null) {
             if(lastLogDay != time.getDayOfMonth()) {
@@ -51,10 +47,10 @@ public class Logger {
 
         String timeText = "\n[" + time.format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS")) + "]\n";
 
-        String logText = timeText + "[" + prefix + "] : " + title + " - " + text + "\n";
+        final String logText = timeText + "[" + prefix + "] : " + title + " - " + text + "\n";
         logs += logText;
 
-        MainActivity.textView.append(logText);
+        MainActivity.mainActivity.runOnUiThread(() -> MainActivity.textView.append(logText));
 
         logCount++;
         lastLogDay = time.getDayOfMonth();
@@ -64,14 +60,16 @@ public class Logger {
         }
     }
 
-    public static void saveLog(LocalDateTime date) {
-        String fileName = FileManager.LOG_PATH + "Log - " + date.format(DateTimeFormatter.BASIC_ISO_DATE) + ".txt";
+    public static synchronized void saveLog(LocalDateTime date) {
+        if(!logs.equals("")) {
+            String fileName = FileManager.LOG_PATH + "/Log - " + date.format(DateTimeFormatter.BASIC_ISO_DATE) + ".txt";
+            FileManager.append(fileName, logs);
 
-        FileManager.append(fileName, logs);
+            MainActivity.toast("로그 저장 완료 - " + fileName);
+        }
+
         logCount = 0;
         logs = "";
-
-        MainActivity.toast("로그 저장 완료 - " + fileName);
     }
 
 }
