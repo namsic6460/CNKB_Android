@@ -50,10 +50,12 @@ public class KakaoTalk {
 
                 Player player = Config.loadPlayer(sender, image);
                 if(player == null) {
-
+                    //Should make registering code for *newbie*
                 } else {
-
+                    //Game code for users
                 }
+
+                //Help or other common codes
             } catch (Exception e) {
                 Logger.e("onChat", e);
             }

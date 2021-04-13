@@ -2,6 +2,7 @@ package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -400,31 +401,30 @@ public abstract class Entity extends NamedObject {
 
     public abstract void onKill(Entity entity);
 
+    public long getEquip(EquipType equipType) {
+        Long value = this.equip.get(equipType);
+
+        if(value != null) {
+            return value;
+        } else {
+            return 0;
+        }
+    }
+
     @NonNull
     public EquipType equip(long equipId) {
-        Equipment equipment = null;
-        EquipType equipType;
+        Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+        EquipType equipType = equipment.getEquipType();
 
-        try {
-            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
-            equipType = equipment.getEquipType();
-
-            if (equip.containsKey(equipType)) {
-                this.unEquip(equipType);
-            }
-
-            StatType statType;
-            for (Map.Entry<StatType, Integer> entry : equipment.stat.entrySet()) {
-                statType = entry.getKey();
-                this.setEquipStat(statType, this.getEquipStat(statType) + entry.getValue());
-            }
-
-            this.equip.put(equipType, equipId);
-        } finally {
-            if(equipment != null) {
-                Config.unloadObject(equipment);
-            }
+        if (equip.containsKey(equipType)) {
+            this.unEquip(equipType);
         }
+
+        for(StatType statType : StatType.values()) {
+            this.setEquipStat(statType, this.getEquipStat(statType) + equipment.getStat(statType));
+        }
+
+        this.equip.put(equipType, equipId);
 
         return equipType;
     }
@@ -435,18 +435,73 @@ public abstract class Entity extends NamedObject {
             throw new ObjectNotFoundException(equipType);
         }
 
+        Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
+
+        for(StatType statType : StatType.values()) {
+            this.setEquipStat(statType, this.getEquipStat(statType) - equipment.getStat(statType));
+        }
+
+        this.equip.remove(equipType);
+    }
+
+    public boolean canReinforce(long equipId, Map<StatType, Integer> increaseLimitStat) {
+        if(this.getEquipInventory().contains(equipId)) {
+            Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+
+            boolean flag = equipment.getReinforceCount().get() < Config.MAX_REINFORCE_COUNT;
+
+            if(flag && this.getEquip(equipment.getEquipType()) == equipId) {
+                Map<StatType, Integer> minStat = new HashMap<>(equipment.getLimitStat().getMin());
+                Map<StatType, Integer> maxStat = new HashMap<>(equipment.getLimitStat().getMax());
+
+                StatType statType;
+                Integer value;
+                int stat;
+
+                for(Map.Entry<StatType, Integer> entry : increaseLimitStat.entrySet()) {
+                    statType = entry.getKey();
+                    stat = entry.getValue();
+
+                    value = minStat.get(statType);
+                    value = value == null ? 0 : value;
+                    minStat.put(statType, value + stat);
+
+                    value = maxStat.get(statType);
+                    value = value == null ? 0 : value;
+                    maxStat.put(statType, value + stat);
+                }
+
+                return equipment.getTotalLimitLv().isInRange(this.lv.get()) && this.checkStatRange(minStat, maxStat);
+            }
+
+            return flag;
+        } else {
+            return false;
+        }
+    }
+
+    public void reinforce(long equipId, Map<StatType, Integer> increaseReinforceStat,
+                          Map<StatType, Integer> increaseMinLimitStat, Map<StatType, Integer> increaseMaxLimitStat) {
         Equipment equipment = null;
 
         try {
             equipment = Config.loadObject(Id.EQUIPMENT, equipId);
 
-            StatType statType;
-            for (Map.Entry<StatType, Integer> entry : equipment.stat.entrySet()) {
-                statType = entry.getKey();
-                this.setEquipStat(statType, this.getEquipStat(statType) - entry.getValue());
+            int increaseLimitLv = Equipment.getLvIncrease(equipment.handleLv.get(), equipment.reinforceCount.get() + 1);
+            equipment.getReinforceCount().add(1);
+            equipment.getLimitLv().add(increaseLimitLv);
+
+            for(Map.Entry<StatType, Integer> entry : increaseReinforceStat.entrySet()) {
+                equipment.addReinforceStat(entry.getKey(), entry.getValue());
             }
 
-            this.equip.remove(equipType);
+            for(Map.Entry<StatType, Integer> entry : increaseMinLimitStat.entrySet()) {
+                equipment.getLimitStat().addMin(entry.getKey(), entry.getValue());
+            }
+
+            for(Map.Entry<StatType, Integer> entry : increaseMaxLimitStat.entrySet()) {
+                equipment.getLimitStat().addMax(entry.getKey(), entry.getValue());
+            }
         } finally {
             if(equipment != null) {
                 Config.unloadObject(equipment);
@@ -577,6 +632,13 @@ public abstract class Entity extends NamedObject {
     public void removeEquip(long equipId) {
         if(!this.equipInventory.contains(equipId)) {
             throw new ObjectNotFoundException(Id.EQUIPMENT, equipId);
+        }
+
+        for(Map.Entry<EquipType, Long> entry : this.equip.entrySet()) {
+            if(entry.getValue().equals(equipId)) {
+                this.unEquip(entry.getKey());
+                break;
+            }
         }
 
         this.equipInventory.remove(equipId);

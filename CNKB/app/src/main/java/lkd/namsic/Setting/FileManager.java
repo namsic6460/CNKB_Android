@@ -105,7 +105,7 @@ public class FileManager extends Application {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
             bufferedWriter.write(data);
             bufferedWriter.close();
-            Logger.i("FileManger", "save - " + path);
+            Logger.i("FileManger", "save - " + path + "\n" + data);
         } catch (Exception e) {
             Logger.e("FileManager(path : " + path + ")", e);
         }

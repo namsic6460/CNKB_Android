@@ -63,9 +63,9 @@ public class Config {
     public static final int MAX_FIELD_Y = 64;
 
     public static final int MIN_HANDLE_LV = 1;
-    public static final int MAX_HANDLE_LV = 20;
+    public static final int MAX_HANDLE_LV = 13;
     public static final int MIN_REINFORCE_COUNT = 0;
-    public static final int MAX_REINFORCE_COUNT = 19;
+    public static final int MAX_REINFORCE_COUNT = 15;
     public static final int MIN_LV = 1;
     public static final int MAX_LV = 999;
     public static final int MIN_SP = 0;
