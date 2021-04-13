@@ -130,7 +130,7 @@ public class Player extends Entity {
         KakaoTalk.reply(this.getSession(), this.getName() + "\n" + msg, innerMsg);
     }
 
-    public boolean useItem(long itemId, @NonNull List<Entity> other) {
+    public boolean useItem(long itemId, @NonNull List<GameObject> other) {
         Config.checkId(Id.ITEM, itemId);
 
         if(this.getItem(itemId) == 0) {
@@ -247,27 +247,21 @@ public class Player extends Entity {
     }
 
     public void eat(long itemId) {
-        Item item = null;
+        Item item = Config.getData(Id.ITEM, itemId);
 
-        try {
-            item = Config.loadObject(Id.ITEM, itemId);
+        if(item.isFood()) {
+            this.addItem(itemId, -1);
+            this.addLog(LogData.EAT, 1);
 
-            if(item.isFood()) {
-                this.addItem(itemId, -1);
-                this.addLog(LogData.EAT, 1);
-
-                for(Map.Entry<Long, HashMap<StatType, Integer>> entry : item.getEatBuff().entrySet()) {
-                    for(Map.Entry<StatType, Integer> statEntry : entry.getValue().entrySet()) {
-                        this.addBuff(entry.getKey(), statEntry.getKey(), statEntry.getValue());
-                    }
+            for(Map.Entry<Long, HashMap<StatType, Integer>> entry : item.getEatBuff().entrySet()) {
+                for(Map.Entry<StatType, Integer> statEntry : entry.getValue().entrySet()) {
+                    this.addBuff(entry.getKey(), statEntry.getKey(), statEntry.getValue());
                 }
-            } else {
-                throw new WeirdDataException(Id.ITEM, itemId);
             }
-        } finally {
-            if(item != null) {
-                Config.unloadObject(item);
-            }
+
+            this.replyPlayer(item.getName() + "을 먹었습니다\n남은 개수 : " + this.getItem(itemId));
+        } else {
+            throw new WeirdDataException(Id.ITEM, itemId);
         }
     }
 
@@ -772,7 +766,7 @@ public class Player extends Entity {
         try {
             equipment = Config.loadObject(Id.EQUIPMENT, equipId);
             flag = equipment.getTotalLimitLv().isInRange(this.lv.get()) &&
-                    Config.compareMap(equipment.getLimitStat(), this.basicStat, false);
+                    this.checkStatRange(equipment.getLimitStat().getMin(), equipment.getLimitStat().getMax());
         } finally {
             if(equipment != null) {
                 Config.unloadObject(equipment);
