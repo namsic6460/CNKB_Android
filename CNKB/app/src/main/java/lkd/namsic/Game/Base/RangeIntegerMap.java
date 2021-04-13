@@ -31,6 +31,16 @@ public class RangeIntegerMap<T> implements Serializable {
         this.max = max;
     }
 
+    public void addMin(T t, int value) {
+        Integer get = this.min.get(t);
+        this.min.put(t, get == null ? value : get + value);
+    }
+
+    public void addMax(T t, int value) {
+        Integer get = this.max.get(t);
+        this.max.put(t, get == null ? value : get + value);
+    }
+
     private void checkKeys(@NonNull Map<T, Integer> min, @NonNull Map<T, Integer> max) {
         for(T t : min.keySet()) {
             if(t instanceof StatType) {

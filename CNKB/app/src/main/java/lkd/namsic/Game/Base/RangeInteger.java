@@ -26,4 +26,13 @@ public class RangeInteger implements Serializable {
         this.max = max;
     }
 
+    public void add(int value) {
+        this.add(value, value);
+    }
+
+    public void add(int minValue, int maxValue) {
+        this.min += minValue;
+        this.max += maxValue;
+    }
+
 }

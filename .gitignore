@@ -1,1 +1,4 @@
-CNKB/.idea
+/CNKB/.idea
+/CNKB/.gradle
+/CNKB/local.properties
+CNKB/.idea/misc.xml
