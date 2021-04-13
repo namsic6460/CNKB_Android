@@ -27,6 +27,7 @@ import lkd.namsic.Game.Exception.InvalidNumberException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Game.Exception.ObjectNotFoundException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
+import lkd.namsic.Setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -480,32 +481,54 @@ public abstract class Entity extends NamedObject {
         }
     }
 
-    public void reinforce(long equipId, Map<StatType, Integer> increaseReinforceStat,
+    public boolean reinforce(double successPercent, long equipId, Map<StatType, Integer> increaseReinforceStat,
                           Map<StatType, Integer> increaseMinLimitStat, Map<StatType, Integer> increaseMaxLimitStat) {
-        Equipment equipment = null;
+        this.setDoing(Doing.REINFORCE);
+
+        Random random = new Random();
+        double percent = random.nextDouble();
 
         try {
-            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
-
-            int increaseLimitLv = Equipment.getLvIncrease(equipment.handleLv.get(), equipment.reinforceCount.get() + 1);
-            equipment.getReinforceCount().add(1);
-            equipment.getLimitLv().add(increaseLimitLv);
-
-            for(Map.Entry<StatType, Integer> entry : increaseReinforceStat.entrySet()) {
-                equipment.addReinforceStat(entry.getKey(), entry.getValue());
-            }
-
-            for(Map.Entry<StatType, Integer> entry : increaseMinLimitStat.entrySet()) {
-                equipment.getLimitStat().addMin(entry.getKey(), entry.getValue());
-            }
-
-            for(Map.Entry<StatType, Integer> entry : increaseMaxLimitStat.entrySet()) {
-                equipment.getLimitStat().addMax(entry.getKey(), entry.getValue());
-            }
+            Thread.sleep(random.nextInt(5000));
+        } catch (InterruptedException e) {
+            Logger.e("Entity.reinforce", e);
+            throw new RuntimeException(e.getMessage());
         } finally {
-            if(equipment != null) {
-                Config.unloadObject(equipment);
+            this.setDoing(Doing.NONE);
+        }
+
+        if(successPercent == 1 || percent <= successPercent) {
+            Equipment equipment = null;
+
+            try {
+                equipment = Config.loadObject(Id.EQUIPMENT, equipId);
+
+                int increaseLimitLv = Equipment.getLvIncrease(equipment.handleLv.get(), equipment.reinforceCount.get() + 1);
+                equipment.getReinforceCount().add(1);
+                equipment.getLimitLv().add(increaseLimitLv);
+
+                for(Map.Entry<StatType, Integer> entry : increaseReinforceStat.entrySet()) {
+                    equipment.addReinforceStat(entry.getKey(), entry.getValue());
+                }
+
+                for(Map.Entry<StatType, Integer> entry : increaseMinLimitStat.entrySet()) {
+                    equipment.getLimitStat().addMin(entry.getKey(), entry.getValue());
+                }
+
+                for(Map.Entry<StatType, Integer> entry : increaseMaxLimitStat.entrySet()) {
+                    equipment.getLimitStat().addMax(entry.getKey(), entry.getValue());
+                }
+            } finally {
+                if(equipment != null) {
+                    Config.unloadObject(equipment);
+                }
             }
+
+            //TODO : send success or fail message in player.java
+
+            return true;
+        } else {
+            return false;
         }
     }
 

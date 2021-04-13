@@ -1,6 +1,5 @@
 package lkd.namsic.Setting;
 
-import android.annotation.SuppressLint;
 import android.util.Log;
 
 import java.time.LocalDateTime;

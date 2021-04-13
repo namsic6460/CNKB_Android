@@ -22,6 +22,8 @@ import lombok.ToString;
 @ToString
 public class Quest extends NamedObject {
 
+    //TODO : add Adder
+
     @Setter
     boolean isRepeatable = false;
 
@@ -63,12 +65,6 @@ public class Quest extends NamedObject {
         this.chatId.set(chatId);
     }
 
-    public void setNeedItem(Map<Long, Integer> needItem) {
-        for(Map.Entry<Long, Integer> entry : needItem.entrySet()) {
-            this.setNeedItem(entry.getKey(), entry.getValue());
-        }
-    }
-
     public void setNeedItem(long itemId, int count) {
         Config.checkId(Id.ITEM, itemId);
 
@@ -90,12 +86,6 @@ public class Quest extends NamedObject {
             return 0;
         } else {
             return value;
-        }
-    }
-
-    public void setNeedStat(Map<StatType, Integer> needStat) {
-        for(Map.Entry<StatType, Integer> entry : needStat.entrySet()) {
-            this.setNeedStat(entry.getKey(), entry.getValue());
         }
     }
 
@@ -124,12 +114,6 @@ public class Quest extends NamedObject {
         }
     }
 
-    public void setNeedCloseRate(Map<Long, Integer> needCloseRate) {
-        for(Map.Entry<Long, Integer> entry : needCloseRate.entrySet()) {
-            this.setNeedCloseRate(entry.getKey(), entry.getValue());
-        }
-    }
-
     public void setNeedCloseRate(long npcId, int closeRate) {
         Config.checkId(Id.NPC, npcId);
 
@@ -151,12 +135,6 @@ public class Quest extends NamedObject {
             return 0;
         } else {
             return value;
-        }
-    }
-
-    public void setRewardItem(Map<Long, Integer> rewardItem) {
-        for(Map.Entry<Long, Integer> entry : rewardItem.entrySet()) {
-            this.setRewardItem(entry.getKey(), entry.getValue());
         }
     }
 
@@ -184,12 +162,6 @@ public class Quest extends NamedObject {
         }
     }
 
-    public void setRewardStat(Map<StatType, Integer> rewardStat) {
-        for(Map.Entry<StatType, Integer> entry : rewardStat.entrySet()) {
-            this.setRewardStat(entry.getKey(), entry.getValue());
-        }
-    }
-
     public void setRewardStat(StatType statType, int stat) {
         Config.checkStatType(statType);
 
@@ -212,12 +184,6 @@ public class Quest extends NamedObject {
             return 0;
         } else {
             return value;
-        }
-    }
-
-    public void setRewardCloseRate(Map<Long, Integer> rewardCloseRate) {
-        for(Map.Entry<Long, Integer> entry : rewardCloseRate.entrySet()) {
-            this.setRewardCloseRate(entry.getKey(), entry.getValue());
         }
     }
 

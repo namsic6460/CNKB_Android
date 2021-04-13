@@ -20,9 +20,6 @@ public enum Doing {
         List<Doing> doingList = new ArrayList<>();
         doingList.add(Doing.NONE);
         doingList.add(Doing.EXPLORE);
-        doingList.add(Doing.MINE);
-        doingList.add(Doing.GATHER);
-        doingList.add(Doing.HARVEST);
 
         return doingList;
     }
