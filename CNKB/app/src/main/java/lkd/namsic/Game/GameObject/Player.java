@@ -34,6 +34,7 @@ import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Game.Exception.ObjectNotFoundException;
 import lkd.namsic.Game.Exception.WeirdDataException;
 import lkd.namsic.Service.KakaoTalk;
+import lkd.namsic.Setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -774,6 +775,88 @@ public class Player extends Entity {
         }
 
         return flag;
+    }
+
+    public boolean canReinforce(long equipId, Map<StatType, Integer> increaseLimitStat) {
+        if(this.getEquipInventory().contains(equipId)) {
+            Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+
+            boolean flag = equipment.getReinforceCount().get() < Config.MAX_REINFORCE_COUNT;
+
+            if(flag && this.getEquip(equipment.getEquipType()) == equipId) {
+                Map<StatType, Integer> minStat = new HashMap<>(equipment.getLimitStat().getMin());
+                Map<StatType, Integer> maxStat = new HashMap<>(equipment.getLimitStat().getMax());
+
+                StatType statType;
+                Integer value;
+                int stat;
+
+                for(Map.Entry<StatType, Integer> entry : increaseLimitStat.entrySet()) {
+                    statType = entry.getKey();
+                    stat = entry.getValue();
+
+                    value = minStat.get(statType);
+                    value = value == null ? 0 : value;
+                    minStat.put(statType, value + stat);
+
+                    value = maxStat.get(statType);
+                    value = value == null ? 0 : value;
+                    maxStat.put(statType, value + stat);
+                }
+
+                return equipment.getTotalLimitLv().isInRange(this.lv.get()) && this.checkStatRange(minStat, maxStat);
+            }
+
+            return flag;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean reinforce(long equipId, Map<StatType, Integer> increaseReinforceStat,
+                             Map<StatType, Integer> increaseMinLimitStat, Map<StatType, Integer> increaseMaxLimitStat) {
+        this.setDoing(Doing.REINFORCE);
+        this.addLog(LogData.REINFORCE_TRIED, 1);
+
+        Random random = new Random();
+        double percent = random.nextDouble();
+
+        try {
+            Thread.sleep(random.nextInt(5000));
+        } catch (InterruptedException e) {
+            Logger.e("Entity.reinforce", e);
+            throw new RuntimeException(e.getMessage());
+        } finally {
+            this.setDoing(Doing.NONE);
+        }
+
+        Equipment equipment = null;
+
+        try {
+            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
+            double reinforcePercent = equipment.getReinforcePercent();
+
+            if(reinforcePercent == 1 || percent <= reinforcePercent) {
+                equipment.successReinforce(increaseReinforceStat, increaseMinLimitStat, increaseMaxLimitStat);
+
+                this.addLog(LogData.REINFORCE_SUCCEED, 1);
+
+                int reinforceCount = equipment.reinforceCount.get();
+                this.replyPlayer("강화에 성공헀습니다!\n" + reinforceCount + "강 -> " + (reinforceCount + 1) + "강");
+
+                return true;
+            } else {
+                equipment.failReinforce();
+                this.replyPlayer("강화에 실패하였습니다...",
+                        "현재 강화 천장 : " + equipment.reinforceFloor.get() + "\n" +
+                                "다음 강화 확률 : " + Config.getDisplayPercent(equipment.getReinforcePercent()) + "%");
+                return false;
+            }
+        } finally {
+            if (equipment != null) {
+                Config.unloadObject(equipment);
+            }
+        }
     }
 
     @Override
