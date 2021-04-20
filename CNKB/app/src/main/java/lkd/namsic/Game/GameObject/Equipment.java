@@ -3,7 +3,6 @@ package lkd.namsic.Game.GameObject;
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import lkd.namsic.Game.Base.LimitInteger;
@@ -23,7 +22,7 @@ import lombok.ToString;
 public class Equipment extends Item {
 
     //Handle Level - {Reinforce Level, Lv Increase}
-    private final static Map<Integer, Map<Integer, Integer>> lvIncrease = new HashMap<Integer, Map<Integer, Integer>>() {{
+    private final static Map<Integer, Map<Integer, Integer>> LV_INCREASE = new HashMap<Integer, Map<Integer, Integer>>() {{
         put(1, new HashMap<Integer, Integer>() {{
             int[] values = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 10, 10, 20};
             for(int i = 0; i < 15; i++) {
@@ -104,6 +103,88 @@ public class Equipment extends Item {
         }});
     }};
 
+    //Handle Level - {Reinforce Level, Reinforce Success Percent}
+    private final static Map<Integer, Map<Integer, Double>> PERCENT = new HashMap<Integer, Map<Integer, Double>>() {{
+        put(1, new HashMap<Integer, Double>() {{
+            double[] values = {1, 1, 1, 1, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.65, 0.55, 0.45, 0.3, 0.15};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(2, new HashMap<Integer, Double>() {{
+            double[] values = {1, 1, 1, 1, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.65, 0.55, 0.45, 0.3, 0.15};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(3, new HashMap<Integer, Double>() {{
+            double[] values = {1, 1, 1, 1, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.65, 0.55, 0.45, 0.3, 0.15};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(4, new HashMap<Integer, Double>() {{
+            double[] values = {1, 1, 1, 1, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.65, 0.55, 0.45, 0.3, 0.15};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(5, new HashMap<Integer, Double>() {{
+            double[] values = {1, 1, 1, 1, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.65, 0.55, 0.45, 0.3, 0.15};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(6, new HashMap<Integer, Double>() {{
+            double[] values = {1, 1, 1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5, 0.5, 0.3, 0.1, 0.1, 0.05, 0.01};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(7, new HashMap<Integer, Double>() {{
+            double[] values = {1, 1, 1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5, 0.5, 0.3, 0.1, 0.1, 0.05, 0.01};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(8, new HashMap<Integer, Double>() {{
+            double[] values = {1, 1, 1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5, 0.5, 0.3, 0.1, 0.1, 0.05, 0.01};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(9, new HashMap<Integer, Double>() {{
+            double[] values = {1, 0.9, 0.8, 0.7, 0.5, 0.5, 0.5, 0.35, 0.2, 0.1, 0.1, 0.1, 0.01, 0.005, 0.001};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(10, new HashMap<Integer, Double>() {{
+            double[] values = {1, 0.9, 0.8, 0.7, 0.5, 0.5, 0.5, 0.35, 0.2, 0.1, 0.1, 0.1, 0.01, 0.005, 0.001};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(11, new HashMap<Integer, Double>() {{
+            double[] values = {0.5, 0.5, 0.5, 0.4, 0.3, 0.2, 0.1, 0.03, 0.03, 0.03, 0.01, 0.01, 0.001, 0.0003, 0.0003};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(12, new HashMap<Integer, Double>() {{
+            double[] values = {0.5, 0.5, 0.5, 0.4, 0.3, 0.2, 0.1, 0.02, 0.02, 0.01, 0.01, 0.001, 0.0002, 0.0002, 0.0001};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+        put(13, new HashMap<Integer, Double>() {{
+            double[] values = {0.5, 0.4, 0.3, 0.2, 0.1, 0.05, 0.03, 0.02, 0.01, 0.003, 0.002, 0.001, 0.0001, 0.0001, 0.0001};
+            for(int i = 0; i < 15; i++) {
+                put(i + 1, values[i]);
+            }
+        }});
+    }};
+
     @SuppressWarnings("ConstantConditions")
     public static int getLvIncrease(int handleLv, int nextReinforceCount) {
         if(handleLv < Config.MIN_HANDLE_LV || handleLv > Config.MAX_HANDLE_LV) {
@@ -114,7 +195,7 @@ public class Equipment extends Item {
             throw new NumberRangeException(nextReinforceCount, Config.MIN_REINFORCE_COUNT, Config.MAX_REINFORCE_COUNT);
         }
 
-        return lvIncrease.get(handleLv).get(nextReinforceCount);
+        return LV_INCREASE.get(handleLv).get(nextReinforceCount);
     }
 
     @Setter
@@ -122,10 +203,12 @@ public class Equipment extends Item {
     EquipType equipType;
 
     LimitInteger reinforceCount = new LimitInteger(Config.MIN_REINFORCE_COUNT, Config.MIN_REINFORCE_COUNT, Config.MAX_REINFORCE_COUNT);
+    LimitInteger reinforceFloor = new LimitInteger(0, 0, Integer.MAX_VALUE);
     RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);
 
     @Setter
     int lvDown = 0;
+    double reinforcePercent;
 
     RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(
             new HashMap<>(), new HashMap<>()
@@ -136,8 +219,16 @@ public class Equipment extends Item {
     public Equipment(@NonNull EquipType equipType, @NonNull String name, @NonNull String description) {
         super(name, description);
         this.id.setId(Id.EQUIPMENT);
+        this.reinforcePercent = this.getReinforcePercent();
 
         this.equipType = equipType;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public double getReinforcePercent() {
+        double basicPercent = PERCENT.get(this.handleLv.get()).get(this.reinforceCount.get() + 1);
+        double value = this.reinforcePercent + basicPercent * (Config.REINFORCE_FLOOR_MULTIPLE * this.getReinforceFloor().get());
+        return Math.min(Math.floor(value * 10000) / 10000, 1);
     }
 
     public RangeInteger getTotalLimitLv() {
@@ -201,6 +292,33 @@ public class Equipment extends Item {
     public int getStat(@NonNull StatType statType) {
         Config.checkStatType(statType);
         return this.getBasicStat(statType) + this.getReinforceStat(statType);
+    }
+
+    public void successReinforce(@NonNull Map<StatType, Integer> increaseReinforceStat,
+                                 @NonNull Map<StatType, Integer> increaseMinLimitStat,
+                                 @NonNull Map<StatType, Integer> increaseMaxLimitStat) {
+        this.reinforceFloor.set(0);
+        this.reinforceCount.add(1);
+        this.limitLv.add(getLvIncrease(this.handleLv.get(), this.reinforceCount.get()));
+
+        for(Map.Entry<StatType, Integer> entry : increaseReinforceStat.entrySet()) {
+            this.addReinforceStat(entry.getKey(), entry.getValue());
+        }
+
+        for(Map.Entry<StatType, Integer> entry : increaseMinLimitStat.entrySet()) {
+            this.getLimitStat().addMin(entry.getKey(), entry.getValue());
+        }
+
+        for(Map.Entry<StatType, Integer> entry : increaseMaxLimitStat.entrySet()) {
+            this.getLimitStat().addMax(entry.getKey(), entry.getValue());
+        }
+
+        this.reinforcePercent = this.getReinforcePercent();
+    }
+
+    public void failReinforce() {
+        this.reinforceFloor.add(1);
+        this.reinforcePercent = this.getReinforcePercent();
     }
 
 }
