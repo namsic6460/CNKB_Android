@@ -22,8 +22,6 @@ import lombok.ToString;
 @ToString
 public class Quest extends NamedObject {
 
-    //TODO : add Adder
-
     @Setter
     boolean isRepeatable = false;
 
@@ -89,6 +87,10 @@ public class Quest extends NamedObject {
         }
     }
 
+    public void addNeedItem(long itemId, int count) {
+        this.setNeedItem(itemId, this.getNeedItem(itemId) + count);
+    }
+
     public void setNeedStat(StatType statType, int stat) {
         Config.checkStatType(statType);
 
@@ -112,6 +114,10 @@ public class Quest extends NamedObject {
         } else {
             return value;
         }
+    }
+
+    public void addNeedStat(StatType statType, int stat) {
+        this.setNeedStat(statType, this.getNeedStat(statType) + stat);
     }
 
     public void setNeedCloseRate(long npcId, int closeRate) {
@@ -138,6 +144,10 @@ public class Quest extends NamedObject {
         }
     }
 
+    public void addNeedCloseRate(long npcId, int closeRate) {
+        this.setNeedCloseRate(npcId, this.getNeedCloseRate(npcId) + closeRate);
+    }
+
     public void setRewardItem(long itemId, int count) {
         Config.checkId(Id.ITEM, itemId);
 
@@ -160,6 +170,10 @@ public class Quest extends NamedObject {
         } else {
             return value;
         }
+    }
+
+    public void addRewardItem(long itemId, int count) {
+        this.setRewardItem(itemId, this.getRewardItem(itemId) + count);
     }
 
     public void setRewardStat(StatType statType, int stat) {
@@ -187,6 +201,10 @@ public class Quest extends NamedObject {
         }
     }
 
+    public void addRewardStat(StatType statType, int stat) {
+        this.setRewardStat(statType, this.getRewardStat(statType) + stat);
+    }
+
     public void setRewardCloseRate(long npcId, int closeRate) {
         Config.checkId(Id.NPC, npcId);
 
@@ -209,6 +227,10 @@ public class Quest extends NamedObject {
         } else {
             return value;
         }
+    }
+
+    public void addRewardCloseRate(long npcId, int closeRate) {
+        this.setRewardCloseRate(npcId, this.getRewardCloseRate(npcId) + closeRate);
     }
 
 }
