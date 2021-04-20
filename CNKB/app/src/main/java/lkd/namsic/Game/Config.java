@@ -66,6 +66,7 @@ public class Config {
     public static final int MAX_HANDLE_LV = 13;
     public static final int MIN_REINFORCE_COUNT = 0;
     public static final int MAX_REINFORCE_COUNT = 15;
+    public static final double REINFORCE_FLOOR_MULTIPLE = 0.025;
     public static final int MIN_LV = 1;
     public static final int MAX_LV = 999;
     public static final int MIN_SP = 0;
@@ -354,22 +355,12 @@ public class Config {
     }
 
     @NonNull
-    public static String mapsToString(@NonNull Map<?, ?> map1, @NonNull Map<?, ?> map2) {
-        String str1, str2;
-
-        if(map1 instanceof AbstractMap) {
-            str1 = map1.toString();
+    public static String mapToString(@NonNull Map<?, ?> map) {
+        if(map instanceof AbstractMap) {
+            return map.toString();
         } else {
-            str1 = new HashMap<>(map1).toString();
+            return new HashMap<>(map).toString();
         }
-
-        if(map2 instanceof AbstractMap) {
-            str2 = map2.toString();
-        } else {
-            str2 = new HashMap<>(map2).toString();
-        }
-
-        return str1 + ", " + str2;
     }
 
     public static <T> boolean compareMap(@NonNull Map<T, Integer> map1, @NonNull Map<T, Integer> map2, boolean firstIsBig) {
@@ -399,6 +390,10 @@ public class Config {
         }
 
         return true;
+    }
+
+    public static String getDisplayPercent(double percent) {
+        return (Math.floor(percent * 10000) / 100) + "%";
     }
 
     @NonNull
