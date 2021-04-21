@@ -709,10 +709,12 @@ public class Player extends Entity {
             }
         }
 
-        this.checkMineLevel();
+        if(this.checkMineLevel()) {
+            this.replyPlayer("광업 레벨이 올랐습니다!\n광업 레벨 : " + mineLv + " -> " + (mineLv + 1));
+        }
     }
 
-    public void checkMineLevel() {
+    public boolean checkMineLevel() {
         int mineLv = this.getVariable(Variable.MINE);
         long mined = this.getLog(LogData.MINED);
 
@@ -774,7 +776,7 @@ public class Player extends Entity {
 
                 break;
 
-            case 7:
+            default:
                 if(mined > 10000000) {
                     isUp = true;
                     this.addVariable(Variable.MINE, 1);
@@ -783,9 +785,7 @@ public class Player extends Entity {
                 break;
         }
 
-        if(isUp) {
-            this.replyPlayer("광업 레벨이 올랐습니다!\n광업 레벨 : " + mineLv + " -> " + (mineLv + 1));
-        }
+        return isUp;
     }
 
     @NonNull
