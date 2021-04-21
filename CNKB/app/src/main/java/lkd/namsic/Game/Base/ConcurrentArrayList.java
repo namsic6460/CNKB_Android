@@ -26,10 +26,6 @@ public class ConcurrentArrayList<T> implements List<T>, Serializable {
         this.list = new ArrayList<>();
     }
 
-    public ConcurrentArrayList(List<T> list) {
-        this.list = list;
-    }
-
     @Override
     public int size() {
         readWriteLock.readLock().lock();

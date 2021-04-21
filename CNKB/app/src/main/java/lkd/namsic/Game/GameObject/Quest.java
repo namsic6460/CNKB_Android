@@ -63,12 +63,6 @@ public class Quest extends NamedObject {
         this.chatId.set(chatId);
     }
 
-    public void setNeedItem(Map<Long, Integer> needItem) {
-        for(Map.Entry<Long, Integer> entry : needItem.entrySet()) {
-            this.setNeedItem(entry.getKey(), entry.getValue());
-        }
-    }
-
     public void setNeedItem(long itemId, int count) {
         Config.checkId(Id.ITEM, itemId);
 
@@ -93,10 +87,8 @@ public class Quest extends NamedObject {
         }
     }
 
-    public void setNeedStat(Map<StatType, Integer> needStat) {
-        for(Map.Entry<StatType, Integer> entry : needStat.entrySet()) {
-            this.setNeedStat(entry.getKey(), entry.getValue());
-        }
+    public void addNeedItem(long itemId, int count) {
+        this.setNeedItem(itemId, this.getNeedItem(itemId) + count);
     }
 
     public void setNeedStat(StatType statType, int stat) {
@@ -124,10 +116,8 @@ public class Quest extends NamedObject {
         }
     }
 
-    public void setNeedCloseRate(Map<Long, Integer> needCloseRate) {
-        for(Map.Entry<Long, Integer> entry : needCloseRate.entrySet()) {
-            this.setNeedCloseRate(entry.getKey(), entry.getValue());
-        }
+    public void addNeedStat(StatType statType, int stat) {
+        this.setNeedStat(statType, this.getNeedStat(statType) + stat);
     }
 
     public void setNeedCloseRate(long npcId, int closeRate) {
@@ -154,10 +144,8 @@ public class Quest extends NamedObject {
         }
     }
 
-    public void setRewardItem(Map<Long, Integer> rewardItem) {
-        for(Map.Entry<Long, Integer> entry : rewardItem.entrySet()) {
-            this.setRewardItem(entry.getKey(), entry.getValue());
-        }
+    public void addNeedCloseRate(long npcId, int closeRate) {
+        this.setNeedCloseRate(npcId, this.getNeedCloseRate(npcId) + closeRate);
     }
 
     public void setRewardItem(long itemId, int count) {
@@ -184,10 +172,8 @@ public class Quest extends NamedObject {
         }
     }
 
-    public void setRewardStat(Map<StatType, Integer> rewardStat) {
-        for(Map.Entry<StatType, Integer> entry : rewardStat.entrySet()) {
-            this.setRewardStat(entry.getKey(), entry.getValue());
-        }
+    public void addRewardItem(long itemId, int count) {
+        this.setRewardItem(itemId, this.getRewardItem(itemId) + count);
     }
 
     public void setRewardStat(StatType statType, int stat) {
@@ -215,10 +201,8 @@ public class Quest extends NamedObject {
         }
     }
 
-    public void setRewardCloseRate(Map<Long, Integer> rewardCloseRate) {
-        for(Map.Entry<Long, Integer> entry : rewardCloseRate.entrySet()) {
-            this.setRewardCloseRate(entry.getKey(), entry.getValue());
-        }
+    public void addRewardStat(StatType statType, int stat) {
+        this.setRewardStat(statType, this.getRewardStat(statType) + stat);
     }
 
     public void setRewardCloseRate(long npcId, int closeRate) {
@@ -243,6 +227,10 @@ public class Quest extends NamedObject {
         } else {
             return value;
         }
+    }
+
+    public void addRewardCloseRate(long npcId, int closeRate) {
+        this.setRewardCloseRate(npcId, this.getRewardCloseRate(npcId) + closeRate);
     }
 
 }

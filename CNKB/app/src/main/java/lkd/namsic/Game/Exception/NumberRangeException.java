@@ -40,7 +40,7 @@ public class NumberRangeException extends RuntimeException {
     }
 
     public NumberRangeException(Map<?, ?> map1, Map<?, ?> map2) {
-        super(Config.mapsToString(map1, map2));
+        super(Config.mapToString(map1) + ", " + Config.mapToString(map2));
     }
 
 }

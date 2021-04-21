@@ -24,10 +24,6 @@ public class ConcurrentHashSet<T> implements Set<T>, Serializable {
         this.set = new HashSet<>();
     }
 
-    public ConcurrentHashSet(Set<T> set) {
-        this.set = set;
-    }
-
     @Override
     public int size() {
         readWriteLock.readLock().lock();

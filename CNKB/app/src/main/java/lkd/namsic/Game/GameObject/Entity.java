@@ -2,7 +2,6 @@ package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -27,6 +26,7 @@ import lkd.namsic.Game.Exception.InvalidNumberException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Game.Exception.ObjectNotFoundException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
+import lkd.namsic.Game.Variable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -63,6 +63,8 @@ public abstract class Entity extends NamedObject {
     Map<Id, ConcurrentHashSet<Long>> enemies = new ConcurrentHashMap<>();
     Map<String, ConcurrentArrayList<Event>> events = new ConcurrentHashMap<>();
 
+    Map<Variable, Integer> variable = new ConcurrentHashMap<>();
+
     protected Entity(@NonNull String name) {
         super(name);
     }
@@ -98,7 +100,7 @@ public abstract class Entity extends NamedObject {
         }
 
         this.addMoney(-1 * money);
-        MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+        MapClass map = Config.loadMap(this.location);
         map.addMoney(this.location, money);
         Config.unloadMap(map);
     }
@@ -127,7 +129,7 @@ public abstract class Entity extends NamedObject {
             MapClass map = null;
 
             try {
-                map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+                map = Config.loadMap(this.location);
 
                 long money = map.getMoney(this.location);
                 if(money != 0) {
@@ -208,7 +210,9 @@ public abstract class Entity extends NamedObject {
                     this.setField(moveMap.getLocation().getFieldX().get(), moveMap.getLocation().getFieldY().get());
                 } else {
                     this.setField(fieldX, fieldY);
-                }    moveMap.addEntity(this);
+                }
+
+                moveMap.addEntity(this);
             } finally {
                 if(moveMap != null) {
                     Config.unloadMap(moveMap);
@@ -218,7 +222,7 @@ public abstract class Entity extends NamedObject {
             MapClass prevMap = null;
 
             try {
-                prevMap = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+                prevMap = Config.loadMap(this.location);
                 prevMap.removeEntity(this);
             } finally {
                 if(prevMap != null && !this.id.getId().equals(Id.PLAYER)) {
@@ -444,71 +448,6 @@ public abstract class Entity extends NamedObject {
         this.equip.remove(equipType);
     }
 
-    public boolean canReinforce(long equipId, Map<StatType, Integer> increaseLimitStat) {
-        if(this.getEquipInventory().contains(equipId)) {
-            Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
-
-            boolean flag = equipment.getReinforceCount().get() < Config.MAX_REINFORCE_COUNT;
-
-            if(flag && this.getEquip(equipment.getEquipType()) == equipId) {
-                Map<StatType, Integer> minStat = new HashMap<>(equipment.getLimitStat().getMin());
-                Map<StatType, Integer> maxStat = new HashMap<>(equipment.getLimitStat().getMax());
-
-                StatType statType;
-                Integer value;
-                int stat;
-
-                for(Map.Entry<StatType, Integer> entry : increaseLimitStat.entrySet()) {
-                    statType = entry.getKey();
-                    stat = entry.getValue();
-
-                    value = minStat.get(statType);
-                    value = value == null ? 0 : value;
-                    minStat.put(statType, value + stat);
-
-                    value = maxStat.get(statType);
-                    value = value == null ? 0 : value;
-                    maxStat.put(statType, value + stat);
-                }
-
-                return equipment.getTotalLimitLv().isInRange(this.lv.get()) && this.checkStatRange(minStat, maxStat);
-            }
-
-            return flag;
-        } else {
-            return false;
-        }
-    }
-
-    public void reinforce(long equipId, Map<StatType, Integer> increaseReinforceStat,
-                          Map<StatType, Integer> increaseMinLimitStat, Map<StatType, Integer> increaseMaxLimitStat) {
-        Equipment equipment = null;
-
-        try {
-            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
-
-            int increaseLimitLv = Equipment.getLvIncrease(equipment.handleLv.get(), equipment.reinforceCount.get() + 1);
-            equipment.getReinforceCount().add(1);
-            equipment.getLimitLv().add(increaseLimitLv);
-
-            for(Map.Entry<StatType, Integer> entry : increaseReinforceStat.entrySet()) {
-                equipment.addReinforceStat(entry.getKey(), entry.getValue());
-            }
-
-            for(Map.Entry<StatType, Integer> entry : increaseMinLimitStat.entrySet()) {
-                equipment.getLimitStat().addMin(entry.getKey(), entry.getValue());
-            }
-
-            for(Map.Entry<StatType, Integer> entry : increaseMaxLimitStat.entrySet()) {
-                equipment.getLimitStat().addMax(entry.getKey(), entry.getValue());
-            }
-        } finally {
-            if(equipment != null) {
-                Config.unloadObject(equipment);
-            }
-        }
-    }
-
     public void setBuff(long time, @NonNull StatType statType, int stat) {
         long currentTime = System.currentTimeMillis();
 
@@ -615,7 +554,7 @@ public abstract class Entity extends NamedObject {
         }
 
         this.addItem(itemId, -1 * count);
-        MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+        MapClass map = Config.loadMap(this.location);
         map.addItem(this.location, itemId, count);
         Config.unloadMap(map);
     }
@@ -646,7 +585,7 @@ public abstract class Entity extends NamedObject {
 
     public void dropEquip(long equipId) {
         this.removeEquip(equipId);
-        MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+        MapClass map = Config.loadMap(this.location);
         map.addEquip(this.location, equipId);
         Config.unloadMap(map);
     }
@@ -811,6 +750,24 @@ public abstract class Entity extends NamedObject {
     public int getFieldDistance(Location location) {
         return (int) Math.sqrt(Math.pow(location.getX().get() - this.location.getX().get(), 2) +
                 Math.pow(location.getY().get() - this.location.getY().get(), 2));
+    }
+
+    public void setVariable(Variable variable, int value) {
+        this.variable.put(variable, value);
+    }
+
+    public int getVariable(Variable variable) {
+        Integer value = this.variable.get(variable);
+
+        if(value != null) {
+            return value;
+        } else {
+            return 0;
+        }
+    }
+
+    public void addVariable(Variable variable, int value) {
+        this.setVariable(variable, this.getVariable(variable) + value);
     }
 
     @NonNull

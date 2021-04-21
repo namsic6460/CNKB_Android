@@ -25,7 +25,6 @@ public class Skill extends NamedObject {
 
     boolean isWaitSkill = false;
 
-    //Only use on getting
     RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(new HashMap<>(), new HashMap<>());
 
     public Skill(@NonNull String name) {

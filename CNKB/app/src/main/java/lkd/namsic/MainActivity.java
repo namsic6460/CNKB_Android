@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView threadCount;
 
     private SwitchCompat switchBtn;
-    private Button initBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
