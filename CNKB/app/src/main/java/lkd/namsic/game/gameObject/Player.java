@@ -717,75 +717,43 @@ public class Player extends Entity {
     public boolean checkMineLevel() {
         int mineLv = this.getVariable(Variable.MINE);
         long mined = this.getLog(LogData.MINED);
+        int requireCount;
 
-        boolean isUp = false;
         switch (mineLv) {
             case 0:
-                if(mined > 30) {
-                    isUp = true;
-                    this.addVariable(Variable.MINE, 1);
-                }
-
+                requireCount = 30;
                 break;
 
             case 1:
-                if(mined > 200) {
-                    isUp = true;
-                    this.addVariable(Variable.MINE, 1);
-                }
-
+                requireCount = 200;
                 break;
 
             case 2:
-                if(mined > 1000) {
-                    isUp = true;
-                    this.addVariable(Variable.MINE, 1);
-                }
-
+                requireCount = 1000;
                 break;
 
             case 3:
-                if(mined > 5000) {
-                    isUp = true;
-                    this.addVariable(Variable.MINE, 1);
-                }
-
+                requireCount = 5000;
                 break;
 
             case 4:
-                if(mined > 20000) {
-                    isUp = true;
-                    this.addVariable(Variable.MINE, 1);
-                }
-
+                requireCount = 20000;
                 break;
 
             case 5:
-                if(mined > 100000) {
-                    isUp = true;
-                    this.addVariable(Variable.MINE, 1);
-                }
-
+                requireCount = 100000;
                 break;
 
             case 6:
-                if(mined > 1000000) {
-                    isUp = true;
-                    this.addVariable(Variable.MINE, 1);
-                }
-
+                requireCount = 1000000;
                 break;
 
             default:
-                if(mined > 10000000) {
-                    isUp = true;
-                    this.addVariable(Variable.MINE, 1);
-                }
-
+                requireCount = 10000000;
                 break;
         }
 
-        return isUp;
+        return mined >= requireCount;
     }
 
     @NonNull
