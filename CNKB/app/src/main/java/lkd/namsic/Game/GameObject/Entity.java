@@ -28,6 +28,7 @@ import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Game.Exception.ObjectNotFoundException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
 import lkd.namsic.Setting.Logger;
+import lkd.namsic.Game.Variable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -63,6 +64,8 @@ public abstract class Entity extends NamedObject {
 
     Map<Id, ConcurrentHashSet<Long>> enemies = new ConcurrentHashMap<>();
     Map<String, ConcurrentArrayList<Event>> events = new ConcurrentHashMap<>();
+
+    Map<Variable, Integer> variable = new ConcurrentHashMap<>();
 
     protected Entity(@NonNull String name) {
         super(name);
@@ -747,6 +750,24 @@ public abstract class Entity extends NamedObject {
     public int getFieldDistance(Location location) {
         return (int) Math.sqrt(Math.pow(location.getX().get() - this.location.getX().get(), 2) +
                 Math.pow(location.getY().get() - this.location.getY().get(), 2));
+    }
+
+    public void setVariable(Variable variable, int value) {
+        this.variable.put(variable, value);
+    }
+
+    public int getVariable(Variable variable) {
+        Integer value = this.variable.get(variable);
+
+        if(value != null) {
+            return value;
+        } else {
+            return 0;
+        }
+    }
+
+    public void addVariable(Variable variable, int value) {
+        this.setVariable(variable, this.getVariable(variable) + value);
     }
 
     @NonNull
