@@ -45,7 +45,7 @@ public class AiEntity extends Entity {
         MapClass map = null;
 
         try {
-            map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+            map = Config.loadMap(this.location);
             map.removeEntity(this);
         } finally {
             if(map != null) {

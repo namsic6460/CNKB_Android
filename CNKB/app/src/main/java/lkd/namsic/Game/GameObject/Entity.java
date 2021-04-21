@@ -2,7 +2,6 @@ package lkd.namsic.Game.GameObject;
 
 import androidx.annotation.NonNull;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -27,7 +26,6 @@ import lkd.namsic.Game.Exception.InvalidNumberException;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Game.Exception.ObjectNotFoundException;
 import lkd.namsic.Game.Exception.UnhandledEnumException;
-import lkd.namsic.Setting.Logger;
 import lkd.namsic.Game.Variable;
 import lombok.Getter;
 import lombok.Setter;
@@ -102,7 +100,7 @@ public abstract class Entity extends NamedObject {
         }
 
         this.addMoney(-1 * money);
-        MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+        MapClass map = Config.loadMap(this.location);
         map.addMoney(this.location, money);
         Config.unloadMap(map);
     }
@@ -131,7 +129,7 @@ public abstract class Entity extends NamedObject {
             MapClass map = null;
 
             try {
-                map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+                map = Config.loadMap(this.location);
 
                 long money = map.getMoney(this.location);
                 if(money != 0) {
@@ -212,7 +210,9 @@ public abstract class Entity extends NamedObject {
                     this.setField(moveMap.getLocation().getFieldX().get(), moveMap.getLocation().getFieldY().get());
                 } else {
                     this.setField(fieldX, fieldY);
-                }    moveMap.addEntity(this);
+                }
+
+                moveMap.addEntity(this);
             } finally {
                 if(moveMap != null) {
                     Config.unloadMap(moveMap);
@@ -222,7 +222,7 @@ public abstract class Entity extends NamedObject {
             MapClass prevMap = null;
 
             try {
-                prevMap = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+                prevMap = Config.loadMap(this.location);
                 prevMap.removeEntity(this);
             } finally {
                 if(prevMap != null && !this.id.getId().equals(Id.PLAYER)) {
@@ -554,7 +554,7 @@ public abstract class Entity extends NamedObject {
         }
 
         this.addItem(itemId, -1 * count);
-        MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+        MapClass map = Config.loadMap(this.location);
         map.addItem(this.location, itemId, count);
         Config.unloadMap(map);
     }
@@ -585,7 +585,7 @@ public abstract class Entity extends NamedObject {
 
     public void dropEquip(long equipId) {
         this.removeEquip(equipId);
-        MapClass map = Config.loadMap(this.location.getX().get(), this.location.getY().get());
+        MapClass map = Config.loadMap(this.location);
         map.addEquip(this.location, equipId);
         Config.unloadMap(map);
     }

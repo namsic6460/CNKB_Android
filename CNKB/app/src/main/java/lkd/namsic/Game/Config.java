@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.Game.Base.ConcurrentHashSet;
+import lkd.namsic.Game.Base.Location;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Exception.NumberRangeException;
@@ -347,11 +348,28 @@ public class Config {
     }
 
     @NonNull
+    public static MapClass loadMap(Location location) {
+        return loadMap(location.getX().get(), location.getY().get());
+    }
+
+    @NonNull
     public static <T extends GameObject> T getData(@NonNull Id id, long objectId) {
         T t = loadObject(id, objectId);
         unloadObject(t);
 
         return t;
+    }
+
+    public static MapClass getMapData(Location location) {
+        return getMapData(location.getX().get(), location.getY().get());
+    }
+
+    @NonNull
+    public static MapClass getMapData(int x, int y) {
+        MapClass map = loadMap(x, y);
+        unloadMap(map);
+
+        return map;
     }
 
     @NonNull
