@@ -1,0 +1,30 @@
+package lkd.namsic.game.enums;
+
+public enum LogData {
+
+    BOUGHT,
+    BUFF_RECEIVED,
+    CHAT,
+    DEATH,
+    EAT,
+    EXPLORED,
+    FIELD_MOVE_DISTANCE,
+    GATHERED,
+    LOG_COUNT,
+    MAP_MOVE_DISTANCE,
+    MAX_CLOSERATE,
+    MAX_MONEY,
+    MAX_PAYMENT,
+    MINED,
+    PLAYED_DAY,
+    QUEST_CLEARED,
+    QUEST_RECEIVED,
+    REINFORCE_SUCCEED,
+    REINFORCE_TRIED,
+    TOTAL_CLOSERATE,
+    TOTAL_EXP,
+    TOTAL_ITEM,
+    TOTAL_ITEM_USED,
+    TOTAL_MONEY
+
+}

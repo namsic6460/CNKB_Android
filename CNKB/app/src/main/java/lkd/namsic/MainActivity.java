@@ -20,15 +20,15 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import lkd.namsic.Game.Config;
-import lkd.namsic.Game.ObjectMaker;
-import lkd.namsic.Setting.FileManager;
-import lkd.namsic.Service.ForcedTerminationService;
+import lkd.namsic.game.Config;
+import lkd.namsic.game.ObjectMaker;
+import lkd.namsic.setting.FileManager;
+import lkd.namsic.service.ForcedTerminationService;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static List<Thread> chatThreads = new ArrayList<>();
-    public static Timer threadCleaner = new Timer();
+    public static final List<Thread> chatThreads = new ArrayList<>();
+    public static final Timer threadCleaner = new Timer();
 
     @SuppressLint("StaticFieldLeak")
     public static MainActivity mainActivity;
