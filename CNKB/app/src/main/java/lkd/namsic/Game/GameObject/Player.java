@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,12 +28,14 @@ import lkd.namsic.Game.Enum.Doing;
 import lkd.namsic.Game.Enum.Id;
 import lkd.namsic.Game.Enum.LogData;
 import lkd.namsic.Game.Enum.MagicType;
+import lkd.namsic.Game.Enum.MapType;
 import lkd.namsic.Game.Enum.StatType;
 import lkd.namsic.Game.Enum.WaitResponse;
 import lkd.namsic.Game.Event.ItemUseEvent;
 import lkd.namsic.Game.Exception.NumberRangeException;
 import lkd.namsic.Game.Exception.ObjectNotFoundException;
 import lkd.namsic.Game.Exception.WeirdDataException;
+import lkd.namsic.Game.Variable;
 import lkd.namsic.Service.KakaoTalk;
 import lombok.Getter;
 import lombok.Setter;
@@ -620,6 +623,156 @@ public class Player extends Entity {
         }
     }
 
+    public boolean canMine() {
+       return Config.getMapData(this.location).getMapType().equals(MapType.COUNTRY);
+    }
+
+    public void mine() {
+        this.addLog(LogData.MINED, 1);
+
+        int mineLv = this.getVariable(Variable.MINE);
+
+        double random = Math.random();
+        List<Double> percents = Arrays.asList(
+                Arrays.asList(50D, 45D, 40D, 35D, 30D, 30D, 30D, 25D, 20D).get(mineLv),
+                Arrays.asList(35D, 35D, 20D, 10D, 0D, 0D, 0D, 0D, 0D).get(mineLv),
+                Arrays.asList(14D, 15D, 20D, 15D, 0D, 0D, 0D, 0D, 0D).get(mineLv),
+                Arrays.asList(1D, 4.5D, 14D, 20D, 15D, 0D, 0D, 0D, 0D).get(mineLv),
+                Arrays.asList(0D, 0.5D, 5.5D, 12D, 40D, 20D, 0D, 0D, 0D).get(mineLv),
+                Arrays.asList(0D, 0D, 0.5D, 7.6D, 10D, 30D, 25D, 0D, 0D).get(mineLv),
+                Arrays.asList(0D, 0D, 0D, 0.4D, 4.98D, 15D, 25D, 20D, 0D).get(mineLv),
+                Arrays.asList(0D, 0D, 0D, 0D, 0.019D, 4.8D, 15D, 32.5D, 30.5D).get(mineLv),
+                Arrays.asList(0D, 0D, 0D, 0D, 0.001D, 0.149D, 4.79D, 17.5D, 30.3D).get(mineLv),
+                Arrays.asList(0D, 0D, 0D, 0D, 0D, 0.001D, 0.2095D, 4.99D, 19.042D).get(mineLv),
+                Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0.0005D, 0.0055D, 0.1577D).get(mineLv),
+                Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0D, 0.0001D, 0.0003D).get(mineLv)
+        );
+        List<Long> output = Arrays.asList(20L, 21L, 0L, 0L, 0L, 31L, 33L, 0L, 0L, 0L, 43L, 0L);
+
+        for(int i = 0; i < percents.size(); i++) {
+            if(random < percents.get(i)) {
+                long itemId = output.get(i);
+
+                if(itemId == 0) {
+                    long[] itemList;
+
+                    switch(i) {
+                        case 2:
+                            itemList = new long[]{23L, 24L, 25L, 26L};
+                            break;
+                        case 3:
+                            itemList = new long[]{27L, 28L};
+                            break;
+                        case 4:
+                            itemList = new long[]{29L, 30L};
+                            break;
+                        case 7:
+                            itemList = new long[]{34L, 35L};
+                            break;
+                        case 8:
+                            itemList = new long[]{36L, 37L};
+                            break;
+                        case 9:
+                            itemList = new long[]{39L, 40L};
+                            break;
+                        default:
+                            itemList = new long[]{44L, 45L, 46L};
+                            break;
+                    }
+
+                    int itemIdx = new Random().nextInt(itemList.length);
+                    itemId = itemList[itemIdx];
+                }
+
+                int count = this.getItem(itemId);
+                this.addItem(itemId, 1);
+
+                Item item = Config.getData(Id.ITEM, itemId);
+                this.replyPlayer(item.getName() + "을 캤습니다!\n아이템 개수 : " + count + " -> " + (count + 1));
+            } else {
+                random -= percents.get(i);
+            }
+        }
+
+        this.checkMineLevel();
+    }
+
+    public void checkMineLevel() {
+        int mineLv = this.getVariable(Variable.MINE);
+        long mined = this.getLog(LogData.MINED);
+
+        boolean isUp = false;
+        switch (mineLv) {
+            case 0:
+                if(mined > 30) {
+                    isUp = true;
+                    this.addVariable(Variable.MINE, 1);
+                }
+
+                break;
+
+            case 1:
+                if(mined > 200) {
+                    isUp = true;
+                    this.addVariable(Variable.MINE, 1);
+                }
+
+                break;
+
+            case 2:
+                if(mined > 1000) {
+                    isUp = true;
+                    this.addVariable(Variable.MINE, 1);
+                }
+
+                break;
+
+            case 3:
+                if(mined > 5000) {
+                    isUp = true;
+                    this.addVariable(Variable.MINE, 1);
+                }
+
+                break;
+
+            case 4:
+                if(mined > 20000) {
+                    isUp = true;
+                    this.addVariable(Variable.MINE, 1);
+                }
+
+                break;
+
+            case 5:
+                if(mined > 100000) {
+                    isUp = true;
+                    this.addVariable(Variable.MINE, 1);
+                }
+
+                break;
+
+            case 6:
+                if(mined > 1000000) {
+                    isUp = true;
+                    this.addVariable(Variable.MINE, 1);
+                }
+
+                break;
+
+            case 7:
+                if(mined > 10000000) {
+                    isUp = true;
+                    this.addVariable(Variable.MINE, 1);
+                }
+
+                break;
+        }
+
+        if(isUp) {
+            this.replyPlayer("광업 레벨이 올랐습니다!\n광업 레벨 : " + mineLv + " -> " + (mineLv + 1));
+        }
+    }
+
     @NonNull
     public Player clearQuest(long questId) {
         Long chatId = this.quest.get(questId);
@@ -776,6 +929,91 @@ public class Player extends Entity {
         return flag;
     }
 
+<<<<<<< Updated upstream
+=======
+    public boolean canReinforce(long equipId, Map<StatType, Integer> increaseLimitStat) {
+        if(this.getEquipInventory().contains(equipId)) {
+            Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+
+            boolean flag = equipment.getReinforceCount().get() < Config.MAX_REINFORCE_COUNT;
+
+            if(flag && this.getEquip(equipment.getEquipType()) == equipId) {
+                Map<StatType, Integer> minStat = new HashMap<>(equipment.getLimitStat().getMin());
+                Map<StatType, Integer> maxStat = new HashMap<>(equipment.getLimitStat().getMax());
+
+                StatType statType;
+                Integer value;
+                int stat;
+
+                for(Map.Entry<StatType, Integer> entry : increaseLimitStat.entrySet()) {
+                    statType = entry.getKey();
+                    stat = entry.getValue();
+
+                    value = minStat.get(statType);
+                    value = value == null ? 0 : value;
+                    minStat.put(statType, value + stat);
+
+                    value = maxStat.get(statType);
+                    value = value == null ? 0 : value;
+                    maxStat.put(statType, value + stat);
+                }
+
+                return equipment.getTotalLimitLv().isInRange(this.lv.get()) && this.checkStatRange(minStat, maxStat);
+            }
+
+            return flag;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean reinforce(long equipId, Map<StatType, Integer> increaseReinforceStat,
+                             Map<StatType, Integer> increaseMinLimitStat, Map<StatType, Integer> increaseMaxLimitStat) {
+        this.setDoing(Doing.REINFORCE);
+        this.addLog(LogData.REINFORCE_TRIED, 1);
+
+        Random random = new Random();
+        double percent = random.nextDouble();
+
+        try {
+            Thread.sleep(random.nextInt(5000));
+        } catch (InterruptedException e) {
+            Logger.e("Entity.reinforce", e);
+            throw new RuntimeException(e.getMessage());
+        } finally {
+            this.setDoing(Doing.NONE);
+        }
+
+        Equipment equipment = null;
+
+        try {
+            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
+            double reinforcePercent = equipment.getReinforcePercent();
+
+            if(percent < reinforcePercent) {
+                equipment.successReinforce(increaseReinforceStat, increaseMinLimitStat, increaseMaxLimitStat);
+
+                this.addLog(LogData.REINFORCE_SUCCEED, 1);
+
+                int reinforceCount = equipment.reinforceCount.get();
+                this.replyPlayer("강화에 성공헀습니다!\n" + reinforceCount + "강 -> " + (reinforceCount + 1) + "강");
+
+                return true;
+            } else {
+                equipment.failReinforce();
+                this.replyPlayer("강화에 실패하였습니다...",
+                        "현재 강화 천장 : " + equipment.reinforceFloor.get() + "\n" +
+                                "다음 강화 확률 : " + Config.getDisplayPercent(equipment.getReinforcePercent()) + "%");
+                return false;
+            }
+        } finally {
+            if (equipment != null) {
+                Config.unloadObject(equipment);
+            }
+        }
+    }
+
+>>>>>>> Stashed changes
     @Override
     public boolean setMoney(long money) {
         money *= Config.MONEY_BOOST;
