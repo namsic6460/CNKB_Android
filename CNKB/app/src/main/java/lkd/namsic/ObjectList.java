@@ -1,4 +1,4 @@
-package lkd.namsic.game.objectList;
+package lkd.namsic;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,8 +12,8 @@ public class ObjectList {
         put("잡초", 4L);
         put("골드 주머니", 5L);
         put("골드 보따리", 6L);
-        put("힘의 정수", 7L);
-        put("마나 정수", 8L);
+        put("약초", 7L);
+        put("마나 조각", 8L);
         put("유리조각", 9L);
         put("흙", 10L);
         put("모래", 11L);
