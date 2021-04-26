@@ -58,12 +58,10 @@ public class Player extends Entity {
     final
     String image;
 
-    final Set<String> title = new ConcurrentHashSet<String>() {{
-        add("초심자");
-    }};
+    final Set<String> title = new ConcurrentHashSet<>();
 
     @NonNull
-    String currentTitle = "초심자";
+    String currentTitle = "";
 
     @Setter
     @NonNull
@@ -119,6 +117,9 @@ public class Player extends Entity {
         this.image = image;
         this.recentRoom = recentRoom;
         this.lastTime = lastTime;
+        
+        this.addTitle("초심자");
+        this.setCurrentTitle("초심자");
     }
 
     //[테스트 칭호] 남식(Lv.123)
@@ -146,42 +147,6 @@ public class Player extends Entity {
 
     public void replyPlayer(@NonNull String msg, @NonNull String innerMsg) {
         KakaoTalk.reply(this.getSession(), this.getName() + "\n" + msg, innerMsg);
-    }
-
-    public boolean useItem(long itemId, @NonNull List<GameObject> other) {
-        Config.checkId(Id.ITEM, itemId);
-
-        if(this.getItem(itemId) == 0) {
-            throw new ObjectNotFoundException(Id.ITEM, itemId);
-        }
-
-        Item item = null;
-        boolean isCancelled;
-
-        try {
-            item = Config.loadObject(Id.ITEM, itemId);
-
-            if (item.getUse() != null) {
-                isCancelled = ItemUseEvent.handleEvent(this.events.get(ItemUseEvent.getName()), new Object[]{item});
-
-                if (!isCancelled) {
-                    Use use = item.getUse();
-
-                    if(use != null) {
-                        this.addLog(LogData.TOTAL_ITEM_USED, 1);
-                        use.use(this, other);
-                    }
-                }
-            } else {
-                throw new WeirdDataException(Id.ITEM, itemId);
-            }
-        } finally {
-            if(item != null) {
-                Config.unloadObject(item);
-            }
-        }
-
-        return isCancelled;
     }
 
     public boolean checkChat() {
@@ -250,9 +215,35 @@ public class Player extends Entity {
         builder.append("(아이템/item) 사용 (아이템 번호) (대상) : 아이템 번호에 해당하는 아이템을 대상(본인 : \"s\")에게 사용합니다\n");
         builder.append("(도망/run) : 거점으로의 도망을 시도합니다. 실패 시 최대 체력의 10%에 해당하는 피해를 입습니다");
         builder.append("(사망하지는 않습니다)(실패 시 15초간 사용이 불가능해집니다)\n");
-        builder.append("(카운터/counter) [대상] : (보스한정) [\"대상\" 또는 \"가장 가까운 보스\"] 의 스킬(집중 스킬 한정)을 반사합니다");
+        builder.append("(카운터/counter) [대상] : (보스한정) [\"대상\" 또는 \"가장 가까운 보스\"] 의 스킬을 반사합니다");
 
         return builder.toString();
+    }
+
+    public boolean canUse(long itemId) {
+        if(this.getItem(itemId) > 0) {
+            Item item = Config.getData(Id.ITEM, itemId);
+            return item.getUse() != null;
+        } else {
+            return false;
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public boolean useItem(long itemId, @NonNull List<GameObject> other) {
+        Config.checkId(Id.ITEM, itemId);
+
+        boolean isCancelled;
+        Item item = Config.getData(Id.ITEM, itemId);
+        isCancelled = ItemUseEvent.handleEvent(this.events.get(ItemUseEvent.getName()), new Object[]{item});
+
+        if (!isCancelled) {
+            this.addLog(LogData.TOTAL_ITEM_USED, 1);
+            item.getUse().use(this, other);
+            this.addItem(itemId, -1);
+        }
+
+        return isCancelled;
     }
 
     public boolean canEat(long itemId) {
@@ -723,31 +714,24 @@ public class Player extends Entity {
             case 0:
                 requireCount = 30;
                 break;
-
             case 1:
                 requireCount = 200;
                 break;
-
             case 2:
                 requireCount = 1000;
                 break;
-
             case 3:
                 requireCount = 5000;
                 break;
-
             case 4:
                 requireCount = 20000;
                 break;
-
             case 5:
                 requireCount = 100000;
                 break;
-
             case 6:
                 requireCount = 1000000;
                 break;
-
             default:
                 requireCount = 10000000;
                 break;

@@ -95,16 +95,22 @@ public class Item extends NamedObject {
     }
 
     public void addRecipe(@NonNull Map<Long, Integer> recipe) {
+        this.addRecipe(recipe, false);
+    }
+
+    public void addRecipe(@NonNull Map<Long, Integer> recipe, boolean skipCheck) {
         long key;
         int value;
         for(Map.Entry<Long, Integer> entry : recipe.entrySet()) {
             key = entry.getKey();
             value = entry.getValue();
 
-            try {
-                Config.checkId(Id.ITEM, key);
-            } catch (NumberRangeException e) {
-                Config.checkId(Id.EQUIPMENT, key);
+            if(!skipCheck) {
+                try {
+                    Config.checkId(Id.ITEM, key);
+                } catch (NumberRangeException e) {
+                    Config.checkId(Id.EQUIPMENT, key);
+                }
             }
 
             if(value < 1) {
