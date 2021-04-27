@@ -1,11 +1,13 @@
 package lkd.namsic;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import java.util.HashMap;
-import java.util.Map;
 
 public class ObjectList {
 
-    public final static Map<String, Long> itemList = new HashMap<String, Long>() {{
+    public final static BiMap<String, Long> itemList = HashBiMap.create(new HashMap<String, Long>() {{
         put("돌멩이", 1L);
         put("나뭇가지", 2L);
         put("나뭇잎", 3L);
@@ -19,12 +21,14 @@ public class ObjectList {
         put("모래", 11L);
         put("유리", 12L);
         put("유리병", 13L);
+
         put("하급 체력포션", 14L);
         put("중급 체력포션", 15L);
         put("상급 체력포션", 16L);
         put("하급 마나포션", 17L);
         put("중급 마나포션", 18L);
         put("상급 마나포션", 19L);
+
         put("돌", 20L);
         put("석탄", 21L);
         put("석영", 22L);
@@ -52,6 +56,7 @@ public class ObjectList {
         put("적청석", 44L);
         put("랜디움", 45L);
         put("에이튬", 46L);
+
         put("가넷", 47L);
         put("자수정", 48L);
         put("아쿠아마린", 49L);
@@ -63,7 +68,6 @@ public class ObjectList {
         put("오팔", 55L);
         put("토파즈", 56L);
         put("터키석", 57L);
-    }};
-
+    }});
 
 }
