@@ -4,8 +4,11 @@ import java.util.HashMap;
 import java.util.Random;
 
 import lkd.namsic.ObjectList;
+import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.gameObject.Item;
+import lkd.namsic.game.gameObject.MapClass;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.setting.Logger;
 
@@ -17,6 +20,7 @@ public class ObjectMaker {
         try {
             makeItem();
             makeEquip();
+            makeMap();
 
             Logger.i("ObjectMaker", "Object making is done!");
         } catch (Exception e) {
@@ -412,6 +416,29 @@ public class ObjectMaker {
 
     private static void makeEquip() {
 
+    }
+
+    private static void makeMap() {
+        Location location = new Location(0, 0);
+        MapClass map = new MapClass(ObjectList.mapList.get(location));
+        map.setMapType(MapType.COUNTRY);
+        Config.unloadMap(map);
+
+        for(int y = 1; y <= 10; y++) {
+            location = new Location(0, y);
+            map = new MapClass(ObjectList.mapList.get(location));
+            map.setMapType(MapType.FIELD);
+            Config.unloadMap(map);
+        }
+
+        for(int x = 1; x <= 10; x++) {
+            for(int y = 0; y <= 10; y++) {
+                location = new Location(x, y);
+                map = new MapClass(ObjectList.mapList.get(location));
+                map.setMapType(MapType.FIELD);
+                Config.unloadMap(map);
+            }
+        }
     }
 
 }

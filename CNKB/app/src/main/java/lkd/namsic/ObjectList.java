@@ -5,6 +5,8 @@ import com.google.common.collect.HashBiMap;
 
 import java.util.HashMap;
 
+import lkd.namsic.game.base.Location;
+
 public class ObjectList {
 
     public final static BiMap<String, Long> itemList = HashBiMap.create(new HashMap<String, Long>() {{
@@ -68,6 +70,20 @@ public class ObjectList {
         put("오팔", 55L);
         put("토파즈", 56L);
         put("터키석", 57L);
+    }});
+
+    public final static BiMap<Location, String> mapList = HashBiMap.create(new HashMap<Location, String>() {{
+        put(new Location(0, 0), "시작의 마을");
+
+        for(int y = 1; y <= 10; y++) {
+            put(new Location(0, y), "Undefined");
+        }
+
+        for(int x = 1; x <= 10; x++) {
+            for(int y = 0; y <= 10; y++) {
+                put(new Location(x, y), "Undefined");
+            }
+        }
     }});
 
 }
