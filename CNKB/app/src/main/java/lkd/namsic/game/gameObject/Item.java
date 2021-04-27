@@ -98,14 +98,14 @@ public class Item extends NamedObject {
         this.addRecipe(recipe, false);
     }
 
-    public void addRecipe(@NonNull Map<Long, Integer> recipe, boolean skipCheck) {
+    public void addRecipe(@NonNull Map<Long, Integer> recipe, boolean skip) {
         long key;
         int value;
         for(Map.Entry<Long, Integer> entry : recipe.entrySet()) {
             key = entry.getKey();
             value = entry.getValue();
 
-            if(!skipCheck) {
+            if(!skip && key != 0L) {
                 try {
                     Config.checkId(Id.ITEM, key);
                 } catch (NumberRangeException e) {
