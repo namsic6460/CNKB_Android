@@ -68,17 +68,22 @@ public class FileManager extends Application {
                 return "";
             }
 
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            char[] c = new char[(int) file.length()];
-            bufferedReader.read(c);
-            bufferedReader.close();
-            Logger.i("FileManger", "read - " + path);
-
-            return new String(c);
+            return read(file);
         } catch (Exception e) {
             Logger.e("FileManager", e);
             return "";
         }
+    }
+
+    @NonNull
+    public static String read(File file) throws Exception {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        char[] c = new char[(int) file.length()];
+        bufferedReader.read(c);
+        bufferedReader.close();
+        Logger.i("FileManger", "read - " + file.getPath());
+
+        return new String(c);
     }
 
     public static void append(String path, @NonNull String data) {

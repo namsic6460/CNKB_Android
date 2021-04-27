@@ -8,11 +8,13 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.base.ConcurrentHashSet;
@@ -50,6 +52,8 @@ public class Config {
 
     public static final Map<String, MapClass> MAP = new ConcurrentHashMap<>();
     public static final Map<String, Long> PLAYER_COUNT = new ConcurrentHashMap<>();
+
+    public static final Set<String> NICKNAME_LIST = new ConcurrentHashSet<>();
 
     public static final double MONEY_BOOST = 1;
     public static final double EXP_BOOST = 1;
@@ -105,6 +109,8 @@ public class Config {
             return;
         }
 
+        initialized = true;
+
         for(Id id : Id.values()) {
             ID_COUNT.put(id, 1L);
 
@@ -113,7 +119,20 @@ public class Config {
             DELETE_LIST.put(id, new ConcurrentHashSet<>());
         }
 
-        initialized = true;
+        File folder = new File(FileManager.DATA_PATH_MAP.get(Id.PLAYER));
+        File[] players = folder.listFiles();
+
+        String json;
+        Player player;
+        for(File playerFile : players) {
+            try {
+                json = FileManager.read(playerFile);
+                player = fromJson(json, Player.class);
+                NICKNAME_LIST.add(player.getNickName());
+            } catch (Exception e) {
+                Logger.e("Config.init", e);
+            }
+        }
     }
 
     public static JSONObject createConfig() throws JSONException {
@@ -173,7 +192,6 @@ public class Config {
         return t;
     }
 
-    @SuppressWarnings("ConstantConditions")
     public static void deleteAiEntity(AiEntity entity) {
         Id id = entity.getId().getId();
         long objectId = entity.getId().getObjectId();
@@ -263,7 +281,7 @@ public class Config {
         }
     }
 
-    @SuppressWarnings({"ConstantConditions", "unchecked"})
+    @SuppressWarnings("unchecked")
     @NonNull
     public static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
         if(id.equals(Id.PLAYER)) {
