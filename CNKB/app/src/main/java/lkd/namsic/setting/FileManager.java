@@ -83,13 +83,13 @@ public class FileManager extends Application {
         bufferedReader.close();
         Logger.i("FileManger", "read - " + file.getPath());
 
-        return new String(c);
+        return new String(c).trim();
     }
 
     public static void append(String path, @NonNull String data) {
         String readData = read(path);
         if (!readData.equals("")) {
-            data = readData + "\n" + data;
+            data = readData + "\r\n" + data;
         }
 
         save(path, data);
@@ -103,7 +103,7 @@ public class FileManager extends Application {
             }
 
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-            bufferedWriter.write(data);
+            bufferedWriter.write(data.trim());
             bufferedWriter.close();
             Logger.i("FileManger", "save - " + path + "\n" + data);
         } catch (Exception e) {
