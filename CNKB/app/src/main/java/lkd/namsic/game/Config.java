@@ -118,7 +118,9 @@ public class Config {
             OBJECT_COUNT.put(id, new ConcurrentHashMap<>());
             DELETE_LIST.put(id, new ConcurrentHashSet<>());
         }
+    }
 
+    public static void loadPlayers() {
         File folder = new File(FileManager.DATA_PATH_MAP.get(Id.PLAYER));
         File[] players = folder.listFiles();
 
@@ -264,7 +266,8 @@ public class Config {
 
     public static void unloadMap(@NonNull MapClass map) {
         String fileName = getMapFileName(map);
-        long playerCount = PLAYER_COUNT.get(fileName);
+        Long playerCount = PLAYER_COUNT.get(fileName);
+        playerCount = playerCount == null ? 0 : playerCount;
 
         if(playerCount > 1) {
             PLAYER_COUNT.put(fileName, playerCount - 1);
@@ -433,7 +436,7 @@ public class Config {
 
     @NonNull
     private static String getPlayerPath(@NonNull String sender, @NonNull String image) {
-        return sender + "-" + image + ".json";
+        return FileManager.DATA_PATH_MAP.get(Id.PLAYER) + sender + "-" + image + ".json";
     }
 
     @NonNull
