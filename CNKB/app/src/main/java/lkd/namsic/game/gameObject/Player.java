@@ -73,8 +73,7 @@ public class Player extends Entity {
     @Setter
     boolean isGroup = true;
 
-    private long lastTime;
-    LimitLong runTime = new LimitLong(0L, 0L, Long.MAX_VALUE);
+    private long lastTime = System.currentTimeMillis();
 
     final Location baseLocation = new Location();
 
@@ -107,16 +106,14 @@ public class Player extends Entity {
         put(LogData.PLAYED_DAY, 1L);
     }};
 
-    public Player(@NonNull String sender, @NonNull String name, @NonNull String nickName,
-                  @NonNull String image, @NonNull String recentRoom, long lastTime) {
-        super(name);
+    public Player(@NonNull String sender, @NonNull String nickName, @NonNull String image, @NonNull String recentRoom) {
+        super(sender);
         this.id.setId(Id.PLAYER);
 
         this.sender = sender;
         this.nickName = nickName;
         this.image = image;
         this.recentRoom = recentRoom;
-        this.lastTime = lastTime;
         
         this.addTitle("초심자");
         this.setCurrentTitle("초심자");
@@ -126,7 +123,7 @@ public class Player extends Entity {
     @NonNull
     @Override
     public String getName() {
-        return "[" + this.getCurrentTitle() + "] " + this.getNickName() + " (Lv." + this.getLv() + ")";
+        return "[" + this.getCurrentTitle() + "] " + this.getNickName() + " (Lv." + this.getLv().get() + ")";
     }
 
     public void addTitle(String title) {
@@ -229,7 +226,6 @@ public class Player extends Entity {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     public boolean useItem(long itemId, @NonNull List<GameObject> other) {
         Config.checkId(Id.ITEM, itemId);
 
@@ -862,6 +858,8 @@ public class Player extends Entity {
         } else {
             this.log.put(logData, count);
         }
+
+        Logger.i("LogData", this.getName() + " {" + logData.toString() + " : " + count + "}");
     }
 
     public long getLog(@NonNull LogData logData) {

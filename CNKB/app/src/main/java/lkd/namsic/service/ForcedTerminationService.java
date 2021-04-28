@@ -27,7 +27,7 @@ public class ForcedTerminationService extends Service {
 
         MainActivity.threadCleaner.cancel();
         Config.onTerminate();
-        for(Thread thread : MainActivity.chatThreads) {
+        for(Thread thread : MainActivity.threads) {
             if (thread.isAlive()) {
                 thread.interrupt();
                 try {
@@ -36,7 +36,8 @@ public class ForcedTerminationService extends Service {
             }
         }
 
-        MainActivity.chatThreads.clear();
+        MainActivity.threads.clear();
+        MainActivity.threadCleaner.cancel();
 
         MainActivity.toast("Stopped");
         stopSelf();

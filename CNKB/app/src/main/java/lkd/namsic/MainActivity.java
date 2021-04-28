@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,7 +29,7 @@ import lkd.namsic.service.ForcedTerminationService;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final List<Thread> chatThreads = new ArrayList<>();
+    public static final List<Thread> threads = new ArrayList<>();
     public static final Timer threadCleaner = new Timer();
 
     @SuppressLint("StaticFieldLeak")
@@ -73,7 +75,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_main);
+
         textView = findViewById(R.id.text);
+        textView.setMovementMethod(new ScrollingMovementMethod());
+
         startService(new Intent(this, ForcedTerminationService.class));
 
         threadCount = findViewById(R.id.thread_count);
@@ -83,11 +88,12 @@ public class MainActivity extends AppCompatActivity {
 
         Config.init();
         FileManager.initDir();
+        Config.loadPlayers();
 
         threadCleaner.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                int size = chatThreads.size();
+                int size = threads.size();
 
                 mainActivity.runOnUiThread(() -> threadCount.setText(String.valueOf(size)));
 
@@ -96,13 +102,13 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 List<Thread> deadThreads = new ArrayList<>();
-                for(Thread thread : chatThreads) {
-                    if(thread.isInterrupted()) {
+                for(Thread thread : threads) {
+                    if(thread.isInterrupted() || !thread.isAlive()) {
                         deadThreads.add(thread);
                     }
                 }
 
-                chatThreads.removeAll(deadThreads);
+                threads.removeAll(deadThreads);
             }
         }, 0, 1000);
     }
@@ -122,12 +128,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void toast(final String msg) {
-        Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
-        toast.show();
+        mainActivity.runOnUiThread(() -> {
+            Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
+            toast.show();
+        });
     }
 
     public static void startThread(Thread thread) {
-        chatThreads.add(thread);
+        threads.add(thread);
         thread.start();
     }
 
