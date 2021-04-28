@@ -3,8 +3,8 @@ package lkd.namsic.game;
 import java.util.HashMap;
 import java.util.Random;
 
+import lkd.namsic.MainActivity;
 import lkd.namsic.ObjectList;
-import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.gameObject.Item;
@@ -17,15 +17,18 @@ public class ObjectMaker {
     public static void start() {
         Logger.i("ObjectMaker", "Making objects...");
 
-        try {
-            makeItem();
-            makeEquip();
-            makeMap();
+        Thread thread = new Thread(() -> {
+            try {
+                makeItem();
+                makeEquip();
+                makeMap();
 
-            Logger.i("ObjectMaker", "Object making is done!");
-        } catch (Exception e) {
-            Logger.e("ObjectMaker", e);
-        }
+                Logger.i("ObjectMaker", "Object making is done!");
+            } catch (Exception e) {
+                Logger.e("ObjectMaker", e);
+            }
+        });
+        MainActivity.startThread(thread);
     }
 
     private static void makeItem() {
@@ -412,6 +415,7 @@ public class ObjectMaker {
         Config.unloadObject(item);
 
         Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 58));
+        Logger.i("ObjectMaker", "Item making is done!");
     }
 
     private static void makeEquip() {
@@ -419,26 +423,27 @@ public class ObjectMaker {
     }
 
     private static void makeMap() {
-        Location location = new Location(0, 0);
-        MapClass map = new MapClass(ObjectList.mapList.get(location));
+        MapClass map = new MapClass(ObjectList.mapList.get("0-0"));
         map.setMapType(MapType.COUNTRY);
         Config.unloadMap(map);
 
         for(int y = 1; y <= 10; y++) {
-            location = new Location(0, y);
-            map = new MapClass(ObjectList.mapList.get(location));
+            map = new MapClass(ObjectList.mapList.get("0-" + y));
+            map.getLocation().setMap(0, y);
             map.setMapType(MapType.FIELD);
             Config.unloadMap(map);
         }
 
         for(int x = 1; x <= 10; x++) {
             for(int y = 0; y <= 10; y++) {
-                location = new Location(x, y);
-                map = new MapClass(ObjectList.mapList.get(location));
+                map = new MapClass(ObjectList.mapList.get(x + "-" + y));
+                map.getLocation().setMap(x, y);
                 map.setMapType(MapType.FIELD);
                 Config.unloadMap(map);
             }
         }
+
+        Logger.i("ObjectMaker", "Map making is done!");
     }
 
 }
