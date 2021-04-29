@@ -78,13 +78,7 @@ public class Quest extends NamedObject {
     }
 
     public int getNeedItem(long itemId) {
-        Integer value = this.needItem.get(itemId);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.needItem.getOrDefault(itemId, 0);
     }
 
     public void addNeedItem(long itemId, int count) {
@@ -107,13 +101,7 @@ public class Quest extends NamedObject {
 
     public int getNeedStat(StatType statType) {
         Config.checkStatType(statType);
-        Integer value = this.needStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.needStat.getOrDefault(statType, 0);
     }
 
     public void addNeedStat(StatType statType, int stat) {
@@ -135,13 +123,8 @@ public class Quest extends NamedObject {
     }
 
     public int getNeedCloseRate(long npcId) {
-        Integer value = this.needCloseRate.get(npcId);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        Config.checkId(Id.NPC, npcId);
+        return this.needCloseRate.getOrDefault(npcId, 0);
     }
 
     public void addNeedCloseRate(long npcId, int closeRate) {
@@ -163,13 +146,7 @@ public class Quest extends NamedObject {
     }
 
     public int getRewardItem(long itemId) {
-        Integer value = this.rewardItem.get(itemId);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.rewardItem.getOrDefault(itemId, 0);
     }
 
     public void addRewardItem(long itemId, int count) {
@@ -192,13 +169,7 @@ public class Quest extends NamedObject {
 
     public int getRewardStat(StatType statType) {
         Config.checkStatType(statType);
-        Integer value = this.rewardStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.rewardStat.getOrDefault(statType, 0);
     }
 
     public void addRewardStat(StatType statType, int stat) {
@@ -220,13 +191,7 @@ public class Quest extends NamedObject {
     }
 
     public int getRewardCloseRate(long npcId) {
-        Integer value = this.rewardCloseRate.get(npcId);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.rewardCloseRate.getOrDefault(npcId, 0);
     }
 
     public void addRewardCloseRate(long npcId, int closeRate) {

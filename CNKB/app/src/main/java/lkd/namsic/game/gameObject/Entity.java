@@ -283,13 +283,7 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getBasicStat(@NonNull StatType statType) {
-        Integer value = this.basicStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.basicStat.getOrDefault(statType, 0);
     }
 
     public void addBasicStat(@NonNull StatType statType, int stat) {
@@ -307,13 +301,7 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getEquipStat(@NonNull StatType statType) {
-        Integer value = this.equipStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.equipStat.getOrDefault(statType, 0);
     }
 
     public void addEquipStat(@NonNull StatType statType, int stat) {
@@ -331,13 +319,7 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getBuffStat(@NonNull StatType statType) {
-        Integer value = this.buffStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.buffStat.getOrDefault(statType, 0);
     }
 
     public void addBuffStat(@NonNull StatType statType, int stat) {
@@ -347,17 +329,17 @@ public abstract class Entity extends NamedObject {
     public int getStat(@NonNull StatType statType) {
         int value = this.getBasicStat(statType) + this.getEquipStat(statType) + this.getBuffStat(statType);
 
-        if(statType.equals(StatType.MAXHP)) {
-            int hp = this.getStat(StatType.HP);
+        if(statType.equals(StatType.HP)) {
+            int maxHp = this.getStat(StatType.MAXHP);
 
-            if(hp > value) {
-                this.setBasicStat(StatType.HP, value);
+            if(maxHp < value) {
+                this.setBasicStat(StatType.HP, maxHp);
             }
-        } else if(statType.equals(StatType.MAXMN)) {
-            int mn = this.getStat(StatType.MN);
+        } else if(statType.equals(StatType.MN)) {
+            int maxMn = this.getStat(StatType.MAXMN);
 
-            if(mn > value) {
-                this.setBasicStat(StatType.MN, value);
+            if(maxMn < value) {
+                this.setBasicStat(StatType.MN, maxMn);
             }
         }
 
@@ -404,13 +386,7 @@ public abstract class Entity extends NamedObject {
     public abstract void onKill(Entity entity);
 
     public long getEquip(EquipType equipType) {
-        Long value = this.equip.get(equipType);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 0;
-        }
+        return this.equip.getOrDefault(equipType, 0L);
     }
 
     @NonNull
@@ -478,11 +454,7 @@ public abstract class Entity extends NamedObject {
         Map<StatType, Integer> buffMap = this.buff.get(time);
 
         if(buffMap != null) {
-            Integer value = buffMap.get(statType);
-
-            if(value != null) {
-                return value;
-            }
+            return buffMap.getOrDefault(statType, 0);
         }
 
         return 0;
@@ -527,13 +499,7 @@ public abstract class Entity extends NamedObject {
 
     public int getItem(long itemId) {
         Config.checkId(Id.ITEM, itemId);
-        Integer value = this.inventory.get(itemId);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.inventory.getOrDefault(itemId, 0);
     }
 
     public void addItem(long itemId, int count) {
@@ -751,13 +717,7 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getVariable(Variable variable) {
-        Integer value = this.variable.get(variable);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 0;
-        }
+        return this.variable.getOrDefault(variable, 0);
     }
 
     public void addVariable(Variable variable, int value) {

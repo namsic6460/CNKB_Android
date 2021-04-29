@@ -66,13 +66,7 @@ public class MapClass {
     }
 
     public long getMoney(Location location) {
-        Long value = this.money.get(location);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 0;
-        }
+        return this.money.getOrDefault(location, 0L);
     }
 
     public void addMoney(Location location, long money) {
@@ -110,11 +104,7 @@ public class MapClass {
         Map<Long, Integer> itemMap = this.item.get(location);
 
         if(itemMap != null) {
-            Integer value = itemMap.get(itemId);
-
-            if(value != null) {
-                return value;
-            }
+            return itemMap.getOrDefault(itemId, 0);
         }
 
         return 0;
@@ -184,13 +174,7 @@ public class MapClass {
         if(spawnMonster == null) {
             return 0;
         } else {
-            Double value = spawnMonster.get(monsterId);
-
-            if(value != null) {
-                return value;
-            } else {
-                return 0;
-            }
+            return spawnMonster.getOrDefault(monsterId, 0D);
         }
     }
 

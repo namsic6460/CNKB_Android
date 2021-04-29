@@ -80,13 +80,7 @@ public class Item extends NamedObject {
         if(buff == null) {
             return 0;
         } else {
-            Integer value = buff.get(statType);
-
-            if(value != null) {
-                return value;
-            } else {
-                return 0;
-            }
+            return buff.getOrDefault(statType, 0);
         }
     }
 

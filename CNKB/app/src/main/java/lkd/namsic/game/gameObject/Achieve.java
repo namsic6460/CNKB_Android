@@ -53,13 +53,7 @@ public class Achieve extends NamedObject {
 
     public int getRewardCloseRate(long npcId) {
         Config.checkId(Id.NPC, npcId);
-        Integer value = this.rewardCloseRate.get(npcId);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 0;
-        }
+        return this.rewardCloseRate.getOrDefault(npcId, 0);
     }
 
     public void addRewardCloseRate(long npcId, int closeRate) {
@@ -88,13 +82,7 @@ public class Achieve extends NamedObject {
 
     public int getRewardItem(long itemId) {
         Config.checkId(Id.ITEM, itemId);
-        Integer value = this.rewardItem.get(itemId);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 0;
-        }
+        return this.rewardItem.getOrDefault(itemId, 0);
     }
 
     public void addRewardItem(long npcId, int closeRate) {
@@ -122,13 +110,7 @@ public class Achieve extends NamedObject {
     }
 
     public int getRewardStat(StatType statType) {
-        Integer value = this.rewardStat.get(statType);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 0;
-        }
+        return this.rewardStat.getOrDefault(statType, 0);
     }
 
     public void addRewardStat(StatType rewardStat, int stat) {

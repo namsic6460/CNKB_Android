@@ -247,13 +247,7 @@ public class Equipment extends Item {
 
     public int getBasicStat(@NonNull StatType statType) {
         Config.checkStatType(statType);
-        Integer value = this.basicStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.basicStat.getOrDefault(statType, 0);
     }
 
     public Equipment addBasicStat(@NonNull StatType statType, int stat) {
@@ -274,13 +268,7 @@ public class Equipment extends Item {
 
     public int getReinforceStat(@NonNull StatType statType) {
         Config.checkStatType(statType);
-        Integer value = this.reinforceStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.reinforceStat.getOrDefault(statType, 0);
     }
 
     public Equipment addReinforceStat(@NonNull StatType statType, int stat) {

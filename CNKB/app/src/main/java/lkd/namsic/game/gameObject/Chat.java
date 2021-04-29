@@ -60,13 +60,7 @@ public class Chat extends GameObject {
     }
 
     public long getResponseChat(@NonNull WaitResponse waitResponse) {
-        Long value = this.responseChat.get(waitResponse);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.responseChat.getOrDefault(waitResponse, 0L);
     }
 
     public void setAnyResponseChat(@NonNull Map<String, Long> anyResponseChat) {
@@ -86,13 +80,7 @@ public class Chat extends GameObject {
     }
 
     public long getAnyResponseChat(@NonNull String response) {
-        Long value = this.anyResponseChat.get(response);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.anyResponseChat.getOrDefault(response, 0L);
     }
 
     public void setNeedStat(@NonNull Map<StatType, Integer> needStat) {
@@ -116,13 +104,7 @@ public class Chat extends GameObject {
     }
 
     public int getNeedStat(@NonNull StatType statType) {
-        Integer value = this.needStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.needStat.getOrDefault(statType, 0);
     }
 
     public void addNeedStat(@NonNull StatType statType, int stat) {
@@ -148,13 +130,7 @@ public class Chat extends GameObject {
     }
 
     public int getNeedItem(long itemId) {
-        Integer value = this.needItem.get(itemId);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.needItem.getOrDefault(itemId, 0);
     }
 
     public void addNeedItem(long itemId, int count) {
@@ -182,13 +158,7 @@ public class Chat extends GameObject {
     }
 
     public int getRewardStat(@NonNull StatType statType) {
-        Integer value = this.rewardStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.rewardStat.getOrDefault(statType, 0);
     }
 
     public void addRewardStat(@NonNull StatType statType, int stat) {
@@ -214,13 +184,7 @@ public class Chat extends GameObject {
     }
 
     public int getRewardItem(long itemId) {
-        Integer value = this.rewardItem.get(itemId);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.rewardItem.getOrDefault(itemId, 0);
     }
 
     public void addRewardItem(long itemId, int count) {

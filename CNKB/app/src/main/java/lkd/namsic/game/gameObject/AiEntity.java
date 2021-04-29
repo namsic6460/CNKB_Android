@@ -125,13 +125,7 @@ public class AiEntity extends Entity {
     }
 
     public double getDropPercent(EquipType equipType) {
-        Double value = this.dropPercent.get(equipType);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 1;
-        }
+        return this.dropPercent.getOrDefault(equipType, 1D);
     }
 
     public void addDropPercent(EquipType equipType, double percent) {
@@ -145,13 +139,7 @@ public class AiEntity extends Entity {
     }
 
     public int getIncreaseStat(StatType statType) {
-        Integer value = this.increaseStat.get(statType);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 0;
-        }
+        return this.increaseStat.getOrDefault(statType, 0);
     }
 
     public void addIncreaseStat(StatType statType, int stat) {
