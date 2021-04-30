@@ -76,6 +76,8 @@ public class Config {
     public static final int MAX_LV = 999;
     public static final int MIN_SP = 0;
     public static final int MAX_SP = 100;
+    public static final int MIN_MAGIC_LV = 1;
+    public static final int MAX_MAGIC_LV = 10;
     public static final long MIN_PAUSE_TIME = 1000;
     public static final long MAX_PAUSE_TIME = 5000;
 
@@ -120,6 +122,7 @@ public class Config {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static void loadPlayers() {
         File folder = new File(FileManager.DATA_PATH_MAP.get(Id.PLAYER));
         File[] players = folder.listFiles();
@@ -194,6 +197,7 @@ public class Config {
         return t;
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static void deleteAiEntity(AiEntity entity) {
         Id id = entity.getId().getId();
         long objectId = entity.getId().getObjectId();
@@ -284,7 +288,7 @@ public class Config {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
     @NonNull
     public static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
         if(id.equals(Id.PLAYER)) {

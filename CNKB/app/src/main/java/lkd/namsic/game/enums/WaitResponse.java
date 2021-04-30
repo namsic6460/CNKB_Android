@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.Getter;
+
 public enum WaitResponse {
 
     NONE(),
@@ -13,7 +15,8 @@ public enum WaitResponse {
     YES(Arrays.asList("네", "ㅇㅇ", "yes", "y")),
     NO(Arrays.asList("아니오", "아니요", "ㄴㄴ", "no", "n"));
 
-    private List<String> list;
+    @Getter
+    public List<String> list;
 
     WaitResponse() {}
 

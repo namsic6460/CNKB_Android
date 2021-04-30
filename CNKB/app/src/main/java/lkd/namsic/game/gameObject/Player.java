@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import lkd.namsic.game.Emoji;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitDouble;
 import lkd.namsic.game.base.LimitInteger;
@@ -34,6 +35,7 @@ import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.event.ItemUseEvent;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
+import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdDataException;
 import lkd.namsic.game.Variable;
 import lkd.namsic.service.KakaoTalk;
@@ -124,6 +126,143 @@ public class Player extends Entity {
     @Override
     public String getName() {
         return "[" + this.getCurrentTitle() + "] " + this.getNickName() + " (Lv." + this.getLv().get() + ")";
+    }
+
+    public void displayInfo() {
+        StringBuilder innerMsg = new StringBuilder();
+
+        if(!(responseChat.isEmpty() && anyResponseChat.isEmpty())) {
+            innerMsg.append(this.getDisplayResponse())
+                    .append("\n\n");
+        }
+
+        innerMsg.append(this.getDisplayStat())
+                .append("\n\n")
+                .append(this.getDisplayQuest())
+                .append("\n\n")
+                .append(this.getDisplayMagic())
+                .append("\n\n달성한 업적 개수: ")
+                .append(this.achieve.size())
+                .append("\n연구 완료 개수: ")
+                .append(this.research.size());
+
+        this.replyPlayer("===내 정보===\n" +
+                Emoji.GOLD + ": " + this.getMoney() + "G\n" +
+                Emoji.HEART + ": " + this.getDisplayHp() + "\n" +
+                Emoji.WORLD + ": " + Config.getMapData(this.location).getName() + "\n" +
+                Emoji.LV + ": " + this.lv.get() + "Lv (" + this.getExp().get() + "/" + this.getTotalNeedExp() + "\n" +
+                Emoji.SP + ": " + this.sp.get() + "\n" +
+                Emoji.ADV + ": " + this.adv.get() + "\n" +
+                Emoji.HOME + ": " + Config.getMapData(this.baseLocation).getName(),
+                innerMsg.toString());
+    }
+
+    public String getDisplayHp() {
+        int maxHp = this.getStat(StatType.MAXHP);
+        int hp = this.getStat(StatType.HP);
+
+        double percent = 10.0 * hp / maxHp;
+        double dec = percent % 1;
+        int filled = (int) percent;
+
+        StringBuilder output = new StringBuilder("[");
+
+        for(int i = 0; i < filled; i++) {
+            output.append(Emoji.FILLED_HEART);
+        }
+
+        output.append(Emoji.HALF_HEART[(int) Math.round(dec * 8)]);
+
+        for(int i = 9; i > filled; i--) {
+            output.append(" ");
+        }
+
+        if(hp % 10 == 0) {
+            output.append(" ");
+        }
+
+        return output + "] (" + hp + "/" + maxHp + ")";
+    }
+
+    public String getDisplayResponse() {
+        StringBuilder builder = new StringBuilder("---대기중인 대답---\n");
+
+        for(WaitResponse waitResponse : this.responseChat.keySet()) {
+            builder.append(waitResponse.toString())
+                    .append(": ")
+                    .append(waitResponse.getList());
+        }
+
+        if(!anyResponseChat.isEmpty()) {
+            builder.append("(다른 메세지 목록)");
+
+            for(String response : anyResponseChat.keySet()) {
+                builder.append("\n")
+                        .append(response);
+            }
+        }
+
+        return builder.toString();
+    }
+
+    public String getDisplayStat() {
+        StringBuilder builder = new StringBuilder("---스텟---");
+        for(StatType statType : StatType.values()) {
+            try {
+                Config.checkStatType(statType);
+            } catch (UnhandledEnumException e) {
+                continue;
+            }
+
+            builder.append("\n")
+                    .append(statType.toString())
+                    .append(": ")
+                    .append(this.getStat(statType));
+        }
+
+        return builder.toString();
+    }
+
+    public String getDisplayQuest() {
+        StringBuilder builder = new StringBuilder("---퀘스트 목록---");
+
+        if(this.quest.isEmpty()) {
+            return builder.toString() + "\n현재 진행중인 퀘스트 없음";
+        }
+
+        for(long questId : this.quest.keySet()) {
+            Quest quest = Config.getData(Id.QUEST, questId);
+
+            builder.append("\n[")
+                    .append(questId)
+                    .append("] ")
+                    .append(quest.getName());
+
+            Long npcId = quest.npcId.get();
+            if(!npcId.equals(0L)) {
+                Npc npc = Config.getData(Id.NPC, npcId);
+
+                builder.append(" (NPC: ")
+                        .append(npc.getName())
+                        .append(")");
+            }
+        }
+
+        return builder.toString();
+    }
+
+    public String getDisplayMagic() {
+        StringBuilder builder = new StringBuilder("---마법 정보---");
+
+        for(MagicType magicType : MagicType.values()) {
+            builder.append("\n")
+                    .append(this.getMagic(magicType))
+                    .append("Lv, 저항: ")
+                    .append(this.getResist(magicType))
+                    .append("Lv");
+        }
+
+        return builder.toString();
     }
 
     public void addTitle(String title) {
@@ -226,6 +365,7 @@ public class Player extends Entity {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public boolean useItem(long itemId, @NonNull List<GameObject> other) {
         Config.checkId(Id.ITEM, itemId);
 
@@ -310,7 +450,11 @@ public class Player extends Entity {
     }
 
     public long getRequiredExp() {
-        return this.getTotalNeedExp(this.lv.get()) - this.getExp().get();
+        return this.getTotalNeedExp() - this.getExp().get();
+    }
+
+    public long getTotalNeedExp() {
+        return this.getTotalNeedExp(this.lv.get());
     }
 
     public long getTotalNeedExp(int lv) {
@@ -334,7 +478,7 @@ public class Player extends Entity {
 
     public long getKillExp(int enemyLv) {
         int lv = this.lv.get();
-        long exp = 5000 + (long) ((this.getTotalNeedExp(enemyLv) * 0.00001) + (this.getTotalNeedExp(lv) * 0.00001));
+        long exp = 5000 + (long) ((this.getTotalNeedExp(enemyLv) * 0.00001) + (this.getTotalNeedExp() * 0.00001));
 
         int gap = lv - enemyLv;
         if(Math.abs(gap) > 10 && lv > 10) {
@@ -651,9 +795,10 @@ public class Player extends Entity {
         );
         List<Long> output = Arrays.asList(20L, 21L, 0L, 0L, 0L, 31L, 33L, 0L, 0L, 0L, 43L, 0L);
 
+        long itemId = 0;
         for(int i = 0; i < percents.size(); i++) {
             if(random < percents.get(i)) {
-                long itemId = output.get(i);
+                itemId = output.get(i);
 
                 if(itemId == 0) {
                     long[] itemList;
@@ -685,16 +830,20 @@ public class Player extends Entity {
                     int itemIdx = new Random().nextInt(itemList.length);
                     itemId = itemList[itemIdx];
                 }
-
-                int count = this.getItem(itemId);
-                this.addItem(itemId, 1);
-
-                Item item = Config.getData(Id.ITEM, itemId);
-                this.replyPlayer(item.getName() + "을 캤습니다!\n아이템 개수 : " + count + " -> " + (count + 1));
             } else {
                 random -= percents.get(i);
             }
         }
+
+        try {
+            Thread.sleep(new Random().nextInt(1000));
+        } catch (InterruptedException ignore) {}
+
+        int count = this.getItem(itemId);
+        this.addItem(itemId, 1);
+
+        Item item = Config.getData(Id.ITEM, itemId);
+        this.replyPlayer(item.getName() + "을 캤습니다!\n아이템 개수 : " + count + " -> " + (count + 1));
 
         if(this.checkMineLevel()) {
             this.replyPlayer("광업 레벨이 올랐습니다!\n광업 레벨 : " + mineLv + " -> " + (mineLv + 1));
@@ -806,19 +955,73 @@ public class Player extends Entity {
     }
 
     public int getClearedQuest(long questId) {
-        Integer value = this.clearedQuest.get(questId);
+        return this.clearedQuest.getOrDefault(questId, 0);
+    }
 
-        if(value != null) {
-            return value;
+    public void setResponseChat(@NonNull WaitResponse waitResponse, long questId) {
+        if(questId == 0) {
+            this.responseChat.remove(waitResponse);
         } else {
-            return 0;
+            Config.checkId(Id.QUEST, questId);
+            this.responseChat.put(waitResponse, questId);
         }
     }
 
-    public void setCloseRate(@NonNull Map<Long, Integer> closeRate) {
-        for(Map.Entry<Long, Integer> entry : closeRate.entrySet()) {
-            this.setCloseRate(entry.getKey(), entry.getValue());
+    public long getResponseChat(@NonNull WaitResponse waitResponse) {
+        return this.responseChat.getOrDefault(waitResponse, 0L);
+    }
+
+    public void setAnyResponseChat(@NonNull String response, long questId) {
+        if(questId == 0) {
+            this.anyResponseChat.remove(response);
+        } else {
+            Config.checkId(Id.QUEST, questId);
+            this.anyResponseChat.put(response, questId);
         }
+    }
+
+    public long getAnyResponseChat(@NonNull String response) {
+        return this.anyResponseChat.getOrDefault(response, 0L);
+    }
+
+    public void setMagic(@NonNull MagicType magicType, int lv) {
+        if(lv == 0) {
+            this.magic.remove(magicType);
+        } else {
+            if(lv < Config.MIN_MAGIC_LV || lv > Config.MAX_MAGIC_LV) {
+                throw new NumberRangeException(lv, Config.MIN_MAGIC_LV, Config.MAX_MAGIC_LV);
+            }
+
+            this.magic.put(magicType, lv);
+        }
+    }
+
+    public int getMagic(@NonNull MagicType magicType) {
+        return this.magic.getOrDefault(magicType, Config.MIN_MAGIC_LV);
+    }
+
+    public void addMagic(@NonNull MagicType magicType, int lv) {
+        this.setMagic(magicType, this.getMagic(magicType) + lv);
+    }
+
+    public void setResist(@NonNull MagicType magicType, int lv) {
+        if(lv == 0) {
+            this.resist.remove(magicType);
+        } else {
+            if(lv < Config.MIN_MAGIC_LV || lv > Config.MAX_MAGIC_LV) {
+                throw new NumberRangeException(lv, Config.MIN_MAGIC_LV, Config.MAX_MAGIC_LV);
+            }
+
+            this.resist.put(magicType, lv);
+        }
+    }
+
+    public int getResist(@NonNull MagicType magicType) {
+        return this.resist.getOrDefault(magicType, Config.MIN_MAGIC_LV);
+    }
+
+    public void addResist(@NonNull MagicType magicType, int lv) {
+        this.setResist(magicType, this.getResist(magicType) + lv);
     }
 
     public void setCloseRate(long npcId, int closeRate) {
@@ -835,13 +1038,7 @@ public class Player extends Entity {
     }
 
     public int getCloseRate(long npcId) {
-        Integer value = this.closeRate.get(npcId);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 0;
-        }
+        return this.closeRate.getOrDefault(npcId, 0);
     }
 
     public void addCloseRate(long npcId, int closeRate) {
@@ -863,13 +1060,7 @@ public class Player extends Entity {
     }
 
     public long getLog(@NonNull LogData logData) {
-        Long value = this.log.get(logData);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.log.getOrDefault(logData, 0L);
     }
 
     public void addLog(@NonNull LogData logData, long count) {

@@ -81,4 +81,7 @@ public class Location implements Serializable {
         return "x: " + x.get() + ", y: " + y.get() + ", fieldX: " + fieldX.get() + ", fieldY: " + fieldY.get();
     }
 
+    @NonNull
+    public String toMapString() { return x.get() + "-" + y.get(); }
+
 }
