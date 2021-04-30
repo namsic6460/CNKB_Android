@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
@@ -355,7 +356,10 @@ public class Config {
             }
 
             MapClass map = fromJson(jsonString, MapClass.class);
-            map.spawnMonster();
+
+            if(!(map.getMapType().equals(MapType.COUNTRY) || map.getMapType().equals(MapType.UNDERGROUND_CITY))) {
+                map.spawnMonster();
+            }
 
             MAP.put(fileName, map);
             PLAYER_COUNT.put(fileName, 1L);

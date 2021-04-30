@@ -11,5 +11,7 @@ public class Emoji {
     public final static String SP = "\uD83C\uDF59";
     public final static String ADV = "\uD83D\uDDFA";
     public final static String HOME = "\uD83C\uDFE0";
+    public final static String MONSTER = "\uD83D\uDC3E";
+    public final static String BOSS = "❗";
 
 }

@@ -3,12 +3,14 @@ package lkd.namsic.game.gameObject;
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lkd.namsic.game.Emoji;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.Location;
@@ -51,6 +53,40 @@ public class MapClass {
 
     public MapClass(@NonNull String name) {
         this.name = name;
+    }
+
+    @NonNull
+    public String getInfo() {
+        return this.name + "(요구 레벨: " + requireLv.get() + ") [" + this.mapType.toString() + "]\n" +
+                Emoji.WORLD + ": " + this.location.toMapString() + "\n" +
+                Emoji.MONSTER + ": " + this.getEntity(Id.MONSTER).size() + ", " +
+                Emoji.BOSS + ": " + this.getEntity(Id.BOSS).size() + "\n";
+    }
+
+    @NonNull String getInnerInfo() {
+        Set<Location> locationSet = new HashSet<>();
+        locationSet.addAll(this.money.keySet());
+        locationSet.addAll(this.item.keySet());
+        locationSet.addAll(this.equip.keySet());
+
+        Id id;
+        Entity entity;
+        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : this.entity.entrySet()) {
+            id = entry.getKey();
+
+            for(long entityId : entry.getValue()) {
+                entity = Config.getData(id, entityId);
+                locationSet.add(entity.getLocation());
+            }
+        }
+
+        StringBuilder builder = new StringBuilder("---무언가 감지된 좌표---");
+        for(Location location : locationSet) {
+            builder.append("\n")
+                    .append(location.toFieldString());
+        }
+
+        return builder.toString();
     }
 
     public void setMoney(Location location, long money) {

@@ -149,7 +149,7 @@ public class Player extends Entity {
         this.replyPlayer("===내 정보===\n" +
                 Emoji.GOLD + ": " + this.getMoney() + "G\n" +
                 Emoji.HEART + ": " + this.getDisplayHp() + "\n" +
-                Emoji.WORLD + ": " + Config.getMapData(this.location).getName() + "\n" +
+                Emoji.WORLD + ": " + Config.getMapData(this.location).getName() + "(" + this.location.toCoordString() + ")\n" +
                 Emoji.LV + ": " + this.lv.get() + "Lv (" + this.getExp().get() + "/" + this.getTotalNeedExp() + "\n" +
                 Emoji.SP + ": " + this.sp.get() + "\n" +
                 Emoji.ADV + ": " + this.adv.get() + "\n" +
