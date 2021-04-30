@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.Config;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.gameObject.MapClass;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.MainActivity;
 import lkd.namsic.setting.Logger;
@@ -105,7 +106,7 @@ public class KakaoTalk {
 
         if(innerMsg != null) {
             StringBuilder builder = new StringBuilder(msg);
-            builder.append("\n(자세한 내용은 전체보기 확인)\n");
+            builder.append("\n");
 
             for(int i = 0; i < 500; i++) {
                 builder.append('\u200b');
@@ -158,6 +159,17 @@ public class KakaoTalk {
             if (Arrays.asList("회원가입", "가입", "register").contains(commands[0])) {
                 reply(session, "이미 회원가입이 되어 있습니다.\n" +
                         "회원가입을 진행한 적이 없는 경우, 프로필 이미지 또는 카카오톡 이름을 변경한 후 다시 시도해주세요");
+            } else if(Arrays.asList("정보", "info", "i").contains(commands[0])) {
+                player.displayInfo();
+            } else if(Arrays.asList("맵", "map").contains(commands[0])) {
+                MapClass map = Config.getMapData(player.getLocation());
+                player.replyPlayer(map.getInfo());
+            } else if(Arrays.asList("광질", "mine").contains(commands[0])) {
+                if(player.canMine()) {
+                    player.mine();
+                } else {
+                    player.replyPlayer("광질이 불가능한 상태입니다");
+                }
             }
         } catch (WeirdCommandException e) {
             reply(session, Objects.requireNonNull(e.getMessage()));
@@ -212,7 +224,8 @@ public class KakaoTalk {
                             "*[개발자/dev] : 개발자 정보를 표시합니다\n" +
                             "\n---유저 명령어---\n" +
                             "(정보/info/i) : 내 정보를 표시합니다\n" +
-                            "(맵/map) : 현재 위치 정보를 표시합니다\n");
+                            "(맵/map) : 현재 위치 정보를 표시합니다\n" +
+                            "(광질/mine) : 광질을 합니다(마을에서만 가능)");
         } else if(Arrays.asList("개발자", "dev").contains(command)) {
             reply(session, "---개발자 정보---\n닉네임 : 남식(namsic)",
                     "메일 : namsic6460@gmail.com\n" +
