@@ -1,5 +1,7 @@
 package lkd.namsic.game.base;
 
+import androidx.annotation.Nullable;
+
 import java.io.Serializable;
 
 import lombok.Getter;
@@ -35,4 +37,18 @@ public class RangeInteger implements Serializable {
         this.max += maxValue;
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(obj instanceof RangeInteger) {
+            RangeInteger o = (RangeInteger) obj;
+            return this.min == o.min && this.max == o.max;
+        } else {
+            return false;
+        }
+    }
 }
