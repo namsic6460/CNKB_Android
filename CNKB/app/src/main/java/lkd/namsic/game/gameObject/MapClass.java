@@ -53,6 +53,11 @@ public class MapClass {
 
     public MapClass(@NonNull String name) {
         this.name = name;
+
+        this.entity.put(Id.PLAYER, new ConcurrentHashSet<>());
+        this.entity.put(Id.MONSTER, new ConcurrentHashSet<>());
+        this.entity.put(Id.BOSS, new ConcurrentHashSet<>());
+        this.entity.put(Id.NPC, new ConcurrentHashSet<>());
     }
 
     @NonNull
@@ -60,10 +65,11 @@ public class MapClass {
         return this.name + "(요구 레벨: " + requireLv.get() + ") [" + this.mapType.toString() + "]\n" +
                 Emoji.WORLD + ": " + this.location.toMapString() + "\n" +
                 Emoji.MONSTER + ": " + this.getEntity(Id.MONSTER).size() + ", " +
-                Emoji.BOSS + ": " + this.getEntity(Id.BOSS).size() + "\n";
+                Emoji.BOSS + ": " + this.getEntity(Id.BOSS).size();
     }
 
-    @NonNull String getInnerInfo() {
+    @NonNull
+    public String getInnerInfo() {
         Set<Location> locationSet = new HashSet<>();
         locationSet.addAll(this.money.keySet());
         locationSet.addAll(this.item.keySet());
@@ -81,6 +87,11 @@ public class MapClass {
         }
 
         StringBuilder builder = new StringBuilder("---무언가 감지된 좌표---");
+
+        if(locationSet.isEmpty()) {
+            return builder.toString() + "\n감지된 물체 없음";
+        }
+
         for(Location location : locationSet) {
             builder.append("\n")
                     .append(location.toFieldString());

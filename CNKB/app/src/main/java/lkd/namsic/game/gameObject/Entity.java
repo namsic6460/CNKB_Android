@@ -171,6 +171,10 @@ public abstract class Entity extends NamedObject {
         return this.setMap(new Location(x, y, fieldX, fieldY), distance, false);
     }
 
+    public boolean setMap(Location location) {
+        return this.setMap(location, false);
+    }
+
     public boolean setMap(Location location, boolean isToBase) {
         int distance = Math.abs(this.location.getX().get() - location.getX().get())
                 + Math.abs(this.location.getY().get() - location.getY().get());
@@ -334,12 +338,14 @@ public abstract class Entity extends NamedObject {
 
             if(maxHp < value) {
                 this.setBasicStat(StatType.HP, maxHp);
+                value = maxHp;
             }
         } else if(statType.equals(StatType.MN)) {
             int maxMn = this.getStat(StatType.MAXMN);
 
             if(maxMn < value) {
                 this.setBasicStat(StatType.MN, maxMn);
+                value = maxMn;
             }
         }
 

@@ -119,6 +119,13 @@ public class Player extends Entity {
         
         this.addTitle("초심자");
         this.setCurrentTitle("초심자");
+
+        this.setBasicStat(StatType.MAXHP, 100);
+        this.setBasicStat(StatType.HP, 100);
+        this.setBasicStat(StatType.MAXMN, 10);
+        this.setBasicStat(StatType.MN, 10);
+
+        this.setMap(this.getLocation());
     }
 
     //[테스트 칭호] 남식(Lv.123)
@@ -149,8 +156,9 @@ public class Player extends Entity {
         this.replyPlayer("===내 정보===\n" +
                 Emoji.GOLD + ": " + this.getMoney() + "G\n" +
                 Emoji.HEART + ": " + this.getDisplayHp() + "\n" +
+                Emoji.MANA + ": " + this.getStat(StatType.MN) + "/" + this.getStat(StatType.MAXMN) + "\n" +
                 Emoji.WORLD + ": " + Config.getMapData(this.location).getName() + "(" + this.location.toCoordString() + ")\n" +
-                Emoji.LV + ": " + this.lv.get() + "Lv (" + this.getExp().get() + "/" + this.getTotalNeedExp() + "\n" +
+                Emoji.LV + ": " + this.lv.get() + "Lv (" + this.getExp().get() + "/" + this.getTotalNeedExp() + ")\n" +
                 Emoji.SP + ": " + this.sp.get() + "\n" +
                 Emoji.ADV + ": " + this.adv.get() + "\n" +
                 Emoji.HOME + ": " + Config.getMapData(this.baseLocation).getName(),
@@ -174,12 +182,12 @@ public class Player extends Entity {
         output.append(Emoji.HALF_HEART[(int) Math.round(dec * 8)]);
 
         for(int i = 9; i > filled; i--) {
-            output.append(" ");
+            output.append("  ");
         }
 
-        if(hp % 10 == 0) {
-            output.append(" ");
-        }
+//        if(hp % 10 == 0) {
+//            output.append(" ");
+//        }
 
         return output + "] (" + hp + "/" + maxHp + ")";
     }
@@ -208,12 +216,6 @@ public class Player extends Entity {
     public String getDisplayStat() {
         StringBuilder builder = new StringBuilder("---스텟---");
         for(StatType statType : StatType.values()) {
-            try {
-                Config.checkStatType(statType);
-            } catch (UnhandledEnumException e) {
-                continue;
-            }
-
             builder.append("\n")
                     .append(statType.toString())
                     .append(": ")
@@ -256,6 +258,8 @@ public class Player extends Entity {
 
         for(MagicType magicType : MagicType.values()) {
             builder.append("\n")
+                    .append(magicType.toString())
+                    .append(": ")
                     .append(this.getMagic(magicType))
                     .append("Lv, 저항: ")
                     .append(this.getResist(magicType))
@@ -356,7 +360,19 @@ public class Player extends Entity {
         return builder.toString();
     }
 
+    public void checkDoing() {
+        if(!this.doing.equals(Doing.NONE)) {
+            throw new UnhandledEnumException(doing);
+        }
+    }
+
     public boolean canUse(long itemId) {
+        try {
+            checkDoing();
+        } catch (UnhandledEnumException e) {
+            return false;
+        }
+
         if(this.getItem(itemId) > 0) {
             Item item = Config.getData(Id.ITEM, itemId);
             return item.getUse() != null;
@@ -383,6 +399,12 @@ public class Player extends Entity {
     }
 
     public boolean canEat(long itemId) {
+        try {
+            checkDoing();
+        } catch (UnhandledEnumException e) {
+            return false;
+        }
+
         if(this.getItem(itemId) > 0) {
             Item item = Config.getData(Id.ITEM, itemId);
             return item.isFood();
@@ -508,39 +530,48 @@ public class Player extends Entity {
 
         long needMoney = chat.getNeedMoney().get();
         if(needMoney != 0 && this.getMoney() < needMoney) {
-            failMsg += "보유 골드가 부족합니다(부족한 금액 : " + (needMoney - this.getMoney()) + "G)\n";
+            failMsg += "보유 골드가 부족합니다(부족한 금액 : " + (needMoney - this.getMoney()) + "G)\n\n";
         }
 
         long questId = chat.getQuestId().get();
         if (!this.canAddQuest(questId)) {
-            failMsg += "퀘스트 수령이 불가능합니다(상세 내용은 퀘스트 검색(아이디 : " + questId + ")\n";
+            failMsg += "퀘스트 수령이 불가능합니다(상세 내용은 퀘스트 검색(아이디 : " + questId + ")\n\n";
         }
 
         int diff;
-        int missingCount = 0;
+        Map<String, Integer> missingItem = new HashMap<>();
+
         for (Map.Entry<Long, Integer> entry : chat.getNeedItem().entrySet()) {
-            diff = entry.getValue() - this.getItem(entry.getKey());
+            long key = entry.getKey();
+            int value = entry.getValue();
+
+            diff = value - this.getItem(key);
 
             if (diff > 0) {
-                missingCount += diff;
+                Item item = Config.getData(Id.ITEM, key);
+                missingItem.put(item.getName(), diff);
             }
         }
 
-        if (missingCount != 0) {
-            failMsg += "보유 아이템이 부족합니다(총 부족한 아이템 개수 : " + missingCount + ")\n";
+        if (!missingItem.isEmpty()) {
+            failMsg += "보유 아이템이 부족합니다\n---부족한 아이템 목록---\n" + Config.mapToDisplayString(missingItem) + "\n";
         }
 
-        missingCount = 0;
+        Map<String, Integer> missingStat = new ConcurrentHashMap<>();
+
         for(Map.Entry<StatType, Integer> entry : chat.getNeedStat().entrySet()) {
+            StatType key = entry.getKey();
+            int value = entry.getValue();
+
             diff = entry.getValue() - this.getStat(entry.getKey());
 
             if(diff > 0) {
-                missingCount += diff;
+                missingStat.put(key.toString(), value);
             }
         }
 
-        if(missingCount != 0) {
-            failMsg += "스텟이 부족합니다(총 부족한 스텟 : " + missingCount + ")";
+        if(!missingStat.isEmpty()) {
+            failMsg += "스텟이 부족합니다\n---부족한 스텟 목록---\n : " + Config.mapToDisplayString(missingStat);
         }
 
         if(failMsg.equals("")) {
@@ -553,80 +584,70 @@ public class Player extends Entity {
     public void startChat(long chatId) {
         Config.checkId(Id.CHAT, chatId);
 
-        Chat chat = null;
-        try {
-            chat = Config.loadObject(Id.CHAT, chatId);
+        Chat chat = Config.getData(Id.CHAT, chatId);
+        Notification.Action session = getSession();
 
-            Notification.Action session = getSession();
-            String failMsg = canStartChat(chat);
+        this.addMoney(-1 * chat.getNeedMoney().get());
 
-            if(failMsg == null) {
-                this.addMoney(-1 * chat.getNeedMoney().get());
+        for(Map.Entry<Long, Integer> entry : chat.getNeedItem().entrySet()) {
+            this.addItem(entry.getKey(), -1 * entry.getValue());
+        }
 
-                for(Map.Entry<Long, Integer> entry : chat.getNeedItem().entrySet()) {
-                    this.addItem(entry.getKey(), -1 * entry.getValue());
+        for(Map.Entry<StatType, Integer> entry : chat.getNeedStat().entrySet()) {
+            this.addBasicStat(entry.getKey(), -1 * entry.getValue());
+        }
+
+        this.setDoing(Doing.CHAT);
+
+        AtomicReference<String> exception = new AtomicReference<>(null);
+        final Chat finalChat = chat;
+        Thread thread = new Thread(() -> {
+            this.addMoney(finalChat.getRewardMoney().get());
+
+            for(Map.Entry<Long, Integer> entry : finalChat.getNeedItem().entrySet()) {
+                this.addItem(entry.getKey(), entry.getValue());
+            }
+
+            for(Map.Entry<StatType, Integer> entry : finalChat.getNeedStat().entrySet()) {
+                this.addBasicStat(entry.getKey(), entry.getValue());
+            }
+
+            long pauseTime = finalChat.getPauseTime().get();
+            for(String text : finalChat.getText()) {
+                KakaoTalk.reply(session, text);
+
+                try {
+                    Thread.sleep(pauseTime);
+                } catch (InterruptedException e) {
+                    Log.e("Player.startChat - chat Thread", Config.errorString(e));
+                    exception.set(e.getMessage());
+                    break;
                 }
+            }
 
-                for(Map.Entry<StatType, Integer> entry : chat.getNeedStat().entrySet()) {
-                    this.addBasicStat(entry.getKey(), -1 * entry.getValue());
-                }
+            this.addQuest(finalChat.getQuestId().get());
+            this.setMap(finalChat.getTpLocation(), false);
+
+            if(finalChat.getResponseChat().isEmpty() && finalChat.getAnyResponseChat().isEmpty()) {
+                this.setDoing(Doing.NONE);
             } else {
-                this.replyPlayer(failMsg);
-                return;
+                this.setDoing(Doing.WAIT_RESPONSE);
+
+                this.responseChat = new ConcurrentHashMap<>(finalChat.getResponseChat());
+                this.anyResponseChat = new ConcurrentHashMap<>(finalChat.getAnyResponseChat());
             }
+        });
 
-            this.setDoing(Doing.CHAT);
+        this.addLog(LogData.CHAT, 1);
+        thread.start();
 
-            AtomicReference<String> exception = new AtomicReference<>(null);
-            final Chat finalChat = chat;
-            Thread thread = new Thread(() -> {
-                this.addMoney(finalChat.getRewardMoney().get());
+        try {
+            thread.join();
+        } catch (InterruptedException ignore) {}
 
-                for(Map.Entry<Long, Integer> entry : finalChat.getNeedItem().entrySet()) {
-                    this.addItem(entry.getKey(), entry.getValue());
-                }
-
-                for(Map.Entry<StatType, Integer> entry : finalChat.getNeedStat().entrySet()) {
-                    this.addBasicStat(entry.getKey(), entry.getValue());
-                }
-
-                long pauseTime = finalChat.getPauseTime().get();
-                for(String text : finalChat.getText()) {
-                    KakaoTalk.reply(session, text);
-
-                    try {
-                        Thread.sleep(pauseTime);
-                    } catch (InterruptedException e) {
-                        Log.e("Player.startChat - chat Thread", Config.errorString(e));
-                        exception.set(e.getMessage());
-                        break;
-                    }
-                }
-
-                this.addQuest(finalChat.getQuestId().get());
-                this.setMap(finalChat.getTpLocation(), false);
-
-                if(finalChat.getResponseChat().isEmpty() && finalChat.getAnyResponseChat().isEmpty()) {
-                    this.setDoing(Doing.NONE);
-                } else {
-                    this.setDoing(Doing.WAIT_RESPONSE);
-
-                    this.responseChat = new ConcurrentHashMap<>(finalChat.getResponseChat());
-                    this.anyResponseChat = new ConcurrentHashMap<>(finalChat.getAnyResponseChat());
-                }
-            });
-
-            thread.start();
-            this.addLog(LogData.CHAT, 1);
-
-            String exceptionMsg = exception.get();
-            if(exceptionMsg != null) {
-                throw new RuntimeException(exceptionMsg);
-            }
-        } finally {
-            if(chat != null) {
-                Config.unloadObject(chat);
-            }
+        String exceptionMsg = exception.get();
+        if(exceptionMsg != null) {
+            throw new RuntimeException(exceptionMsg);
         }
     }
 
@@ -770,15 +791,22 @@ public class Player extends Entity {
     }
 
     public boolean canMine() {
-       return Config.getMapData(this.location).getMapType().equals(MapType.COUNTRY);
+        try {
+            checkDoing();
+        } catch (UnhandledEnumException e) {
+            return false;
+        }
+
+        return Config.getMapData(this.location).getMapType().equals(MapType.COUNTRY);
     }
 
     public void mine() {
+        this.setDoing(Doing.MINE);
         this.addLog(LogData.MINED, 1);
 
         int mineLv = this.getVariable(Variable.MINE);
 
-        double random = Math.random();
+        double random = Math.random() * 100;
         List<Double> percents = Arrays.asList(
                 Arrays.asList(50D, 45D, 40D, 35D, 30D, 30D, 30D, 25D, 20D).get(mineLv),
                 Arrays.asList(35D, 35D, 20D, 10D, 0D, 0D, 0D, 0D, 0D).get(mineLv),
@@ -795,9 +823,12 @@ public class Player extends Entity {
         );
         List<Long> output = Arrays.asList(20L, 21L, 0L, 0L, 0L, 31L, 33L, 0L, 0L, 0L, 43L, 0L);
 
+//        Log.i("namsic!", mineLv + " " + random);
+
         long itemId = 0;
         for(int i = 0; i < percents.size(); i++) {
             if(random < percents.get(i)) {
+                Log.i("namsic!", "i: " + i);
                 itemId = output.get(i);
 
                 if(itemId == 0) {
@@ -830,6 +861,8 @@ public class Player extends Entity {
                     int itemIdx = new Random().nextInt(itemList.length);
                     itemId = itemList[itemIdx];
                 }
+
+                break;
             } else {
                 random -= percents.get(i);
             }
@@ -846,8 +879,11 @@ public class Player extends Entity {
         this.replyPlayer(item.getName() + "을 캤습니다!\n아이템 개수 : " + count + " -> " + (count + 1));
 
         if(this.checkMineLevel()) {
+            this.addVariable(Variable.MINE, 1);
             this.replyPlayer("광업 레벨이 올랐습니다!\n광업 레벨 : " + mineLv + " -> " + (mineLv + 1));
         }
+
+        this.setDoing(Doing.NONE);
     }
 
     public boolean checkMineLevel() {
@@ -1069,6 +1105,12 @@ public class Player extends Entity {
     }
 
     public boolean canEquip(long equipId) {
+        try {
+            checkDoing();
+        } catch (UnhandledEnumException e) {
+            return false;
+        }
+
         Equipment equipment = null;
         boolean flag;
 
@@ -1086,6 +1128,12 @@ public class Player extends Entity {
     }
 
     public boolean canReinforce(long equipId, Map<StatType, Integer> increaseLimitStat) {
+        try {
+            checkDoing();
+        } catch (UnhandledEnumException e) {
+            return false;
+        }
+
         if(this.getEquipInventory().contains(equipId)) {
             Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
 

@@ -4,6 +4,7 @@ public class Emoji {
 
     public final static String GOLD = "\uD83D\uDCB0";
     public final static String HEART = "♥";
+    public final static String MANA = "\uD83D\uDCA7";
     public final static String FILLED_HEART = "█";
     public final static String[] HALF_HEART = {"", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"};
     public final static String WORLD = "🌏";
