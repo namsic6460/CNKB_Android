@@ -83,6 +83,7 @@ public class KakaoTalkListener extends NotificationListenerService {
                             image = image + "+" + image.hashCode() + "+" + imageLength;
                         }
 
+                        this.cancelNotification(sbn.getKey());
                         KakaoTalk.onChat(sender, image, msg.trim(), room, isGroupChat, action);
                     }
                 }
@@ -91,5 +92,6 @@ public class KakaoTalkListener extends NotificationListenerService {
             }
         }
     }
+
 
 }

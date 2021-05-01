@@ -55,6 +55,7 @@ public class Config {
     public static final Map<String, Long> PLAYER_COUNT = new ConcurrentHashMap<>();
 
     public static final Set<String> NICKNAME_LIST = new ConcurrentHashSet<>();
+    public static final Map<Long, Map<String, String>> PLAYER_LIST = new ConcurrentHashMap<>();
 
     public static final double MONEY_BOOST = 1;
     public static final double EXP_BOOST = 1;
@@ -129,12 +130,15 @@ public class Config {
         File[] players = folder.listFiles();
 
         String json;
-        Player player;
         for(File playerFile : players) {
             try {
                 json = FileManager.read(playerFile);
-                player = fromJson(json, Player.class);
+                Player player = fromJson(json, Player.class);
                 NICKNAME_LIST.add(player.getNickName());
+                PLAYER_LIST.put(player.getId().getObjectId(), new HashMap<String, String>() {{
+                    put("sender", player.getSender());
+                    put("image", player.getImage());
+                }});
             } catch (Exception e) {
                 Logger.e("Config.init", e);
             }
@@ -213,8 +217,17 @@ public class Config {
     }
 
     public static void checkId(@NonNull Id id, long objectId) throws NumberRangeException {
-        if(objectId < 1 || ID_COUNT.get(id) < objectId) {
-            throw new NumberRangeException(objectId, 1L, ID_COUNT.get(id));
+        String path;
+
+        if(id.equals(Id.PLAYER)) {
+            throw new UnhandledEnumException(id);
+        } else {
+            path = Config.getPath(id, objectId);
+        }
+
+        File file = new File(path);
+        if(!file.exists()) {
+            throw new ObjectNotFoundException(id, objectId);
         }
     }
 
@@ -235,7 +248,7 @@ public class Config {
         return (T) new Gson().fromJson(jsonString, c);
     }
 
-    public static void unloadObject(@NonNull GameObject gameObject) {
+    public synchronized static void unloadObject(@NonNull GameObject gameObject) {
         Id id = gameObject.getId().getId();
         long objectId = gameObject.getId().getObjectId();
 
@@ -269,7 +282,7 @@ public class Config {
         }
     }
 
-    public static void unloadMap(@NonNull MapClass map) {
+    public synchronized static void unloadMap(@NonNull MapClass map) {
         String fileName = getMapFileName(map);
         Long playerCount = PLAYER_COUNT.get(fileName);
         playerCount = playerCount == null ? 0 : playerCount;
@@ -291,9 +304,10 @@ public class Config {
 
     @SuppressWarnings({"unchecked", "ConstantConditions"})
     @NonNull
-    public static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
+    public synchronized static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
         if(id.equals(Id.PLAYER)) {
-            throw new UnhandledEnumException(id);
+            Map<String, String> playerData = PLAYER_LIST.get(objectId);
+            return (T) loadPlayer(playerData.get("sender"), playerData.get("image"));
         }
 
         checkId(id, objectId);
@@ -320,7 +334,7 @@ public class Config {
     }
 
     @Nullable
-    public static Player loadPlayer(@NonNull String sender, @NonNull String image) {
+    public synchronized static Player loadPlayer(@NonNull String sender, @NonNull String image) {
         String path = getPlayerPath(sender, image);
         String jsonString = FileManager.read(path);
 
@@ -336,6 +350,7 @@ public class Config {
             OBJECT.get(Id.PLAYER).put(objectId, player);
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, 1L);
         } else {
+            player = (Player) OBJECT.get(Id.PLAYER).get(objectId);
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, objectCount + 1);
         }
 
@@ -343,7 +358,7 @@ public class Config {
     }
 
     @NonNull
-    public static MapClass loadMap(int x, int y) {
+    public synchronized static MapClass loadMap(int x, int y) {
         String fileName = getMapFileName(x, y);
         Long playerCount = PLAYER_COUNT.get(fileName);
 
@@ -371,24 +386,24 @@ public class Config {
     }
 
     @NonNull
-    public static MapClass loadMap(Location location) {
+    public synchronized static MapClass loadMap(Location location) {
         return loadMap(location.getX().get(), location.getY().get());
     }
 
     @NonNull
-    public static <T extends GameObject> T getData(@NonNull Id id, long objectId) {
+    public synchronized static <T extends GameObject> T getData(@NonNull Id id, long objectId) {
         T t = loadObject(id, objectId);
         unloadObject(t);
 
         return t;
     }
 
-    public static MapClass getMapData(Location location) {
+    public synchronized static MapClass getMapData(Location location) {
         return getMapData(location.getX().get(), location.getY().get());
     }
 
     @NonNull
-    public static MapClass getMapData(int x, int y) {
+    public synchronized static MapClass getMapData(int x, int y) {
         MapClass map = loadMap(x, y);
         unloadMap(map);
 
@@ -402,6 +417,20 @@ public class Config {
         } else {
             return new HashMap<>(map).toString();
         }
+    }
+
+    @NonNull
+    public static String mapToDisplayString(@NonNull Map<?, ?> map) {
+        StringBuilder builder = new StringBuilder();
+
+        for(Map.Entry<?, ?> entry : map.entrySet()) {
+            builder.append(entry.getKey())
+                    .append(" - ")
+                    .append(entry.getValue())
+                    .append("\n");
+        }
+
+        return builder.toString();
     }
 
     public static <T> boolean compareMap(@NonNull Map<T, Integer> map1, @NonNull Map<T, Integer> map2, boolean firstIsBig) {

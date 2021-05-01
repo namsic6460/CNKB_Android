@@ -30,7 +30,7 @@ import lkd.namsic.service.ForcedTerminationService;
 public class MainActivity extends AppCompatActivity {
 
     public static final List<Thread> threads = new ArrayList<>();
-    public static final Timer threadCleaner = new Timer();
+    public static Timer threadCleaner;
 
     @SuppressLint("StaticFieldLeak")
     public static MainActivity mainActivity;
@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         FileManager.initDir();
         Config.loadPlayers();
 
+        threadCleaner = new Timer();
         threadCleaner.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {

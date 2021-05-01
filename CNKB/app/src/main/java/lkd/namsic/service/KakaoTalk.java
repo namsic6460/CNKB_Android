@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.app.RemoteInput;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,9 +30,6 @@ public class KakaoTalk {
     private static String lastMsg = "";
 
     public static Notification.Action getGroupSession(String room) {
-        Log.i("namsic!", room);
-        Log.i("namsic!", groupSessions.toString());
-        Log.i("namsic!", soloSessions.toString());
         return Objects.requireNonNull(groupSessions.get(room));
     }
 
@@ -84,6 +80,8 @@ public class KakaoTalk {
                 }
             } catch (Exception e) {
                 Logger.e("onChat", e);
+
+                //추후 봇 전용 휴대폰으로 돌릴 시, 에러 발생을 replyAll 으로 알려야한다.
             } finally {
                 if(player != null) {
                     Config.unloadObject(player);
@@ -136,6 +134,7 @@ public class KakaoTalk {
         }
     }
 
+    @Deprecated
     private void replyAll(@NonNull String msg) {
         replyGroup(msg);
 
@@ -163,7 +162,7 @@ public class KakaoTalk {
                 player.displayInfo();
             } else if(Arrays.asList("맵", "map").contains(commands[0])) {
                 MapClass map = Config.getMapData(player.getLocation());
-                player.replyPlayer(map.getInfo());
+                player.replyPlayer(map.getInfo(), map.getInnerInfo());
             } else if(Arrays.asList("광질", "mine").contains(commands[0])) {
                 if(player.canMine()) {
                     player.mine();
