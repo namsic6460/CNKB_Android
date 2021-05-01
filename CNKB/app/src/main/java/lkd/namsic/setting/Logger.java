@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import lkd.namsic.game.Config;
 import lkd.namsic.MainActivity;
@@ -12,9 +13,8 @@ public class Logger {
 
     private Logger() {}
 
-    public static Integer lastLogDay = null;
-
-    private static final int SAVE_COUNT = 100;
+    private static final int SAVE_COUNT = 1000;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS", Locale.KOREA);
     static volatile int logCount = 0;
     static volatile String logs = "";
 
@@ -34,17 +34,12 @@ public class Logger {
         Log.e(title, errorString);
 
         MainActivity.toast("ERROR!\n" + e.getMessage());
+        FileManager.save("ERROR_" + getTimeFileName(), errorString);
     }
 
     private static synchronized void log(String title, String text, String prefix) {
         LocalDateTime time = LocalDateTime.now();
-        if(lastLogDay != null) {
-            if(lastLogDay != time.getDayOfMonth()) {
-                saveLog(time.plusDays(lastLogDay - time.getDayOfMonth()));
-            }
-        }
-
-        String timeText = "\n[" + time.format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS")) + "]\n";
+        String timeText = "\n[" + time.format(formatter) + "]\n";
 
         final String logText = timeText + "[" + prefix + "] : " + title + " - " + text + "\n";
         logs += logText;
@@ -52,23 +47,30 @@ public class Logger {
         MainActivity.mainActivity.runOnUiThread(() -> MainActivity.textView.append(logText));
 
         logCount++;
-        lastLogDay = time.getDayOfMonth();
 
         if(logCount == SAVE_COUNT) {
             saveLog(time);
         }
     }
 
-    public static synchronized void saveLog(LocalDateTime date) {
-        if(!logs.equals("")) {
-            String fileName = FileManager.LOG_PATH + "/Log - " + date.format(DateTimeFormatter.BASIC_ISO_DATE) + ".txt";
-            FileManager.append(fileName, logs);
+    public static void saveLog(LocalDateTime date) {
+        Thread thread = new Thread(() -> {
+            if (!logs.equals("")) {
+                String fileName = FileManager.LOG_PATH + "/Log - " + getTimeFileName();
+                FileManager.save(fileName, logs);
 
-            MainActivity.toast("로그 저장 완료 - " + fileName);
-        }
+                MainActivity.toast("로그 저장 완료 - " + fileName);
+            }
 
-        logCount = 0;
-        logs = "";
+            logCount = 0;
+            logs = "";
+        });
+
+        MainActivity.startThread(thread);
+    }
+
+    private static String getTimeFileName() {
+        return LocalDateTime.now().format(formatter) + ".txt";
     }
 
 }
