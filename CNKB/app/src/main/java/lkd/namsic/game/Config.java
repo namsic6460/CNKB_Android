@@ -439,9 +439,14 @@ public class Config {
 
     public static <T> boolean compareMap(@NonNull Map<T, Integer> map1, @NonNull Map<T, Integer> map2,
                                          boolean firstIsBig, boolean regardZero) {
+        if(!firstIsBig) {
+            return compareMap(map2, map1, true, regardZero);
+        }
+
         Integer value;
-        for(Map.Entry<T, Integer> entry : map1.entrySet()) {
-            value = map2.get(entry.getKey());
+        boolean flag;
+        for(Map.Entry<T, Integer> entry : map2.entrySet()) {
+            value = map1.get(entry.getKey());
             if(value == null) {
                 if(regardZero) {
                     value = 0;
@@ -450,11 +455,8 @@ public class Config {
                 }
             }
 
-            if(firstIsBig) {
-                if(entry.getValue() < value) {
-                    return false;
-                }
-            } else if(entry.getValue() > value) {
+            flag = value >= entry.getValue();
+            if(!flag) {
                 return false;
             }
         }

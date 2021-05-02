@@ -152,34 +152,46 @@ public class KakaoTalk {
         player.setRecentRoom(room);
         player.setGroup(isGroupChat);
 
+        boolean isRightCmd = false;
+
         try {
             String[] commands = command.split(" ");
 
             if (Arrays.asList("회원가입", "가입", "register").contains(commands[0])) {
                 reply(session, "이미 회원가입이 되어 있습니다.\n" +
                         "회원가입을 진행한 적이 없는 경우, 프로필 이미지 또는 카카오톡 이름을 변경한 후 다시 시도해주세요");
+
+                isRightCmd = true;
             } else if(Arrays.asList("정보", "info", "i").contains(commands[0])) {
                 player.displayInfo();
+
+                isRightCmd = true;
             } else if(Arrays.asList("맵", "map").contains(commands[0])) {
                 MapClass map = Config.getMapData(player.getLocation());
                 player.replyPlayer(map.getInfo(), map.getInnerInfo());
+
+                isRightCmd = true;
             } else if(Arrays.asList("광질", "mine").contains(commands[0])) {
                 if(player.canMine()) {
                     player.mine();
                 } else {
                     player.replyPlayer("광질이 불가능한 상태입니다");
                 }
+
+                isRightCmd = true;
             }
         } catch (WeirdCommandException e) {
             reply(session, Objects.requireNonNull(e.getMessage()));
         }
         
-        return false;
+        return isRightCmd;
     }
 
     private static boolean nonPlayerCommand(@NonNull String sender, @NonNull String image,
                                             @NonNull String command, @NonNull String room,
                                             boolean isGroupChat, @NonNull Notification.Action session) {
+        boolean isRightCmd = false;
+
         try {
             String[] commands = command.split(" ");
 
@@ -195,19 +207,20 @@ public class KakaoTalk {
                 }
 
                 Player player = new Player(sender, nickName, image, room);
-                player.setMoney(10);
                 player.setGroup(isGroupChat);
+                player.setCloseRate(1L, 100);
+                player.setCloseRate(2L, 100);
                 Config.unloadObject(player);
 
                 player.replyPlayer("회원가입에 성공하였습니다!");
 
-                return true;
+                isRightCmd = true;
             }
         } catch (WeirdCommandException e) {
             reply(session, Objects.requireNonNull(e.getMessage()));
         }
 
-        return false;
+        return isRightCmd;
     }
 
     private static void otherCommand(@NonNull final String command, @NonNull final Notification.Action session) {
@@ -216,11 +229,11 @@ public class KakaoTalk {
                             "모든 명령어는 접두어 'n' 또는 'ㅜ'가 포함됩니다\n" +
                             "영어는 대소문자에 영향받지 않습니다\n" +
                             "'*' 이 붙은 명령어는 언제나 사용이 가능한 명령어입니다\n" +
-                            "() : 필수 명령어, [] : 필수x 명령어",
+                            "() : 필수 명령어, [] : 필수x 명령어, {} : 직접 입력",
                     "---전체 사용 가능 명령어---\n" +
                             "*(도움말/명령어/?/h/help) : 도움말을 표시합니다\n" +
-                            "[회원가입/가입/register] (닉네임) : 회원가입을 합니다\n" +
-                            "*[개발자/dev] : 개발자 정보를 표시합니다\n" +
+                            "(회원가입/가입/register) ({닉네임}) : 회원가입을 합니다\n" +
+                            "*(개발자/dev) : 개발자 정보를 표시합니다\n" +
                             "\n---유저 명령어---\n" +
                             "(정보/info/i) : 내 정보를 표시합니다\n" +
                             "(맵/map) : 현재 위치 정보를 표시합니다\n" +

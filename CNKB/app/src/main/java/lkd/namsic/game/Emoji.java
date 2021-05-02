@@ -2,6 +2,8 @@ package lkd.namsic.game;
 
 public class Emoji {
 
+    public final static String OPENER = "「";
+    public final static String CLOSER = "」";
     public final static String GOLD = "\uD83D\uDCB0";
     public final static String HEART = "♥";
     public final static String MANA = "\uD83D\uDCA7";
@@ -14,5 +16,9 @@ public class Emoji {
     public final static String HOME = "\uD83C\uDFE0";
     public final static String MONSTER = "\uD83D\uDC3E";
     public final static String BOSS = "❗";
+
+    public static String focus(String text) {
+        return OPENER + text + CLOSER;
+    }
 
 }

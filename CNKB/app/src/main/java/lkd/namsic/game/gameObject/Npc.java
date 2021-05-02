@@ -3,6 +3,7 @@ package lkd.namsic.game.gameObject;
 import androidx.annotation.NonNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -12,7 +13,6 @@ import lkd.namsic.game.Config;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.RangeInteger;
 import lkd.namsic.game.enums.Id;
-import lkd.namsic.game.exception.ObjectNotFoundException;
 import lombok.ToString;
 
 @ToString
@@ -26,7 +26,8 @@ public class Npc extends AiEntity {
         this.id.setId(Id.NPC);
     }
 
-    public void startChat(Player player) {
+    @NonNull
+    public Set<Long> getAvailableChat(@NonNull Player player) {
         int closeRate = player.getCloseRate(this.id.getObjectId());
 
         Set<Long> availableSet = new HashSet<>();
@@ -36,12 +37,12 @@ public class Npc extends AiEntity {
             }
         }
 
-        if(availableSet.isEmpty()) {
-            throw new ObjectNotFoundException("Cannot find available chat to start");
-        }
+        return availableSet;
+    }
 
-        long chatId = (long) availableSet.toArray()[new Random().nextInt(availableSet.size())];
-        player.startChat(chatId);
+    public void startChat(@NonNull Player player, @NonNull List<Long> availableChat) {
+        long chatId = (long) availableChat.toArray()[new Random().nextInt(availableChat.size())];
+        player.startChat(chatId, this.getName());
     }
 
     public void addChat(int minCloseRate, int maxCloseRate, long chatId) {

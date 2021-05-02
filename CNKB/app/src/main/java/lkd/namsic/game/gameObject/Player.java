@@ -161,7 +161,7 @@ public class Player extends Entity {
                 Emoji.LV + ": " + this.lv.get() + "Lv (" + this.getExp().get() + "/" + this.getTotalNeedExp() + ")\n" +
                 Emoji.SP + ": " + this.sp.get() + "\n" +
                 Emoji.ADV + ": " + this.adv.get() + "\n" +
-                Emoji.HOME + ": " + Config.getMapData(this.baseLocation).getName(),
+                Emoji.HOME + ": " + Config.getMapData(this.baseLocation).getName() + "(" + this.baseLocation.toCoordString() + ")",
                 innerMsg.toString());
     }
 
@@ -426,6 +426,8 @@ public class Player extends Entity {
                 }
             }
 
+            this.revalidateBuff();
+
             this.replyPlayer(item.getName() + "을 먹었습니다\n남은 개수 : " + this.getItem(itemId));
         } else {
             throw new WeirdDataException(Id.ITEM, itemId);
@@ -581,7 +583,7 @@ public class Player extends Entity {
         }
     }
 
-    public void startChat(long chatId) {
+    public void startChat(long chatId, String npcName) {
         Config.checkId(Id.CHAT, chatId);
 
         Chat chat = Config.getData(Id.CHAT, chatId);
@@ -613,8 +615,10 @@ public class Player extends Entity {
             }
 
             long pauseTime = finalChat.getPauseTime().get();
+            String preString = "[" + npcName + " -> " + this.getNickName() + "]\n";
             for(String text : finalChat.getText()) {
-                KakaoTalk.reply(session, text);
+                KakaoTalk.reply(session, preString + text.replaceAll("__nickname", this.getNickName())
+                        .replaceAll("__lv", this.getLv().get().toString()));
 
                 try {
                     Thread.sleep(pauseTime);
@@ -823,8 +827,6 @@ public class Player extends Entity {
         );
         List<Long> output = Arrays.asList(20L, 21L, 0L, 0L, 0L, 31L, 33L, 0L, 0L, 0L, 43L, 0L);
 
-//        Log.i("namsic!", mineLv + " " + random);
-
         long itemId = 0;
         for(int i = 0; i < percents.size(); i++) {
             if(random < percents.get(i)) {
@@ -921,73 +923,81 @@ public class Player extends Entity {
         return mined >= requireCount;
     }
 
-    @NonNull
-    public Player clearQuest(long questId) {
+    public boolean canClearQuest(long questId) {
+        Config.checkId(Id.QUEST, questId);
         Long chatId = this.quest.get(questId);
 
         if(chatId == null) {
             throw new ObjectNotFoundException(Id.QUEST, questId);
         }
 
-        Quest quest = null;
+        Quest quest = Config.getData(Id.QUEST, questId);
 
-        try {
-            quest = Config.loadObject(Id.QUEST, questId);
+        return this.getMoney() >= quest.getNeedMoney().get() &&
+                this.getAdv().get() >= quest.getNeedAdv().get() &&
+                Config.compareMap(this.inventory, quest.getNeedItem(), true) &&
+                this.compareStat(quest.getNeedStat()) &&
+                Config.compareMap(this.getCloseRate(), quest.getNeedCloseRate(), true);
+    }
 
-            this.addMoney(-1 * quest.getNeedMoney().get());
-            this.adv.add(-1 * quest.getNeedAdv().get());
+    public void clearQuest(long questId) {
+        Config.checkId(Id.QUEST, questId);
+        Long chatId = this.quest.get(questId);
 
-            for(Map.Entry<Long, Integer> entry : quest.getNeedItem().entrySet()) {
-                this.addItem(entry.getKey(), -1 * entry.getValue());
-            }
+        if(chatId == null) {
+            throw new ObjectNotFoundException(Id.QUEST, questId);
+        }
 
-            for(Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
-                this.addBasicStat(entry.getKey(), -1 * entry.getValue());
-            }
+        Quest quest = Config.getData(Id.QUEST, questId);
 
-            for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
-                this.addCloseRate(entry.getKey(), -1 * entry.getValue());
-            }
+        this.addMoney(-1 * quest.getNeedMoney().get());
+        this.adv.add(-1 * quest.getNeedAdv().get());
 
-            this.addMoney(quest.getRewardMoney().get());
-            this.addExp(quest.getRewardExp().get());
-            this.adv.add(quest.getRewardAdv().get());
+        for(Map.Entry<Long, Integer> entry : quest.getNeedItem().entrySet()) {
+            this.addItem(entry.getKey(), -1 * entry.getValue());
+        }
 
-            for(Map.Entry<Long, Integer> entry : quest.getRewardItem().entrySet()) {
-                this.addItem(entry.getKey(), entry.getValue());
-            }
+        for(Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
+            this.addBasicStat(entry.getKey(), -1 * entry.getValue());
+        }
 
-            for(Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
-                this.addBasicStat(entry.getKey(), -1 * entry.getValue());
-            }
+        for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
+            this.addCloseRate(entry.getKey(), -1 * entry.getValue());
+        }
 
-            for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
-                this.addCloseRate(entry.getKey(), -1 * entry.getValue());
-            }
+        this.addMoney(quest.getRewardMoney().get());
+        this.addExp(quest.getRewardExp().get());
+        this.adv.add(quest.getRewardAdv().get());
 
-            this.clearedQuest.put(questId, this.getClearedQuest(questId) + 1);
-            this.quest.remove(questId);
-            this.addLog(LogData.QUEST_CLEARED, 1);
+        for(Map.Entry<Long, Integer> entry : quest.getRewardItem().entrySet()) {
+            this.addItem(entry.getKey(), entry.getValue());
+        }
 
-            long questNpcId = quest.getNpcId().get();
-            if(questNpcId != 0) {
-                ConcurrentHashSet<Long> questNpc = Objects.requireNonNull(this.questNpc.get(questNpcId));
+        for(Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
+            this.addBasicStat(entry.getKey(), -1 * entry.getValue());
+        }
 
-                if(questNpc.size() == 1) {
-                    this.questNpc.remove(questId);
-                } else {
-                    questNpc.remove(questId);
-                }
-            }
+        for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
+            this.addCloseRate(entry.getKey(), -1 * entry.getValue());
+        }
 
-            this.startChat(chatId);
-        } finally {
-            if(quest != null) {
-                Config.unloadObject(quest);
+        this.clearedQuest.put(questId, this.getClearedQuest(questId) + 1);
+        this.quest.remove(questId);
+        this.addLog(LogData.QUEST_CLEARED, 1);
+
+        long questNpcId = quest.getNpcId().get();
+        Npc npc = Config.getData(Id.NPC, questNpcId);
+        if(questNpcId != 0) {
+            ConcurrentHashSet<Long> questNpc = Objects.requireNonNull(this.questNpc.get(questNpcId));
+
+            if(questNpc.size() == 1) {
+                this.questNpc.remove(questId);
+            } else {
+                questNpc.remove(questId);
             }
         }
 
-        return this;
+        this.startChat(chatId, npc.getName());
     }
 
     public int getClearedQuest(long questId) {

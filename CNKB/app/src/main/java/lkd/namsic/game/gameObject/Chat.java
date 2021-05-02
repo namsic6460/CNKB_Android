@@ -63,12 +63,6 @@ public class Chat extends GameObject {
         return this.responseChat.getOrDefault(waitResponse, 0L);
     }
 
-    public void setAnyResponseChat(@NonNull Map<String, Long> anyResponseChat) {
-        for(Map.Entry<String, Long> entry : anyResponseChat.entrySet()) {
-            this.setAnyResponseChat(entry.getKey(), entry.getValue());
-        }
-    }
-
     public void setAnyResponseChat(@NonNull String response, long chatId) {
         Config.checkId(Id.CHAT, chatId);
 
@@ -81,12 +75,6 @@ public class Chat extends GameObject {
 
     public long getAnyResponseChat(@NonNull String response) {
         return this.anyResponseChat.getOrDefault(response, 0L);
-    }
-
-    public void setNeedStat(@NonNull Map<StatType, Integer> needStat) {
-        for(Map.Entry<StatType, Integer> entry : needStat.entrySet()) {
-            this.setNeedStat(entry.getKey(), entry.getValue());
-        }
     }
 
     public void setNeedStat(@NonNull StatType statType, int stat) {
@@ -111,12 +99,6 @@ public class Chat extends GameObject {
         this.setNeedStat(statType, this.getNeedStat(statType) + stat);
     }
 
-    public void setNeedItem(@NonNull Map<Long, Integer> needItem) {
-        for(Map.Entry<Long, Integer> entry : needItem.entrySet()) {
-            this.setNeedItem(entry.getKey(), entry.getValue());
-        }
-    }
-
     public void setNeedItem(long itemId, int count) {
         if(count < 0) {
             throw new NumberRangeException(count, 0);
@@ -135,12 +117,6 @@ public class Chat extends GameObject {
 
     public void addNeedItem(long itemId, int count) {
         this.setNeedItem(itemId, this.getNeedItem(itemId) + count);
-    }
-
-    public void setRewardStat(@NonNull Map<StatType, Integer> rewardStat) {
-        for(Map.Entry<StatType, Integer> entry : rewardStat.entrySet()) {
-            this.setRewardStat(entry.getKey(), entry.getValue());
-        }
     }
 
     public void setRewardStat(@NonNull StatType statType, int stat) {
@@ -163,12 +139,6 @@ public class Chat extends GameObject {
 
     public void addRewardStat(@NonNull StatType statType, int stat) {
         this.setRewardStat(statType, this.getRewardStat(statType) + stat);
-    }
-
-    public void setRewardItem(@NonNull Map<Long, Integer> rewardItem) {
-        for(Map.Entry<Long, Integer> entry : rewardItem.entrySet()) {
-            this.setRewardItem(entry.getKey(), entry.getValue());
-        }
     }
 
     public void setRewardItem(long itemId, int count) {

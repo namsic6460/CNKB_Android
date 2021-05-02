@@ -352,11 +352,30 @@ public abstract class Entity extends NamedObject {
         return value;
     }
 
+    public boolean compareStat(@NonNull Map<StatType, Integer> map) {
+        return this.compareStat(map, true);
+    }
+
+    public boolean compareStat(@NonNull Map<StatType, Integer> map, boolean firstIsBig) {
+        this.revalidateBuff();
+
+        boolean flag;
+        for(Map.Entry<StatType, Integer> entry : map.entrySet()) {
+            flag = this.getStat(entry.getKey()) >= entry.getValue();
+
+            if(firstIsBig != flag) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public boolean checkStatRange(@NonNull Map<StatType, Integer> min, @NonNull Map<StatType, Integer> max) {
+        this.revalidateBuff();
+
         Integer minValue, maxValue;
         int value;
-
-        this.revalidateBuff();
 
         for(StatType statType : StatType.values()) {
             try {
