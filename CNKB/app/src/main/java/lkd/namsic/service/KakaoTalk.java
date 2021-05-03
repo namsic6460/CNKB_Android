@@ -81,10 +81,11 @@ public class KakaoTalk {
             } catch (Exception e) {
                 Logger.e("onChat", e);
 
-                //추후 봇 전용 휴대폰으로 돌릴 시, 에러 발생을 replyAll 으로 알려야한다.
-            } finally {
+                //TODO: 추후 봇 전용 휴대폰으로 돌릴 시, 에러 발생을 replyAll 으로 알려야한다.
+                reply(session, "[ERROR!]\n" + e.getMessage());
+
                 if(player != null) {
-                    Config.unloadObject(player);
+                    Config.discardPlayer(player);
                 }
             }
         });
@@ -179,10 +180,13 @@ public class KakaoTalk {
                 }
 
                 isRightCmd = true;
+                }
             }
-        } catch (WeirdCommandException e) {
-            reply(session, Objects.requireNonNull(e.getMessage()));
+        } catch (WeirdCommandException | DoingFilterException | ObjectNotFoundException e) {
+            player.replyPlayer(Objects.requireNonNull(e.getMessage()));
+            player.replyPlayer("숫자를 입력해야합니다");
         }
+
         
         return isRightCmd;
     }

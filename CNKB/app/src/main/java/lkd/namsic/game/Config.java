@@ -282,6 +282,17 @@ public class Config {
         }
     }
 
+
+    public synchronized static void discardPlayer(@NonNull Player player) {
+        String path = getPlayerPath(player.getSender(), player.getImage());
+        String jsonString = FileManager.read(path);
+
+        Player originalPlayer = fromJson(jsonString, Player.class);
+        OBJECT.get(Id.PLAYER).put(player.getId().getObjectId(), originalPlayer);
+
+        Logger.w("discardPlayer", "Player discarded - " + player.getName());
+    }
+
     public synchronized static void unloadMap(@NonNull MapClass map) {
         String fileName = getMapFileName(map);
         Long playerCount = PLAYER_COUNT.get(fileName);
