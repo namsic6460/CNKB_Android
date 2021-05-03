@@ -1,6 +1,7 @@
 package lkd.namsic.game.gameObject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
@@ -61,7 +62,7 @@ public abstract class Entity extends NamedObject {
     final Map<Id, ConcurrentHashSet<Long>> enemies = new ConcurrentHashMap<>();
     final Map<String, ConcurrentArrayList<Event>> events = new ConcurrentHashMap<>();
 
-    final Map<Variable, Integer> variable = new ConcurrentHashMap<>();
+    final Map<Variable, Object> variable = new ConcurrentHashMap<>();
 
     protected Entity(@NonNull String name) {
         super(name);
@@ -737,12 +738,18 @@ public abstract class Entity extends NamedObject {
                 Math.pow(location.getY().get() - this.location.getY().get(), 2));
     }
 
-    public void setVariable(Variable variable, int value) {
+    public void setVariable(Variable variable, Object value) {
         this.variable.put(variable, value);
     }
 
     public int getVariable(Variable variable) {
-        return this.variable.getOrDefault(variable, 0);
+        return (int) this.variable.getOrDefault(variable, 0);
+    }
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public <T> T getObjectVariable(Variable variable) {
+        return (T) this.variable.getOrDefault(variable, null);
     }
 
     public void addVariable(Variable variable, int value) {

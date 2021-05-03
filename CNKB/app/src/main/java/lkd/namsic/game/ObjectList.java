@@ -72,4 +72,8 @@ public class ObjectList {
             .put("0-0", "시작의 마을")
             .build();
 
+    public static long getItem(String name) {
+        return itemList.getOrDefault(name, 0L);
+    }
+
 }

@@ -546,9 +546,8 @@ public class ObjectMaker {
         chat.getId().setObjectId(4L);
         chat.getText().addAll(Arrays.asList(
                 "그럼 난 이만 가볼게. 어짜피 할 일도 많고 너도 이젠 혼자서 다 할 수 있을거같으니까",
-                "뭐라도 주고 가라고? 흠.. 여전하네. 골드를 조금 넣어놨으니까 그거라도 써",
-                "물론 적은 돈이긴 한데, 이렇게 전음하면서 마나를 거의 다 써버렸거든",
-                "기다릴게"
+                "뭐라도 주고 가라고? 골드를 조금 넣어놨으니까 그거라도 써",
+                "아 그리고... ... ... (더 이상 들리지 않는다)"
         ));
         chat.getRewardMoney().set(1000L);
         Config.unloadObject(chat);
@@ -557,16 +556,16 @@ public class ObjectMaker {
     private static void makeNpc() {
         Npc npc = new Npc("???");
         npc.getId().setObjectId(1L);
-        npc.getLocation().set(10, 10, 64, 64);
+        npc.getLocation().set(0, 0, 1, 1);
         npc.addChat(0, Integer.MAX_VALUE, 1L);
         npc.addChat(0, Integer.MAX_VALUE, 2L);
         npc.addChat(0, Integer.MAX_VALUE, 3L);
         npc.addChat(0, Integer.MAX_VALUE, 4L);
         Config.unloadObject(npc);
 
-        npc = new Npc("");
-        npc.getId().setObjectId(1L);
-        npc.getLocation().set(10, 10, 64, 64);
+        npc = new Npc("최후의 용");
+        npc.getId().setObjectId(2L);
+        npc.getLocation().set(0, 0, 1, 1);
         Config.unloadObject(npc);
     }
 

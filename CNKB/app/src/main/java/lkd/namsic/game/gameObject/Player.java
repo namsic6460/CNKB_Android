@@ -6,6 +6,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.common.collect.BiMap;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,10 +17,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import lkd.namsic.game.Emoji;
+import lkd.namsic.game.ObjectList;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitDouble;
 import lkd.namsic.game.base.LimitInteger;
@@ -33,6 +37,7 @@ import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.event.ItemUseEvent;
+import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.UnhandledEnumException;
@@ -98,6 +103,7 @@ public class Player extends Entity {
 
     Map<WaitResponse, Long> responseChat = new ConcurrentHashMap<>();
     Map<String, Long> anyResponseChat = new ConcurrentHashMap<>();
+    String waitNpcName;
 
     Map<MagicType, Integer> magic = new ConcurrentHashMap<>();
     Map<MagicType, Integer> resist = new ConcurrentHashMap<>();
@@ -269,6 +275,56 @@ public class Player extends Entity {
         return builder.toString();
     }
 
+    public void displayInventory(int page) {
+        List<Long> highPriorityItems = this.getObjectVariable(Variable.HIGH_PRIORITY_ITEM);
+        BiMap<Long, String> inverseMap = ObjectList.itemList.inverse();
+
+        if(this.inventory.isEmpty()) {
+            this.replyPlayer("---인벤토리---\n인벤토리가 비어있습니다...");
+            return;
+        }
+
+        StringBuilder msgBuilder = new StringBuilder("---인벤토리---\n[")
+                .append(page)
+                .append("/")
+                .append(Math.ceil(this.inventory.size() / 30D));
+
+        if(highPriorityItems == null) {
+            highPriorityItems = new ArrayList<>();
+            msgBuilder.append("우선 표시 설정된 아이템이 없습니다");
+        } else {
+            for(long itemId : highPriorityItems) {
+                msgBuilder.append("\n")
+                        .append(inverseMap.get(itemId))
+                        .append(": ")
+                        .append(this.getItem(itemId))
+                        .append("개");
+            }
+        }
+
+        StringBuilder innerMsgBuilder = new StringBuilder();
+
+        int count = 0;
+        Set<Long> sortedKeys = new TreeSet<>(this.inventory.keySet());
+        for(long itemId : sortedKeys) {
+            if(highPriorityItems.contains(itemId)) {
+                continue;
+            }
+
+            innerMsgBuilder.append(inverseMap.get(itemId))
+                    .append(": ")
+                    .append(this.getItem(itemId))
+                    .append("개\n");
+            count++;
+
+            if(count == 30) {
+                break;
+            }
+        }
+
+        this.replyPlayer(msgBuilder.toString(), innerMsgBuilder.toString());
+    }
+
     public void addTitle(String title) {
         this.title.add(title);
     }
@@ -360,19 +416,7 @@ public class Player extends Entity {
         return builder.toString();
     }
 
-    public void checkDoing() {
-        if(!this.doing.equals(Doing.NONE)) {
-            throw new UnhandledEnumException(doing);
-        }
-    }
-
     public boolean canUse(long itemId) {
-        try {
-            checkDoing();
-        } catch (UnhandledEnumException e) {
-            return false;
-        }
-
         if(this.getItem(itemId) > 0) {
             Item item = Config.getData(Id.ITEM, itemId);
             return item.getUse() != null;
@@ -399,12 +443,6 @@ public class Player extends Entity {
     }
 
     public boolean canEat(long itemId) {
-        try {
-            checkDoing();
-        } catch (UnhandledEnumException e) {
-            return false;
-        }
-
         if(this.getItem(itemId) > 0) {
             Item item = Config.getData(Id.ITEM, itemId);
             return item.isFood();
@@ -583,11 +621,12 @@ public class Player extends Entity {
         }
     }
 
-    public void startChat(long chatId, String npcName) {
+    public void startChat(long chatId, @NonNull  String npcName) {
         Config.checkId(Id.CHAT, chatId);
+        this.setDoing(Doing.CHAT);
 
         Chat chat = Config.getData(Id.CHAT, chatId);
-        Notification.Action session = getSession();
+        Notification.Action session = this.getSession();
 
         this.addMoney(-1 * chat.getNeedMoney().get());
 
@@ -598,8 +637,6 @@ public class Player extends Entity {
         for(Map.Entry<StatType, Integer> entry : chat.getNeedStat().entrySet()) {
             this.addBasicStat(entry.getKey(), -1 * entry.getValue());
         }
-
-        this.setDoing(Doing.CHAT);
 
         AtomicReference<String> exception = new AtomicReference<>(null);
         final Chat finalChat = chat;
@@ -625,7 +662,7 @@ public class Player extends Entity {
                 } catch (InterruptedException e) {
                     Log.e("Player.startChat - chat Thread", Config.errorString(e));
                     exception.set(e.getMessage());
-                    break;
+                    return;
                 }
             }
 
@@ -635,8 +672,19 @@ public class Player extends Entity {
             if(finalChat.getResponseChat().isEmpty() && finalChat.getAnyResponseChat().isEmpty()) {
                 this.setDoing(Doing.NONE);
             } else {
+                long anyLinkedChatId = finalChat.getResponseChat(WaitResponse.ANYTHING);
+                if(anyLinkedChatId != 0) {
+                    if(chatId == anyLinkedChatId) {
+                        throw new InvalidNumberException(chatId);
+                    }
+
+                    this.startChat(anyLinkedChatId, npcName);
+                    return;
+                }
+
                 this.setDoing(Doing.WAIT_RESPONSE);
 
+                this.waitNpcName = npcName;
                 this.responseChat = new ConcurrentHashMap<>(finalChat.getResponseChat());
                 this.anyResponseChat = new ConcurrentHashMap<>(finalChat.getAnyResponseChat());
             }
@@ -795,12 +843,6 @@ public class Player extends Entity {
     }
 
     public boolean canMine() {
-        try {
-            checkDoing();
-        } catch (UnhandledEnumException e) {
-            return false;
-        }
-
         return Config.getMapData(this.location).getMapType().equals(MapType.COUNTRY);
     }
 
@@ -1115,12 +1157,6 @@ public class Player extends Entity {
     }
 
     public boolean canEquip(long equipId) {
-        try {
-            checkDoing();
-        } catch (UnhandledEnumException e) {
-            return false;
-        }
-
         Equipment equipment = null;
         boolean flag;
 
@@ -1138,12 +1174,6 @@ public class Player extends Entity {
     }
 
     public boolean canReinforce(long equipId, Map<StatType, Integer> increaseLimitStat) {
-        try {
-            checkDoing();
-        } catch (UnhandledEnumException e) {
-            return false;
-        }
-
         if(this.getEquipInventory().contains(equipId)) {
             Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
 

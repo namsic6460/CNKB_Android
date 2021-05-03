@@ -2,6 +2,7 @@ package lkd.namsic.game;
 
 public enum Variable {
 
-    MINE
+    MINE,
+    HIGH_PRIORITY_ITEM
 
 }
