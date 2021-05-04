@@ -477,15 +477,31 @@ public class ObjectMaker {
         map.setMapType(MapType.COUNTRY);
         Config.unloadMap(map);
 
-        for(int y = 1; y <= 10; y++) {
+        map = new MapClass(ObjectList.mapList.get("0-1"));
+        map.setMapType(MapType.SEA);
+        Config.unloadMap(map);
+
+        for(int y = 2; y <= 10; y++) {
             map = new MapClass(ObjectList.mapList.get("0-" + y));
             map.getLocation().setMap(0, y);
             map.setMapType(MapType.FIELD);
             Config.unloadMap(map);
         }
 
+        map = new MapClass(ObjectList.mapList.get("1-0"));
+        map.setMapType(MapType.FIELD);
+        Config.unloadMap(map);
+
+        map = new MapClass(ObjectList.mapList.get("1-1"));
+        map.setMapType(MapType.RIVER);
+        Config.unloadMap(map);
+
         for(int x = 1; x <= 10; x++) {
             for(int y = 0; y <= 10; y++) {
+                if(x == 1 && y <= 1) {
+                    continue;
+                }
+
                 map = new MapClass(ObjectList.mapList.get(x + "-" + y));
                 map.getLocation().setMap(x, y);
                 map.setMapType(MapType.FIELD);

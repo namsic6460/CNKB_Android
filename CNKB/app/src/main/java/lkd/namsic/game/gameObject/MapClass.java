@@ -70,6 +70,42 @@ public class MapClass {
 
     @NonNull
     public String getInnerInfo() {
+        StringBuilder builder = new StringBuilder("---플레이어 목록---");
+        
+        Set<Long> playerSet = this.entity.get(Id.PLAYER);
+        Player player;
+        if(playerSet.isEmpty()) {
+            builder.append("\n플레이어 없음");
+        } else {
+            for (long playerId : playerSet) {
+                player = Config.getData(Id.PLAYER, playerId);
+                builder.append("\n[")
+                        .append(player.getLocation().toFieldString())
+                        .append("] ")
+                        .append(player.getName());
+            }
+        }
+
+        builder.append("\n\n---NPC 목록---");
+
+        Set<Long> npcSet = this.entity.get(Id.NPC);
+        npcSet.remove(1L);
+
+        Npc npc;
+        if(npcSet.isEmpty()) {
+            builder.append("\nNPC 없음");
+        } else {
+            for(long npcId : npcSet) {
+                npc = Config.getData(Id.NPC, npcId);
+                builder.append("\n[")
+                        .append(npc.getLocation().toFieldString())
+                        .append("] ")
+                        .append(npc.getName());
+            }
+        }
+
+        builder.append("\n\n---무언가 감지된 좌표---");
+
         Set<Location> locationSet = new HashSet<>();
         locationSet.addAll(this.money.keySet());
         locationSet.addAll(this.item.keySet());
@@ -85,8 +121,6 @@ public class MapClass {
                 locationSet.add(entity.getLocation());
             }
         }
-
-        StringBuilder builder = new StringBuilder("---무언가 감지된 좌표---");
 
         if(locationSet.isEmpty()) {
             return builder.toString() + "\n감지된 물체 없음";

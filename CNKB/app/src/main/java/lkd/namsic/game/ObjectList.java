@@ -70,6 +70,9 @@ public class ObjectList {
 
     public final static BiMap<String, String> mapList = new ImmutableBiMap.Builder<String, String>()
             .put("0-0", "시작의 마을")
+            .put("0-1", "평화로운 바닷가")
+            .put("1-0", "모험의 평원")
+            .put("1-1", "평화로운 강")
             .build();
 
     public static long getItem(String name) {

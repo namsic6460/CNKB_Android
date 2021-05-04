@@ -58,7 +58,7 @@ public class KakaoTalk {
         final String command = isCommand ? msg.substring(2).toLowerCase() : null;
 
         Thread gameThread = new Thread(() -> {
-            Player player;
+            Player player = null;
 
             try {
                 if(lastSender.equals(sender) && lastMsg.equals(msg)) {
