@@ -475,25 +475,30 @@ public class ObjectMaker {
     private static void makeMap() {
         MapClass map = new MapClass(ObjectList.mapList.get("0-0"));
         map.setMapType(MapType.COUNTRY);
+        map.getLocation().set(0, 0, 1, 1);
         Config.unloadMap(map);
 
         map = new MapClass(ObjectList.mapList.get("0-1"));
         map.setMapType(MapType.SEA);
+        map.getLocation().set(0, 1, 1, 1);
         Config.unloadMap(map);
 
         for(int y = 2; y <= 10; y++) {
             map = new MapClass(ObjectList.mapList.get("0-" + y));
             map.getLocation().setMap(0, y);
             map.setMapType(MapType.FIELD);
+            map.getLocation().set(0, y, 1, 1);
             Config.unloadMap(map);
         }
 
         map = new MapClass(ObjectList.mapList.get("1-0"));
         map.setMapType(MapType.FIELD);
+        map.getLocation().set(1, 0, 1, 1);
         Config.unloadMap(map);
 
         map = new MapClass(ObjectList.mapList.get("1-1"));
         map.setMapType(MapType.RIVER);
+        map.getLocation().set(1, 1, 1, 1);
         Config.unloadMap(map);
 
         for(int x = 1; x <= 10; x++) {
@@ -505,6 +510,7 @@ public class ObjectMaker {
                 map = new MapClass(ObjectList.mapList.get(x + "-" + y));
                 map.getLocation().setMap(x, y);
                 map.setMapType(MapType.FIELD);
+                map.getLocation().set(x, y, 1, 1);
                 Config.unloadMap(map);
             }
         }

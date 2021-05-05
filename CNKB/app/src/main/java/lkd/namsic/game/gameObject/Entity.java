@@ -110,9 +110,7 @@ public abstract class Entity extends NamedObject {
     }
 
     public boolean setField(int fieldX, int fieldY) {
-        int xDis = Math.abs(this.location.getFieldX().get() - fieldX);
-        int yDis = Math.abs(this.location.getFieldY().get() - fieldX);
-        return setField(fieldX, fieldY, xDis + yDis);
+        return setField(fieldX, fieldY, this.getFieldDistance(new Location(0, 0, fieldX, fieldY)));
     }
 
     public boolean setField(int fieldX, int fieldY, int distance) {
@@ -168,8 +166,7 @@ public abstract class Entity extends NamedObject {
     }
 
     public boolean setMap(int x, int y, int fieldX, int fieldY) {
-        int distance = Math.abs(this.location.getX().get() - x) + Math.abs(this.location.getY().get() - y);
-        return this.setMap(new Location(x, y, fieldX, fieldY), distance, false);
+        return this.setMap(new Location(x, y, fieldX, fieldY), getMapDistance(new Location(x, y)), false);
     }
 
     public boolean setMap(Location location) {
@@ -177,14 +174,12 @@ public abstract class Entity extends NamedObject {
     }
 
     public boolean setMap(Location location, boolean isToBase) {
-        int distance = Math.abs(this.location.getX().get() - location.getX().get())
-                + Math.abs(this.location.getY().get() - location.getY().get());
-        return this.setMap(location, distance, isToBase);
+        return this.setMap(location, getMapDistance(location), isToBase);
     }
 
     public boolean setMap(Location location, int distance, boolean isToBase) {
         if(isToBase) {
-            return this.setMap(location.getX().get(), this.location.getY().get(), 0, 0, distance,true);
+            return this.setMap(location.getX().get(), this.location.getY().get(), 1, 1, distance,true);
         } else {
             return this.setMap(location.getX().get(), location.getY().get(),
                     location.getFieldX().get(), location.getFieldY().get(), distance, false);
@@ -734,7 +729,12 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getFieldDistance(Location location) {
-        return (int) Math.sqrt(Math.pow(location.getX().get() - this.location.getX().get(), 2) +
+        return (int) Math.sqrt(Math.pow(this.location.getFieldX().get() - this.location.getFieldX().get(), 2) +
+                Math.pow(location.getFieldY().get() - this.location.getFieldX().get(), 2));
+    }
+
+    public int getMapDistance(Location location) {
+        return (int) Math.sqrt(Math.pow(this.location.getX().get() - this.location.getX().get(), 2) +
                 Math.pow(location.getY().get() - this.location.getY().get(), 2));
     }
 

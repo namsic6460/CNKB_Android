@@ -189,6 +189,13 @@ public class KakaoTalk {
                             }
                         }
                     }
+                } else if(Arrays.asList("이동", "move").contains(first)) {
+                    if(second == null) {
+                        throw new WeirdCommandException();
+                    }
+
+                    checkDoing(player);
+                    player.move(second);
                 } else if (Arrays.asList("광질", "mine").contains(first)) {
                     checkDoing(player);
 

@@ -40,7 +40,7 @@ import lkd.namsic.game.event.ItemUseEvent;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
-import lkd.namsic.game.exception.UnhandledEnumException;
+import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.exception.WeirdDataException;
 import lkd.namsic.game.Variable;
 import lkd.namsic.service.KakaoTalk;
@@ -52,6 +52,21 @@ import lombok.ToString;
 @Getter
 @ToString
 public class Player extends Entity {
+    
+    public static List<List<Double>> MINE_PERCENT = Arrays.asList(
+            Arrays.asList(50D, 45D, 40D, 35D, 30D, 30D, 30D, 25D, 20D),
+            Arrays.asList(35D, 35D, 20D, 10D, 0D, 0D, 0D, 0D, 0D),
+            Arrays.asList(14D, 15D, 20D, 15D, 0D, 0D, 0D, 0D, 0D),
+            Arrays.asList(1D, 4.5D, 14D, 20D, 15D, 0D, 0D, 0D, 0D),
+            Arrays.asList(0D, 0.5D, 5.5D, 12D, 40D, 20D, 0D, 0D, 0D),
+            Arrays.asList(0D, 0D, 0.5D, 7.6D, 10D, 30D, 25D, 0D, 0D),
+            Arrays.asList(0D, 0D, 0D, 0.4D, 4.98D, 15D, 25D, 20D, 0D),
+            Arrays.asList(0D, 0D, 0D, 0D, 0.019D, 4.8D, 15D, 32.5D, 30.5D),
+            Arrays.asList(0D, 0D, 0D, 0D, 0.001D, 0.149D, 4.79D, 17.5D, 30.3D),
+            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0.001D, 0.2095D, 4.99D, 19.042D),
+            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0.0005D, 0.0055D, 0.1577D),
+            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0D, 0.0001D, 0.0003D)
+    );
 
     @NonNull
     final
@@ -414,6 +429,53 @@ public class Player extends Entity {
         builder.append("(카운터/counter) [대상] : (보스한정) [\"대상\" 또는 \"가장 가까운 보스\"] 의 스킬을 반사합니다");
 
         return builder.toString();
+    }
+
+    public int getMovableDistance() {
+        return (int) Math.sqrt(2 + this.getStat(StatType.AGI) / 4D);
+    }
+
+    public void move(String locationStr) {
+        String[] split = locationStr.split("-");
+        if(split.length != 2) {
+            throw new WeirdCommandException("좌표를 정확하게 입력해주세요(x좌표-y좌표)\nex) 0-1");
+        }
+
+        int x = Integer.parseInt(split[0]);
+        int y = Integer.parseInt(split[1]);
+        Location location = new Location(x, y);
+
+        int dis = this.getMapDistance(location);
+        int movableDis = this.getMovableDistance();
+
+        if(dis > movableDis) {
+            throw new WeirdCommandException("이동 가능한 거리보다 먼 거리에 있는 좌표입니다\n" +
+                    "이동 가능 거리 : " + movableDis + ", 실제 거리: " + dis);
+        } else {
+            MapClass moveMap = null;
+
+            try {
+                moveMap = Config.loadMap(x, y);
+
+                try {
+                    this.setMap(location, true);
+                } catch (NumberRangeException e) {
+                    if(Objects.requireNonNull(e.getMessage()).endsWith(Integer.toString(Config.MAX_LV))) {
+                        this.replyPlayer("해당 지역으로 이동하기 위한 요구 레벨이 부족합니다\n현재 레벨: " +
+                                this.lv.get() + ", 요구 레벨: " + moveMap.getRequireLv().get());
+                        return;
+                    } else {
+                        throw e;
+                    }
+                }
+
+                this.replyPlayer("이동을 완료했습니다\n현재 좌표: " + this.location.toCoordString());
+            } finally {
+                if(moveMap != null) {
+                    Config.unloadMap(moveMap);
+                }
+            }
+        }
     }
 
     public boolean canUse(long itemId) {
@@ -853,26 +915,17 @@ public class Player extends Entity {
         int mineLv = this.getVariable(Variable.MINE);
 
         double random = Math.random() * 100;
-        List<Double> percents = Arrays.asList(
-                Arrays.asList(50D, 45D, 40D, 35D, 30D, 30D, 30D, 25D, 20D).get(mineLv),
-                Arrays.asList(35D, 35D, 20D, 10D, 0D, 0D, 0D, 0D, 0D).get(mineLv),
-                Arrays.asList(14D, 15D, 20D, 15D, 0D, 0D, 0D, 0D, 0D).get(mineLv),
-                Arrays.asList(1D, 4.5D, 14D, 20D, 15D, 0D, 0D, 0D, 0D).get(mineLv),
-                Arrays.asList(0D, 0.5D, 5.5D, 12D, 40D, 20D, 0D, 0D, 0D).get(mineLv),
-                Arrays.asList(0D, 0D, 0.5D, 7.6D, 10D, 30D, 25D, 0D, 0D).get(mineLv),
-                Arrays.asList(0D, 0D, 0D, 0.4D, 4.98D, 15D, 25D, 20D, 0D).get(mineLv),
-                Arrays.asList(0D, 0D, 0D, 0D, 0.019D, 4.8D, 15D, 32.5D, 30.5D).get(mineLv),
-                Arrays.asList(0D, 0D, 0D, 0D, 0.001D, 0.149D, 4.79D, 17.5D, 30.3D).get(mineLv),
-                Arrays.asList(0D, 0D, 0D, 0D, 0D, 0.001D, 0.2095D, 4.99D, 19.042D).get(mineLv),
-                Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0.0005D, 0.0055D, 0.1577D).get(mineLv),
-                Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0D, 0.0001D, 0.0003D).get(mineLv)
-        );
+
+        List<Double> percents = new ArrayList<>();
+        for(List<Double> minePercent : MINE_PERCENT) {
+            percents.add(minePercent.get(mineLv));
+        }
+
         List<Long> output = Arrays.asList(20L, 21L, 0L, 0L, 0L, 31L, 33L, 0L, 0L, 0L, 43L, 0L);
 
         long itemId = 0;
         for(int i = 0; i < percents.size(); i++) {
             if(random < percents.get(i)) {
-                Log.i("namsic!", "i: " + i);
                 itemId = output.get(i);
 
                 if(itemId == 0) {

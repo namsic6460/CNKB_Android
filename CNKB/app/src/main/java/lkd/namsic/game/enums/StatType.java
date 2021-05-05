@@ -16,7 +16,6 @@ public enum StatType {
     DRA,
     MDRA,
     EVA,
-    ACC,
-    ADV
+    ACC
 
 }
