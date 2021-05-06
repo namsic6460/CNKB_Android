@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.Config;
+import lkd.namsic.game.Emoji;
 import lkd.namsic.game.ObjectList;
 import lkd.namsic.game.Variable;
 import lkd.namsic.game.base.ConcurrentArrayList;
@@ -136,7 +137,7 @@ public class KakaoTalk {
                     player.displayInfo();
 
                     isRightCmd = true;
-                } else if (Arrays.asList("맵", "map").contains(first)) {
+                } else if (first.equals("맵") || first.equals("map")) {
                     MapClass map = Config.getMapData(player.getLocation());
                     player.replyPlayer(map.getInfo(), map.getInnerInfo());
 
@@ -163,7 +164,7 @@ public class KakaoTalk {
 
                         List<Long> highPriorityItems = player.getObjectVariable(Variable.HIGH_PRIORITY_ITEM);
 
-                        if(Arrays.asList("추가", "add").contains(third)) {
+                        if(third.equals("추가") || third.equals("add")) {
                             if(highPriorityItems == null) {
                                 highPriorityItems = new ConcurrentArrayList<>();
                                 highPriorityItems.add(itemId);
@@ -175,7 +176,7 @@ public class KakaoTalk {
 
                                 highPriorityItems.add(itemId);
                             }
-                        } else if(Arrays.asList("제거", "remove").contains(third)) {
+                        } else if(first.equals("제거") || first.equals("remove")) {
                             if(highPriorityItems == null) {
                                 throw new ObjectNotFoundException("우선순위 목록이 비어있습니다");
                             } else if(!highPriorityItems.contains(itemId)) {
@@ -189,20 +190,44 @@ public class KakaoTalk {
                             }
                         }
                     }
-                } else if(Arrays.asList("이동", "move").contains(first)) {
+
+                    isRightCmd = true;
+                } else if(first.equals("이동") || first.equals("move")) {
                     if(second == null) {
                         throw new WeirdCommandException();
                     }
 
                     checkDoing(player);
                     player.move(second);
-                } else if (Arrays.asList("광질", "mine").contains(first)) {
+
+                    isRightCmd = true;
+                } else if (first.equals("광질") || first.equals("mine")) {
                     checkDoing(player);
 
                     if (player.canMine()) {
                         player.mine();
                     } else {
                         player.replyPlayer("광질이 불가능한 상태입니다");
+                    }
+
+                    isRightCmd = true;
+                } else if (first.equals("낚시") || first.equals("fish")) {
+                    Doing doing = player.getDoing();
+
+                    if(doing.equals(Doing.NONE)) {
+                        if(player.canFish()) {
+                            player.fish();
+                        } else {
+                            player.replyPlayer("낚시가 불가능한 상태입니다");
+                        }
+                    } else if(doing.equals(Doing.FISH)) {
+                        if(second == null) {
+                            throw new WeirdCommandException();
+                        }
+
+                        player.fishCommand(second);
+                    } else {
+                        throw new DoingFilterException();
                     }
 
                     isRightCmd = true;
@@ -278,13 +303,16 @@ public class KakaoTalk {
                             "\n---유저 명령어---\n" +
                             "(정보/info/i) : 내 정보를 표시합니다\n" +
                             "(맵/map) : 현재 위치 정보를 표시합니다\n" +
-                            "(광질/mine) : 광질을 합니다(마을에서만 가능)\n" +
+                            "(이동/move) (x좌표-y좌표) : 해당 좌표의 지역으로 이동합니다(ex : " +
+                            Emoji.focus("n move 2-3") + ")\n" +
+                            "(광질/mine) : 광질을 합니다(약 1초 소요)(마을에서만 가능)\n" +
+                            "(낚시/fish) : 낚시를 합니다(추가 명령 필요)(강 또는 바다에서만 가능)\n" +
                             "(가방/인벤토리/inventory/inven) [{페이지}] : 현재 인벤토리를 확인합니다\n" +
                             "(설정/setting/set) (가방/인벤토리/inventory/inven) (추가/add) ({아이템 이름}) : " +
                             "해당 아이템을 인벤토리 표시 우선순위로 설정합니다\n" +
                             "(설정/setting/set) (가방/인벤토리/inventory/inven) (제거/remove) ({아이템 이름}) : " +
                             "해당 아이템을 인벤토리 표시 우선순위에서 해제합니다");
-        } else if(Arrays.asList("개발자", "dev").contains(command)) {
+        } else if(command.equals("개발자") || command.equals("dev")) {
             reply(session, "---개발자 정보---\n닉네임 : 남식(namsic)",
                     "메일 : namsic6460@gmail.com\n" +
                             "문의 : 개인 카카오톡 또는 이메일");
