@@ -749,7 +749,7 @@ public abstract class Entity extends NamedObject {
     @Nullable
     @SuppressWarnings("unchecked")
     public <T> T getObjectVariable(Variable variable) {
-        return (T) this.variable.getOrDefault(variable, null);
+        return (T) this.variable.get(variable);
     }
 
     public void addVariable(Variable variable, int value) {

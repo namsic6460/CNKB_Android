@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import lkd.namsic.MainActivity;
 import lkd.namsic.game.Emoji;
 import lkd.namsic.game.ObjectList;
 import lkd.namsic.game.base.ConcurrentHashSet;
@@ -30,6 +31,7 @@ import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.Config;
 import lkd.namsic.game.enums.Doing;
+import lkd.namsic.game.enums.FishWaitType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MagicType;
@@ -66,6 +68,15 @@ public class Player extends Entity {
             Arrays.asList(0D, 0D, 0D, 0D, 0D, 0.001D, 0.2095D, 4.99D, 19.042D),
             Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0.0005D, 0.0055D, 0.1577D),
             Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0D, 0.0001D, 0.0003D)
+    );
+
+    public static List<List<Double>> FISH_PERCENT = Arrays.asList(
+            Arrays.asList(35D, 25D, 15D, 5D, 1D, 0D, 0D, 0D, 0D),
+            Arrays.asList(55D, 50D, 35D, 25D, 15D, 10D, 9D, 7D, 4D),
+            Arrays.asList(10D, 25D, 40D, 40D, 30D, 25D, 20D, 10D, 5D),
+            Arrays.asList(0D, 0D, 10D, 30D, 50D, 45D, 30D, 30D, 25D),
+            Arrays.asList(0D, 0D, 0D, 0D, 4D, 20D, 40D, 5D, 60D),
+            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0D, 0D, 1D)
     );
 
     @NonNull
@@ -306,6 +317,7 @@ public class Player extends Entity {
 
         if(highPriorityItems == null) {
             highPriorityItems = new ArrayList<>();
+            this.setVariable(Variable.HIGH_PRIORITY_ITEM, highPriorityItems);
             msgBuilder.append("우선 표시 설정된 아이템이 없습니다");
         } else {
             for(long itemId : highPriorityItems) {
@@ -914,7 +926,7 @@ public class Player extends Entity {
 
         int mineLv = this.getVariable(Variable.MINE);
 
-        double random = Math.random() * 100;
+        double randomPercent = Math.random() * 100;
 
         List<Double> percents = new ArrayList<>();
         for(List<Double> minePercent : MINE_PERCENT) {
@@ -923,15 +935,18 @@ public class Player extends Entity {
 
         List<Long> output = Arrays.asList(20L, 21L, 0L, 0L, 0L, 31L, 33L, 0L, 0L, 0L, 43L, 0L);
 
+        double percent;
         long itemId = 0;
-        for(int i = 0; i < percents.size(); i++) {
-            if(random < percents.get(i)) {
-                itemId = output.get(i);
+        for(int itemTier = 0; itemTier < percents.size(); itemTier++) {
+            percent = percents.get(itemTier);
+
+            if(randomPercent < percent) {
+                itemId = output.get(itemTier);
 
                 if(itemId == 0) {
                     long[] itemList;
 
-                    switch(i) {
+                    switch(itemTier) {
                         case 2:
                             itemList = new long[]{23L, 24L, 25L, 26L};
                             break;
@@ -950,18 +965,19 @@ public class Player extends Entity {
                         case 9:
                             itemList = new long[]{39L, 40L};
                             break;
-                        default:
+                        case 11:
                             itemList = new long[]{44L, 45L, 46L};
                             break;
+                        default:
+                            throw new InvalidNumberException(itemTier);
                     }
 
-                    int itemIdx = new Random().nextInt(itemList.length);
-                    itemId = itemList[itemIdx];
+                    itemId = itemList[new Random().nextInt(itemList.length)];
                 }
 
                 break;
             } else {
-                random -= percents.get(i);
+                randomPercent -= percent;
             }
         }
 
@@ -977,7 +993,7 @@ public class Player extends Entity {
 
         if(this.checkMineLevel()) {
             this.addVariable(Variable.MINE, 1);
-            this.replyPlayer("광업 레벨이 올랐습니다!\n광업 레벨 : " + mineLv + " -> " + (mineLv + 1));
+            this.replyPlayer("광업 레벨이 올랐습니다!\n광업 레벨: " + mineLv + " -> " + (mineLv + 1));
         }
 
         this.setDoing(Doing.NONE);
@@ -987,6 +1003,10 @@ public class Player extends Entity {
         int mineLv = this.getVariable(Variable.MINE);
         long mined = this.getLog(LogData.MINED);
         int requireCount;
+
+        if(mineLv == 8) {
+            return false;
+        }
 
         switch (mineLv) {
             case 0:
@@ -1010,12 +1030,281 @@ public class Player extends Entity {
             case 6:
                 requireCount = 1000000;
                 break;
-            default:
+            case 7:
                 requireCount = 10000000;
                 break;
+            default:
+                throw new NumberRangeException(mineLv, 0, 7);
         }
 
         return mined >= requireCount;
+    }
+
+    public boolean canFish() {
+        MapType mapType = Config.getMapData(this.location).getMapType();
+        return mapType.equals(MapType.SEA) || mapType.equals(MapType.RIVER);
+    }
+
+    public void fish() {
+        this.setDoing(Doing.FISH);
+        this.addLog(LogData.FISH, 1);
+
+        int fishLv = this.getVariable(Variable.FISH);
+
+        double randomPercent = Math.random() * 100;
+
+        List<Double> percents = new ArrayList<>();
+        for(List<Double> fishPercent : FISH_PERCENT) {
+            percents.add(fishPercent.get(fishLv));
+        }
+
+        Random random = new Random();
+
+        int itemTier = 0;
+        long itemId = 0;
+        int commandCount = 0;
+        double percent;
+        for(; itemTier < percents.size(); itemTier++) {
+            percent = percents.get(itemTier);
+
+            if(randomPercent < percent) {
+                if (randomPercent < percents.get(itemTier)) {
+                    long[] itemList;
+
+                    switch (itemTier) {
+                        case 0:
+                            itemList = new long[]{1L, 2L, 58L, 59L};
+                            commandCount = random.nextInt(2);
+                            break;
+                        case 1:
+                            itemList = new long[]{60L, 61L, 62L, 63L, 64L};
+                            commandCount = random.nextInt(6);
+                            break;
+                        case 2:
+                            itemList = new long[]{65L, 66L, 67L, 68L, 69L, 70L};
+                            commandCount = random.nextInt(8) + 1;
+                            break;
+                        case 3:
+                            itemList = new long[]{71L, 72L, 73L, 74L, 75L, 76L, 77L, 78L, 79L, 80L};
+                            commandCount = random.nextInt(8) + 3;
+                            break;
+                        case 4:
+                            itemList = new long[]{81L, 82L, 83L, 84L, 85L, 86L, 87L};
+                            commandCount = random.nextInt(10) + 6;
+                            break;
+                        case 5:
+                            itemList = new long[]{88L, 89L, 90L, 91L};
+                            commandCount = random.nextInt(6) + 10;
+                            break;
+                        case 6:
+                            itemList = new long[]{92L, 93L};
+                            commandCount = random.nextInt(11) + 20;
+                            break;
+                        default:
+                            throw new NumberRangeException(itemTier, 0, 6);
+                    }
+
+                    itemId = itemList[random.nextInt(itemList.length)];
+                }
+
+                break;
+            } else {
+                randomPercent -= percent;
+            }
+        }
+
+        this.startFishThread(itemId, commandCount);
+    }
+
+    public void startFishThread(long itemId, int commandCount) {
+        Random random = new Random();
+
+        this.replyPlayer("낚시를 시작합니다");
+        Thread thread = new Thread(() -> {
+            FishWaitType lastWaitType = null;
+            FishWaitType waitType;
+
+            for(int i = commandCount; i >= 0; i--) {
+                if(i == 0) {
+                    waitType = FishWaitType.CATCH;
+                } else {
+                    int randomWaitTypeIdx;
+
+                    if(lastWaitType == null || lastWaitType.equals(FishWaitType.SHAKE) || lastWaitType.equals(FishWaitType.WAIT)) {
+                        randomWaitTypeIdx = random.nextInt(4);
+                        waitType = new FishWaitType[]{
+                                FishWaitType.SHAKE, FishWaitType.WAIT, FishWaitType.PULL, FishWaitType.RESIST
+                        }[randomWaitTypeIdx];
+                    } else {
+                        randomWaitTypeIdx = random.nextInt(2);
+                        waitType = new FishWaitType[]{
+                                FishWaitType.PULL, FishWaitType.RESIST
+                        }[randomWaitTypeIdx];
+                    }
+                }
+
+                lastWaitType = waitType;
+
+                try {
+                    Thread.sleep(random.nextInt(5000) + 5000);
+                } catch (InterruptedException e) {
+                    Logger.e("Player.fishThread", e);
+                    throw new RuntimeException(e.getMessage());
+                }
+
+                this.setVariable(Variable.FISH_WAIT_TYPE, waitType);
+
+                String message;
+                if(waitType.equals(FishWaitType.SHAKE)) {
+                    message = "아직 특별한 느낌이 없습니다\n낚싯대를 흔들어 물고기를 유혹해봅시다\n" +
+                            "(접두사 포함) " + Emoji.focus("(낚시/fish) (흔들기/shake)");
+                } else if(waitType.equals(FishWaitType.WAIT)) {
+                    message = "미세한 무언가가 느껴집니다...\n확실히 물릴때까지 기다려봅시다\n" +
+                            "(접두사 포함) " + Emoji.focus("(낚시/fish) (기다리기/wait)");
+                } else if(waitType.equals(FishWaitType.PULL)) {
+                    message = "걸린 것 같습니다!\n힘차게 당겨봅시다\n" +
+                            "(접두사 포함) " + Emoji.focus("(낚시/fish) (당기기/pull)");
+                } else if(waitType.equals(FishWaitType.RESIST)) {
+                    message = "이런! 잘못하면 낚싯대가 망가지겠네요\n최대한 버텨봅시다\n" +
+                            "(접두사 포함) " + Emoji.focus("(낚시/fish) (버티기/resist)");
+                } else {
+                    message = "지금입니다, 당기세요!\n" +
+                            "(접두사 포함) " + Emoji.focus("(낚시/fish) (잡기/catch)");
+                }
+
+                this.replyPlayer(message);
+
+                synchronized (this) {
+                    try {
+                        this.wait(3000);
+                    } catch (InterruptedException e) {
+                        Logger.e("Player.fishThread - wait", e);
+                        throw new RuntimeException(e.getMessage());
+                    }
+
+                    this.notifyAll();
+                }
+
+                FishWaitType response = this.getObjectVariable(Variable.FISH_WAIT_TYPE);
+
+                assert response != null;
+                if(response.equals(FishWaitType.NONE)) {
+                    String successMessage;
+
+                    if(i == 0) {
+                        this.addItem(itemId, 1);
+                        this.addVariable(Variable.FISH_SKILL, 1);
+                        successMessage = "낚시 성공!\n" +
+                                "낚은 아이템: " + ObjectList.itemList.inverse().get(itemId) +
+                                "현재 보유 개수: " + this.getItem(itemId) + "개";
+
+                        int fishLv = this.getVariable(Variable.FISH);
+                        if(checkFishLevel()) {
+                            this.addVariable(Variable.FISH, 1);
+                            this.replyPlayer("낚시 레벨이 올랐습니다!\n낚시 레벨: " + fishLv + " -> " + (fishLv + 1));
+                        }
+                    } else {
+                        successMessage = "성공적으로 물고기를 컨트롤했습니다!";
+                    }
+
+                    this.replyPlayer(successMessage);
+                } else {
+                    int fishSkill = this.getVariable(Variable.FISH_SKILL);
+
+                    String failMessage = "이런... 물고기를 놓쳐버렸습니다";
+                    if(fishSkill > 0) {
+                        if(random.nextInt(2) == 0) {
+                            this.setVariable(Variable.FISH_SKILL, fishSkill - 1);
+                            failMessage = failMessage + "\n낚시 숙련도 -1";
+                        }
+                    }
+
+                    this.replyPlayer(failMessage);
+                }
+            }
+        });
+
+        MainActivity.startThread(thread);
+    }
+
+    public void fishCommand(String command) {
+        FishWaitType waitType = this.getObjectVariable(Variable.FISH_WAIT_TYPE);
+        FishWaitType response;
+
+        switch (command) {
+            case "흔들기":
+            case "shake":
+                response = FishWaitType.SHAKE;
+                break;
+            case "기다리기":
+            case "wait":
+                response = FishWaitType.WAIT;
+                break;
+            case "당기기":
+            case "pull":
+                response = FishWaitType.PULL;
+                break;
+            case "버티기":
+            case "resist":
+                response = FishWaitType.RESIST;
+                break;
+            case "잡기":
+            case "catch":
+                response = FishWaitType.CATCH;
+                break;
+            default:
+                throw new WeirdCommandException();
+        }
+
+        assert waitType != null;
+        if(waitType.equals(response)) {
+            this.setVariable(Variable.FISH_WAIT_TYPE, FishWaitType.NONE);
+
+            synchronized (this) {
+                this.notifyAll();
+            }
+        }
+    }
+
+    public boolean checkFishLevel() {
+        int fishLv = this.getVariable(Variable.FISH);
+        int fishSkill = this.getVariable(Variable.FISH_SKILL);
+        int requireCount;
+
+        if(fishLv == 8) {
+            return false;
+        }
+
+        switch (fishLv) {
+            case 0:
+                requireCount = 5;
+                break;
+            case 1:
+                requireCount = 20;
+                break;
+            case 2:
+                requireCount = 50;
+                break;
+            case 3:
+                requireCount = 100;
+                break;
+            case 4:
+                requireCount = 500;
+                break;
+            case 5:
+                requireCount = 1000;
+                break;
+            case 6:
+                requireCount = 5000;
+                break;
+            case 7:
+                requireCount = 10000;
+                break;
+            default:
+                throw new NumberRangeException(fishLv, 0, 7);
+        }
+
+        return fishSkill >= requireCount;
     }
 
     public boolean canClearQuest(long questId) {
@@ -1273,7 +1562,7 @@ public class Player extends Entity {
         try {
             Thread.sleep(random.nextInt(5000));
         } catch (InterruptedException e) {
-            Logger.e("Entity.reinforce", e);
+            Logger.e("Player.reinforce", e);
             throw new RuntimeException(e.getMessage());
         } finally {
             this.setDoing(Doing.NONE);

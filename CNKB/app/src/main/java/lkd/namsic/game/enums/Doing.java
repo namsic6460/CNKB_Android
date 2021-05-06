@@ -9,6 +9,7 @@ public enum Doing {
     BUY,
     CHAT,
     FIGHT,
+    FISH,
     EXPLORE,
     MINE,
     GATHER,

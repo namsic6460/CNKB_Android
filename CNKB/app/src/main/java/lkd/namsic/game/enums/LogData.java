@@ -9,6 +9,7 @@ public enum LogData {
     EAT,
     EXPLORED,
     FIELD_MOVE_DISTANCE,
+    FISH,
     GATHERED,
     LOG_COUNT,
     MAP_MOVE_DISTANCE,
