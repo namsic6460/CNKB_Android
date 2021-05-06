@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,12 +23,13 @@ import java.util.TimerTask;
 
 import lkd.namsic.game.Config;
 import lkd.namsic.game.ObjectMaker;
+import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.service.ForcedTerminationService;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final List<Thread> threads = new ArrayList<>();
+    public static final List<Thread> threads = new ConcurrentArrayList<>();
     public static Timer threadCleaner;
 
     @SuppressLint("StaticFieldLeak")
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     public static TextView textView;
 
     @SuppressLint("StaticFieldLeak")
-    private TextView threadCount;
+    private static TextView threadCount;
 
     private SwitchCompat switchBtn;
 
@@ -96,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 int size = threads.size();
 
-                mainActivity.runOnUiThread(() -> threadCount.setText(String.valueOf(size)));
-
                 if(size == 0) {
                     return;
                 }
@@ -109,7 +107,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                threads.removeAll(deadThreads);
+                if(!deadThreads.isEmpty()) {
+                    threads.removeAll(deadThreads);
+                    mainActivity.runOnUiThread(() -> threadCount.setText(String.valueOf(size - deadThreads.size())));
+                }
             }
         }, 0, 1000);
     }
@@ -137,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static void startThread(Thread thread) {
         threads.add(thread);
+        mainActivity.runOnUiThread(() -> threadCount.setText(String.valueOf(threads.size())));
         thread.start();
     }
 

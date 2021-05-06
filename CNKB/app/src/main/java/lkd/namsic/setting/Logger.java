@@ -49,11 +49,11 @@ public class Logger {
         logCount++;
 
         if(logCount == SAVE_COUNT) {
-            saveLog(time);
+            saveLog();
         }
     }
 
-    public static void saveLog(LocalDateTime date) {
+    public static void saveLog() {
         Thread thread = new Thread(() -> {
             if (!logs.equals("")) {
                 String fileName = FileManager.LOG_PATH + "/Log - " + getTimeFileName();
