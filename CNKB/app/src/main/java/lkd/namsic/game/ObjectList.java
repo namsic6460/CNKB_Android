@@ -68,7 +68,7 @@ public class ObjectList {
             .put("터키석", 57L)
 
             .put("쓰레기", 58L)
-            .put("해초", 59L)
+            .put("물풀", 59L)
             .put("(Common) 금강모치", 60L)
             .put("(Common) 미꾸라지", 61L)
             .put("(Common) 붕어", 62L)

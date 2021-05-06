@@ -463,8 +463,188 @@ public class ObjectMaker {
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
         item.getHandleLv().set(11);
         Config.unloadObject(item);
+        
+        item = new Item("쓰레기", "누가 이런걸 물에 버렸어?");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
 
-        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 58));
+        item = new Item("물풀", "물에서 자라는 다양한 풀이다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Common) 금강모치", "평범 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Common) 미꾸라지", "평범 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Common) 붕어", "평범 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Common) 송사리", "평범 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Common) 피라미", "평범 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(UnCommon) 망둑어", "특별 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(UnCommon) 미꾸라지", "특별 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(UnCommon) 배스", "특별 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(UnCommon) 살치", "특별 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(UnCommon) 쏘가리", "특별 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(UnCommon) 은어", "특별 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Rare) 강준치", "희귀 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Rare) 망둑어", "희귀 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Rare) 메기", "희귀 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Rare) 뱀장어", "희귀 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Rare) 산천어", "희귀 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Rare) 숭어", "희귀 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Rare) 쏘가리", "희귀 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Rare) 연어", "희귀 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Rare) 은어", "희귀 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Rare) 잉어", "희귀 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Unique) 강준치", "유일 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Unique) 메기", "유일 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Unique) 뱀장어", "유일 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Unique) 산천어", "유일 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Unique) 숭어", "유일 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Unique) 연어", "유일 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Unique) 잉어", "유일 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Legendary) 다금바리", "전설 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Legendary) 돗돔", "전설 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Legendary) 자치", "전설 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Legendary) 쿠니마스", "전설 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Myth) 실러캔스", "신화 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        item = new Item("(Myth) 폐어", "신화 등급의 물고기다");
+        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(1);
+        Config.unloadObject(item);
+
+        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 94L));
         Logger.i("ObjectMaker", "Item making is done!");
     }
 
