@@ -22,6 +22,7 @@ import lombok.ToString;
 @ToString
 public class Chat extends GameObject {
 
+    final LimitLong delayTime = new LimitLong(Config.MIN_DELAY_TIME, Config.MIN_DELAY_TIME, Config.MAX_DELAY_TIME);
     final LimitLong pauseTime = new LimitLong(Config.MIN_PAUSE_TIME, Config.MIN_PAUSE_TIME, Config.MAX_PAUSE_TIME);
     final LimitId questId = new LimitId(0, Id.QUEST);
     final Location tpLocation = new Location();
@@ -50,7 +51,13 @@ public class Chat extends GameObject {
     }
 
     public void setResponseChat(@NonNull WaitResponse waitResponse, long chatId) {
-        Config.checkId(Id.CHAT, chatId);
+        this.setResponseChat(waitResponse, chatId, false);
+    }
+
+    public void setResponseChat(@NonNull WaitResponse waitResponse, long chatId, boolean skip) {
+        if(!skip) {
+            Config.checkId(Id.CHAT, chatId);
+        }
 
         if(chatId == 0) {
             this.responseChat.remove(waitResponse);
@@ -64,7 +71,13 @@ public class Chat extends GameObject {
     }
 
     public void setAnyResponseChat(@NonNull String response, long chatId) {
-        Config.checkId(Id.CHAT, chatId);
+        this.setAnyResponseChat(response, chatId, false);
+    }
+
+    public void setAnyResponseChat(@NonNull String response, long chatId, boolean skip) {
+        if(!skip) {
+            Config.checkId(Id.CHAT, chatId);
+        }
 
         if(chatId == 0) {
             this.anyResponseChat.remove(response);
