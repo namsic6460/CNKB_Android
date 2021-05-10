@@ -4,7 +4,6 @@ public enum Variable {
 
     FISH,
     FISH_WAIT_TYPE,
-    FISH_LIST,
     FISH_MAP,
     FISH_SKILL,
     MINE,

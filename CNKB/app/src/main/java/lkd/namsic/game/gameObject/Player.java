@@ -510,7 +510,6 @@ public class Player extends Entity {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     public boolean useItem(long itemId, @NonNull List<GameObject> other) {
         Config.checkId(Id.ITEM, itemId);
 
@@ -1054,16 +1053,16 @@ public class Player extends Entity {
                 requireCount = 5000;
                 break;
             case 4:
-                requireCount = 20000;
+                requireCount = 20_000;
                 break;
             case 5:
-                requireCount = 100000;
+                requireCount = 100_000;
                 break;
             case 6:
-                requireCount = 1000000;
+                requireCount = 1_000_000;
                 break;
             case 7:
-                requireCount = 10000000;
+                requireCount = 10_000_000;
                 break;
             default:
                 throw new NumberRangeException(mineLv, 0, 7);
@@ -1145,10 +1144,10 @@ public class Player extends Entity {
             }
         }
 
-        this.startFishThread(itemId, commandCount);
+        this.startFishThread(itemId, itemTier, commandCount);
     }
 
-    public void startFishThread(long itemId, int commandCount) {
+    public void startFishThread(long itemId, int itemTier, int commandCount) {
         Random random = new Random();
 
         this.setVariable(Variable.FISH_WAIT_TYPE, FishWaitType.NONE);
@@ -1191,19 +1190,19 @@ public class Player extends Entity {
                 String message;
                 if(waitType.equals(FishWaitType.SHAKE)) {
                     message = "아직 특별한 느낌이 없습니다\n낚싯대를 흔들어 물고기를 유혹해봅시다\n" +
-                            "(접두사 포함) " + Emoji.focus("(낚시/fish) (흔들기/shake)");
+                            Emoji.focus("(n/ㅜ) (낚시/fish) (흔들기/shake)");
                 } else if(waitType.equals(FishWaitType.WAIT)) {
                     message = "미세한 무언가가 느껴집니다...\n확실히 물릴때까지 기다려봅시다\n" +
-                            "(접두사 포함) " + Emoji.focus("(낚시/fish) (기다리기/wait)");
+                            Emoji.focus("(n/ㅜ) (낚시/fish) (기다리기/wait)");
                 } else if(waitType.equals(FishWaitType.PULL)) {
                     message = "걸린 것 같습니다!\n힘차게 당겨봅시다\n" +
-                            "(접두사 포함) " + Emoji.focus("(낚시/fish) (당기기/pull)");
+                            Emoji.focus("(n/ㅜ) (낚시/fish) (당기기/pull)");
                 } else if(waitType.equals(FishWaitType.RESIST)) {
                     message = "이런! 잘못하면 낚싯대가 망가지겠네요\n최대한 버텨봅시다\n" +
-                            "(접두사 포함) " + Emoji.focus("(낚시/fish) (버티기/resist)");
+                            Emoji.focus("(n/ㅜ) (낚시/fish) (버티기/resist)");
                 } else {
                     message = "지금입니다, 당기세요!\n" +
-                            "(접두사 포함) " + Emoji.focus("(낚시/fish) (잡기/catch)");
+                            Emoji.focus("(n/ㅜ) (낚시/fish) (잡기/catch)");
                 }
 
                 this.replyPlayer(message);
@@ -1226,25 +1225,56 @@ public class Player extends Entity {
                         this.addItem(itemId, 1);
                         this.addVariable(Variable.FISH_SKILL, 1);
                         this.setDoing(Doing.NONE);
-                        
-                        //물고기 도감 및 리스트에 관하여 경험치 추가 지급
+
+                        if(itemTier != 0) {
+                            Map<Long, Integer> fishMap = this.getObjectVariable(Variable.FISH_MAP);
+                            if (fishMap == null) {
+                                fishMap = new ConcurrentHashMap<>();
+                                this.setVariable(Variable.FISH_MAP, fishMap);
+
+                                int skillIncrease = 2 * itemTier * itemTier;
+                                this.replyPlayer("새로운 물고기를 낚았습니다!\n낚시 숙련도 + " + skillIncrease);
+
+                                this.addVariable(Variable.FISH_SKILL, skillIncrease);
+                            }
+
+                            int fishCount = fishMap.getOrDefault(itemId, 0) + 1;
+                            fishMap.put(itemId, fishCount);
+
+                            int skillIncrease = 0;
+                            if(fishCount == 10) {
+                                skillIncrease = 5;
+                            } else if(fishCount == 50) {
+                                skillIncrease = 10;
+                            } else if(fishCount == 100 || fishCount % 500 == 0) {
+                                skillIncrease = 50;
+                            }
+
+                            if(skillIncrease != 0) {
+                                this.replyPlayer("해당 물고기를 " + fishCount + "회 낚았습니다!\n낚시 숙련도 + " + skillIncrease);
+                                this.addVariable(Variable.FISH_SKILL, skillIncrease);
+                            }
+                        }
 
                         int fishLv = this.getVariable(Variable.FISH);
                         if(checkFishLevel()) {
                             this.addVariable(Variable.FISH, 1);
+                            this.setVariable(Variable.FISH_SKILL, 0);
                             this.replyPlayer("낚시 레벨이 올랐습니다!\n낚시 레벨: " + fishLv + " -> " + (fishLv + 1));
                         }
+
+                        int fishSkill = this.getVariable(Variable.FISH_SKILL);
 
                         this.getVariable().remove(Variable.FISH_WAIT_TYPE);
                         this.replyPlayer("낚시 성공!\n" +
                                 "낚은 아이템: " + ObjectList.itemList.inverse().get(itemId) + "\n" +
-                                "현재 보유 개수: " + this.getItem(itemId) + "개");
+                                "현재 보유 개수: " + this.getItem(itemId) + "개\n" +
+                                "현재 낚시 숙련도: " + fishSkill);
 
                         return;
                     } else {
                         this.replyPlayer("성공적으로 물고기를 컨트롤했습니다!");
                     }
-
                 } else {
                     int fishSkill = this.getVariable(Variable.FISH_SKILL);
 
@@ -1314,7 +1344,7 @@ public class Player extends Entity {
     public boolean checkFishLevel() {
         int fishLv = this.getVariable(Variable.FISH);
         int fishSkill = this.getVariable(Variable.FISH_SKILL);
-        int requireCount;
+        int requireSkill;
 
         if(fishLv == 8) {
             return false;
@@ -1322,34 +1352,34 @@ public class Player extends Entity {
 
         switch (fishLv) {
             case 0:
-                requireCount = 5;
+                requireSkill = 20;
                 break;
             case 1:
-                requireCount = 20;
+                requireSkill = 50;
                 break;
             case 2:
-                requireCount = 50;
+                requireSkill = 100;
                 break;
             case 3:
-                requireCount = 100;
+                requireSkill = 500;
                 break;
             case 4:
-                requireCount = 500;
+                requireSkill = 1000;
                 break;
             case 5:
-                requireCount = 1000;
+                requireSkill = 5000;
                 break;
             case 6:
-                requireCount = 5000;
+                requireSkill = 10000;
                 break;
             case 7:
-                requireCount = 10000;
+                requireSkill = 20000;
                 break;
             default:
                 throw new NumberRangeException(fishLv, 0, 7);
         }
 
-        return fishSkill >= requireCount;
+        return fishSkill >= requireSkill;
     }
 
     public boolean canClearQuest(long questId) {
