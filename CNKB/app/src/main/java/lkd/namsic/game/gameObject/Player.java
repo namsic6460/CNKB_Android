@@ -19,7 +19,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 import lkd.namsic.MainActivity;
 import lkd.namsic.game.Emoji;
@@ -216,10 +215,6 @@ public class Player extends Entity {
         for(int i = 9; i > filled; i--) {
             output.append("  ");
         }
-
-//        if(hp % 10 == 0) {
-//            output.append(" ");
-//        }
 
         return output + "] (" + hp + "/" + maxHp + ")";
     }
@@ -455,14 +450,24 @@ public class Player extends Entity {
     }
 
     public void move(String locationStr) {
+        Location location;
+        int x, y;
+
         String[] split = locationStr.split("-");
         if(split.length != 2) {
-            throw new WeirdCommandException("좌표를 정확하게 입력해주세요(x좌표-y좌표)\nex) 0-1");
+            String loc = ObjectList.mapList.inverse().get(locationStr);
+
+            if(loc == null) {
+                throw new WeirdCommandException("좌표를 또는 맵의 이름을 정확하게 입력해주세요\n(예시 : " +
+                        Emoji.focus("0-1") + " 또는 " + Emoji.focus("시작의 마을") + ")");
+            }
+
+            split = loc.split("-");
         }
 
-        int x = Integer.parseInt(split[0]);
-        int y = Integer.parseInt(split[1]);
-        Location location = new Location(x, y);
+        x = Integer.parseInt(split[0]);
+        y = Integer.parseInt(split[1]);
+        location = new Location(x, y);
 
         if(location.equalsMap(this.location)) {
             throw new WeirdCommandException("현재 위치로는 이동할 수 없습니다");
@@ -1190,19 +1195,19 @@ public class Player extends Entity {
                 String message;
                 if(waitType.equals(FishWaitType.SHAKE)) {
                     message = "아직 특별한 느낌이 없습니다\n낚싯대를 흔들어 물고기를 유혹해봅시다\n" +
-                            Emoji.focus("(n/ㅜ) (낚시/fish) (흔들기/shake)");
+                            Emoji.focus("(ㅜ/n) (낚시/fish) (흔들기/shake)");
                 } else if(waitType.equals(FishWaitType.WAIT)) {
                     message = "미세한 무언가가 느껴집니다...\n확실히 물릴때까지 기다려봅시다\n" +
-                            Emoji.focus("(n/ㅜ) (낚시/fish) (기다리기/wait)");
+                            Emoji.focus("(ㅜ/n) (낚시/fish) (기다리기/wait)");
                 } else if(waitType.equals(FishWaitType.PULL)) {
                     message = "걸린 것 같습니다!\n힘차게 당겨봅시다\n" +
-                            Emoji.focus("(n/ㅜ) (낚시/fish) (당기기/pull)");
+                            Emoji.focus("(ㅜ/n) (낚시/fish) (당기기/pull)");
                 } else if(waitType.equals(FishWaitType.RESIST)) {
                     message = "이런! 잘못하면 낚싯대가 망가지겠네요\n최대한 버텨봅시다\n" +
-                            Emoji.focus("(n/ㅜ) (낚시/fish) (버티기/resist)");
+                            Emoji.focus("(ㅜ/n) (낚시/fish) (버티기/resist)");
                 } else {
                     message = "지금입니다, 당기세요!\n" +
-                            Emoji.focus("(n/ㅜ) (낚시/fish) (잡기/catch)");
+                            Emoji.focus("(ㅜ/n) (낚시/fish) (잡기/catch)");
                 }
 
                 this.replyPlayer(message);
@@ -1233,15 +1238,17 @@ public class Player extends Entity {
                             if (fishMap == null) {
                                 fishMap = new ConcurrentHashMap<>();
                                 this.setVariable(Variable.FISH_MAP, fishMap);
+                            }
 
+                            int fishCount = fishMap.getOrDefault(itemId, 0) + 1;
+                            fishMap.put(itemId, fishCount);
+
+                            if(fishCount == 1) {
                                 int skillIncrease = 2 * itemTier * itemTier;
                                 this.replyPlayer("새로운 물고기를 낚았습니다!\n낚시 숙련도 + " + skillIncrease);
 
                                 this.addVariable(Variable.FISH_SKILL, skillIncrease);
                             }
-
-                            int fishCount = fishMap.getOrDefault(itemId, 0) + 1;
-                            fishMap.put(itemId, fishCount);
 
                             int skillIncrease = 0;
                             if(fishCount == 10) {

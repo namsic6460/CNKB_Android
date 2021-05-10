@@ -184,7 +184,8 @@ public class KakaoTalk {
                         throw new WeirdCommandException();
                     }
 
-                    player.move(second);
+                    String locationStr = third == null ? second : second + " " + third;
+                    player.move(locationStr.trim());
                 } else if (first.equals("광질") || first.equals("mine")) {
                     boolean isTutorial = player.getObjectVariable(Variable.IS_TUTORIAL);
                     if(!isTutorial) {
@@ -287,7 +288,7 @@ public class KakaoTalk {
     private static void otherCommand(@NonNull final String command, @NonNull final Notification.Action session) {
         if(Arrays.asList("도움말", "명령어", "?", "h", "help").contains(command)) {
             reply(session, "=====명령어 목록=====\n" +
-                            "모든 명령어는 접두어 'n' 또는 'ㅜ'가 포함됩니다\n" +
+                            "모든 명령어는 앞쪽에 " + Emoji.focus("n") + " 또는 " + Emoji.focus("ㅜ") + " 를 붙여야합니다\n" +
                             "(예시 : " + Emoji.focus("n 가방 1") + ")\n" +
                             "영어는 대소문자에 영향받지 않습니다\n" +
                             Emoji.focus("*") + " 이 붙은 명령어는 언제나 사용이 가능한 명령어입니다\n" +
@@ -299,8 +300,10 @@ public class KakaoTalk {
                             "\n---유저 명령어---\n" +
                             "(정보/info/i) : 내 정보를 표시합니다\n" +
                             "(맵/map) : 현재 위치 정보를 표시합니다\n" +
-                            "(이동/move) (x좌표-y좌표) : 해당 좌표의 지역으로 이동합니다(ex : " +
+                            "(이동/move) ({x좌표}-{y좌표}) : 해당 좌표의 지역으로 이동합니다(예시 : " +
                             Emoji.focus("n move 2-3") + ")\n" +
+                            "(이동/move) ({맵 이름}) : 해당 맵으로 이동합니다(예시 : " +
+                            Emoji.focus("n move 시작의 마을") + ")\n" +
                             "(광질/mine) : 광질을 합니다(약 1초 소요)(마을에서만 가능)\n" +
                             "(낚시/fish) : 낚시를 합니다(추가 명령 필요)(강 또는 바다에서만 가능)\n" +
                             "(가방/인벤토리/inventory/inven) [{페이지}] : 현재 인벤토리를 확인합니다\n" +
@@ -314,6 +317,8 @@ public class KakaoTalk {
                             "문의 : 개인 카카오톡 또는 이메일");
         }
     }
+    
+    //TODO : 이동 가능한 거리를 바탕으로 주변 맵 이름 및 좌표 출력
 
     private static void checkResponseChat(@NonNull Player player, @NonNull String msg) {
         String response = null;
