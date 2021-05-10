@@ -157,7 +157,7 @@ public class Player extends Entity {
         this.setBasicStat(StatType.MAXMN, 10);
         this.setBasicStat(StatType.MN, 10);
 
-        this.setMap(this.getLocation());
+        this.setMap(this.getLocation(), 1, true);
     }
 
     //[테스트 칭호] 남식(Lv.123)
@@ -170,7 +170,7 @@ public class Player extends Entity {
     public void displayInfo() {
         StringBuilder innerMsg = new StringBuilder();
 
-        if(!(responseChat.isEmpty() && anyResponseChat.isEmpty())) {
+        if(this.doing.equals(Doing.WAIT_RESPONSE)) {
             innerMsg.append(this.getDisplayResponse())
                     .append("\n\n");
         }
@@ -238,7 +238,7 @@ public class Player extends Entity {
 
             for(String response : anyResponseChat.keySet()) {
                 builder.append("\n")
-                        .append(response);
+                        .append(response.replaceAll("__", "n "));
             }
         }
 
@@ -302,23 +302,30 @@ public class Player extends Entity {
     }
 
     public void displayInventory(int page) {
-        List<Long> highPriorityItems = this.getObjectVariable(Variable.HIGH_PRIORITY_ITEM);
-        BiMap<Long, String> inverseMap = ObjectList.itemList.inverse();
-
         if(this.inventory.isEmpty()) {
             this.replyPlayer("---인벤토리---\n인벤토리가 비어있습니다...");
             return;
         }
 
+        int maxPage = (int) Math.ceil(this.inventory.size() / 30D);
+
+        if(page < 1 || page > maxPage) {
+            throw new WeirdCommandException(page + "페이지 부터 " + maxPage + "페이지 범위 내의 숫자를 입력해주세요");
+        }
+
+        List<Long> highPriorityItems = this.getObjectVariable(Variable.HIGH_PRIORITY_ITEM);
+        BiMap<Long, String> inverseMap = ObjectList.itemList.inverse();
+
         StringBuilder msgBuilder = new StringBuilder("---인벤토리---\n[")
                 .append(page)
-                .append("/")
-                .append(Math.ceil(this.inventory.size() / 30D));
+                .append("페이지 /")
+                .append(maxPage)
+                .append("페이지]");
 
         if(highPriorityItems == null) {
             highPriorityItems = new ArrayList<>();
             this.setVariable(Variable.HIGH_PRIORITY_ITEM, highPriorityItems);
-            msgBuilder.append("우선 표시 설정된 아이템이 없습니다");
+            msgBuilder.append("\n우선 표시 설정된 아이템이 없습니다");
         } else {
             for(long itemId : highPriorityItems) {
                 msgBuilder.append("\n")
@@ -456,6 +463,10 @@ public class Player extends Entity {
         int x = Integer.parseInt(split[0]);
         int y = Integer.parseInt(split[1]);
         Location location = new Location(x, y);
+
+        if(location.equalsMap(this.location)) {
+            throw new WeirdCommandException("현재 위치로는 이동할 수 없습니다");
+        }
 
         int dis = this.getMapDistance(location);
         int movableDis = this.getMovableDistance();
@@ -699,6 +710,9 @@ public class Player extends Entity {
         Config.checkId(Id.CHAT, chatId);
         this.setDoing(Doing.CHAT);
 
+        this.getResponseChat().clear();
+        this.getAnyResponseChat().clear();
+
         Chat chat = Config.getData(Id.CHAT, chatId);
         Notification.Action session = this.getSession();
 
@@ -712,9 +726,15 @@ public class Player extends Entity {
             this.addBasicStat(entry.getKey(), -1 * entry.getValue());
         }
 
-        AtomicReference<String> exception = new AtomicReference<>(null);
         final Chat finalChat = chat;
         Thread thread = new Thread(() -> {
+            try {
+                Thread.sleep(chat.delayTime.get());
+            } catch (InterruptedException e) {
+                Log.e("Player.startChat - chat Thread", Config.errorString(e));
+                return;
+            }
+
             this.addMoney(finalChat.getRewardMoney().get());
 
             for(Map.Entry<Long, Integer> entry : finalChat.getNeedItem().entrySet()) {
@@ -727,28 +747,39 @@ public class Player extends Entity {
 
             long pauseTime = finalChat.getPauseTime().get();
             String preString = "[" + npcName + " -> " + this.getNickName() + "]\n";
-            for(String text : finalChat.getText()) {
-                KakaoTalk.reply(session, preString + text.replaceAll("__nickname", this.getNickName())
+
+            List<String> texts = finalChat.getText();
+            int size = texts.size() - 1;
+            for(int i = 0; i <= size; i++) {
+                KakaoTalk.reply(session, preString + texts.get(i).replaceAll("__nickname", this.getNickName())
                         .replaceAll("__lv", this.getLv().get().toString()));
 
                 try {
-                    Thread.sleep(pauseTime);
+                    if(i != size) {
+                        Thread.sleep(pauseTime);
+                    }
                 } catch (InterruptedException e) {
                     Log.e("Player.startChat - chat Thread", Config.errorString(e));
-                    exception.set(e.getMessage());
                     return;
                 }
             }
 
-            this.addQuest(finalChat.getQuestId().get());
-            this.setMap(finalChat.getTpLocation(), false);
+            long questId = finalChat.getQuestId().get();
+            if(questId != 0) {
+                this.addQuest(finalChat.getQuestId().get());
+            }
+
+            Location tpLocation = finalChat.getTpLocation();
+            if(!this.getLocation().equals(tpLocation)) {
+                this.setMap(finalChat.getTpLocation(), false);
+            }
 
             if(finalChat.getResponseChat().isEmpty() && finalChat.getAnyResponseChat().isEmpty()) {
                 this.setDoing(Doing.NONE);
             } else {
                 long anyLinkedChatId = finalChat.getResponseChat(WaitResponse.ANYTHING);
                 if(anyLinkedChatId != 0) {
-                    if(chatId == anyLinkedChatId) {
+                    if (chatId == anyLinkedChatId) {
                         throw new InvalidNumberException(chatId);
                     }
 
@@ -756,11 +787,11 @@ public class Player extends Entity {
                     return;
                 }
 
-                this.setDoing(Doing.WAIT_RESPONSE);
-
                 this.waitNpcName = npcName;
                 this.responseChat = new ConcurrentHashMap<>(finalChat.getResponseChat());
                 this.anyResponseChat = new ConcurrentHashMap<>(finalChat.getAnyResponseChat());
+
+                this.setDoing(Doing.WAIT_RESPONSE);
             }
         });
 
@@ -769,11 +800,9 @@ public class Player extends Entity {
 
         try {
             thread.join();
-        } catch (InterruptedException ignore) {}
-
-        String exceptionMsg = exception.get();
-        if(exceptionMsg != null) {
-            throw new RuntimeException(exceptionMsg);
+        } catch (InterruptedException e) {
+            Logger.e("player.chatThread", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -983,7 +1012,10 @@ public class Player extends Entity {
 
         try {
             Thread.sleep(new Random().nextInt(1000));
-        } catch (InterruptedException ignore) {}
+        } catch (InterruptedException e) {
+            Logger.e("player.mineThread", e);
+            return;
+        }
 
         int count = this.getItem(itemId);
         this.addItem(itemId, 1);
@@ -1119,7 +1151,9 @@ public class Player extends Entity {
     public void startFishThread(long itemId, int commandCount) {
         Random random = new Random();
 
+        this.setVariable(Variable.FISH_WAIT_TYPE, FishWaitType.NONE);
         this.replyPlayer("낚시를 시작합니다");
+
         Thread thread = new Thread(() -> {
             FishWaitType lastWaitType = null;
             FishWaitType waitType;
@@ -1146,7 +1180,7 @@ public class Player extends Entity {
                 lastWaitType = waitType;
 
                 try {
-                    Thread.sleep(random.nextInt(5000) + 5000);
+                    Thread.sleep(random.nextInt(3000) + 5000);
                 } catch (InterruptedException e) {
                     Logger.e("Player.fishThread", e);
                     throw new RuntimeException(e.getMessage());
@@ -1176,7 +1210,7 @@ public class Player extends Entity {
 
                 synchronized (this) {
                     try {
-                        this.wait(3000);
+                        this.wait(5000);
                     } catch (InterruptedException e) {
                         Logger.e("Player.fishThread - wait", e);
                         throw new RuntimeException(e.getMessage());
@@ -1187,27 +1221,30 @@ public class Player extends Entity {
 
                 FishWaitType response = this.getObjectVariable(Variable.FISH_WAIT_TYPE);
 
-                assert response != null;
                 if(response.equals(FishWaitType.NONE)) {
-                    String successMessage;
-
                     if(i == 0) {
                         this.addItem(itemId, 1);
                         this.addVariable(Variable.FISH_SKILL, 1);
-                        successMessage = "낚시 성공!\n" +
-                                "낚은 아이템: " + ObjectList.itemList.inverse().get(itemId) +
-                                "현재 보유 개수: " + this.getItem(itemId) + "개";
+                        this.setDoing(Doing.NONE);
+                        
+                        //물고기 도감 및 리스트에 관하여 경험치 추가 지급
 
                         int fishLv = this.getVariable(Variable.FISH);
                         if(checkFishLevel()) {
                             this.addVariable(Variable.FISH, 1);
                             this.replyPlayer("낚시 레벨이 올랐습니다!\n낚시 레벨: " + fishLv + " -> " + (fishLv + 1));
                         }
+
+                        this.getVariable().remove(Variable.FISH_WAIT_TYPE);
+                        this.replyPlayer("낚시 성공!\n" +
+                                "낚은 아이템: " + ObjectList.itemList.inverse().get(itemId) + "\n" +
+                                "현재 보유 개수: " + this.getItem(itemId) + "개");
+
+                        return;
                     } else {
-                        successMessage = "성공적으로 물고기를 컨트롤했습니다!";
+                        this.replyPlayer("성공적으로 물고기를 컨트롤했습니다!");
                     }
 
-                    this.replyPlayer(successMessage);
                 } else {
                     int fishSkill = this.getVariable(Variable.FISH_SKILL);
 
@@ -1219,12 +1256,21 @@ public class Player extends Entity {
                         }
                     }
 
+                    this.setDoing(Doing.NONE);
+
                     this.replyPlayer(failMessage);
+                    return;
                 }
             }
         });
 
         MainActivity.startThread(thread);
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            Log.e("Player.fishThread", Config.errorString(e));
+        }
     }
 
     public void fishCommand(String command) {
@@ -1256,13 +1302,12 @@ public class Player extends Entity {
                 throw new WeirdCommandException();
         }
 
-        assert waitType != null;
         if(waitType.equals(response)) {
             this.setVariable(Variable.FISH_WAIT_TYPE, FishWaitType.NONE);
+        }
 
-            synchronized (this) {
-                this.notifyAll();
-            }
+        synchronized (this) {
+            this.notifyAll();
         }
     }
 

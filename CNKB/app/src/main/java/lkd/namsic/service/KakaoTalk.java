@@ -74,24 +74,21 @@ public class KakaoTalk {
                 lastMsg = msg;
 
                 if(isCommand) {
-                    boolean isEnd;
+                    otherCommand(command, session);
+
                     player = Config.loadPlayer(sender, image);
 
                     if (player != null) {
-                        isEnd = playerCommand(player, msg, command, room, isGroupChat, session);
+                        playerCommand(player, msg, command, room, isGroupChat, session);
                     } else {
-                        isEnd = nonPlayerCommand(sender, image, command, room, isGroupChat, session);
-                    }
-
-                    if (!isEnd) {
-                        otherCommand(command, session);
+                        nonPlayerCommand(sender, image, command, room, isGroupChat, session);
                     }
                 }
             } catch (Exception e) {
                 Logger.e("onChat", e);
 
                 //TODO: 추후 봇 전용 휴대폰으로 돌릴 시, 에러 발생을 replyAll 으로 알려야한다.
-                reply(session, "[ERROR!]\n" + e.getMessage());
+                reply(session, "[ERROR]\n" + Config.errorString(e));
 
                 if(player != null) {
                     Config.discardPlayer(player);
@@ -102,16 +99,14 @@ public class KakaoTalk {
         MainActivity.startThread(gameThread);
     }
 
-    private static boolean playerCommand(@NonNull Player player, @NonNull String msg, @NonNull String command,
+    private static void playerCommand(@NonNull Player player, @NonNull String msg, @NonNull String command,
                                          @NonNull String room, boolean isGroupChat, @NonNull Notification.Action session) {
         if(!player.checkChat()) {
-            return true;
+            return;
         }
 
         player.setRecentRoom(room);
         player.setGroup(isGroupChat);
-
-        boolean isRightCmd = false;
 
         try {
             List<String> commands = Arrays.asList(command.split(" "));
@@ -130,23 +125,15 @@ public class KakaoTalk {
             if (Arrays.asList("회원가입", "가입", "register").contains(first)) {
                 reply(session, "이미 회원가입이 되어 있습니다.\n" +
                         "회원가입을 진행한 적이 없는 경우, 프로필 이미지 또는 카카오톡 이름을 변경한 후 다시 시도해주세요");
-
-                isRightCmd = true;
             } else {
                 if (Arrays.asList("정보", "info", "i").contains(first)) {
                     player.displayInfo();
-
-                    isRightCmd = true;
                 } else if (first.equals("맵") || first.equals("map")) {
                     MapClass map = Config.getMapData(player.getLocation());
                     player.replyPlayer(map.getInfo(), map.getInnerInfo());
-
-                    isRightCmd = true;
                 } else if(Arrays.asList("가방", "인벤토리", "inventory", "inven").contains(first)) {
-                    int page = second == null ? 0 : Integer.parseInt(second);
+                    int page = second == null ? 1 : Integer.parseInt(second);
                     player.displayInventory(page);
-
-                    isRightCmd = true;
                 } else if(Arrays.asList("설정", "setting", "set").contains(first)) {
                     if(second == null) {
                         throw new WeirdCommandException();
@@ -190,31 +177,39 @@ public class KakaoTalk {
                             }
                         }
                     }
-
-                    isRightCmd = true;
                 } else if(first.equals("이동") || first.equals("move")) {
+                    checkDoing(player);
+
                     if(second == null) {
                         throw new WeirdCommandException();
                     }
 
-                    checkDoing(player);
                     player.move(second);
-
-                    isRightCmd = true;
                 } else if (first.equals("광질") || first.equals("mine")) {
-                    checkDoing(player);
+                    boolean isTutorial = player.getObjectVariable(Variable.IS_TUTORIAL);
+                    if(!isTutorial) {
+                        checkDoing(player);
+                    } else {
+                        player.setVariable(Variable.IS_TUTORIAL, false);
+                    }
 
                     if (player.canMine()) {
                         player.mine();
+
+                        if(isTutorial) {
+                            player.setDoing(Doing.WAIT_RESPONSE);
+                        }
                     } else {
                         player.replyPlayer("광질이 불가능한 상태입니다");
                     }
-
-                    isRightCmd = true;
                 } else if (first.equals("낚시") || first.equals("fish")) {
                     Doing doing = player.getDoing();
 
                     if(doing.equals(Doing.NONE)) {
+                        if(second != null) {
+                            throw new WeirdCommandException();
+                        }
+
                         if(player.canFish()) {
                             player.fish();
                         } else {
@@ -229,8 +224,6 @@ public class KakaoTalk {
                     } else {
                         throw new DoingFilterException();
                     }
-
-                    isRightCmd = true;
                 }
             }
         } catch (WeirdCommandException | DoingFilterException | ObjectNotFoundException e) {
@@ -239,17 +232,16 @@ public class KakaoTalk {
             player.replyPlayer("숫자를 입력해야합니다");
         }
 
-        checkResponseChat(player, msg);
+        if(player.getDoing().equals(Doing.WAIT_RESPONSE)) {
+            checkResponseChat(player, msg);
+        }
+
         Config.unloadObject(player);
-        
-        return isRightCmd;
     }
 
-    private static boolean nonPlayerCommand(@NonNull String sender, @NonNull String image,
+    private static void nonPlayerCommand(@NonNull String sender, @NonNull String image,
                                             @NonNull String command, @NonNull String room,
                                             boolean isGroupChat, @NonNull Notification.Action session) {
-        boolean isRightCmd = false;
-
         try {
             List<String> commands = Arrays.asList(command.split(" "));
 
@@ -275,18 +267,21 @@ public class KakaoTalk {
                 player.setGroup(isGroupChat);
                 player.setCloseRate(1L, 100);
                 player.setCloseRate(2L, 100);
-                Config.unloadObject(player);
+                player.setVariable(Variable.IS_TUTORIAL, true);
+
+                Config.NICKNAME_LIST.add(second);
+
+                MapClass map = Config.loadMap(Config.MIN_MAP_X, Config.MIN_MAP_Y);
+                map.addEntity(player);
+                Config.unloadMap(map);
 
                 player.replyPlayer("회원가입에 성공하였습니다!");
                 player.startChat(1L, "???");
-
-                isRightCmd = true;
+                Config.unloadObject(player);
             }
         } catch (WeirdCommandException e) {
             reply(session, Objects.requireNonNull(e.getMessage()));
         }
-
-        return isRightCmd;
     }
 
     private static void otherCommand(@NonNull final String command, @NonNull final Notification.Action session) {
