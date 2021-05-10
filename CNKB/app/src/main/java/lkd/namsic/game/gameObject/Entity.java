@@ -1,20 +1,23 @@
 package lkd.namsic.game.gameObject;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lkd.namsic.game.Config;
+import lkd.namsic.game.Variable;
 import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
-import lkd.namsic.game.Config;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
@@ -27,8 +30,6 @@ import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.UnhandledEnumException;
-import lkd.namsic.game.Variable;
-import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -758,8 +759,31 @@ public abstract class Entity extends NamedObject {
         return (T) this.variable.get(variable);
     }
 
+    public List<Long> getListVariable(Variable variable) {
+        List<String> list = this.getObjectVariable(variable);
+        List<Long> outputList = new ArrayList<>();
+
+        for(String element : list) {
+            outputList.add(Long.parseLong(element));
+        }
+
+        this.setVariable(variable, outputList);
+        return outputList;
+    }
+
+    public Map<Long, Integer> getMapVariable(Variable variable) {
+        Map<String, Double> map = this.getObjectVariable(variable);
+        Map<Long, Integer> outputMap = new HashMap<>();
+
+        for(Map.Entry<String, Double> entry : map.entrySet()) {
+            outputMap.put((long) Double.parseDouble(entry.getKey()), entry.getValue().intValue());
+        }
+
+        this.setVariable(variable, outputMap);
+        return outputMap;
+    }
+
     public void addVariable(Variable variable, int value) {
-//        TODO : Type cast error
         this.setVariable(variable, this.getVariable(variable) + value);
     }
 

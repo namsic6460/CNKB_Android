@@ -149,7 +149,7 @@ public class KakaoTalk {
                             throw new ObjectNotFoundException("해당 이름을 가진 아이템을 찾을 수 없습니다");
                         }
 
-                        List<Long> highPriorityItems = player.getObjectVariable(Variable.HIGH_PRIORITY_ITEM);
+                        List<Long> highPriorityItems = player.getListVariable(Variable.HIGH_PRIORITY_ITEM);
 
                         if(third.equals("추가") || third.equals("add")) {
                             if(highPriorityItems == null) {
@@ -288,7 +288,7 @@ public class KakaoTalk {
         if(Arrays.asList("도움말", "명령어", "?", "h", "help").contains(command)) {
             reply(session, "=====명령어 목록=====\n" +
                             "모든 명령어는 접두어 'n' 또는 'ㅜ'가 포함됩니다\n" +
-                            "(예시 : " + Emoji.focus("n 가방 1") + "\n" +
+                            "(예시 : " + Emoji.focus("n 가방 1") + ")\n" +
                             "영어는 대소문자에 영향받지 않습니다\n" +
                             Emoji.focus("*") + " 이 붙은 명령어는 언제나 사용이 가능한 명령어입니다\n" +
                             "() : 필수 명령어, [] : 필수x 명령어, {} : 직접 입력",

@@ -313,7 +313,7 @@ public class Player extends Entity {
             throw new WeirdCommandException(page + "페이지 부터 " + maxPage + "페이지 범위 내의 숫자를 입력해주세요");
         }
 
-        List<Long> highPriorityItems = this.getObjectVariable(Variable.HIGH_PRIORITY_ITEM);
+        List<Long> highPriorityItems = this.getListVariable(Variable.HIGH_PRIORITY_ITEM);
         BiMap<Long, String> inverseMap = ObjectList.itemList.inverse();
 
         StringBuilder msgBuilder = new StringBuilder("---인벤토리---\n[")
@@ -1223,11 +1223,13 @@ public class Player extends Entity {
                 if(response.equals(FishWaitType.NONE)) {
                     if(i == 0) {
                         this.addItem(itemId, 1);
-                        this.addVariable(Variable.FISH_SKILL, 1);
                         this.setDoing(Doing.NONE);
 
                         if(itemTier != 0) {
-                            Map<Long, Integer> fishMap = this.getObjectVariable(Variable.FISH_MAP);
+                            this.addVariable(Variable.FISH_SKILL, 1);
+
+                            Map<Long, Integer> fishMap = this.getMapVariable(Variable.FISH_MAP);
+
                             if (fishMap == null) {
                                 fishMap = new ConcurrentHashMap<>();
                                 this.setVariable(Variable.FISH_MAP, fishMap);
