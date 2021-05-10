@@ -8,6 +8,7 @@ public enum Variable {
     FISH_MAP,
     FISH_SKILL,
     MINE,
-    HIGH_PRIORITY_ITEM
+    HIGH_PRIORITY_ITEM,
+    IS_TUTORIAL
 
 }

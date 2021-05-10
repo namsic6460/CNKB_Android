@@ -27,7 +27,6 @@ public class ForcedTerminationService extends Service {
         Config.onTerminate();
         for(Thread thread : MainActivity.threads) {
             if (thread.isAlive()) {
-                thread.notifyAll();
                 thread.interrupt();
                 try {
                     thread.join(1000);

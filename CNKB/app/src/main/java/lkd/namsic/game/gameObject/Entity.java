@@ -28,6 +28,7 @@ import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.Variable;
+import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -179,7 +180,7 @@ public abstract class Entity extends NamedObject {
 
     public boolean setMap(Location location, int distance, boolean isToBase) {
         if(isToBase) {
-            return this.setMap(location.getX().get(), this.location.getY().get(), 1, 1, distance,true);
+            return this.setMap(location.getX().get(), location.getY().get(), 1, 1, distance,true);
         } else {
             return this.setMap(location.getX().get(), location.getY().get(),
                     location.getFieldX().get(), location.getFieldY().get(), distance, false);
@@ -194,6 +195,17 @@ public abstract class Entity extends NamedObject {
         boolean isCancelled = MoveEvent.handleEvent(this.events.get(MoveEvent.getName()), new Object[]{distance, false});
 
         if(!isCancelled) {
+            MapClass prevMap = null;
+
+            try {
+                prevMap = Config.loadMap(this.location);
+                prevMap.removeEntity(this);
+            } finally {
+                if(prevMap != null) {
+                    Config.unloadMap(prevMap);
+                }
+            }
+
             MapClass moveMap = null;
 
             try {
@@ -214,17 +226,6 @@ public abstract class Entity extends NamedObject {
             } finally {
                 if(moveMap != null) {
                     Config.unloadMap(moveMap);
-                }
-            }
-
-            MapClass prevMap = null;
-
-            try {
-                prevMap = Config.loadMap(this.location);
-                prevMap.removeEntity(this);
-            } finally {
-                if(prevMap != null && !this.id.getId().equals(Id.PLAYER)) {
-                    Config.unloadMap(prevMap);
                 }
             }
         }
@@ -743,16 +744,22 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getVariable(Variable variable) {
-        return (int) this.variable.getOrDefault(variable, 0);
+        Object value = this.variable.getOrDefault(variable, 0);
+
+        if(value instanceof Double) {
+            return ((Double) value).intValue();
+        } else {
+            return (int) value;
+        }
     }
 
-    @Nullable
     @SuppressWarnings("unchecked")
     public <T> T getObjectVariable(Variable variable) {
         return (T) this.variable.get(variable);
     }
 
     public void addVariable(Variable variable, int value) {
+//        TODO : Type cast error
         this.setVariable(variable, this.getVariable(variable) + value);
     }
 

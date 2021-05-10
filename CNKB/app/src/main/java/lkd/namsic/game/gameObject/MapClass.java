@@ -43,7 +43,7 @@ public class MapClass {
 
     final Location location = new Location();
 
-    Map<Id, Map<Long, Double>> spawnMonster;
+    Map<Id, Map<Long, Double>> spawnMonster = new ConcurrentHashMap<>();
 
     //This part can be frequently changed
     final Map<Location, Long> money = new ConcurrentHashMap<>();
@@ -111,15 +111,15 @@ public class MapClass {
         locationSet.addAll(this.item.keySet());
         locationSet.addAll(this.equip.keySet());
 
-        Id id;
         Entity entity;
-        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : this.entity.entrySet()) {
-            id = entry.getKey();
+        for(long monsterId : this.getEntity(Id.MONSTER)) {
+            entity = Config.getData(Id.MONSTER, monsterId);
+            locationSet.add(entity.getLocation());
+        }
 
-            for(long entityId : entry.getValue()) {
-                entity = Config.getData(id, entityId);
-                locationSet.add(entity.getLocation());
-            }
+        for(long bossId : this.getEntity(Id.BOSS)) {
+            entity = Config.getData(Id.BOSS, bossId);
+            locationSet.add(entity.getLocation());
         }
 
         if(locationSet.isEmpty()) {

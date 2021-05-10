@@ -30,6 +30,7 @@ public class ObjectMaker {
                 Logger.i("ObjectMaker", "Object making is done!");
             } catch (Exception e) {
                 Logger.e("ObjectMaker", e);
+                System.exit(-1);
             }
         });
         MainActivity.startThread(thread);
@@ -703,16 +704,16 @@ public class ObjectMaker {
         chat.getId().setObjectId(1L);
         chat.getText().addAll(Arrays.asList(
                 "드디어 일어났네 __nickname",
-                "아 이 소리가 어디서 들려오는지는 아직은 몰라도 될거야. 결국엔 알게될테니까",
+                "아 이 소리가 어디서 들려오는지는 아직은 몰라도 될거야. 결국엔 알게 될테니까",
                 "어찌됬든 넌 여기서 성장해야만 해. 그리고 니가 나한테 했던 약속을 지켜야겠지",
                 "음 뭐가됬든 일단 기본적인거부터 가르쳐줄게. " + Emoji.focus("n 도움말")
                         + " 을 입력해서 명령어를 살펴봐"
         ));
-        chat.setAnyResponseChat("__도움말", 2);
-        chat.setAnyResponseChat("__명령어", 2);
-        chat.setAnyResponseChat("__?", 2);
-        chat.setAnyResponseChat("__h", 2);
-        chat.setAnyResponseChat("__help", 2);
+        chat.setAnyResponseChat("__도움말", 2, true);
+        chat.setAnyResponseChat("__명령어", 2, true);
+        chat.setAnyResponseChat("__?", 2, true);
+        chat.setAnyResponseChat("__h", 2, true);
+        chat.setAnyResponseChat("__help", 2, true);
         Config.unloadObject(chat);
 
         chat = new Chat();
@@ -721,13 +722,13 @@ public class ObjectMaker {
                 "좋아, 잘 따라오고 있네",
                 "일단 네 정보부터 살펴볼 필요가 있겠지",
                 "명령어 목록을 보고 네 정보를 표시하는 명령어를 사용해봐",
-                "아 물론 거기 적혀있기도 하지만 네가 명령어 창을 연 것 처럼," +
+                "아 물론 거기 적혀있기도 하지만 네가 명령어 창을 연 것 처럼, " +
                         "모든 명령어에는 " + Emoji.focus("n") + "이나 " +
                         Emoji.focus("ㅜ") + "라는 접두사가 포함되니까 기억해"
         ));
-        chat.setAnyResponseChat("__정보", 3);
-        chat.setAnyResponseChat("__info", 3);
-        chat.setAnyResponseChat("__i", 3);
+        chat.setAnyResponseChat("__정보", 3, true);
+        chat.setAnyResponseChat("__info", 3, true);
+        chat.setAnyResponseChat("__i", 3, true);
         Config.unloadObject(chat);
 
         chat = new Chat();
@@ -735,24 +736,28 @@ public class ObjectMaker {
         chat.getText().addAll(Arrays.asList(
                 "거기 표시된 정보는 위에서부터 [돈, 체력, 마나, 현재 위치(+좌표), 레벨," +
                         " 잔여 스텟 포인트, 모험 포인트, 거점(+좌표)] 야",
-                "일단 우리는 0.0.1.1, 그러니까 가장 외곽에 있는거고, 거점도 여기로 잡혀있어",
+                "일단 우리는 0-0-1-1, 그러니까 가장 외곽에 있는거고, 거점도 여기로 잡혀있어",
                 "거점? 아 거점은 죽으면 태어나는 장소야. 어짜피 넌 내 권능때문에 죽을 수 없거든...",
                 "마지막으로 간단한거 하나만 소개하고 가봐야겠네. 일단 마을에서는 광질을 할 수 있으니까" +
-                        "광질 명령어를 입력해봐"
+                        " 광질 명령어를 입력해봐"
         ));
-        chat.setAnyResponseChat("__광질", 4);
-        chat.setAnyResponseChat("__mine", 4);
+        chat.setAnyResponseChat("__광질", 4, true);
+        chat.setAnyResponseChat("__mine", 4, true);
         Config.unloadObject(chat);
 
         chat = new Chat();
         chat.getId().setObjectId(4L);
         chat.getText().addAll(Arrays.asList(
-                "그럼 난 이만 가볼게. 어짜피 할 일도 많고 너도 이젠 혼자서 다 할 수 있을거같으니까",
+                "그럼 난 이만 가볼게. 어짜피 할 일도 많고 너도 이젠 혼자서 다 할 수 있을거 같으니까",
                 "뭐라도 주고 가라고? 골드를 조금 넣어놨으니까 그거라도 써",
                 "아 그리고... ... ... (더 이상 들리지 않는다)"
         ));
+        chat.getDelayTime().set(1500L);
         chat.getRewardMoney().set(1000L);
         Config.unloadObject(chat);
+
+        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 5L));
+        Logger.i("ObjectMaker", "Chat making is done!");
    }
 
     private static void makeNpc() {
@@ -769,6 +774,9 @@ public class ObjectMaker {
         npc.getId().setObjectId(2L);
         npc.getLocation().set(0, 0, 1, 1);
         Config.unloadObject(npc);
+
+        Config.ID_COUNT.put(Id.NPC, Math.max(Config.ID_COUNT.get(Id.NPC), 3L));
+        Logger.i("ObjectMaker", "Npc making is done!");
     }
 
 }
