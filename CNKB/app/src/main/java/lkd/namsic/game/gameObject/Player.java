@@ -105,8 +105,6 @@ public class Player extends Entity {
     @Setter
     boolean isGroup = true;
 
-    private long lastTime = System.currentTimeMillis();
-
     final Location baseLocation = new Location();
 
     final LimitDouble moneyBoost = new LimitDouble(1, 1D, Double.MAX_VALUE);
@@ -117,7 +115,10 @@ public class Player extends Entity {
     final LimitLong exp = new LimitLong(0, 0L, Long.MAX_VALUE);
 
     @Setter
-    int lastDay = LocalDateTime.now().getDayOfMonth();
+    int lastYear = LocalDateTime.now().getYear();
+
+    @Setter
+    int lastDay = LocalDateTime.now().getDayOfYear();
 
     final Set<Long> achieve = new ConcurrentHashSet<>();
     final Set<Long> research = new ConcurrentHashSet<>();
@@ -374,26 +375,21 @@ public class Player extends Entity {
         KakaoTalk.reply(this.getSession(), this.getName() + "\n" + msg, innerMsg);
     }
 
-    public boolean checkChat() {
-        long currentTime = System.currentTimeMillis();
-        long diffTime = currentTime - this.lastTime;
-        this.lastTime = currentTime;
+    public void checkNewDay() {
+        LocalDateTime now = LocalDateTime.now();
+        int day = now.getDayOfYear();
+        int year = now.getYear();
 
-        boolean flag = this.getDoing().equals(Doing.FIGHT) ? diffTime >= 3000 : diffTime >= 500;
-        if(flag) {
-            LocalDateTime now = LocalDateTime.now();
-
-            if(now.getDayOfMonth() != this.lastDay) {
-                this.lastDay = now.getDayOfMonth();
-                this.newDay();
-            }
+        if(day != this.lastDay || year != this.lastYear) {
+            this.lastDay = day;
+            this.lastYear = year;
+            this.newDay();
         }
-
-        return flag;
     }
 
     public void newDay() {
-        System.out.println("New Day!");
+        //출석 보상
+        this.replyPlayer("New Day!");
     }
 
     @NonNull

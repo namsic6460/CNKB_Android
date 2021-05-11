@@ -101,9 +101,7 @@ public class KakaoTalk {
 
     private static void playerCommand(@NonNull Player player, @NonNull String msg, @NonNull String command,
                                          @NonNull String room, boolean isGroupChat, @NonNull Notification.Action session) {
-        if(!player.checkChat()) {
-            return;
-        }
+        player.checkNewDay();
 
         player.setRecentRoom(room);
         player.setGroup(isGroupChat);
@@ -144,8 +142,8 @@ public class KakaoTalk {
                             throw new WeirdCommandException();
                         }
 
-                        long itemId = ObjectList.getItem(fourth);
-                        if(itemId == 0L) {
+                        Long itemId = ObjectList.itemList.get(fourth);
+                        if(itemId == null) {
                             throw new ObjectNotFoundException("해당 이름을 가진 아이템을 찾을 수 없습니다");
                         }
 

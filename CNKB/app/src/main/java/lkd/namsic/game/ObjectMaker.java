@@ -7,11 +7,13 @@ import java.util.Random;
 import lkd.namsic.MainActivity;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
+import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.gameObject.Chat;
 import lkd.namsic.game.gameObject.Item;
 import lkd.namsic.game.gameObject.MapClass;
 import lkd.namsic.game.gameObject.Npc;
 import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.gameObject.Quest;
 import lkd.namsic.setting.Logger;
 
 public class ObjectMaker {
@@ -25,6 +27,7 @@ public class ObjectMaker {
                 makeEquip();
                 makeMap();
                 makeChat();
+                makeQuest();
                 makeNpc();
 
                 Logger.i("ObjectMaker", "Object making is done!");
@@ -756,8 +759,67 @@ public class ObjectMaker {
         chat.getRewardMoney().set(1000L);
         Config.unloadObject(chat);
 
-        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 5L));
+        chat = new Chat();
+        chat.getId().setObjectId(5L);
+        chat.getText().addAll(Arrays.asList(
+                "음? 못보던 얼굴이군",
+                "그래 이름이 __nickname 이라고?",
+                "난 이 '시작의 마을' 의 이장이라네. 잘 지네봄세"
+        ));
+        Config.unloadObject(chat);
+        
+        chat = new Chat();
+        chat.getId().setObjectId(6L);
+        chat.getText().addAll(Arrays.asList(
+                "그래 무슨 일인가 __nickname?",
+                "1: 광질을 하면서 할만한 일이 있을까요?\n" +
+                        "2: 낚시를 하면서 할만한 일이 있을까요?\n" +
+                        "3: 아무것도 아닙니다"
+        ));
+        chat.setAnyResponseChat("1", 7, true);
+        chat.setAnyResponseChat("2", 8, true);
+        chat.setAnyResponseChat("3", 9, true);
+        Config.unloadObject(chat);
+
+        chat = new Chat();
+        chat.getId().setObjectId(7L);
+        chat.getText().addAll(Arrays.asList(
+                "음 광질을 하면서 할만한 일은 항상 있지!",
+                "아무래도 돌이 항상 부족해서 말이야..",
+                "돌 50개만 구해와줄 수 있겠나?"
+        ));
+        chat.setResponseChat(WaitResponse.YES, 10, true);
+        chat.setResponseChat(WaitResponse.NO, 11, true);
+        Config.unloadObject(chat);
+
+        chat = new Chat();
+        chat.getId().setObjectId(8L);
+        chat.getText().addAll(Arrays.asList(
+                "음 낚시를 하면서 할만한 일이라...",
+                "생각해보니 요즘 강과 바다가 좀 더러워진 것 같아서 말이지",
+                "쓰레기 10개만 구해와줄 수 있겠나?"
+        ));
+        chat.setResponseChat(WaitResponse.YES, 12, true);
+        chat.setResponseChat(WaitResponse.NO, 11, true);
+        Config.unloadObject(chat);
+
+        chat = new Chat();
+        chat.getId().setObjectId(9L);
+        chat.getText().add("그래그래, 뭐 필요한 일 있으면 말하게나");
+        Config.unloadObject(chat);
+
+        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), L));
         Logger.i("ObjectMaker", "Chat making is done!");
+   }
+
+   private static void makeQuest() {
+       Quest quest = new Quest("광부의 일", 5L);
+       quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
+
+       Config.unloadObject(quest);
+
+       Config.ID_COUNT.put(Id.QUEST, Math.max(Config.ID_COUNT.get(Id.CHAT), 5L));
+       Logger.i("ObjectMaker", "Quest making is done!");
    }
 
     private static void makeNpc() {
@@ -774,8 +836,13 @@ public class ObjectMaker {
         npc.getId().setObjectId(2L);
         npc.getLocation().set(0, 0, 1, 1);
         Config.unloadObject(npc);
+        
+        npc = new Npc("시작의 마을 이장");
+        npc.getId().setObjectId(3L);
+        npc.getLocation().set(0, 0, 16, 16);
+        Config.unloadObject(npc);
 
-        Config.ID_COUNT.put(Id.NPC, Math.max(Config.ID_COUNT.get(Id.NPC), 3L));
+        Config.ID_COUNT.put(Id.NPC, Math.max(Config.ID_COUNT.get(Id.NPC), 5L));
         Logger.i("ObjectMaker", "Npc making is done!");
     }
 

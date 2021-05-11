@@ -105,15 +105,18 @@ public class ObjectList {
             .put("(Myth) 폐어", 93L)
             .build();
 
+    public final static BiMap<String, Long> questList = new ImmutableBiMap.Builder<String, Long>()
+            .put("광부의 일", 1L)
+            .put("낚시꾼의 일", 2L)
+            .put("장작이 필요해!", 3L)
+            .put("미꾸라지 낚시", 4L)
+            .build();
+
     public final static BiMap<String, String> mapList = new ImmutableBiMap.Builder<String, String>()
             .put("0-0", "시작의 마을")
-            .put("0-1", "평화로운 바닷가")
+            .put("0-1", "바닷가 청소")
             .put("1-0", "모험의 평원")
             .put("1-1", "평화로운 강")
             .build();
-
-    public static long getItem(String name) {
-        return itemList.getOrDefault(name, 0L);
-    }
 
 }
