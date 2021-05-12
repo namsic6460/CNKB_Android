@@ -4,17 +4,19 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import lkd.namsic.game.Variable;
 import lkd.namsic.game.base.LimitId;
+import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.Config;
 import lkd.namsic.game.enums.Id;
-import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
-import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -32,22 +34,13 @@ public class Chat extends GameObject {
     final Map<WaitResponse, Long> responseChat = new HashMap<>();
     final Map<String, Long> anyResponseChat = new HashMap<>();
 
-    final LimitLong needMoney = new LimitLong(0, 0L, Long.MAX_VALUE);
-    final Map<StatType, Integer> needStat = new HashMap<>();
-    final Map<Long, Integer> needItem = new HashMap<>();
-
-    final LimitLong rewardMoney = new LimitLong(0, 0L, Long.MAX_VALUE);
-    final Map<StatType, Integer> rewardStat = new HashMap<>();
-    final Map<Long, Integer> rewardItem = new HashMap<>();
+    final LimitInteger money = new LimitInteger(0, 0, null);
+    final Set<Long> equipment = new HashSet<>();
+    final Map<Long, Integer> item = new HashMap<>();
+    final Map<Variable, Integer> variable = new HashMap<>();
 
     public Chat() {
         this.id.setId(Id.CHAT);
-    }
-
-    public void setResponseChat(@NonNull Map<WaitResponse, Long> responseChat) {
-        for(Map.Entry<WaitResponse, Long> entry : responseChat.entrySet()) {
-            this.setResponseChat(entry.getKey(), entry.getValue());
-        }
     }
 
     public void setResponseChat(@NonNull WaitResponse waitResponse, long chatId) {
@@ -90,88 +83,12 @@ public class Chat extends GameObject {
         return this.anyResponseChat.getOrDefault(response, 0L);
     }
 
-    public void setNeedStat(@NonNull StatType statType, int stat) {
-        Config.checkStatType(statType);
-
-        if(stat < 0) {
-            throw new NumberRangeException(stat, 0);
-        }
-
-        if(stat == 0) {
-            this.needStat.remove(statType);
-        } else {
-            this.needStat.put(statType, stat);
-        }
+    public void setVariable(@NonNull Variable variable, int value) {
+        this.variable.put(variable, value);
     }
 
-    public int getNeedStat(@NonNull StatType statType) {
-        return this.needStat.getOrDefault(statType, 0);
-    }
-
-    public void addNeedStat(@NonNull StatType statType, int stat) {
-        this.setNeedStat(statType, this.getNeedStat(statType) + stat);
-    }
-
-    public void setNeedItem(long itemId, int count) {
-        if(count < 0) {
-            throw new NumberRangeException(count, 0);
-        }
-
-        if(count == 0) {
-            this.needItem.remove(itemId);
-        } else {
-            this.needItem.put(itemId, count);
-        }
-    }
-
-    public int getNeedItem(long itemId) {
-        return this.needItem.getOrDefault(itemId, 0);
-    }
-
-    public void addNeedItem(long itemId, int count) {
-        this.setNeedItem(itemId, this.getNeedItem(itemId) + count);
-    }
-
-    public void setRewardStat(@NonNull StatType statType, int stat) {
-        Config.checkStatType(statType);
-
-        if(stat < 0) {
-            throw new NumberRangeException(stat, 0);
-        }
-
-        if(stat == 0) {
-            this.rewardStat.remove(statType);
-        } else {
-            this.rewardStat.put(statType, stat);
-        }
-    }
-
-    public int getRewardStat(@NonNull StatType statType) {
-        return this.rewardStat.getOrDefault(statType, 0);
-    }
-
-    public void addRewardStat(@NonNull StatType statType, int stat) {
-        this.setRewardStat(statType, this.getRewardStat(statType) + stat);
-    }
-
-    public void setRewardItem(long itemId, int count) {
-        if(count < 0) {
-            throw new NumberRangeException(count, 0);
-        }
-
-        if(count == 0) {
-            this.rewardItem.remove(itemId);
-        } else {
-            this.rewardItem.put(itemId, count);
-        }
-    }
-
-    public int getRewardItem(long itemId) {
-        return this.rewardItem.getOrDefault(itemId, 0);
-    }
-
-    public void addRewardItem(long itemId, int count) {
-        this.setRewardItem(itemId, this.getRewardItem(itemId) + count);
+    public int getVariable(@NonNull Variable variable) {
+        return this.variable.put(variable, 0);
     }
 
 }
