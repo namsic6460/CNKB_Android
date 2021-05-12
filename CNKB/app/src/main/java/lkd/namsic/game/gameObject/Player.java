@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.google.common.collect.BiMap;
 
@@ -23,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lkd.namsic.MainActivity;
 import lkd.namsic.game.Emoji;
 import lkd.namsic.game.ObjectList;
+import lkd.namsic.game.Percent;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitDouble;
 import lkd.namsic.game.base.LimitInteger;
@@ -53,30 +53,6 @@ import lombok.ToString;
 @Getter
 @ToString
 public class Player extends Entity {
-    
-    public static List<List<Double>> MINE_PERCENT = Arrays.asList(
-            Arrays.asList(50D, 45D, 40D, 35D, 30D, 30D, 30D, 25D, 20D),
-            Arrays.asList(35D, 35D, 20D, 10D, 0D, 0D, 0D, 0D, 0D),
-            Arrays.asList(14D, 15D, 20D, 15D, 0D, 0D, 0D, 0D, 0D),
-            Arrays.asList(1D, 4.5D, 14D, 20D, 15D, 0D, 0D, 0D, 0D),
-            Arrays.asList(0D, 0.5D, 5.5D, 12D, 40D, 20D, 0D, 0D, 0D),
-            Arrays.asList(0D, 0D, 0.5D, 7.6D, 10D, 30D, 25D, 0D, 0D),
-            Arrays.asList(0D, 0D, 0D, 0.4D, 4.98D, 15D, 25D, 20D, 0D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0.019D, 4.8D, 15D, 32.5D, 30.5D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0.001D, 0.149D, 4.79D, 17.5D, 30.3D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0.001D, 0.2095D, 4.99D, 19.042D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0.0005D, 0.0055D, 0.1577D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0D, 0.0001D, 0.0003D)
-    );
-
-    public static List<List<Double>> FISH_PERCENT = Arrays.asList(
-            Arrays.asList(35D, 25D, 15D, 5D, 1D, 0D, 0D, 0D, 0D),
-            Arrays.asList(55D, 50D, 35D, 25D, 15D, 10D, 9D, 7D, 4D),
-            Arrays.asList(10D, 25D, 40D, 40D, 30D, 25D, 20D, 10D, 5D),
-            Arrays.asList(0D, 0D, 10D, 30D, 50D, 45D, 30D, 30D, 25D),
-            Arrays.asList(0D, 0D, 0D, 0D, 4D, 20D, 40D, 5D, 60D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0D, 0D, 1D)
-    );
 
     @NonNull
     final
@@ -107,12 +83,12 @@ public class Player extends Entity {
 
     final Location baseLocation = new Location();
 
-    final LimitDouble moneyBoost = new LimitDouble(1, 1D, Double.MAX_VALUE);
-    final LimitDouble expBoost = new LimitDouble(1, 1D, Double.MAX_VALUE);
+    final LimitDouble moneyBoost = new LimitDouble(1, 1D, null);
+    final LimitDouble expBoost = new LimitDouble(1, 1D, null);
 
     final LimitInteger sp = new LimitInteger(0, Config.MIN_SP, Config.MAX_SP);
-    final LimitInteger adv = new LimitInteger(0, 0, Integer.MAX_VALUE);
-    final LimitLong exp = new LimitLong(0, 0L, Long.MAX_VALUE);
+    final LimitInteger adv = new LimitInteger(0, 0, null);
+    final LimitLong exp = new LimitLong(0, 0L, null);
 
     @Setter
     int lastYear = LocalDateTime.now().getYear();
@@ -511,6 +487,7 @@ public class Player extends Entity {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public boolean useItem(long itemId, @NonNull List<GameObject> other) {
         Config.checkId(Id.ITEM, itemId);
 
@@ -559,7 +536,7 @@ public class Player extends Entity {
 
     public void addExp(long exp) {
         if(exp < 0) {
-            throw new NumberRangeException(0, 0, Long.MAX_VALUE);
+            throw new NumberRangeException(0, 0);
         }
 
         exp *= Config.EXP_BOOST;
@@ -647,86 +624,13 @@ public class Player extends Entity {
         this.exp.add(-1 * requiredExp);
     }
 
-    @Nullable
-    public String canStartChat(Chat chat) {
-        this.revalidateBuff();
-
-        String failMsg = "";
-
-        long needMoney = chat.getNeedMoney().get();
-        if(needMoney != 0 && this.getMoney() < needMoney) {
-            failMsg += "보유 골드가 부족합니다(부족한 금액 : " + (needMoney - this.getMoney()) + "G)\n\n";
-        }
-
-        long questId = chat.getQuestId().get();
-        if (!this.canAddQuest(questId)) {
-            failMsg += "퀘스트 수령이 불가능합니다(상세 내용은 퀘스트 검색(아이디 : " + questId + ")\n\n";
-        }
-
-        int diff;
-        Map<String, Integer> missingItem = new HashMap<>();
-
-        for (Map.Entry<Long, Integer> entry : chat.getNeedItem().entrySet()) {
-            long key = entry.getKey();
-            int value = entry.getValue();
-
-            diff = value - this.getItem(key);
-
-            if (diff > 0) {
-                Item item = Config.getData(Id.ITEM, key);
-                missingItem.put(item.getName(), diff);
-            }
-        }
-
-        if (!missingItem.isEmpty()) {
-            failMsg += "보유 아이템이 부족합니다\n---부족한 아이템 목록---\n" + Config.mapToDisplayString(missingItem) + "\n";
-        }
-
-        Map<String, Integer> missingStat = new ConcurrentHashMap<>();
-
-        for(Map.Entry<StatType, Integer> entry : chat.getNeedStat().entrySet()) {
-            StatType key = entry.getKey();
-            int value = entry.getValue();
-
-            diff = entry.getValue() - this.getStat(entry.getKey());
-
-            if(diff > 0) {
-                missingStat.put(key.toString(), value);
-            }
-        }
-
-        if(!missingStat.isEmpty()) {
-            failMsg += "스텟이 부족합니다\n---부족한 스텟 목록---\n : " + Config.mapToDisplayString(missingStat);
-        }
-
-        if(failMsg.equals("")) {
-            return null;
-        } else {
-            return failMsg;
-        }
-    }
-
-    public void startChat(long chatId, @NonNull  String npcName) {
+    public void startChat(long chatId, @NonNull String npcName) {
         Config.checkId(Id.CHAT, chatId);
         this.setDoing(Doing.CHAT);
-
-        this.getResponseChat().clear();
-        this.getAnyResponseChat().clear();
 
         Chat chat = Config.getData(Id.CHAT, chatId);
         Notification.Action session = this.getSession();
 
-        this.addMoney(-1 * chat.getNeedMoney().get());
-
-        for(Map.Entry<Long, Integer> entry : chat.getNeedItem().entrySet()) {
-            this.addItem(entry.getKey(), -1 * entry.getValue());
-        }
-
-        for(Map.Entry<StatType, Integer> entry : chat.getNeedStat().entrySet()) {
-            this.addBasicStat(entry.getKey(), -1 * entry.getValue());
-        }
-
-        final Chat finalChat = chat;
         Thread thread = new Thread(() -> {
             try {
                 Thread.sleep(chat.delayTime.get());
@@ -735,20 +639,10 @@ public class Player extends Entity {
                 return;
             }
 
-            this.addMoney(finalChat.getRewardMoney().get());
-
-            for(Map.Entry<Long, Integer> entry : finalChat.getNeedItem().entrySet()) {
-                this.addItem(entry.getKey(), entry.getValue());
-            }
-
-            for(Map.Entry<StatType, Integer> entry : finalChat.getNeedStat().entrySet()) {
-                this.addBasicStat(entry.getKey(), entry.getValue());
-            }
-
-            long pauseTime = finalChat.getPauseTime().get();
+            long pauseTime = chat.getPauseTime().get();
             String preString = "[" + npcName + " -> " + this.getNickName() + "]\n";
 
-            List<String> texts = finalChat.getText();
+            List<String> texts = chat.getText();
             int size = texts.size() - 1;
             for(int i = 0; i <= size; i++) {
                 KakaoTalk.reply(session, preString + texts.get(i).replaceAll("__nickname", this.getNickName())
@@ -764,20 +658,34 @@ public class Player extends Entity {
                 }
             }
 
-            long questId = finalChat.getQuestId().get();
+            this.addMoney(chat.getMoney().get());
+
+            for(Map.Entry<Long, Integer> entry : chat.getItem().entrySet()) {
+                this.addItem(entry.getKey(), entry.getValue());
+            }
+
+            for(long equipId : chat.getEquipment()) {
+                this.addEquip(equipId);
+            }
+
+            for(Map.Entry<Variable, Integer> entry : chat.getVariable().entrySet()) {
+                this.addVariable(entry.getKey(), entry.getValue());
+            }
+
+            long questId = chat.getQuestId().get();
             if(questId != 0) {
-                this.addQuest(finalChat.getQuestId().get());
+                this.addQuest(chat.getQuestId().get());
             }
 
-            Location tpLocation = finalChat.getTpLocation();
+            Location tpLocation = chat.getTpLocation();
             if(!this.getLocation().equals(tpLocation)) {
-                this.setMap(finalChat.getTpLocation(), false);
+                this.setMap(chat.getTpLocation(), false);
             }
 
-            if(finalChat.getResponseChat().isEmpty() && finalChat.getAnyResponseChat().isEmpty()) {
+            if(chat.getResponseChat().isEmpty() && chat.getAnyResponseChat().isEmpty()) {
                 this.setDoing(Doing.NONE);
             } else {
-                long anyLinkedChatId = finalChat.getResponseChat(WaitResponse.ANYTHING);
+                long anyLinkedChatId = chat.getResponseChat(WaitResponse.ANYTHING);
                 if(anyLinkedChatId != 0) {
                     if (chatId == anyLinkedChatId) {
                         throw new InvalidNumberException(chatId);
@@ -788,8 +696,8 @@ public class Player extends Entity {
                 }
 
                 this.waitNpcName = npcName;
-                this.responseChat = new ConcurrentHashMap<>(finalChat.getResponseChat());
-                this.anyResponseChat = new ConcurrentHashMap<>(finalChat.getAnyResponseChat());
+                this.responseChat = new ConcurrentHashMap<>(chat.getResponseChat());
+                this.anyResponseChat = new ConcurrentHashMap<>(chat.getAnyResponseChat());
 
                 this.setDoing(Doing.WAIT_RESPONSE);
             }
@@ -958,7 +866,7 @@ public class Player extends Entity {
         double randomPercent = Math.random() * 100;
 
         List<Double> percents = new ArrayList<>();
-        for(List<Double> minePercent : MINE_PERCENT) {
+        for(List<Double> minePercent : Percent.MINE_PERCENT) {
             percents.add(minePercent.get(mineLv));
         }
 
@@ -1086,7 +994,7 @@ public class Player extends Entity {
         double randomPercent = Math.random() * 100;
 
         List<Double> percents = new ArrayList<>();
-        for(List<Double> fishPercent : FISH_PERCENT) {
+        for(List<Double> fishPercent : Percent.FISH_PERCENT) {
             percents.add(fishPercent.get(fishLv));
         }
 
@@ -1398,7 +1306,6 @@ public class Player extends Entity {
         Quest quest = Config.getData(Id.QUEST, questId);
 
         return this.getMoney() >= quest.getNeedMoney().get() &&
-                this.getAdv().get() >= quest.getNeedAdv().get() &&
                 Config.compareMap(this.inventory, quest.getNeedItem(), true) &&
                 this.compareStat(quest.getNeedStat()) &&
                 Config.compareMap(this.getCloseRate(), quest.getNeedCloseRate(), true);
@@ -1415,7 +1322,6 @@ public class Player extends Entity {
         Quest quest = Config.getData(Id.QUEST, questId);
 
         this.addMoney(-1 * quest.getNeedMoney().get());
-        this.adv.add(-1 * quest.getNeedAdv().get());
 
         for(Map.Entry<Long, Integer> entry : quest.getNeedItem().entrySet()) {
             this.addItem(entry.getKey(), -1 * entry.getValue());
