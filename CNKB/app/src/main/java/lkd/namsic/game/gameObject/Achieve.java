@@ -18,9 +18,9 @@ import lombok.ToString;
 @ToString
 public class Achieve extends NamedObject {
 
-    final LimitLong rewardMoney = new LimitLong(0, 0L, Long.MAX_VALUE);
-    final LimitInteger rewardExp = new LimitInteger(0, 0, Integer.MAX_VALUE);
-    final LimitInteger rewardAdv = new LimitInteger(0, 0, Integer.MAX_VALUE);
+    final LimitLong rewardMoney = new LimitLong(0, 0L, null);
+    final LimitInteger rewardExp = new LimitInteger(0, 0, null);
+    final LimitInteger rewardAdv = new LimitInteger(0, 0, null);
 
     final Map<Long, Integer> rewardCloseRate = new HashMap<>();
     final Map<Long, Integer> rewardItem = new HashMap<>();

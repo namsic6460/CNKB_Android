@@ -202,7 +202,7 @@ public class Equipment extends Item {
     EquipType equipType;
 
     final LimitInteger reinforceCount = new LimitInteger(Config.MIN_REINFORCE_COUNT, Config.MIN_REINFORCE_COUNT, Config.MAX_REINFORCE_COUNT);
-    final LimitInteger reinforceFloor = new LimitInteger(0, 0, Integer.MAX_VALUE);
+    final LimitInteger reinforceFloor = new LimitInteger(0, 0, null);
     final RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);
 
     @Setter

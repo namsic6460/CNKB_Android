@@ -33,17 +33,14 @@ public class Quest extends NamedObject {
             new HashMap<>(), new HashMap<>()
     );
 
-    final LimitLong needMoney = new LimitLong(0, null, Long.MAX_VALUE);
-    final LimitInteger needAdv = new LimitInteger(0, null, Integer.MAX_VALUE);
-
+    final LimitLong needMoney = new LimitLong(0, 0L, null);
     final Map<Long, Integer> needItem = new HashMap<>();
     final Map<StatType, Integer> needStat = new HashMap<>();
     final Map<Long, Integer> needCloseRate = new HashMap<>();
 
-    final LimitLong rewardMoney = new LimitLong(0, null, Long.MAX_VALUE);
-    final LimitInteger rewardExp = new LimitInteger(0, null, Integer.MAX_VALUE);
-    final LimitInteger rewardAdv = new LimitInteger(0, null, Integer.MAX_VALUE);
-
+    final LimitLong rewardMoney = new LimitLong(0, 0L, null);
+    final LimitInteger rewardExp = new LimitInteger(0, 0, null);
+    final LimitInteger rewardAdv = new LimitInteger(0, 0, null);
     final Map<Long, Integer> rewardItem = new HashMap<>();
     final Map<StatType, Integer> rewardStat = new HashMap<>();
     final Map<Long, Integer> rewardCloseRate = new HashMap<>();

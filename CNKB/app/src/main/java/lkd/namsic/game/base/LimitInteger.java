@@ -20,6 +20,10 @@ public class LimitInteger implements LimitClass<Integer> {
     private int value;
 
     public LimitInteger(int value, @Nullable Integer min, @Nullable Integer max) {
+        if(min == null && max == null) {
+            throw new RuntimeException("both minValue and maxValue can't be null");
+        }
+
         if(min != null && max != null && min > max) {
             throw new RuntimeException("minValue can't be bigger than maxValue");
         }

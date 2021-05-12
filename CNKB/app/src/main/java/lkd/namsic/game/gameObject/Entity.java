@@ -42,7 +42,7 @@ import lombok.Setter;
 public abstract class Entity extends NamedObject {
 
     final LimitInteger lv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
-    final LimitLong money = new LimitLong(0, 0L, Long.MAX_VALUE);
+    final LimitLong money = new LimitLong(0, 0L, null);
 
     final Location location = new Location();
 
@@ -354,14 +354,14 @@ public abstract class Entity extends NamedObject {
         return this.compareStat(map, true);
     }
 
-    public boolean compareStat(@NonNull Map<StatType, Integer> map, boolean firstIsBig) {
+    public boolean compareStat(@NonNull Map<StatType, Integer> map, boolean entityIsBig) {
         this.revalidateBuff();
 
         boolean flag;
         for(Map.Entry<StatType, Integer> entry : map.entrySet()) {
             flag = this.getStat(entry.getKey()) >= entry.getValue();
 
-            if(firstIsBig != flag) {
+            if(entityIsBig != flag) {
                 return false;
             }
         }
