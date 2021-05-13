@@ -21,21 +21,8 @@ public class AiEntity extends Entity {
     @NonNull
     final Map<EquipType, Double> dropPercent = new ConcurrentHashMap<>();
 
-    @NonNull
-    final Map<StatType, Integer> increaseStat = new ConcurrentHashMap<>();
-
     public AiEntity(@NonNull String name) {
         super(name);
-
-        for(StatType statType : StatType.values()) {
-            try {
-                Config.checkStatType(statType);
-            } catch (UnhandledEnumException e) {
-                continue;
-            }
-
-            this.setIncreaseStat(statType, (int) (this.getIncreaseStat(statType) * Config.BASE_INCREASE_PERCENT));
-        }
     }
 
     @Override
@@ -130,20 +117,6 @@ public class AiEntity extends Entity {
 
     public void addDropPercent(EquipType equipType, double percent) {
         this.setDropPercent(equipType, this.getDropPercent(equipType) + percent);
-    }
-
-    public void setIncreaseStat(StatType statType, int stat) {
-        Config.checkStatType(statType);
-
-        this.increaseStat.put(statType, stat);
-    }
-
-    public int getIncreaseStat(StatType statType) {
-        return this.increaseStat.getOrDefault(statType, 0);
-    }
-
-    public void addIncreaseStat(StatType statType, int stat) {
-        this.setIncreaseStat(statType, this.getIncreaseStat(statType) + stat);
     }
 
 }

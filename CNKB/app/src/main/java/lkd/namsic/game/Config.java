@@ -57,6 +57,8 @@ public class Config {
     public static final Set<String> NICKNAME_LIST = new ConcurrentHashSet<>();
     public static final Map<Long, Map<String, String>> PLAYER_LIST = new ConcurrentHashMap<>();
 
+    public static final Set<Long> SELECTABLE_CHAT_SET = new ConcurrentHashSet<>();
+
     public static final double MONEY_BOOST = 1;
     public static final double EXP_BOOST = 1;
 
@@ -82,7 +84,7 @@ public class Config {
     public static final int MAX_MAGIC_LV = 10;
     public static final long MIN_DELAY_TIME = 500;
     public static final long MAX_DELAY_TIME = 5000;
-    public static final long MIN_PAUSE_TIME = 1500;
+    public static final long MIN_PAUSE_TIME = 2000;
     public static final long MAX_PAUSE_TIME = 5000;
 
     public static final double TOTAL_MONEY_LOSE_RANDOM = 0.1;
@@ -91,8 +93,6 @@ public class Config {
     public static final double MONEY_DROP_MIN = 0.2;
     public static final int ITEM_DROP = 4;
     public static final double ITEM_DROP_PERCENT = 0.95;
-
-    public static final double BASE_INCREASE_PERCENT = 0.05;
 
     public static final int MAX_EVADE = 95;
 
@@ -276,6 +276,10 @@ public class Config {
                     FileManager.delete(path);
                     return;
                 }
+            } else if(objectCount == 0 && id.equals(Id.CHAT)) {
+                if(((Chat) gameObject).getName() != null) {
+                    SELECTABLE_CHAT_SET.add(objectId);
+                }
             }
 
             FileManager.save(path, jsonString);
@@ -428,20 +432,6 @@ public class Config {
         } else {
             return new HashMap<>(map).toString();
         }
-    }
-
-    @NonNull
-    public static String mapToDisplayString(@NonNull Map<?, ?> map) {
-        StringBuilder builder = new StringBuilder();
-
-        for(Map.Entry<?, ?> entry : map.entrySet()) {
-            builder.append(entry.getKey())
-                    .append(" - ")
-                    .append(entry.getValue())
-                    .append("\n");
-        }
-
-        return builder.toString();
     }
 
     public static <T> boolean compareMap(@NonNull Map<T, Integer> map1, @NonNull Map<T, Integer> map2, boolean firstIsBig) {

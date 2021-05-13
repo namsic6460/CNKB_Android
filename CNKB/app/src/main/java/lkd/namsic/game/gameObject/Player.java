@@ -99,13 +99,15 @@ public class Player extends Entity {
     final Set<Long> achieve = new ConcurrentHashSet<>();
     final Set<Long> research = new ConcurrentHashSet<>();
 
+    //QuestId - Clear ChatId
     final Map<Long, Long> quest = new ConcurrentHashMap<>();
     final Map<Long, ConcurrentHashSet<Long>> questNpc = new ConcurrentHashMap<>();
     final Map<Long, Integer> clearedQuest = new ConcurrentHashMap<>();
 
+    Map<Long, Long> chatCount = new ConcurrentHashMap<>();
     Map<WaitResponse, Long> responseChat = new ConcurrentHashMap<>();
     Map<String, Long> anyResponseChat = new ConcurrentHashMap<>();
-    String waitNpcName;
+    long waitNpcId;
 
     Map<MagicType, Integer> magic = new ConcurrentHashMap<>();
     Map<MagicType, Integer> resist = new ConcurrentHashMap<>();
@@ -487,7 +489,6 @@ public class Player extends Entity {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     public boolean useItem(long itemId, @NonNull List<GameObject> other) {
         Config.checkId(Id.ITEM, itemId);
 
@@ -624,11 +625,12 @@ public class Player extends Entity {
         this.exp.add(-1 * requiredExp);
     }
 
-    public void startChat(long chatId, @NonNull String npcName) {
+    public void startChat(long chatId, long npcId) {
         Config.checkId(Id.CHAT, chatId);
         this.setDoing(Doing.CHAT);
 
         Chat chat = Config.getData(Id.CHAT, chatId);
+        Npc npc = Config.getData(Id.NPC, npcId);
         Notification.Action session = this.getSession();
 
         Thread thread = new Thread(() -> {
@@ -640,7 +642,7 @@ public class Player extends Entity {
             }
 
             long pauseTime = chat.getPauseTime().get();
-            String preString = "[" + npcName + " -> " + this.getNickName() + "]\n";
+            String preString = "[" + npc.getName() + " -> " + this.getNickName() + "]\n";
 
             List<String> texts = chat.getText();
             int size = texts.size() - 1;
@@ -682,28 +684,60 @@ public class Player extends Entity {
                 this.setMap(chat.getTpLocation(), false);
             }
 
-            if(chat.getResponseChat().isEmpty() && chat.getAnyResponseChat().isEmpty()) {
-                this.setDoing(Doing.NONE);
-            } else {
-                long anyLinkedChatId = chat.getResponseChat(WaitResponse.ANYTHING);
-                if(anyLinkedChatId != 0) {
-                    if (chatId == anyLinkedChatId) {
-                        throw new InvalidNumberException(chatId);
-                    }
+            if(chat.isBaseMsg()) {
+                this.responseChat.clear();
+                this.anyResponseChat.clear();
 
-                    this.startChat(anyLinkedChatId, npcName);
+                Set<Long> availableChat = npc.getAvailableChat(this);
+
+                if(availableChat.isEmpty()) {
                     return;
                 }
 
-                this.waitNpcName = npcName;
-                this.responseChat = new ConcurrentHashMap<>(chat.getResponseChat());
-                this.anyResponseChat = new ConcurrentHashMap<>(chat.getAnyResponseChat());
+                int index = 0;
+                String indexStr;
+                Chat chatData;
+                StringBuilder builder = new StringBuilder("대화를 선택해주세요");
+                for(long availableChatId : availableChat) {
+                    chatData = Config.getData(Id.CHAT, availableChatId);
+                    indexStr = Integer.toString(index++);
+
+                    builder.append("\n")
+                            .append(indexStr)
+                            .append(": ")
+                            .append(chatData.getName());
+
+                    this.setAnyResponseChat(indexStr, availableChatId);
+                }
 
                 this.setDoing(Doing.WAIT_RESPONSE);
+
+                this.replyPlayer(builder.toString());
+            } else {
+                if (chat.getResponseChat().isEmpty() && chat.getAnyResponseChat().isEmpty()) {
+                    this.setDoing(Doing.NONE);
+                } else {
+                    long anyLinkedChatId = chat.getResponseChat(WaitResponse.ANYTHING);
+                    if (anyLinkedChatId != 0) {
+                        if (chatId == anyLinkedChatId) {
+                            throw new InvalidNumberException(chatId);
+                        }
+
+                        this.startChat(anyLinkedChatId, npcId);
+                        return;
+                    }
+
+                    this.waitNpcId = npcId;
+                    this.responseChat = new ConcurrentHashMap<>(chat.getResponseChat());
+                    this.anyResponseChat = new ConcurrentHashMap<>(chat.getAnyResponseChat());
+
+                    this.setDoing(Doing.WAIT_RESPONSE);
+                }
             }
         });
 
         this.addLog(LogData.CHAT, 1);
+        this.addChatCount(npcId, 1);
         thread.start();
 
         try {
@@ -1367,11 +1401,33 @@ public class Player extends Entity {
             }
         }
 
-        this.startChat(chatId, npc.getName());
+        this.startChat(chatId, npc.getId().getObjectId());
     }
 
     public int getClearedQuest(long questId) {
         return this.clearedQuest.getOrDefault(questId, 0);
+    }
+
+    public void setChatCount(long npcId, long count) {
+        Config.checkId(Id.NPC, npcId);
+
+        if(count < 0) {
+            throw new NumberRangeException(count, 0);
+        }
+
+        if(count != 0) {
+            this.chatCount.put(npcId, count);
+        } else {
+            this.chatCount.remove(npcId);
+        }
+    }
+
+    public long getChatCount(long npcId) {
+        return this.chatCount.getOrDefault(npcId, 0L);
+    }
+
+    public void addChatCount(long npcId, long count) {
+        this.setChatCount(npcId, this.getChatCount(npcId) + count);
     }
 
     public void setResponseChat(@NonNull WaitResponse waitResponse, long questId) {

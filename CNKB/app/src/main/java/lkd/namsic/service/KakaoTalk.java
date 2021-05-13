@@ -264,8 +264,6 @@ public class KakaoTalk {
 
                 Player player = new Player(sender, second, image, room);
                 player.setGroup(isGroupChat);
-                player.setCloseRate(1L, 100);
-                player.setCloseRate(2L, 100);
                 player.setVariable(Variable.IS_TUTORIAL, true);
 
                 Config.NICKNAME_LIST.add(second);
@@ -275,7 +273,7 @@ public class KakaoTalk {
                 Config.unloadMap(map);
 
                 player.replyPlayer("회원가입에 성공하였습니다!");
-                player.startChat(1L, "???");
+                player.startChat(1L, 1L);
                 Config.unloadObject(player);
             }
         } catch (WeirdCommandException e) {
@@ -329,14 +327,14 @@ public class KakaoTalk {
         
         for(Map.Entry<WaitResponse, Long> entry : player.getResponseChat().entrySet()) {
             if(entry.getKey().getList().contains(response)) {
-                player.startChat(entry.getValue(), player.getWaitNpcName());
+                player.startChat(entry.getValue(), player.getWaitNpcId());
                 return;
             }
         }
 
         for(Map.Entry<String, Long> entry : player.getAnyResponseChat().entrySet()) {
             if(entry.getKey().equals(response)) {
-                player.startChat(entry.getValue(), player.getWaitNpcName());
+                player.startChat(entry.getValue(), player.getWaitNpcId());
                 return;
             }
         }

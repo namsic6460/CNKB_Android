@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import lkd.namsic.MainActivity;
+import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.WaitResponse;
@@ -653,7 +654,8 @@ public class ObjectMaker {
     }
 
     private static void makeEquip() {
-
+        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 1L));
+        Logger.i("ObjectMaker", "Equipment making is done!");
     }
 
     private static void makeMap() {
@@ -737,8 +739,8 @@ public class ObjectMaker {
         chat = new Chat();
         chat.getId().setObjectId(3L);
         chat.getText().addAll(Arrays.asList(
-                "거기 표시된 정보는 위에서부터 [돈, 체력, 마나, 현재 위치(+좌표), 레벨," +
-                        " 잔여 스텟 포인트, 모험 포인트, 거점(+좌표)] 야",
+                "거기 표시된 정보는 위에서부터 [돈, 체력, 마나, 현재 위치(좌표), 레벨," +
+                        " 잔여 스텟 포인트, 모험 포인트, 거점(좌표)] 야",
                 "일단 우리는 0-0-1-1, 그러니까 가장 외곽에 있는거고, 거점도 여기로 잡혀있어",
                 "거점? 아 거점은 죽으면 태어나는 장소야. 어짜피 넌 내 권능때문에 죽을 수 없거든...",
                 "마지막으로 간단한거 하나만 소개하고 가봐야겠네. 일단 마을에서는 광질을 할 수 있으니까" +
@@ -756,7 +758,7 @@ public class ObjectMaker {
                 "아 그리고... ... ... (더 이상 들리지 않는다)"
         ));
         chat.getDelayTime().set(1500L);
-        chat.getRewardMoney().set(1000L);
+        chat.getMoney().set(1000L);
         Config.unloadObject(chat);
 
         chat = new Chat();
@@ -767,58 +769,81 @@ public class ObjectMaker {
                 "난 이 '시작의 마을' 의 이장이라네. 잘 지네봄세"
         ));
         Config.unloadObject(chat);
-        
+
         chat = new Chat();
         chat.getId().setObjectId(6L);
-        chat.getText().addAll(Arrays.asList(
-                "그래 무슨 일인가 __nickname?",
-                "1: 광질을 하면서 할만한 일이 있을까요?\n" +
-                        "2: 낚시를 하면서 할만한 일이 있을까요?\n" +
-                        "3: 아무것도 아닙니다"
-        ));
-        chat.setAnyResponseChat("1", 7, true);
-        chat.setAnyResponseChat("2", 8, true);
-        chat.setAnyResponseChat("3", 9, true);
+        chat.getText().add("그래 무슨 일인가 __nickname?");
+        chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
-        chat = new Chat();
+        chat = new Chat("아무일도 아닙니다");
         chat.getId().setObjectId(7L);
-        chat.getText().addAll(Arrays.asList(
-                "음 광질을 하면서 할만한 일은 항상 있지!",
-                "아무래도 돌이 항상 부족해서 말이야..",
-                "돌 50개만 구해와줄 수 있겠나?"
-        ));
-        chat.setResponseChat(WaitResponse.YES, 10, true);
-        chat.setResponseChat(WaitResponse.NO, 11, true);
+        chat.getText().add("그래그래, 무슨 일 있으면 언제나 말 걸게나");
         Config.unloadObject(chat);
 
-        chat = new Chat();
+        chat = new Chat("광질을 하면서 할만한 퀘스트가 있을까요?");
         chat.getId().setObjectId(8L);
         chat.getText().addAll(Arrays.asList(
-                "음 낚시를 하면서 할만한 일이라...",
-                "생각해보니 요즘 강과 바다가 좀 더러워진 것 같아서 말이지",
-                "쓰레기 10개만 구해와줄 수 있겠나?"
+                "음, 아무래도 돌은 항상 부족해서 말이지",
+                "돌 50개만 구해다 줄 수 있겠나?"
         ));
-        chat.setResponseChat(WaitResponse.YES, 12, true);
-        chat.setResponseChat(WaitResponse.NO, 11, true);
+        chat.setResponseChat(WaitResponse.YES, 10);
+        chat.setResponseChat(WaitResponse.NO, 11);
+        Config.unloadObject(chat);
+
+        chat = new Chat("낚시를 하면서 할만한 퀘스트가 있을까요?");
+        chat.getId().setObjectId(9L);
+        chat.getText().addAll(Arrays.asList(
+                "요즘 바다나 강이 너무 더러워저셔 말일세",
+                "쓰레기가 낚이는게 있으면 10개만 구해다 줄 수 있겠나?"
+        ));
+        chat.setResponseChat(WaitResponse.YES, 12);
+        chat.setResponseChat(WaitResponse.NO, 11);
         Config.unloadObject(chat);
 
         chat = new Chat();
-        chat.getId().setObjectId(9L);
-        chat.getText().add("그래그래, 뭐 필요한 일 있으면 말하게나");
+        chat.getId().setObjectId(10L);
+        chat.getText().add("고맙네! 돌을 다 구하고 다시 말을 걸어주게나");
+        chat.getQuestId().set(1L);
         Config.unloadObject(chat);
 
-        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), L));
+        chat = new Chat();
+        chat.getId().setObjectId(11L);
+        chat.getText().add("그럼 어쩔 수 없지. 나중에 마음 바뀌면 다시 받아가게나");
+        Config.unloadObject(chat);
+
+        chat = new Chat();
+        chat.getId().setObjectId(12L);
+        chat.getText().add("고맙네! 쓰레기를 다 수거하고 다시 말을 걸어주게나");
+        chat.getQuestId().set(2L);
+        Config.unloadObject(chat);
+
+        chat = new Chat();
+        chat.getId().setObjectId(13L);
+        chat.getText().add("빨리 구해와줬군! 여기 보상이네");
+        Config.unloadObject(chat);
+
+        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 14L));
         Logger.i("ObjectMaker", "Chat making is done!");
    }
 
    private static void makeQuest() {
-       Quest quest = new Quest("광부의 일", 5L);
+       Quest quest = new Quest("광부의 일", 13L);
        quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
-
+       quest.setNeedItem(20L, 50);
+       quest.setRewardCloseRate(3L, 1);
+       quest.getRewardExp().set(20000);
+       quest.getRewardMoney().set(250L);
        Config.unloadObject(quest);
 
-       Config.ID_COUNT.put(Id.QUEST, Math.max(Config.ID_COUNT.get(Id.CHAT), 5L));
+       quest = new Quest("쓰레기 수거", 13L);
+       quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
+       quest.setNeedItem(58L, 10);
+       quest.setRewardCloseRate(3L, 1);
+       quest.getRewardExp().set(50000);
+       Config.unloadObject(quest);
+
+       Config.ID_COUNT.put(Id.QUEST, Math.max(Config.ID_COUNT.get(Id.CHAT), 3L));
        Logger.i("ObjectMaker", "Quest making is done!");
    }
 
@@ -826,23 +851,27 @@ public class ObjectMaker {
         Npc npc = new Npc("???");
         npc.getId().setObjectId(1L);
         npc.getLocation().set(0, 0, 1, 1);
-        npc.addChat(0, Integer.MAX_VALUE, 1L);
-        npc.addChat(0, Integer.MAX_VALUE, 2L);
-        npc.addChat(0, Integer.MAX_VALUE, 3L);
-        npc.addChat(0, Integer.MAX_VALUE, 4L);
         Config.unloadObject(npc);
 
-        npc = new Npc("최후의 용");
+        npc = new Npc("아벨");
         npc.getId().setObjectId(2L);
         npc.getLocation().set(0, 0, 1, 1);
         Config.unloadObject(npc);
         
-        npc = new Npc("시작의 마을 이장");
+        npc = new Npc("노아");
         npc.getId().setObjectId(3L);
         npc.getLocation().set(0, 0, 16, 16);
+        npc.setFirstChat(5L);
+        npc.setChat(new ChatLimit(), 7L);
+        npc.setChat(new ChatLimit() {{
+            this.getRunningQuest().add(1L);
+        }}, 8L);
+        npc.setChat(new ChatLimit() {{
+            this.getRunningQuest().add(2L);
+        }}, 9L);
         Config.unloadObject(npc);
 
-        Config.ID_COUNT.put(Id.NPC, Math.max(Config.ID_COUNT.get(Id.NPC), 5L));
+        Config.ID_COUNT.put(Id.NPC, Math.max(Config.ID_COUNT.get(Id.NPC), 4L));
         Logger.i("ObjectMaker", "Npc making is done!");
     }
 

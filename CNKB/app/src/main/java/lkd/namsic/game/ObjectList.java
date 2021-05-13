@@ -107,9 +107,15 @@ public class ObjectList {
 
     public final static BiMap<String, Long> questList = new ImmutableBiMap.Builder<String, Long>()
             .put("광부의 일", 1L)
-            .put("낚시꾼의 일", 2L)
+            .put("쓰레기 수거", 2L)
             .put("장작이 필요해!", 3L)
             .put("미꾸라지 낚시", 4L)
+            .build();
+
+    public final static BiMap<String, Long> npcList = new ImmutableBiMap.Builder<String, Long>()
+            .put("???", 1L)
+            .put("아벨", 2L)
+            .put("노아", 3L)
             .build();
 
     public final static BiMap<String, String> mapList = new ImmutableBiMap.Builder<String, String>()
