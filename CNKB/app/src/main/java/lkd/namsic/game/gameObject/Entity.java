@@ -106,11 +106,6 @@ public abstract class Entity extends NamedObject {
         Config.unloadMap(map);
     }
 
-    public boolean moveField(int fieldX, int fieldY) {
-        return this.setField(this.location.getFieldX().get() + fieldX,
-                this.location.getFieldY().get() + fieldY, Math.abs(fieldX) + Math.abs(fieldY));
-    }
-
     public boolean setField(int fieldX, int fieldY) {
         return setField(fieldX, fieldY, this.getFieldDistance(new Location(0, 0, fieldX, fieldY)));
     }

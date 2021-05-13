@@ -15,7 +15,9 @@ import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.UnhandledEnumException;
+import lombok.Getter;
 
+@Getter
 public class AiEntity extends Entity {
 
     @NonNull

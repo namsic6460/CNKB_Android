@@ -127,8 +127,18 @@ public class KakaoTalk {
                 if (Arrays.asList("정보", "info", "i").contains(first)) {
                     player.displayInfo();
                 } else if (first.equals("맵") || first.equals("map")) {
-                    MapClass map = Config.getMapData(player.getLocation());
-                    player.replyPlayer(map.getInfo(), map.getInnerInfo());
+                    if (second == null) {
+                        MapClass map = Config.getMapData(player.getLocation());
+                        player.replyPlayer(map.getInfo(), map.getInnerInfo());
+                    } else if (second.equals("목록") || second.equals("list")) {
+                        player.displayMapList();
+                    }
+                } else if(first.equals("대화") || first.equals("chat")) {
+                    if(second == null) {
+                        throw new WeirdCommandException();
+                    }
+
+                    player.startChat(second);
                 } else if(Arrays.asList("가방", "인벤토리", "inventory", "inven").contains(first)) {
                     int page = second == null ? 1 : Integer.parseInt(second);
                     player.displayInventory(page);
@@ -178,12 +188,16 @@ public class KakaoTalk {
                 } else if(first.equals("이동") || first.equals("move")) {
                     checkDoing(player);
 
-                    if(second == null) {
+                    if(third == null) {
                         throw new WeirdCommandException();
                     }
 
-                    String locationStr = third == null ? second : second + " " + third;
-                    player.move(locationStr.trim());
+                    if(second.equals("맵") || second.equals("map")) {
+                        String locationStr = fourth == null ? third : third + " " + fourth;
+                        player.moveMap(locationStr.trim());
+                    } else if(second.equals("필드") || second.equals("field")) {
+                        player.moveField(third);
+                    }
                 } else if (first.equals("광질") || first.equals("mine")) {
                     boolean isTutorial = player.getObjectVariable(Variable.IS_TUTORIAL);
                     if(!isTutorial) {
@@ -295,11 +309,15 @@ public class KakaoTalk {
                             "*(개발자/dev) : 개발자 정보를 표시합니다\n" +
                             "\n---유저 명령어---\n" +
                             "(정보/info/i) : 내 정보를 표시합니다\n" +
+                            "(대화/chat) ({NPC 이름}) : 해당 NPC 와 대화를 합니다\n" +
                             "(맵/map) : 현재 위치 정보를 표시합니다\n" +
-                            "(이동/move) ({x좌표}-{y좌표}) : 해당 좌표의 지역으로 이동합니다(예시 : " +
-                            Emoji.focus("n move 2-3") + ")\n" +
+                            "(맵/map) (목록/list) : 이동 가능한 주변 맵의 정보를 표시합니다\n" +
+                            "(이동/move) (맵/map) ({x좌표}-{y좌표}) : 해당 좌표의 지역으로 이동합니다(예시 : " +
+                            Emoji.focus("n move map 2-3") + ")\n" +
                             "(이동/move) ({맵 이름}) : 해당 맵으로 이동합니다(예시 : " +
-                            Emoji.focus("n move 시작의 마을") + ")\n" +
+                            Emoji.focus("n move map 시작의 마을") + ")\n" +
+                            "(이동/move) (필드/field) ({x좌표}-{y좌표}) : 해당 좌표의 필드 위치로 이동합니다(예시 : " +
+                            Emoji.focus("n move field 16-10") + ")\n" +
                             "(광질/mine) : 광질을 합니다(약 1초 소요)(마을에서만 가능)\n" +
                             "(낚시/fish) : 낚시를 합니다(추가 명령 필요)(강 또는 바다에서만 가능)\n" +
                             "(가방/인벤토리/inventory/inven) [{페이지}] : 현재 인벤토리를 확인합니다\n" +

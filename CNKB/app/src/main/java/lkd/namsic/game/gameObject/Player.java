@@ -333,6 +333,57 @@ public class Player extends Entity {
         this.replyPlayer(msgBuilder.toString(), innerMsgBuilder.toString());
     }
 
+    public void displayMapList() {
+        int movableDistance = this.getMovableDistance();
+
+        StringBuilder msg = new StringBuilder("---이동 가능한 가까운 맵 목록---");
+        StringBuilder innerMsg = new StringBuilder("---이동 가능한 먼 맵 목록---");
+        
+        boolean flag;
+        StringBuilder builder = null;
+
+        int currentX = this.location.getX().get();
+        int currentY = this.location.getY().get();
+
+        int distance;
+        MapClass map;
+        for(int x = currentX - movableDistance; x <= currentX + movableDistance; x++) {
+            for(int y = currentY - movableDistance; y <= currentY + movableDistance; y++) {
+                flag = false;
+                
+                if(x == currentX && y == currentY) {
+                    continue;
+                }
+
+                if(x >= currentX - 1 && x <= currentX + 1 && y >= currentY - 1 && y <= currentY + 1) {
+                    builder = msg;
+                    distance = 1;
+                    flag = true;
+                } else {
+                    distance = this.getMapDistance(new Location(x, y));
+
+                    if (movableDistance <= distance) {
+                        builder = innerMsg;
+                        flag = true;
+                    }
+                }
+                
+                if(flag) {
+                    map = Config.getMapData(x, y);
+                    builder.append("\n")
+                            .append(map.getName())
+                            .append("(")
+                            .append(map.getLocation().toMapString())
+                            .append(") (거리: ")
+                            .append(distance)
+                            .append(")");
+                }
+            }
+        }
+
+        this.replyPlayer(msg.toString(), innerMsg.toString());
+    }
+
     public void addTitle(String title) {
         this.title.add(title);
     }
@@ -423,7 +474,7 @@ public class Player extends Entity {
         return (int) Math.sqrt(2 + this.getStat(StatType.AGI) / 4D);
     }
 
-    public void move(String locationStr) {
+    public void moveMap(String locationStr) {
         Location location;
         int x, y;
 
@@ -478,6 +529,24 @@ public class Player extends Entity {
                 }
             }
         }
+    }
+
+    public void moveField(String locationStr) {
+        String[] split = locationStr.split("-");
+        if(split.length != 2) {
+            throw new WeirdCommandException("좌표를 정확하게 입력해주세요\n(예시 : " +
+                    Emoji.focus("0-1") + ")");
+        }
+
+        int x = Integer.parseInt(split[0]);
+        int y = Integer.parseInt(split[1]);
+
+        if(new Location(0, 0, x, y).equalsField(this.location)) {
+            throw new WeirdCommandException("현재 위치로는 이동할 수 없습니다");
+        }
+
+        this.setField(x, y);
+        this.replyPlayer("이동을 완료했습니다\n현재 좌표: " + this.location.toCoordString());
     }
 
     public boolean canUse(long itemId) {
@@ -623,6 +692,26 @@ public class Player extends Entity {
         this.lv.add(1);
         this.sp.add(5);
         this.exp.add(-1 * requiredExp);
+    }
+
+    public void startChat(@NonNull String npcName) {
+        Long npcId = ObjectList.npcList.get(npcName);
+        MapClass map = Config.getMapData(this.location);
+
+        if(npcId == null || !map.getEntity(Id.NPC).contains(npcId)) {
+            throw new WeirdCommandException("해당 NPC 를 찾을 수 없습니다\n" +
+                    "존재하지 않거나 현재 맵에 없는 NPC 일 수 있습니다\n" +
+                    "현재 위치 정보를 확인해보세요");
+        }
+
+        Npc npc = Config.getData(Id.NPC, npcId);
+        long chatCount = this.getChatCount(npcId);
+
+        if(chatCount == 0 && npc.firstChat != null) {
+            this.startChat(npc.firstChat, npcId);
+        } else {
+            npc.startChat(this);
+        }
     }
 
     public void startChat(long chatId, long npcId) {

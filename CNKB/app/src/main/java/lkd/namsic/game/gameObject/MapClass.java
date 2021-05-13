@@ -90,6 +90,7 @@ public class MapClass {
 
         Set<Long> npcSet = this.entity.get(Id.NPC);
         npcSet.remove(1L);
+        npcSet.remove(2L);
 
         Npc npc;
         if(npcSet.isEmpty()) {

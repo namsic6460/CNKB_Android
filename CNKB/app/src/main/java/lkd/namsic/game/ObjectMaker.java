@@ -862,6 +862,7 @@ public class ObjectMaker {
         npc.getId().setObjectId(3L);
         npc.getLocation().set(0, 0, 16, 16);
         npc.setFirstChat(5L);
+        npc.setCommonChat(new ChatLimit(), 6L);
         npc.setChat(new ChatLimit(), 7L);
         npc.setChat(new ChatLimit() {{
             this.getRunningQuest().add(1L);
