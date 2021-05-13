@@ -38,11 +38,6 @@ public class RangeInteger implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
     public boolean equals(@Nullable Object obj) {
         if(obj instanceof RangeInteger) {
             RangeInteger o = (RangeInteger) obj;
@@ -51,4 +46,10 @@ public class RangeInteger implements Serializable {
             return false;
         }
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
 }

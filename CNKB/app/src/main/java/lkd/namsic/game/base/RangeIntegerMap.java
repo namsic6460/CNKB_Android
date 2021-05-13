@@ -1,6 +1,7 @@
 package lkd.namsic.game.base;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -10,14 +11,19 @@ import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
 
-@Getter
 public class RangeIntegerMap<T> implements Serializable {
 
+    final private Class<T> c;
+
+    @Getter
     private Map<T, Integer> min;
+
+    @Getter
     private Map<T, Integer> max;
 
-    public RangeIntegerMap(@NonNull Map<T, Integer> min, @NonNull Map<T, Integer> max) {
+    public RangeIntegerMap(@NonNull Map<T, Integer> min, @NonNull Map<T, Integer> max, Class<T> c) {
         this.set(min, max);
+        this.c = c;
     }
 
     public void set(Map<T, Integer> min, Map<T, Integer> max) {
@@ -78,6 +84,26 @@ public class RangeIntegerMap<T> implements Serializable {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(obj instanceof RangeIntegerMap) {
+            RangeIntegerMap<?> map = (RangeIntegerMap<?>) obj;
+
+            if(this.c == map.c) {
+                return this.min.equals(map.min) && this.max.equals(map.max);
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
 }

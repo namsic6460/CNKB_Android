@@ -13,12 +13,15 @@ public class ChatLimit {
     final RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);
     final RangeIntegerMap<Long> limitCloseRate = new RangeIntegerMap<>(
             new HashMap<>(), new HashMap<>()
+            new HashMap<>(), new HashMap<>(), Long.class
     );
     final RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(
             new HashMap<>(), new HashMap<>()
+            new HashMap<>(), new HashMap<>(), StatType.class
     );
     final RangeIntegerMap<Long> limitQuest = new RangeIntegerMap<>(
             new HashMap<>(), new HashMap<>()
+            new HashMap<>(), new HashMap<>(), Long.class
     );
 
     public boolean isAvailable(Player player) {

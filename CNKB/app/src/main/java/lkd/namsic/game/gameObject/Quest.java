@@ -27,10 +27,10 @@ public class Quest extends NamedObject {
 
     final RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);
     final RangeIntegerMap<Long> limitCloseRate = new RangeIntegerMap<>(
-            new HashMap<>(), new HashMap<>()
+            new HashMap<>(), new HashMap<>(), Long.class
     );
     final RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(
-            new HashMap<>(), new HashMap<>()
+            new HashMap<>(), new HashMap<>(), StatType.class
     );
 
     final LimitLong needMoney = new LimitLong(0, 0L, null);

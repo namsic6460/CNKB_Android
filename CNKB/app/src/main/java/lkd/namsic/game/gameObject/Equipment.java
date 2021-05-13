@@ -210,7 +210,7 @@ public class Equipment extends Item {
     double reinforcePercent;
 
     final RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(
-            new HashMap<>(), new HashMap<>()
+            new HashMap<>(), new HashMap<>(), StatType.class
     );
     final Map<StatType, Integer> basicStat = new HashMap<>();
     final Map<StatType, Integer> reinforceStat = new HashMap<>();
