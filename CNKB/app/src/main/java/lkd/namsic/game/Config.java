@@ -4,14 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.io.File;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,7 @@ import lkd.namsic.game.gameObject.Achieve;
 import lkd.namsic.game.gameObject.AiEntity;
 import lkd.namsic.game.gameObject.Boss;
 import lkd.namsic.game.gameObject.Chat;
+import lkd.namsic.game.gameObject.Entity;
 import lkd.namsic.game.gameObject.Equipment;
 import lkd.namsic.game.gameObject.GameObject;
 import lkd.namsic.game.gameObject.Item;
@@ -39,10 +41,18 @@ import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.gameObject.Quest;
 import lkd.namsic.game.gameObject.Research;
 import lkd.namsic.game.gameObject.Skill;
+import lkd.namsic.game.json.NpcDeserializer;
+import lkd.namsic.game.json.NpcSerializer;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.setting.Logger;
 
 public class Config {
+
+    public static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(Npc.class, new NpcSerializer())
+            .registerTypeAdapter(Npc.class, new NpcDeserializer())
+            .setVersion(1.0)
+            .create();
 
     public static final Map<Id, Long> ID_COUNT = new ConcurrentHashMap<>();
     public static final Map<Id, Class<?>> ID_CLASS = new HashMap<>();
@@ -146,30 +156,34 @@ public class Config {
         }
     }
 
-    public static JSONObject createConfig() throws JSONException {
-        JSONObject jsonObject = new JSONObject();
+    public static JsonObject createConfig() {
+        JsonObject jsonObject = new JsonObject();
 
-        JSONObject idJson = new JSONObject();
-        String idName;
+        JsonObject idJson = new JsonObject();
         for(Id id : Id.values()) {
-            idName = id.toString();
-            idJson.put(idName, ID_COUNT.get(id));
+            idJson.addProperty(id.toString(), ID_COUNT.get(id));
         }
 
-        jsonObject.put("id", idJson);
+        jsonObject.add("id", idJson);
+        jsonObject.add("selectableChat", gson.toJsonTree(SELECTABLE_CHAT_SET, HashSet.class));
 
         return jsonObject;
     }
 
-    public static void parseConfig(JSONObject jsonObject) throws JSONException {
-        JSONObject idObject = jsonObject.getJSONObject("id");
+    @SuppressWarnings("unchecked")
+    public static void parseConfig(JsonObject jsonObject) {
+        JsonObject idObject = jsonObject.getAsJsonObject("id");
 
         String idName;
         for(Id id : Id.values()) {
             idName = id.toString();
 
-            ID_COUNT.put(id, idObject.getLong(idName));
+            ID_COUNT.put(id, idObject.getAsJsonPrimitive(idName).getAsLong());
         }
+
+        JsonArray selectableArray = jsonObject.getAsJsonArray("selectableChat");
+        Set<Long> selectableChat = gson.fromJson(selectableArray, HashSet.class);
+        SELECTABLE_CHAT_SET.addAll(selectableChat);
     }
 
     public static void onTerminate() {
@@ -239,13 +253,13 @@ public class Config {
 
     @NonNull
     public static <T> String toJson(@NonNull T t) {
-        return new Gson().toJson(t);
+        return gson.toJson(t);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T> T fromJson(@NonNull String jsonString, @NonNull Class<?> c) {
-        return (T) new Gson().fromJson(jsonString, c);
+        return (T) gson.fromJson(jsonString, c);
     }
 
     public synchronized static void unloadObject(@NonNull GameObject gameObject) {
@@ -276,9 +290,25 @@ public class Config {
                     FileManager.delete(path);
                     return;
                 }
-            } else if(objectCount == 0 && id.equals(Id.CHAT)) {
-                if(((Chat) gameObject).getName() != null) {
-                    SELECTABLE_CHAT_SET.add(objectId);
+            } else if(objectCount == 0) {
+                if(id.equals(Id.CHAT)) {
+                    if(((Chat) gameObject).getName() != null) {
+                        SELECTABLE_CHAT_SET.add(objectId);
+                    }
+                }
+
+                if(gameObject instanceof Entity) {
+                    MapClass map = Config.loadMap(Config.MIN_MAP_X, Config.MIN_MAP_Y);
+                    map.addEntity((Entity) gameObject);
+                    Config.unloadMap(map);
+
+                    if(gameObject instanceof Player) {
+                        Player player = (Player) gameObject;
+                        PLAYER_LIST.put(player.getId().getObjectId(), new HashMap<String, String>() {{
+                            put("sender", player.getSender());
+                            put("image", player.getImage());
+                        }});
+                    }
                 }
             }
 
@@ -500,13 +530,32 @@ public class Config {
         return FileManager.MAP_PATH + "/" + fileName;
     }
 
+    public static String getIncrease(int value) {
+        if(value > 0) {
+            return "+" + value;
+        } else if(value == 0) {
+            return "-";
+        } else {
+            return Integer.toString(value);
+        }
+    }
+
+    public static String getIncrease(long value) {
+        if(value > 0) {
+            return "+" + value;
+        } else if(value == 0) {
+            return "-";
+        } else {
+            return Long.toString(value);
+        }
+    }
+
     public static String errorString(@NonNull Throwable throwable) {
         StringBuilder builder = new StringBuilder(throwable.getClass().getName());
         builder.append(": ");
         builder.append(throwable.getMessage());
-        builder.append("\n");
         for(StackTraceElement element : throwable.getStackTrace()) {
-            builder.append("\tat");
+            builder.append("\n\tat ");
             builder.append(element.toString());
         }
 

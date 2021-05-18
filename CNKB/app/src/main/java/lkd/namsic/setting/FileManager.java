@@ -5,7 +5,8 @@ import android.os.Environment;
 
 import androidx.annotation.NonNull;
 
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -45,10 +46,10 @@ public class FileManager extends Application {
 
             String config = read(CONFIG_PATH);
             if (config.equals("")) {
-                JSONObject configObject = Config.createConfig();
+                JsonObject configObject = Config.createConfig();
                 save(CONFIG_PATH, configObject.toString());
             } else {
-                JSONObject jsonObject = new JSONObject(config);
+                JsonObject jsonObject = JsonParser.parseString(config).getAsJsonObject();
                 Config.parseConfig(jsonObject);
             }
 
