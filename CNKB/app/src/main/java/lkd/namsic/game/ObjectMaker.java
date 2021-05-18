@@ -1,5 +1,7 @@
 package lkd.namsic.game;
 
+import android.util.Log;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
@@ -33,6 +35,8 @@ public class ObjectMaker {
 
                 Logger.i("ObjectMaker", "Object making is done!");
             } catch (Exception e) {
+                e.printStackTrace();
+                Log.e("namsic!", Config.errorString(e));
                 Logger.e("ObjectMaker", e);
                 System.exit(-1);
             }
@@ -729,7 +733,7 @@ public class ObjectMaker {
                 "명령어 목록을 보고 네 정보를 표시하는 명령어를 사용해봐",
                 "아 물론 거기 적혀있기도 하지만 네가 명령어 창을 연 것 처럼, " +
                         "모든 명령어에는 " + Emoji.focus("n") + "이나 " +
-                        Emoji.focus("ㅜ") + "라는 접두사가 포함되니까 기억해"
+                        Emoji.focus("ㅜ") + "라는 글자가 붙으니까 기억해"
         ));
         chat.setAnyResponseChat("__정보", 3, true);
         chat.setAnyResponseChat("__info", 3, true);
@@ -787,8 +791,8 @@ public class ObjectMaker {
                 "음, 아무래도 돌은 항상 부족해서 말이지",
                 "돌 50개만 구해다 줄 수 있겠나?"
         ));
-        chat.setResponseChat(WaitResponse.YES, 10);
-        chat.setResponseChat(WaitResponse.NO, 11);
+        chat.setResponseChat(WaitResponse.YES, 10, true);
+        chat.setResponseChat(WaitResponse.NO, 11, true);
         Config.unloadObject(chat);
 
         chat = new Chat("낚시를 하면서 할만한 퀘스트가 있을까요?");
@@ -797,8 +801,8 @@ public class ObjectMaker {
                 "요즘 바다나 강이 너무 더러워저셔 말일세",
                 "쓰레기가 낚이는게 있으면 10개만 구해다 줄 수 있겠나?"
         ));
-        chat.setResponseChat(WaitResponse.YES, 12);
-        chat.setResponseChat(WaitResponse.NO, 11);
+        chat.setResponseChat(WaitResponse.YES, 12, true);
+        chat.setResponseChat(WaitResponse.NO, 11, true);
         Config.unloadObject(chat);
 
         chat = new Chat();
@@ -828,19 +832,19 @@ public class ObjectMaker {
    }
 
    private static void makeQuest() {
-       Quest quest = new Quest("광부의 일", 13L);
+       Quest quest = new Quest("광부의 일", 3L, 13L);
        quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
        quest.setNeedItem(20L, 50);
-       quest.setRewardCloseRate(3L, 1);
-       quest.getRewardExp().set(20000);
+       quest.setRewardCloseRate(3L, 1, true);
+       quest.getRewardExp().set(20000L);
        quest.getRewardMoney().set(250L);
        Config.unloadObject(quest);
 
-       quest = new Quest("쓰레기 수거", 13L);
+       quest = new Quest("쓰레기 수거", 3L, 13L);
        quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
        quest.setNeedItem(58L, 10);
-       quest.setRewardCloseRate(3L, 1);
-       quest.getRewardExp().set(50000);
+       quest.setRewardCloseRate(3L, 1, true);
+       quest.getRewardExp().set(50000L);
        Config.unloadObject(quest);
 
        Config.ID_COUNT.put(Id.QUEST, Math.max(Config.ID_COUNT.get(Id.CHAT), 3L));
@@ -850,11 +854,13 @@ public class ObjectMaker {
     private static void makeNpc() {
         Npc npc = new Npc("???");
         npc.getId().setObjectId(1L);
+        npc.getLv().set(Config.MAX_LV);
         npc.getLocation().set(0, 0, 1, 1);
         Config.unloadObject(npc);
 
         npc = new Npc("아벨");
         npc.getId().setObjectId(2L);
+        npc.getLv().set(Config.MAX_LV);
         npc.getLocation().set(0, 0, 1, 1);
         Config.unloadObject(npc);
         
@@ -864,12 +870,15 @@ public class ObjectMaker {
         npc.setFirstChat(5L);
         npc.setCommonChat(new ChatLimit(), 6L);
         npc.setChat(new ChatLimit(), 7L);
-        npc.setChat(new ChatLimit() {{
-            this.getRunningQuest().add(1L);
-        }}, 8L);
-        npc.setChat(new ChatLimit() {{
-            this.getRunningQuest().add(2L);
-        }}, 9L);
+
+        ChatLimit chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(1L);
+        npc.setChat(chatLimit, 8L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(2L);
+        npc.setChat(chatLimit, 9L);
+
         Config.unloadObject(npc);
 
         Config.ID_COUNT.put(Id.NPC, Math.max(Config.ID_COUNT.get(Id.NPC), 4L));

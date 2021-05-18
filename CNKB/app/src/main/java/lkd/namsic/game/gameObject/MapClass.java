@@ -1,5 +1,7 @@
 package lkd.namsic.game.gameObject;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;

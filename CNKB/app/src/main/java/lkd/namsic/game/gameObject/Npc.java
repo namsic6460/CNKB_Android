@@ -17,9 +17,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
+@Setter
 public class Npc extends AiEntity {
 
-    @Setter
     @Nullable
     Long firstChat = null;
 
@@ -39,7 +39,7 @@ public class Npc extends AiEntity {
         if(chatSet == null) {
             chatSet = new ConcurrentHashSet<>();
             chatSet.add(chatId);
-            this.chat.put(chatLimit, chatSet);
+            this.commonChat.put(chatLimit, chatSet);
         } else {
             chatSet.add(chatId);
         }

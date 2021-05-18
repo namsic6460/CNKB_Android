@@ -130,10 +130,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void toast(final String msg) {
-        mainActivity.runOnUiThread(() -> {
-            Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
-            toast.show();
-        });
+        if(mainActivity != null) {
+            mainActivity.runOnUiThread(() -> {
+                Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
+                toast.show();
+            });
+        }
     }
 
     public static void startThread(Thread thread) {
