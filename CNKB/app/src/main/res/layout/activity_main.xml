@@ -38,7 +38,8 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
-        android:visibility="visible">
+        android:visibility="visible"
+        android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -50,6 +51,7 @@
                 android:layout_height="match_parent"
                 android:textSize="16sp"
                 android:visibility="visible"
+                android:gravity="bottom"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

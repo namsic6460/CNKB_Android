@@ -1,14 +1,18 @@
 package lkd.namsic.game.gameObject;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lkd.namsic.game.Emoji;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.Location;
@@ -41,7 +45,7 @@ public class MapClass {
 
     final Location location = new Location();
 
-    Map<Id, Map<Long, Double>> spawnMonster;
+    Map<Id, Map<Long, Double>> spawnMonster = new ConcurrentHashMap<>();
 
     //This part can be frequently changed
     final Map<Location, Long> money = new ConcurrentHashMap<>();
@@ -51,6 +55,86 @@ public class MapClass {
 
     public MapClass(@NonNull String name) {
         this.name = name;
+
+        this.entity.put(Id.PLAYER, new ConcurrentHashSet<>());
+        this.entity.put(Id.MONSTER, new ConcurrentHashSet<>());
+        this.entity.put(Id.BOSS, new ConcurrentHashSet<>());
+        this.entity.put(Id.NPC, new ConcurrentHashSet<>());
+    }
+
+    @NonNull
+    public String getInfo() {
+        return this.name + "(요구 레벨: " + requireLv.get() + ") [" + this.mapType.toString() + "]\n" +
+                Emoji.WORLD + ": " + this.location.toMapString() + "\n" +
+                Emoji.MONSTER + ": " + this.getEntity(Id.MONSTER).size() + ", " +
+                Emoji.BOSS + ": " + this.getEntity(Id.BOSS).size();
+    }
+
+    @NonNull
+    public String getInnerInfo() {
+        StringBuilder builder = new StringBuilder("---플레이어 목록---");
+        
+        Set<Long> playerSet = this.entity.get(Id.PLAYER);
+        Player player;
+        if(playerSet.isEmpty()) {
+            builder.append("\n플레이어 없음");
+        } else {
+            for (long playerId : playerSet) {
+                player = Config.getData(Id.PLAYER, playerId);
+                builder.append("\n[")
+                        .append(player.getLocation().toFieldString())
+                        .append("] ")
+                        .append(player.getName());
+            }
+        }
+
+        builder.append("\n\n---NPC 목록---");
+
+        Set<Long> npcSet = this.entity.get(Id.NPC);
+        npcSet.remove(1L);
+        npcSet.remove(2L);
+
+        Npc npc;
+        if(npcSet.isEmpty()) {
+            builder.append("\nNPC 없음");
+        } else {
+            for(long npcId : npcSet) {
+                npc = Config.getData(Id.NPC, npcId);
+                builder.append("\n[")
+                        .append(npc.getLocation().toFieldString())
+                        .append("] ")
+                        .append(npc.getName());
+            }
+        }
+
+        builder.append("\n\n---무언가 감지된 좌표---");
+
+        Set<Location> locationSet = new HashSet<>();
+        locationSet.addAll(this.money.keySet());
+        locationSet.addAll(this.item.keySet());
+        locationSet.addAll(this.equip.keySet());
+
+        Entity entity;
+        for(long monsterId : this.getEntity(Id.MONSTER)) {
+            entity = Config.getData(Id.MONSTER, monsterId);
+            locationSet.add(entity.getLocation());
+        }
+
+        for(long bossId : this.getEntity(Id.BOSS)) {
+            entity = Config.getData(Id.BOSS, bossId);
+            locationSet.add(entity.getLocation());
+        }
+
+        if(locationSet.isEmpty()) {
+            return builder.toString() + "\n감지된 물체 없음";
+        }
+
+        for(Location location : locationSet) {
+            builder.append("\n")
+                    .append(location.toFieldString());
+        }
+
+        return builder.toString();
     }
 
     public void setMoney(Location location, long money) {
@@ -66,13 +150,7 @@ public class MapClass {
     }
 
     public long getMoney(Location location) {
-        Long value = this.money.get(location);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 0;
-        }
+        return this.money.getOrDefault(location, 0L);
     }
 
     public void addMoney(Location location, long money) {
@@ -110,11 +188,7 @@ public class MapClass {
         Map<Long, Integer> itemMap = this.item.get(location);
 
         if(itemMap != null) {
-            Integer value = itemMap.get(itemId);
-
-            if(value != null) {
-                return value;
-            }
+            return itemMap.getOrDefault(itemId, 0);
         }
 
         return 0;
@@ -184,13 +258,7 @@ public class MapClass {
         if(spawnMonster == null) {
             return 0;
         } else {
-            Double value = spawnMonster.get(monsterId);
-
-            if(value != null) {
-                return value;
-            } else {
-                return 0;
-            }
+            return spawnMonster.getOrDefault(monsterId, 0D);
         }
     }
 

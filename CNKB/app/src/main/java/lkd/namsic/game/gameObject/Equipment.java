@@ -202,7 +202,7 @@ public class Equipment extends Item {
     EquipType equipType;
 
     final LimitInteger reinforceCount = new LimitInteger(Config.MIN_REINFORCE_COUNT, Config.MIN_REINFORCE_COUNT, Config.MAX_REINFORCE_COUNT);
-    final LimitInteger reinforceFloor = new LimitInteger(0, 0, Integer.MAX_VALUE);
+    final LimitInteger reinforceFloor = new LimitInteger(0, 0, null);
     final RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);
 
     @Setter
@@ -210,7 +210,7 @@ public class Equipment extends Item {
     double reinforcePercent;
 
     final RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(
-            new HashMap<>(), new HashMap<>()
+            new HashMap<>(), new HashMap<>(), StatType.class
     );
     final Map<StatType, Integer> basicStat = new HashMap<>();
     final Map<StatType, Integer> reinforceStat = new HashMap<>();
@@ -247,13 +247,7 @@ public class Equipment extends Item {
 
     public int getBasicStat(@NonNull StatType statType) {
         Config.checkStatType(statType);
-        Integer value = this.basicStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.basicStat.getOrDefault(statType, 0);
     }
 
     public Equipment addBasicStat(@NonNull StatType statType, int stat) {
@@ -274,13 +268,7 @@ public class Equipment extends Item {
 
     public int getReinforceStat(@NonNull StatType statType) {
         Config.checkStatType(statType);
-        Integer value = this.reinforceStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.reinforceStat.getOrDefault(statType, 0);
     }
 
     public Equipment addReinforceStat(@NonNull StatType statType, int stat) {

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Base64;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
@@ -73,9 +74,16 @@ public class KakaoTalkListener extends NotificationListenerService {
                             image = Base64.encodeToString(baos.toByteArray(), 0);
                             int imageLength = image.length();
                             image = image.substring(200, 250);
+                            image = image.replaceAll("\\\\", "").replaceAll("/", "")
+                                    .replaceAll(":", "").replaceAll("\\*", "")
+                                    .replaceAll("\\?", "").replaceAll("\"", "")
+                                    .replaceAll("<", "").replaceAll(">", "")
+                                    .replaceAll("\\|", "").replaceAll("\r", "")
+                                    .replaceAll("\n", "").replaceAll(" ", "_");
                             image = image + "+" + image.hashCode() + "+" + imageLength;
                         }
 
+                        this.cancelNotification(sbn.getKey());
                         KakaoTalk.onChat(sender, image, msg.trim(), room, isGroupChat, action);
                     }
                 }
@@ -84,5 +92,6 @@ public class KakaoTalkListener extends NotificationListenerService {
             }
         }
     }
+
 
 }

@@ -1,5 +1,7 @@
 package lkd.namsic.game.enums;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ public enum Doing {
     BUY,
     CHAT,
     FIGHT,
+    FISH,
     EXPLORE,
     MINE,
     GATHER,
@@ -16,6 +19,7 @@ public enum Doing {
     REINFORCE,
     WAIT_RESPONSE;
 
+    @NonNull
     public static List<Doing> fightList() {
         List<Doing> doingList = new ArrayList<>();
         doingList.add(Doing.NONE);

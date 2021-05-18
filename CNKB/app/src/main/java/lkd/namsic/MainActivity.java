@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,13 +23,14 @@ import java.util.TimerTask;
 
 import lkd.namsic.game.Config;
 import lkd.namsic.game.ObjectMaker;
+import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.service.ForcedTerminationService;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final List<Thread> chatThreads = new ArrayList<>();
-    public static final Timer threadCleaner = new Timer();
+    public static final List<Thread> threads = new ConcurrentArrayList<>();
+    public static Timer threadCleaner;
 
     @SuppressLint("StaticFieldLeak")
     public static MainActivity mainActivity;
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     public static TextView textView;
 
     @SuppressLint("StaticFieldLeak")
-    private TextView threadCount;
+    private static TextView threadCount;
 
     private SwitchCompat switchBtn;
 
@@ -73,7 +75,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_main);
+
         textView = findViewById(R.id.text);
+        textView.setMovementMethod(new ScrollingMovementMethod());
+
         startService(new Intent(this, ForcedTerminationService.class));
 
         threadCount = findViewById(R.id.thread_count);
@@ -83,26 +88,29 @@ public class MainActivity extends AppCompatActivity {
 
         Config.init();
         FileManager.initDir();
+        Config.loadPlayers();
 
+        threadCleaner = new Timer();
         threadCleaner.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                int size = chatThreads.size();
-
-                mainActivity.runOnUiThread(() -> threadCount.setText(String.valueOf(size)));
+                int size = threads.size();
 
                 if(size == 0) {
                     return;
                 }
 
                 List<Thread> deadThreads = new ArrayList<>();
-                for(Thread thread : chatThreads) {
-                    if(thread.isInterrupted()) {
+                for(Thread thread : threads) {
+                    if(thread.isInterrupted() || !thread.isAlive()) {
                         deadThreads.add(thread);
                     }
                 }
 
-                chatThreads.removeAll(deadThreads);
+                if(!deadThreads.isEmpty()) {
+                    threads.removeAll(deadThreads);
+                    mainActivity.runOnUiThread(() -> threadCount.setText(String.valueOf(size - deadThreads.size())));
+                }
             }
         }, 0, 1000);
     }
@@ -122,12 +130,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void toast(final String msg) {
-        Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
-        toast.show();
+        if(mainActivity != null) {
+            mainActivity.runOnUiThread(() -> {
+                Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
+                toast.show();
+            });
+        }
     }
 
     public static void startThread(Thread thread) {
-        chatThreads.add(thread);
+        threads.add(thread);
+        mainActivity.runOnUiThread(() -> threadCount.setText(String.valueOf(threads.size())));
         thread.start();
     }
 

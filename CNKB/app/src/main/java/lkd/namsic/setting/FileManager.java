@@ -5,7 +5,8 @@ import android.os.Environment;
 
 import androidx.annotation.NonNull;
 
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -45,10 +46,10 @@ public class FileManager extends Application {
 
             String config = read(CONFIG_PATH);
             if (config.equals("")) {
-                JSONObject configObject = Config.createConfig();
+                JsonObject configObject = Config.createConfig();
                 save(CONFIG_PATH, configObject.toString());
             } else {
-                JSONObject jsonObject = new JSONObject(config);
+                JsonObject jsonObject = JsonParser.parseString(config).getAsJsonObject();
                 Config.parseConfig(jsonObject);
             }
 
@@ -61,36 +62,41 @@ public class FileManager extends Application {
     }
 
     @NonNull
-    public static String read(String path) {
+    public synchronized static String read(String path) {
         try {
             File file = new File(path);
             if (!file.exists()) {
                 return "";
             }
 
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            char[] c = new char[(int) file.length()];
-            bufferedReader.read(c);
-            bufferedReader.close();
-            Logger.i("FileManger", "read - " + path);
-
-            return new String(c);
+            return read(file);
         } catch (Exception e) {
             Logger.e("FileManager", e);
             return "";
         }
     }
 
-    public static void append(String path, @NonNull String data) {
+    @NonNull
+    public synchronized static String read(File file) throws Exception {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        char[] c = new char[(int) file.length()];
+        bufferedReader.read(c);
+        bufferedReader.close();
+        Logger.i("FileManger", "read - " + file.getPath());
+
+        return new String(c).trim();
+    }
+
+    public synchronized static void append(String path, @NonNull String data) {
         String readData = read(path);
         if (!readData.equals("")) {
-            data = readData + "\n" + data;
+            data = readData + "\r\n" + data;
         }
 
         save(path, data);
     }
 
-    public static void save(String path, @NonNull String data) {
+    public synchronized static void save(String path, @NonNull String data) {
         try {
             File file = new File(path);
             if(!file.exists()) {
@@ -98,7 +104,7 @@ public class FileManager extends Application {
             }
 
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-            bufferedWriter.write(data);
+            bufferedWriter.write(data.trim());
             bufferedWriter.close();
             Logger.i("FileManger", "save - " + path + "\n" + data);
         } catch (Exception e) {
@@ -106,7 +112,7 @@ public class FileManager extends Application {
         }
     }
 
-    public static void delete(String path) {
+    public synchronized static void delete(String path) {
         try {
             File file = new File(path);
             if (file.exists()) {

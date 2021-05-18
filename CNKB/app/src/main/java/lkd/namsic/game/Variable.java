@@ -2,6 +2,12 @@ package lkd.namsic.game;
 
 public enum Variable {
 
-    MINE
+    FISH,
+    FISH_WAIT_TYPE,
+    FISH_MAP,
+    FISH_SKILL,
+    MINE,
+    HIGH_PRIORITY_ITEM,
+    IS_TUTORIAL
 
 }

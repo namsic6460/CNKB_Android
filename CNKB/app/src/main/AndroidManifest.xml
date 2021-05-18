@@ -29,6 +29,8 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+        <uses-library android:name="com.google.guava"
+            android:required="false" />
     </application>
 
 </manifest>

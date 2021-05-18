@@ -1,19 +1,19 @@
 package lkd.namsic.game.enums;
 
-import androidx.annotation.NonNull;
-
 import java.util.Arrays;
 import java.util.List;
+
+import lombok.Getter;
 
 public enum WaitResponse {
 
     NONE(),
     ANYTHING(),
-    NUMBER(),
     YES(Arrays.asList("네", "ㅇㅇ", "yes", "y")),
     NO(Arrays.asList("아니오", "아니요", "ㄴㄴ", "no", "n"));
 
-    private List<String> list;
+    @Getter
+    public List<String> list;
 
     WaitResponse() {}
 
@@ -21,21 +21,25 @@ public enum WaitResponse {
         this.list = list;
     }
 
-    public static WaitResponse fromString(@NonNull String response) {
-        response = response.toLowerCase();
-
-        try {
-            Integer.valueOf(response);
-            return NUMBER;
-        } catch (NumberFormatException ignore) {}
-
-        if(YES.list.contains(response)) {
-            return YES;
-        } else if(NO.list.contains(response)) {
-            return NO;
+    public String getDisplay() {
+        if(this.equals(ANYTHING)) {
+            return "아무 채팅이나 입력해주세요";
         }
 
-        return ANYTHING;
+        StringBuilder builder = new StringBuilder("(");
+
+        boolean first = true;
+        for(String string : this.list) {
+            if(first) {
+                first = false;
+            } else {
+                builder.append("/");
+            }
+
+            builder.append(string);
+        }
+
+        return builder.append(")").toString();
     }
 
 }

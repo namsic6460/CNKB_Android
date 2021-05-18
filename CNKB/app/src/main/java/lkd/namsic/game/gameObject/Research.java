@@ -49,13 +49,7 @@ public class Research extends Achieve {
 
     public int getNeedItem(long itemId) {
         Config.checkId(Id.ITEM, itemId);
-        Integer value = this.needItem.get(itemId);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 0;
-        }
+        return this.needItem.getOrDefault(itemId, 0);
     }
 
     public void addNeedItem(long itemId, int count) {

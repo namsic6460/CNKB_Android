@@ -2,18 +2,22 @@ package lkd.namsic.game.gameObject;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lkd.namsic.game.Config;
+import lkd.namsic.game.Variable;
 import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
-import lkd.namsic.game.Config;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
@@ -26,7 +30,6 @@ import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.UnhandledEnumException;
-import lkd.namsic.game.Variable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,7 +42,7 @@ import lombok.Setter;
 public abstract class Entity extends NamedObject {
 
     final LimitInteger lv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
-    final LimitLong money = new LimitLong(0, 0L, Long.MAX_VALUE);
+    final LimitLong money = new LimitLong(0, 0L, null);
 
     final Location location = new Location();
 
@@ -61,7 +64,7 @@ public abstract class Entity extends NamedObject {
     final Map<Id, ConcurrentHashSet<Long>> enemies = new ConcurrentHashMap<>();
     final Map<String, ConcurrentArrayList<Event>> events = new ConcurrentHashMap<>();
 
-    final Map<Variable, Integer> variable = new ConcurrentHashMap<>();
+    final Map<Variable, Object> variable = new ConcurrentHashMap<>();
 
     protected Entity(@NonNull String name) {
         super(name);
@@ -76,7 +79,7 @@ public abstract class Entity extends NamedObject {
         }
 
         if (!isCancelled) {
-            this.money.set(this.getMoney() + money);
+            this.money.set(money);
         }
 
         return isCancelled;
@@ -87,6 +90,8 @@ public abstract class Entity extends NamedObject {
     }
 
     public boolean addMoney(long money) {
+        money *= Config.MONEY_BOOST;
+
         return this.setMoney(this.getMoney() + money);
     }
 
@@ -103,15 +108,8 @@ public abstract class Entity extends NamedObject {
         Config.unloadMap(map);
     }
 
-    public boolean moveField(int fieldX, int fieldY) {
-        return this.setField(this.location.getFieldX().get() + fieldX,
-                this.location.getFieldY().get() + fieldY, Math.abs(fieldX) + Math.abs(fieldY));
-    }
-
     public boolean setField(int fieldX, int fieldY) {
-        int xDis = Math.abs(this.location.getFieldX().get() - fieldX);
-        int yDis = Math.abs(this.location.getFieldY().get() - fieldX);
-        return setField(fieldX, fieldY, xDis + yDis);
+        return setField(fieldX, fieldY, this.getFieldDistance(new Location(0, 0, fieldX, fieldY)));
     }
 
     public boolean setField(int fieldX, int fieldY, int distance) {
@@ -167,19 +165,20 @@ public abstract class Entity extends NamedObject {
     }
 
     public boolean setMap(int x, int y, int fieldX, int fieldY) {
-        int distance = Math.abs(this.location.getX().get() - x) + Math.abs(this.location.getY().get() - y);
-        return this.setMap(new Location(x, y, fieldX, fieldY), distance, false);
+        return this.setMap(new Location(x, y, fieldX, fieldY), getMapDistance(new Location(x, y)), false);
+    }
+
+    public boolean setMap(Location location) {
+        return this.setMap(location, false);
     }
 
     public boolean setMap(Location location, boolean isToBase) {
-        int distance = Math.abs(this.location.getX().get() - location.getX().get())
-                + Math.abs(this.location.getY().get() - location.getY().get());
-        return this.setMap(location, distance, isToBase);
+        return this.setMap(location, getMapDistance(location), isToBase);
     }
 
     public boolean setMap(Location location, int distance, boolean isToBase) {
         if(isToBase) {
-            return this.setMap(location.getX().get(), this.location.getY().get(), 0, 0, distance,true);
+            return this.setMap(location.getX().get(), location.getY().get(), 1, 1, distance,true);
         } else {
             return this.setMap(location.getX().get(), location.getY().get(),
                     location.getFieldX().get(), location.getFieldY().get(), distance, false);
@@ -194,6 +193,17 @@ public abstract class Entity extends NamedObject {
         boolean isCancelled = MoveEvent.handleEvent(this.events.get(MoveEvent.getName()), new Object[]{distance, false});
 
         if(!isCancelled) {
+            MapClass prevMap = null;
+
+            try {
+                prevMap = Config.loadMap(this.location);
+                prevMap.removeEntity(this);
+            } finally {
+                if(prevMap != null) {
+                    Config.unloadMap(prevMap);
+                }
+            }
+
             MapClass moveMap = null;
 
             try {
@@ -214,17 +224,6 @@ public abstract class Entity extends NamedObject {
             } finally {
                 if(moveMap != null) {
                     Config.unloadMap(moveMap);
-                }
-            }
-
-            MapClass prevMap = null;
-
-            try {
-                prevMap = Config.loadMap(this.location);
-                prevMap.removeEntity(this);
-            } finally {
-                if(prevMap != null && !this.id.getId().equals(Id.PLAYER)) {
-                    Config.unloadMap(prevMap);
                 }
             }
         }
@@ -283,13 +282,7 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getBasicStat(@NonNull StatType statType) {
-        Integer value = this.basicStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.basicStat.getOrDefault(statType, 0);
     }
 
     public void addBasicStat(@NonNull StatType statType, int stat) {
@@ -307,13 +300,7 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getEquipStat(@NonNull StatType statType) {
-        Integer value = this.equipStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.equipStat.getOrDefault(statType, 0);
     }
 
     public void addEquipStat(@NonNull StatType statType, int stat) {
@@ -331,13 +318,7 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getBuffStat(@NonNull StatType statType) {
-        Integer value = this.buffStat.get(statType);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.buffStat.getOrDefault(statType, 0);
     }
 
     public void addBuffStat(@NonNull StatType statType, int stat) {
@@ -347,28 +328,49 @@ public abstract class Entity extends NamedObject {
     public int getStat(@NonNull StatType statType) {
         int value = this.getBasicStat(statType) + this.getEquipStat(statType) + this.getBuffStat(statType);
 
-        if(statType.equals(StatType.MAXHP)) {
-            int hp = this.getStat(StatType.HP);
+        if(statType.equals(StatType.HP)) {
+            int maxHp = this.getStat(StatType.MAXHP);
 
-            if(hp > value) {
-                this.setBasicStat(StatType.HP, value);
+            if(maxHp < value) {
+                this.setBasicStat(StatType.HP, maxHp);
+                value = maxHp;
             }
-        } else if(statType.equals(StatType.MAXMN)) {
-            int mn = this.getStat(StatType.MN);
+        } else if(statType.equals(StatType.MN)) {
+            int maxMn = this.getStat(StatType.MAXMN);
 
-            if(mn > value) {
-                this.setBasicStat(StatType.MN, value);
+            if(maxMn < value) {
+                this.setBasicStat(StatType.MN, maxMn);
+                value = maxMn;
             }
         }
 
         return value;
     }
 
+    public boolean compareStat(@NonNull Map<StatType, Integer> map) {
+        return this.compareStat(map, true);
+    }
+
+    public boolean compareStat(@NonNull Map<StatType, Integer> map, boolean entityIsBig) {
+        this.revalidateBuff();
+
+        boolean flag;
+        for(Map.Entry<StatType, Integer> entry : map.entrySet()) {
+            flag = this.getStat(entry.getKey()) >= entry.getValue();
+
+            if(entityIsBig != flag) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public boolean checkStatRange(@NonNull Map<StatType, Integer> min, @NonNull Map<StatType, Integer> max) {
+        this.revalidateBuff();
+
         Integer minValue, maxValue;
         int value;
-
-        this.revalidateBuff();
 
         for(StatType statType : StatType.values()) {
             try {
@@ -404,13 +406,7 @@ public abstract class Entity extends NamedObject {
     public abstract void onKill(Entity entity);
 
     public long getEquip(EquipType equipType) {
-        Long value = this.equip.get(equipType);
-
-        if(value != null) {
-            return value;
-        } else {
-            return 0;
-        }
+        return this.equip.getOrDefault(equipType, 0L);
     }
 
     @NonNull
@@ -478,11 +474,7 @@ public abstract class Entity extends NamedObject {
         Map<StatType, Integer> buffMap = this.buff.get(time);
 
         if(buffMap != null) {
-            Integer value = buffMap.get(statType);
-
-            if(value != null) {
-                return value;
-            }
+            return buffMap.getOrDefault(statType, 0);
         }
 
         return 0;
@@ -527,13 +519,7 @@ public abstract class Entity extends NamedObject {
 
     public int getItem(long itemId) {
         Config.checkId(Id.ITEM, itemId);
-        Integer value = this.inventory.get(itemId);
-
-        if(value == null) {
-            return 0;
-        } else {
-            return value;
-        }
+        return this.inventory.getOrDefault(itemId, 0);
     }
 
     public void addItem(long itemId, int count) {
@@ -742,22 +728,60 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getFieldDistance(Location location) {
-        return (int) Math.sqrt(Math.pow(location.getX().get() - this.location.getX().get(), 2) +
+        return (int) Math.sqrt(Math.pow(this.location.getFieldX().get() - this.location.getFieldX().get(), 2) +
+                Math.pow(location.getFieldY().get() - this.location.getFieldX().get(), 2));
+    }
+
+    public int getMapDistance(Location location) {
+        return (int) Math.sqrt(Math.pow(this.location.getX().get() - this.location.getX().get(), 2) +
                 Math.pow(location.getY().get() - this.location.getY().get(), 2));
     }
 
-    public void setVariable(Variable variable, int value) {
+    public void setVariable(Variable variable, Object value) {
         this.variable.put(variable, value);
     }
 
     public int getVariable(Variable variable) {
-        Integer value = this.variable.get(variable);
+        Object value = this.variable.getOrDefault(variable, 0);
 
-        if(value != null) {
-            return value;
+        if(value instanceof Double) {
+            return ((Double) value).intValue();
         } else {
-            return 0;
+            return (int) value;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getObjectVariable(Variable variable) {
+        return (T) this.variable.get(variable);
+    }
+
+    public List<Long> getListVariable(Variable variable) {
+        List<String> list = this.getObjectVariable(variable);
+        if(list == null) {
+            return new ArrayList<>();
+        }
+
+        List<Long> outputList = new ArrayList<>();
+
+        for(String element : list) {
+            outputList.add(Long.parseLong(element));
+        }
+
+        this.setVariable(variable, outputList);
+        return outputList;
+    }
+
+    public Map<Long, Integer> getMapVariable(Variable variable) {
+        Map<String, Double> map = this.getObjectVariable(variable);
+        Map<Long, Integer> outputMap = new HashMap<>();
+
+        for(Map.Entry<String, Double> entry : map.entrySet()) {
+            outputMap.put((long) Double.parseDouble(entry.getKey()), entry.getValue().intValue());
+        }
+
+        this.setVariable(variable, outputMap);
+        return outputMap;
     }
 
     public void addVariable(Variable variable, int value) {
@@ -767,7 +791,7 @@ public abstract class Entity extends NamedObject {
     @NonNull
     @Override
     public String getName() {
-        return this.name + " (Lv." + this.getLv() + ")";
+        return this.name + " (Lv." + this.getLv().get() + ")";
     }
 
 }

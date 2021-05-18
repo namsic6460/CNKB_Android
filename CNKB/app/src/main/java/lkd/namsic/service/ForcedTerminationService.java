@@ -6,8 +6,6 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-import java.time.LocalDateTime;
-
 import lkd.namsic.game.Config;
 import lkd.namsic.setting.Logger;
 import lkd.namsic.MainActivity;
@@ -23,11 +21,11 @@ public class ForcedTerminationService extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         MainActivity.toast("Stopping...");
-        Logger.saveLog(LocalDateTime.now().withDayOfMonth(Logger.lastLogDay));
+        Logger.saveLog();
 
         MainActivity.threadCleaner.cancel();
         Config.onTerminate();
-        for(Thread thread : MainActivity.chatThreads) {
+        for(Thread thread : MainActivity.threads) {
             if (thread.isAlive()) {
                 thread.interrupt();
                 try {
@@ -36,7 +34,8 @@ public class ForcedTerminationService extends Service {
             }
         }
 
-        MainActivity.chatThreads.clear();
+        MainActivity.threads.clear();
+        MainActivity.threadCleaner.cancel();
 
         MainActivity.toast("Stopped");
         stopSelf();

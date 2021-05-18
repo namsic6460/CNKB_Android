@@ -4,20 +4,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.File;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
@@ -26,6 +30,7 @@ import lkd.namsic.game.gameObject.Achieve;
 import lkd.namsic.game.gameObject.AiEntity;
 import lkd.namsic.game.gameObject.Boss;
 import lkd.namsic.game.gameObject.Chat;
+import lkd.namsic.game.gameObject.Entity;
 import lkd.namsic.game.gameObject.Equipment;
 import lkd.namsic.game.gameObject.GameObject;
 import lkd.namsic.game.gameObject.Item;
@@ -36,10 +41,18 @@ import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.gameObject.Quest;
 import lkd.namsic.game.gameObject.Research;
 import lkd.namsic.game.gameObject.Skill;
+import lkd.namsic.game.json.NpcDeserializer;
+import lkd.namsic.game.json.NpcSerializer;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.setting.Logger;
 
 public class Config {
+
+    public static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(Npc.class, new NpcSerializer())
+            .registerTypeAdapter(Npc.class, new NpcDeserializer())
+            .setVersion(1.0)
+            .create();
 
     public static final Map<Id, Long> ID_COUNT = new ConcurrentHashMap<>();
     public static final Map<Id, Class<?>> ID_CLASS = new HashMap<>();
@@ -50,6 +63,11 @@ public class Config {
 
     public static final Map<String, MapClass> MAP = new ConcurrentHashMap<>();
     public static final Map<String, Long> PLAYER_COUNT = new ConcurrentHashMap<>();
+
+    public static final Set<String> NICKNAME_LIST = new ConcurrentHashSet<>();
+    public static final Map<Long, Map<String, String>> PLAYER_LIST = new ConcurrentHashMap<>();
+
+    public static final Set<Long> SELECTABLE_CHAT_SET = new ConcurrentHashSet<>();
 
     public static final double MONEY_BOOST = 1;
     public static final double EXP_BOOST = 1;
@@ -72,7 +90,11 @@ public class Config {
     public static final int MAX_LV = 999;
     public static final int MIN_SP = 0;
     public static final int MAX_SP = 100;
-    public static final long MIN_PAUSE_TIME = 1000;
+    public static final int MIN_MAGIC_LV = 1;
+    public static final int MAX_MAGIC_LV = 10;
+    public static final long MIN_DELAY_TIME = 500;
+    public static final long MAX_DELAY_TIME = 5000;
+    public static final long MIN_PAUSE_TIME = 2000;
     public static final long MAX_PAUSE_TIME = 5000;
 
     public static final double TOTAL_MONEY_LOSE_RANDOM = 0.1;
@@ -81,8 +103,6 @@ public class Config {
     public static final double MONEY_DROP_MIN = 0.2;
     public static final int ITEM_DROP = 4;
     public static final double ITEM_DROP_PERCENT = 0.95;
-
-    public static final double BASE_INCREASE_PERCENT = 0.05;
 
     public static final int MAX_EVADE = 95;
 
@@ -105,6 +125,8 @@ public class Config {
             return;
         }
 
+        initialized = true;
+
         for(Id id : Id.values()) {
             ID_COUNT.put(id, 1L);
 
@@ -112,34 +134,56 @@ public class Config {
             OBJECT_COUNT.put(id, new ConcurrentHashMap<>());
             DELETE_LIST.put(id, new ConcurrentHashSet<>());
         }
-
-        initialized = true;
     }
 
-    public static JSONObject createConfig() throws JSONException {
-        JSONObject jsonObject = new JSONObject();
+    public static void loadPlayers() {
+        File folder = new File(FileManager.DATA_PATH_MAP.get(Id.PLAYER));
+        File[] players = folder.listFiles();
 
-        JSONObject idJson = new JSONObject();
-        String idName;
+        String json;
+        for(File playerFile : players) {
+            try {
+                json = FileManager.read(playerFile);
+                Player player = fromJson(json, Player.class);
+                NICKNAME_LIST.add(player.getNickName());
+                PLAYER_LIST.put(player.getId().getObjectId(), new HashMap<String, String>() {{
+                    put("sender", player.getSender());
+                    put("image", player.getImage());
+                }});
+            } catch (Exception e) {
+                Logger.e("Config.init", e);
+            }
+        }
+    }
+
+    public static JsonObject createConfig() {
+        JsonObject jsonObject = new JsonObject();
+
+        JsonObject idJson = new JsonObject();
         for(Id id : Id.values()) {
-            idName = id.toString();
-            idJson.put(idName, ID_COUNT.get(id));
+            idJson.addProperty(id.toString(), ID_COUNT.get(id));
         }
 
-        jsonObject.put("id", idJson);
+        jsonObject.add("id", idJson);
+        jsonObject.add("selectableChat", gson.toJsonTree(SELECTABLE_CHAT_SET, HashSet.class));
 
         return jsonObject;
     }
 
-    public static void parseConfig(JSONObject jsonObject) throws JSONException {
-        JSONObject idObject = jsonObject.getJSONObject("id");
+    @SuppressWarnings("unchecked")
+    public static void parseConfig(JsonObject jsonObject) {
+        JsonObject idObject = jsonObject.getAsJsonObject("id");
 
         String idName;
         for(Id id : Id.values()) {
             idName = id.toString();
 
-            ID_COUNT.put(id, idObject.getLong(idName));
+            ID_COUNT.put(id, idObject.getAsJsonPrimitive(idName).getAsLong());
         }
+
+        JsonArray selectableArray = jsonObject.getAsJsonArray("selectableChat");
+        Set<Long> selectableChat = gson.fromJson(selectableArray, HashSet.class);
+        SELECTABLE_CHAT_SET.addAll(selectableChat);
     }
 
     public static void onTerminate() {
@@ -173,7 +217,6 @@ public class Config {
         return t;
     }
 
-    @SuppressWarnings("ConstantConditions")
     public static void deleteAiEntity(AiEntity entity) {
         Id id = entity.getId().getId();
         long objectId = entity.getId().getObjectId();
@@ -188,8 +231,17 @@ public class Config {
     }
 
     public static void checkId(@NonNull Id id, long objectId) throws NumberRangeException {
-        if(objectId < 1 || ID_COUNT.get(id) < objectId) {
-            throw new NumberRangeException(objectId, 1L, ID_COUNT.get(id));
+        String path;
+
+        if(id.equals(Id.PLAYER)) {
+            throw new UnhandledEnumException(id);
+        } else {
+            path = Config.getPath(id, objectId);
+        }
+
+        File file = new File(path);
+        if(!file.exists()) {
+            throw new ObjectNotFoundException(id, objectId);
         }
     }
 
@@ -201,16 +253,16 @@ public class Config {
 
     @NonNull
     public static <T> String toJson(@NonNull T t) {
-        return new Gson().toJson(t);
+        return gson.toJson(t);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T> T fromJson(@NonNull String jsonString, @NonNull Class<?> c) {
-        return (T) new Gson().fromJson(jsonString, c);
+        return (T) gson.fromJson(jsonString, c);
     }
 
-    public static void unloadObject(@NonNull GameObject gameObject) {
+    public synchronized static void unloadObject(@NonNull GameObject gameObject) {
         Id id = gameObject.getId().getId();
         long objectId = gameObject.getId().getObjectId();
 
@@ -238,15 +290,47 @@ public class Config {
                     FileManager.delete(path);
                     return;
                 }
+            } else if(objectCount == 0) {
+                if(id.equals(Id.CHAT)) {
+                    if(((Chat) gameObject).getName() != null) {
+                        SELECTABLE_CHAT_SET.add(objectId);
+                    }
+                }
+
+                if(gameObject instanceof Entity) {
+                    MapClass map = Config.loadMap(Config.MIN_MAP_X, Config.MIN_MAP_Y);
+                    map.addEntity((Entity) gameObject);
+                    Config.unloadMap(map);
+
+                    if(gameObject instanceof Player) {
+                        Player player = (Player) gameObject;
+                        PLAYER_LIST.put(player.getId().getObjectId(), new HashMap<String, String>() {{
+                            put("sender", player.getSender());
+                            put("image", player.getImage());
+                        }});
+                    }
+                }
             }
 
             FileManager.save(path, jsonString);
         }
     }
 
-    public static void unloadMap(@NonNull MapClass map) {
+
+    public synchronized static void discardPlayer(@NonNull Player player) {
+        String path = getPlayerPath(player.getSender(), player.getImage());
+        String jsonString = FileManager.read(path);
+
+        Player originalPlayer = fromJson(jsonString, Player.class);
+        OBJECT.get(Id.PLAYER).put(player.getId().getObjectId(), originalPlayer);
+
+        Logger.w("discardPlayer", "Player discarded - " + player.getName());
+    }
+
+    public synchronized static void unloadMap(@NonNull MapClass map) {
         String fileName = getMapFileName(map);
-        long playerCount = PLAYER_COUNT.get(fileName);
+        Long playerCount = PLAYER_COUNT.get(fileName);
+        playerCount = playerCount == null ? 0 : playerCount;
 
         if(playerCount > 1) {
             PLAYER_COUNT.put(fileName, playerCount - 1);
@@ -263,11 +347,12 @@ public class Config {
         }
     }
 
-    @SuppressWarnings({"ConstantConditions", "unchecked"})
+    @SuppressWarnings("unchecked")
     @NonNull
-    public static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
+    public synchronized static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
         if(id.equals(Id.PLAYER)) {
-            throw new UnhandledEnumException(id);
+            Map<String, String> playerData = PLAYER_LIST.get(objectId);
+            return (T) loadPlayer(playerData.get("sender"), playerData.get("image"));
         }
 
         checkId(id, objectId);
@@ -294,7 +379,7 @@ public class Config {
     }
 
     @Nullable
-    public static Player loadPlayer(@NonNull String sender, @NonNull String image) {
+    public synchronized static Player loadPlayer(@NonNull String sender, @NonNull String image) {
         String path = getPlayerPath(sender, image);
         String jsonString = FileManager.read(path);
 
@@ -310,6 +395,7 @@ public class Config {
             OBJECT.get(Id.PLAYER).put(objectId, player);
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, 1L);
         } else {
+            player = (Player) OBJECT.get(Id.PLAYER).get(objectId);
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, objectCount + 1);
         }
 
@@ -317,7 +403,7 @@ public class Config {
     }
 
     @NonNull
-    public static MapClass loadMap(int x, int y) {
+    public synchronized static MapClass loadMap(int x, int y) {
         String fileName = getMapFileName(x, y);
         Long playerCount = PLAYER_COUNT.get(fileName);
 
@@ -330,7 +416,10 @@ public class Config {
             }
 
             MapClass map = fromJson(jsonString, MapClass.class);
-            map.spawnMonster();
+
+            if(!(map.getMapType().equals(MapType.COUNTRY) || map.getMapType().equals(MapType.UNDERGROUND_CITY))) {
+                map.spawnMonster();
+            }
 
             MAP.put(fileName, map);
             PLAYER_COUNT.put(fileName, 1L);
@@ -342,24 +431,24 @@ public class Config {
     }
 
     @NonNull
-    public static MapClass loadMap(Location location) {
+    public synchronized static MapClass loadMap(Location location) {
         return loadMap(location.getX().get(), location.getY().get());
     }
 
     @NonNull
-    public static <T extends GameObject> T getData(@NonNull Id id, long objectId) {
+    public synchronized static <T extends GameObject> T getData(@NonNull Id id, long objectId) {
         T t = loadObject(id, objectId);
         unloadObject(t);
 
         return t;
     }
 
-    public static MapClass getMapData(Location location) {
+    public synchronized static MapClass getMapData(Location location) {
         return getMapData(location.getX().get(), location.getY().get());
     }
 
     @NonNull
-    public static MapClass getMapData(int x, int y) {
+    public synchronized static MapClass getMapData(int x, int y) {
         MapClass map = loadMap(x, y);
         unloadMap(map);
 
@@ -381,9 +470,14 @@ public class Config {
 
     public static <T> boolean compareMap(@NonNull Map<T, Integer> map1, @NonNull Map<T, Integer> map2,
                                          boolean firstIsBig, boolean regardZero) {
+        if(!firstIsBig) {
+            return compareMap(map2, map1, true, regardZero);
+        }
+
         Integer value;
-        for(Map.Entry<T, Integer> entry : map1.entrySet()) {
-            value = map2.get(entry.getKey());
+        boolean flag;
+        for(Map.Entry<T, Integer> entry : map2.entrySet()) {
+            value = map1.get(entry.getKey());
             if(value == null) {
                 if(regardZero) {
                     value = 0;
@@ -392,11 +486,8 @@ public class Config {
                 }
             }
 
-            if(firstIsBig) {
-                if(entry.getValue() < value) {
-                    return false;
-                }
-            } else if(entry.getValue() > value) {
+            flag = value >= entry.getValue();
+            if(!flag) {
                 return false;
             }
         }
@@ -415,7 +506,7 @@ public class Config {
 
     @NonNull
     private static String getPlayerPath(@NonNull String sender, @NonNull String image) {
-        return sender + "-" + image + ".json";
+        return FileManager.DATA_PATH_MAP.get(Id.PLAYER) + sender + "-" + image + ".json";
     }
 
     @NonNull
@@ -439,13 +530,32 @@ public class Config {
         return FileManager.MAP_PATH + "/" + fileName;
     }
 
+    public static String getIncrease(int value) {
+        if(value > 0) {
+            return "+" + value;
+        } else if(value == 0) {
+            return "-";
+        } else {
+            return Integer.toString(value);
+        }
+    }
+
+    public static String getIncrease(long value) {
+        if(value > 0) {
+            return "+" + value;
+        } else if(value == 0) {
+            return "-";
+        } else {
+            return Long.toString(value);
+        }
+    }
+
     public static String errorString(@NonNull Throwable throwable) {
         StringBuilder builder = new StringBuilder(throwable.getClass().getName());
         builder.append(": ");
         builder.append(throwable.getMessage());
-        builder.append("\n");
         for(StackTraceElement element : throwable.getStackTrace()) {
-            builder.append("\tat");
+            builder.append("\n\tat ");
             builder.append(element.toString());
         }
 

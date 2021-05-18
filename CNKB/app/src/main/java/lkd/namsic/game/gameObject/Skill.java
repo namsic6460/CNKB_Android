@@ -25,7 +25,9 @@ public class Skill extends NamedObject {
 
     boolean isWaitSkill = false;
 
-    final RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(new HashMap<>(), new HashMap<>());
+    final RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(
+            new HashMap<>(), new HashMap<>(), StatType.class
+    );
 
     public Skill(@NonNull String name) {
         super(name);
