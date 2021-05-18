@@ -202,17 +202,23 @@ public class Player extends Entity {
         StringBuilder builder = new StringBuilder("---대기중인 대답---\n");
 
         for(WaitResponse waitResponse : this.responseChat.keySet()) {
-            builder.append(waitResponse.toString())
-                    .append(": ")
-                    .append(waitResponse.getList());
+            builder.append(waitResponse.getDisplay())
+                    .append("\n");
         }
 
         if(!anyResponseChat.isEmpty()) {
-            builder.append("(다른 메세지 목록)");
+            builder.append("\n(다른 메세지 목록)");
 
+            String waitResponse;
             for(String response : anyResponseChat.keySet()) {
+                if(response.startsWith("__")) {
+                    waitResponse = response.replace("__", "(ㅜ/n) ");
+                } else {
+                    waitResponse = response;
+                }
+
                 builder.append("\n")
-                        .append(response.replaceAll("__", "n "));
+                        .append(waitResponse);
             }
         }
 
@@ -223,7 +229,7 @@ public class Player extends Entity {
         StringBuilder builder = new StringBuilder("---스텟---");
         for(StatType statType : StatType.values()) {
             builder.append("\n")
-                    .append(statType.toString())
+                    .append(statType.getDisplayName())
                     .append(": ")
                     .append(this.getStat(statType));
         }
@@ -370,6 +376,7 @@ public class Player extends Entity {
                 
                 if(flag) {
                     map = Config.getMapData(x, y);
+
                     builder.append("\n")
                             .append(map.getName())
                             .append("(")
@@ -610,7 +617,6 @@ public class Player extends Entity {
         }
 
         exp *= Config.EXP_BOOST;
-        exp *= this.expBoost.get();
 
         this.exp.add(exp);
         this.addLog(LogData.TOTAL_EXP, exp);
@@ -1519,12 +1525,12 @@ public class Player extends Entity {
         this.setChatCount(npcId, this.getChatCount(npcId) + count);
     }
 
-    public void setResponseChat(@NonNull WaitResponse waitResponse, long questId) {
-        if(questId == 0) {
+    public void setResponseChat(@NonNull WaitResponse waitResponse, long chatId) {
+        if(chatId == 0) {
             this.responseChat.remove(waitResponse);
         } else {
-            Config.checkId(Id.QUEST, questId);
-            this.responseChat.put(waitResponse, questId);
+            Config.checkId(Id.CHAT, chatId);
+            this.responseChat.put(waitResponse, chatId);
         }
     }
 
@@ -1532,12 +1538,12 @@ public class Player extends Entity {
         return this.responseChat.getOrDefault(waitResponse, 0L);
     }
 
-    public void setAnyResponseChat(@NonNull String response, long questId) {
-        if(questId == 0) {
+    public void setAnyResponseChat(@NonNull String response, long chatId) {
+        if(chatId == 0) {
             this.anyResponseChat.remove(response);
         } else {
-            Config.checkId(Id.QUEST, questId);
-            this.anyResponseChat.put(response, questId);
+            Config.checkId(Id.CHAT, chatId);
+            this.anyResponseChat.put(response, chatId);
         }
     }
 
