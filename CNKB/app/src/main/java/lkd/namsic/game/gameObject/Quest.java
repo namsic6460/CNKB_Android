@@ -39,7 +39,7 @@ public class Quest extends NamedObject {
     final Map<Long, Integer> needCloseRate = new HashMap<>();
 
     final LimitLong rewardMoney = new LimitLong(0, 0L, null);
-    final LimitInteger rewardExp = new LimitInteger(0, 0, null);
+    final LimitLong rewardExp = new LimitLong(0, 0L, null);
     final LimitInteger rewardAdv = new LimitInteger(0, 0, null);
     final Map<Long, Integer> rewardItem = new HashMap<>();
     final Map<StatType, Integer> rewardStat = new HashMap<>();
@@ -48,11 +48,22 @@ public class Quest extends NamedObject {
     final LimitId npcId = new LimitId(0, Id.NPC);
     final LimitId chatId = new LimitId(0, Id.QUEST);
 
-    public Quest(@NonNull String name, long chatId) {
+    public Quest(@NonNull String name, long npcId, long chatId) {
         super(name);
         this.id.setId(Id.QUEST);
 
+        this.setNpcId(npcId);
         this.setChatId(chatId);
+    }
+
+    //Only use in constructor
+    private void setNpcId(long npcId) {
+        if(npcId < 1) {
+            throw new NumberRangeException(npcId, 0L);
+        }
+
+        //Since npc creating is after creating quests
+        this.npcId.set(npcId);
     }
 
     public void setChatId(long chatId) {
@@ -174,7 +185,13 @@ public class Quest extends NamedObject {
     }
 
     public void setRewardCloseRate(long npcId, int closeRate) {
-        Config.checkId(Id.NPC, npcId);
+        this.setRewardCloseRate(npcId, closeRate, false);
+    }
+
+    public void setRewardCloseRate(long npcId, int closeRate, boolean skip) {
+        if(!skip) {
+            Config.checkId(Id.NPC, npcId);
+        }
 
         if(closeRate < 0) {
             throw new NumberRangeException(closeRate, 0);

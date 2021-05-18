@@ -24,7 +24,6 @@ import lkd.namsic.game.Emoji;
 import lkd.namsic.game.ObjectList;
 import lkd.namsic.game.Percent;
 import lkd.namsic.game.base.ConcurrentHashSet;
-import lkd.namsic.game.base.LimitDouble;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
@@ -82,9 +81,6 @@ public class Player extends Entity {
     boolean isGroup = true;
 
     final Location baseLocation = new Location();
-
-    final LimitDouble moneyBoost = new LimitDouble(1, 1D, null);
-    final LimitDouble expBoost = new LimitDouble(1, 1D, null);
 
     final LimitInteger sp = new LimitInteger(0, Config.MIN_SP, Config.MAX_SP);
     final LimitInteger adv = new LimitInteger(0, 0, null);
@@ -353,8 +349,14 @@ public class Player extends Entity {
 
         int distance;
         MapClass map;
-        for(int x = currentX - movableDistance; x <= currentX + movableDistance; x++) {
-            for(int y = currentY - movableDistance; y <= currentY + movableDistance; y++) {
+
+        int minX = Math.max(Config.MIN_MAP_X, currentX - movableDistance);
+        int maxX = Math.min(Config.MAX_MAP_X, currentX + movableDistance);
+        int minY = Math.max(Config.MIN_MAP_Y, currentY - movableDistance);
+        int maxY = Math.min(Config.MAX_MAP_Y, currentY + movableDistance);
+
+        for(int x = minX; x <= maxX; x++) {
+            for(int y = minY; y <= maxY; y++) {
                 flag = false;
                 
                 if(x == currentX && y == currentY) {
@@ -710,6 +712,17 @@ public class Player extends Entity {
                     "현재 위치 정보를 확인해보세요");
         }
 
+        Set<Long> questSet = this.questNpc.get(npcId);
+        if(questSet != null) {
+            for (long questId : questSet) {
+                if (this.canClearQuest(questId)) {
+                    this.startChat(this.quest.get(questId), npcId);
+                    this.clearQuest(questId, npcId);
+                    return;
+                }
+            }
+        }
+
         Npc npc = Config.getData(Id.NPC, npcId);
         long chatCount = this.getChatCount(npcId);
 
@@ -786,13 +799,15 @@ public class Player extends Entity {
                 Set<Long> availableChat = npc.getAvailableChat(this);
 
                 if(availableChat.isEmpty()) {
+                    this.replyPlayer("가능한 대화가 없습니다");
+                    this.setDoing(Doing.NONE);
                     return;
                 }
 
                 int index = 0;
                 String indexStr;
                 Chat chatData;
-                StringBuilder builder = new StringBuilder("대화를 선택해주세요");
+                StringBuilder builder = new StringBuilder("대화를 선택해주세요\n");
                 for(long availableChatId : availableChat) {
                     chatData = Config.getData(Id.CHAT, availableChatId);
                     indexStr = Integer.toString(index++);
@@ -805,26 +820,59 @@ public class Player extends Entity {
                     this.setAnyResponseChat(indexStr, availableChatId);
                 }
 
+                this.waitNpcId = npcId;
                 this.setDoing(Doing.WAIT_RESPONSE);
 
-                this.replyPlayer(builder.toString());
+                this.replyPlayer(builder.toString().trim());
             } else {
                 if (chat.getResponseChat().isEmpty() && chat.getAnyResponseChat().isEmpty()) {
                     this.setDoing(Doing.NONE);
                 } else {
-                    long anyLinkedChatId = chat.getResponseChat(WaitResponse.ANYTHING);
-                    if (anyLinkedChatId != 0) {
-                        if (chatId == anyLinkedChatId) {
-                            throw new InvalidNumberException(chatId);
+                    long noneChatId = chat.getResponseChat(WaitResponse.NONE);
+                    if (noneChatId != 0) {
+                        if (chatId == noneChatId) {
+                            throw new InvalidNumberException(noneChatId);
                         }
 
-                        this.startChat(anyLinkedChatId, npcId);
+                        this.startChat(noneChatId, npcId);
                         return;
                     }
 
                     this.waitNpcId = npcId;
                     this.responseChat = new ConcurrentHashMap<>(chat.getResponseChat());
                     this.anyResponseChat = new ConcurrentHashMap<>(chat.getAnyResponseChat());
+
+                    boolean isTutorial = this.getObjectVariable(Variable.IS_TUTORIAL);
+                    if(!isTutorial) {
+                        StringBuilder builder = new StringBuilder("대답을 입력해주세요\n");
+
+                        if (!chat.getResponseChat().isEmpty()) {
+                            builder.append("\n");
+
+                            for (WaitResponse waitResponse : chat.getResponseChat().keySet()) {
+                                builder.append(waitResponse.getDisplay())
+                                        .append("\n");
+                            }
+                        }
+
+                        if (!chat.getAnyResponseChat().isEmpty()) {
+                            builder.append("\n(다른 메세지 목록)");
+
+                            String waitResponse;
+                            for (String response : chat.getAnyResponseChat().keySet()) {
+                                if (response.startsWith("__")) {
+                                    waitResponse = response.replace("__", "(ㅜ/n) ");
+                                } else {
+                                    waitResponse = response;
+                                }
+
+                                builder.append("\n")
+                                        .append(waitResponse);
+                            }
+                        }
+
+                        this.replyPlayer(builder.toString().trim());
+                    }
 
                     this.setDoing(Doing.WAIT_RESPONSE);
                 }
@@ -955,30 +1003,20 @@ public class Player extends Entity {
     }
 
     public void addQuest(long questId) {
-        Quest quest = null;
+        Quest quest = Config.getData(Id.QUEST, questId);
 
-        try {
-            quest = Config.loadObject(Id.QUEST, questId);
+        this.quest.put(questId, quest.getChatId().get());
+        this.addLog(LogData.QUEST_RECEIVED, 1);
 
-            this.quest.put(questId, quest.getChatId().get());
-            this.addLog(LogData.QUEST_RECEIVED, 1);
+        long questNpcId = quest.getNpcId().get();
+        ConcurrentHashSet<Long> questNpcSet = this.questNpc.get(questNpcId);
 
-            long questNpcId = quest.getNpcId().get();
-            if(questNpcId != 0) {
-                ConcurrentHashSet<Long> questNpc = this.questNpc.get(questNpcId);
-
-                if(questNpc == null) {
-                    questNpc = new ConcurrentHashSet<>();
-                    questNpc.add(questId);
-                    this.questNpc.put(questNpcId, questNpc);
-                } else {
-                    questNpc.add(questId);
-                }
-            }
-        } finally {
-            if(quest != null) {
-                Config.unloadObject(quest);
-            }
+        if(questNpcSet == null) {
+            questNpcSet = new ConcurrentHashSet<>();
+            questNpcSet.add(questId);
+            this.questNpc.put(questNpcId, questNpcSet);
+        } else {
+            questNpcSet.add(questId);
         }
     }
 
@@ -1440,63 +1478,144 @@ public class Player extends Entity {
                 Config.compareMap(this.getCloseRate(), quest.getNeedCloseRate(), true);
     }
 
-    public void clearQuest(long questId) {
+    public void clearQuest(long questId, long npcId) {
         Config.checkId(Id.QUEST, questId);
+        Config.checkId(Id.NPC, npcId);
         Long chatId = this.quest.get(questId);
 
         if(chatId == null) {
             throw new ObjectNotFoundException(Id.QUEST, questId);
         }
 
+        long totalMoney = 0;
+        long totalExp;
+        int totalAdv;
+        Map<Long, Integer> totalItem = new HashMap<>();
+        Map<StatType, Integer> totalStat = new HashMap<>();
+        Map<Long, Integer> totalCloseRate = new HashMap<>();
+
+        //Remove Need Things
         Quest quest = Config.getData(Id.QUEST, questId);
 
         this.addMoney(-1 * quest.getNeedMoney().get());
+        totalMoney -= quest.getNeedMoney().get();
 
+        long longKey;
+        int value;
         for(Map.Entry<Long, Integer> entry : quest.getNeedItem().entrySet()) {
-            this.addItem(entry.getKey(), -1 * entry.getValue());
+            longKey = entry.getKey();
+            value = -1 * entry.getValue();
+
+            this.addItem(longKey, value);
+            totalItem.put(longKey, value);
         }
 
+        StatType statTypeKey;
         for(Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
-            this.addBasicStat(entry.getKey(), -1 * entry.getValue());
+            statTypeKey = entry.getKey();
+            value = -1 * entry.getValue();
+
+            this.addBasicStat(statTypeKey, value);
+            totalStat.put(statTypeKey, value);
         }
 
         for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
-            this.addCloseRate(entry.getKey(), -1 * entry.getValue());
+            longKey = entry.getKey();
+            value = -1 * entry.getValue();
+
+            this.addCloseRate(longKey, value);
+            totalCloseRate.put(longKey, value);
         }
 
+        //Add Reward Things
         this.addMoney(quest.getRewardMoney().get());
+        totalMoney += quest.getRewardMoney().get();
+
         this.addExp(quest.getRewardExp().get());
+        totalExp = quest.getRewardExp().get();
+
         this.adv.add(quest.getRewardAdv().get());
+        totalAdv = quest.getRewardAdv().get();
 
         for(Map.Entry<Long, Integer> entry : quest.getRewardItem().entrySet()) {
-            this.addItem(entry.getKey(), entry.getValue());
+            longKey = entry.getKey();
+            value = entry.getValue();
+
+            this.addItem(longKey, value);
+            totalItem.put(longKey, totalItem.getOrDefault(longKey, 0) + value);
         }
 
-        for(Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
-            this.addBasicStat(entry.getKey(), -1 * entry.getValue());
+        for(Map.Entry<StatType, Integer> entry : quest.getRewardStat().entrySet()) {
+            statTypeKey = entry.getKey();
+            value = entry.getValue();
+
+            this.addBasicStat(statTypeKey, value);
+            totalStat.put(statTypeKey, totalStat.getOrDefault(statTypeKey, 0) + value);
         }
 
-        for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
-            this.addCloseRate(entry.getKey(), -1 * entry.getValue());
+        for(Map.Entry<Long, Integer> entry : quest.getRewardCloseRate().entrySet()) {
+            longKey = entry.getKey();
+            value = entry.getValue();
+
+            this.addCloseRate(longKey, value);
+            totalCloseRate.put(longKey, totalCloseRate.getOrDefault(longKey, 0) + value);
         }
 
-        this.clearedQuest.put(questId, this.getClearedQuest(questId) + 1);
-        this.quest.remove(questId);
-        this.addLog(LogData.QUEST_CLEARED, 1);
+        StringBuilder innerMsg = new StringBuilder("---아이템 현황---");
 
-        long questNpcId = quest.getNpcId().get();
-        Npc npc = Config.getData(Id.NPC, questNpcId);
-        if(questNpcId != 0) {
-            ConcurrentHashSet<Long> questNpc = Objects.requireNonNull(this.questNpc.get(questNpcId));
-
-            if(questNpc.size() == 1) {
-                this.questNpc.remove(questId);
-            } else {
-                questNpc.remove(questId);
+        if(totalItem.isEmpty()) {
+            innerMsg.append("\n변경된 아이템이 없습니다");
+        } else {
+            BiMap<Long, String> itemBiMap = ObjectList.itemList.inverse();
+            for (Map.Entry<Long, Integer> entry : totalItem.entrySet()) {
+                innerMsg.append("\n")
+                        .append(itemBiMap.get(entry.getKey()))
+                        .append(": ")
+                        .append(Config.getIncrease(entry.getValue()));
             }
         }
 
-        this.startChat(chatId, npc.getId().getObjectId());
+        innerMsg.append("\n\n---스텟 현황---");
+        if(totalStat.isEmpty()) {
+            innerMsg.append("\n변경된 스텟이 없습니다");
+        } else {
+            for (Map.Entry<StatType, Integer> entry : totalStat.entrySet()) {
+                innerMsg.append("\n")
+                        .append(entry.getKey().getDisplayName())
+                        .append(": ")
+                        .append(Config.getIncrease(entry.getValue()));
+            }
+        }
+
+        innerMsg.append("\n\n---친밀도 현황---");
+        if(totalCloseRate.isEmpty()) {
+            innerMsg.append("\n변경된 친밀도가 없습니다");
+        } else {
+            BiMap<Long, String> npcBiMap = ObjectList.npcList.inverse();
+            for (Map.Entry<Long, Integer> entry : totalCloseRate.entrySet()) {
+                innerMsg.append("\n")
+                        .append(npcBiMap.get(entry.getKey()))
+                        .append(": ")
+                        .append(Config.getIncrease(entry.getValue()));
+            }
+        }
+
+        String msg = "===퀘스트 클리어 결과===\n" +
+                Emoji.GOLD + ": " + Config.getIncrease(totalMoney) + "\n" +
+                Emoji.EXP + ": " + Config.getIncrease(totalExp) + "\n" +
+                Emoji.ADV + ": " + Config.getIncrease(totalAdv);
+        this.replyPlayer(msg, innerMsg.toString());
+
+        this.clearedQuest.put(questId, this.getClearedQuest(questId) + 1);
+        this.quest.remove(questId);
+
+        Set<Long> questNpcSet = this.questNpc.get(npcId);
+        questNpcSet.remove(questId);
+        if(questNpcSet.isEmpty()) {
+            this.questNpc.remove(npcId);
+        }
+
+        this.addLog(LogData.QUEST_CLEARED, 1);
     }
 
     public int getClearedQuest(long questId) {

@@ -49,7 +49,7 @@ public class Chat extends GameObject {
     final Map<Variable, Integer> variable = new HashMap<>();
 
     public Chat() {
-        new Chat(null);
+        this(null);
     }
 
     public Chat(@Nullable String name) {
