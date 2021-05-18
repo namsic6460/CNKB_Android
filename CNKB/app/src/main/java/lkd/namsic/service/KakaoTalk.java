@@ -73,16 +73,24 @@ public class KakaoTalk {
                 lastSender = sender;
                 lastMsg = msg;
 
+                player = Config.loadPlayer(sender, image);
+
                 if(isCommand) {
                     otherCommand(command, session);
 
-                    player = Config.loadPlayer(sender, image);
-
                     if (player != null) {
-                        playerCommand(player, msg, command, room, isGroupChat, session);
+                        playerCommand(player, command, room, isGroupChat, session);
                     } else {
                         nonPlayerCommand(sender, image, command, room, isGroupChat, session);
                     }
+                }
+
+                if(player != null) {
+                    if(player.getDoing().equals(Doing.WAIT_RESPONSE)) {
+                        checkResponseChat(player, msg);
+                    }
+
+                    Config.unloadObject(player);
                 }
             } catch (Exception e) {
                 Logger.e("onChat", e);
@@ -99,7 +107,7 @@ public class KakaoTalk {
         MainActivity.startThread(gameThread);
     }
 
-    private static void playerCommand(@NonNull Player player, @NonNull String msg, @NonNull String command,
+    private static void playerCommand(@NonNull Player player, @NonNull String command,
                                          @NonNull String room, boolean isGroupChat, @NonNull Notification.Action session) {
         player.checkNewDay();
 
@@ -120,6 +128,10 @@ public class KakaoTalk {
                 fourth = commands.get(3);
             } catch (IndexOutOfBoundsException ignore) {}
 
+            if(first.equals("give")) {
+                player.addItem(Long.parseLong(second), Integer.parseInt(third));
+            }
+
             if (Arrays.asList("회원가입", "가입", "register").contains(first)) {
                 reply(session, "이미 회원가입이 되어 있습니다.\n" +
                         "회원가입을 진행한 적이 없는 경우, 프로필 이미지 또는 카카오톡 이름을 변경한 후 다시 시도해주세요");
@@ -132,8 +144,12 @@ public class KakaoTalk {
                         player.replyPlayer(map.getInfo(), map.getInnerInfo());
                     } else if (second.equals("목록") || second.equals("list")) {
                         player.displayMapList();
+                    } else {
+                        throw new WeirdCommandException();
                     }
                 } else if(first.equals("대화") || first.equals("chat")) {
+                    checkDoing(player);
+
                     if(second == null) {
                         throw new WeirdCommandException();
                     }
@@ -197,6 +213,8 @@ public class KakaoTalk {
                         player.moveMap(locationStr.trim());
                     } else if(second.equals("필드") || second.equals("field")) {
                         player.moveField(third);
+                    } else {
+                        throw new WeirdCommandException();
                     }
                 } else if (first.equals("광질") || first.equals("mine")) {
                     boolean isTutorial = player.getObjectVariable(Variable.IS_TUTORIAL);
@@ -244,12 +262,6 @@ public class KakaoTalk {
         } catch (NumberFormatException e) {
             player.replyPlayer("숫자를 입력해야합니다");
         }
-
-        if(player.getDoing().equals(Doing.WAIT_RESPONSE)) {
-            checkResponseChat(player, msg);
-        }
-
-        Config.unloadObject(player);
     }
 
     private static void nonPlayerCommand(@NonNull String sender, @NonNull String image,
@@ -281,10 +293,6 @@ public class KakaoTalk {
                 player.setVariable(Variable.IS_TUTORIAL, true);
 
                 Config.NICKNAME_LIST.add(second);
-
-                MapClass map = Config.loadMap(Config.MIN_MAP_X, Config.MIN_MAP_Y);
-                map.addEntity(player);
-                Config.unloadMap(map);
 
                 player.replyPlayer("회원가입에 성공하였습니다!");
                 player.startChat(1L, 1L);
@@ -331,16 +339,16 @@ public class KakaoTalk {
                             "문의 : 개인 카카오톡 또는 이메일");
         }
     }
-    
-    //TODO : 이동 가능한 거리를 바탕으로 주변 맵 이름 및 좌표 출력
 
     private static void checkResponseChat(@NonNull Player player, @NonNull String msg) {
-        String response = null;
+        String response;
 
         if(msg.startsWith("__")) {
             return;
         } else if(msg.startsWith("n ") || msg.startsWith("ㅜ ")) {
             response = msg.replaceAll("n ", "__").replaceAll("ㅜ ", "__");
+        } else {
+            response = msg;
         }
         
         for(Map.Entry<WaitResponse, Long> entry : player.getResponseChat().entrySet()) {
