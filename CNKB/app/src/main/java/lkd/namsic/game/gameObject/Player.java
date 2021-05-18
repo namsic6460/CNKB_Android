@@ -1607,16 +1607,13 @@ public class Player extends Entity {
     }
 
     public void setLog(@NonNull LogData logData, long count) {
-        if(count < 0) {
-            throw new NumberRangeException(count, 0);
-        }
-
         if(count == 0) {
             this.log.remove(logData);
         } else {
             this.log.put(logData, count);
         }
 
+        this.log.put(LogData.LOG_COUNT, this.getLog(LogData.LOG_COUNT) + 1);
         Logger.i("LogData", this.getName() + " {" + logData.toString() + " : " + count + "}");
     }
 
@@ -1626,7 +1623,6 @@ public class Player extends Entity {
 
     public void addLog(@NonNull LogData logData, long count) {
         this.setLog(logData, this.getLog(logData) + count);
-        this.log.put(LogData.LOG_COUNT, this.getLog(LogData.LOG_COUNT) + 1);
     }
 
     public boolean canEquip(long equipId) {
@@ -1730,9 +1726,6 @@ public class Player extends Entity {
 
     @Override
     public boolean setMoney(long money) {
-        money *= Config.MONEY_BOOST;
-        money *= this.moneyBoost.get();
-
         long gap = money - this.getMoney();
         boolean isCancelled = super.setMoney(money);
 
@@ -1850,14 +1843,6 @@ public class Player extends Entity {
 
         this.replyPlayer(entity.getName() + "을 처치했습니다!\n경험치 : " + prevExp + " -> " + this.exp.get(),
                 "획득한 경험치 : " + exp);
-    }
-
-    @Override
-    public void setItem(long itemId, int count) {
-        int currentItem = this.getItem(itemId);
-        super.setItem(itemId, count);
-
-        this.addLog(LogData.TOTAL_ITEM, count - currentItem);
     }
 
     @Override

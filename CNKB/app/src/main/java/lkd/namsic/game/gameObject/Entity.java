@@ -79,7 +79,7 @@ public abstract class Entity extends NamedObject {
         }
 
         if (!isCancelled) {
-            this.money.set(this.getMoney() + money);
+            this.money.set(money);
         }
 
         return isCancelled;
@@ -90,6 +90,8 @@ public abstract class Entity extends NamedObject {
     }
 
     public boolean addMoney(long money) {
+        money *= Config.MONEY_BOOST;
+
         return this.setMoney(this.getMoney() + money);
     }
 
@@ -756,6 +758,10 @@ public abstract class Entity extends NamedObject {
 
     public List<Long> getListVariable(Variable variable) {
         List<String> list = this.getObjectVariable(variable);
+        if(list == null) {
+            return new ArrayList<>();
+        }
+
         List<Long> outputList = new ArrayList<>();
 
         for(String element : list) {
@@ -785,7 +791,7 @@ public abstract class Entity extends NamedObject {
     @NonNull
     @Override
     public String getName() {
-        return this.name + " (Lv." + this.getLv() + ")";
+        return this.name + " (Lv." + this.getLv().get() + ")";
     }
 
 }

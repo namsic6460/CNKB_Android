@@ -24,7 +24,6 @@ public enum LogData {
     REINFORCE_TRIED,
     TOTAL_CLOSERATE,
     TOTAL_EXP,
-    TOTAL_ITEM,
     TOTAL_ITEM_USED,
     TOTAL_MONEY
 
