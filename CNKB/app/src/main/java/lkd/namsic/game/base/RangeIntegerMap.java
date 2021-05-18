@@ -13,7 +13,7 @@ import lombok.Getter;
 
 public class RangeIntegerMap<T> implements Serializable {
 
-    final private Class<T> c;
+    final private String className;
 
     @Getter
     private Map<T, Integer> min;
@@ -23,7 +23,7 @@ public class RangeIntegerMap<T> implements Serializable {
 
     public RangeIntegerMap(@NonNull Map<T, Integer> min, @NonNull Map<T, Integer> max, Class<T> c) {
         this.set(min, max);
-        this.c = c;
+        this.className = c.getName();
     }
 
     public void set(Map<T, Integer> min, Map<T, Integer> max) {
@@ -91,7 +91,7 @@ public class RangeIntegerMap<T> implements Serializable {
         if(obj instanceof RangeIntegerMap) {
             RangeIntegerMap<?> map = (RangeIntegerMap<?>) obj;
 
-            if(this.c == map.c) {
+            if(this.className.equals(map.className)) {
                 return this.min.equals(map.min) && this.max.equals(map.max);
             } else {
                 return false;

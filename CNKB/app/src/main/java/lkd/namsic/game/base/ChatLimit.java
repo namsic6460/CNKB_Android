@@ -2,6 +2,7 @@ package lkd.namsic.game.base;
 
 import androidx.annotation.Nullable;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +12,9 @@ import lkd.namsic.game.Config;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.gameObject.Player;
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 @Getter
 public class ChatLimit {
 
