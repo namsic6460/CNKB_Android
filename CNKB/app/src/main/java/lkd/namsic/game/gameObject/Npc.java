@@ -79,7 +79,7 @@ public class Npc extends AiEntity {
             if(entry.getKey().isAvailable(player)) {
                 for(long chatId : entry.getValue()) {
                     if(Config.SELECTABLE_CHAT_SET.contains(chatId)) {
-                        availableSet.addAll(entry.getValue());
+                        availableSet.add(chatId);
                     }
                 }
             }
