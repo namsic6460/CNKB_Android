@@ -182,8 +182,11 @@ public class Config {
         }
 
         JsonArray selectableArray = jsonObject.getAsJsonArray("selectableChat");
-        Set<Long> selectableChat = gson.fromJson(selectableArray, HashSet.class);
-        SELECTABLE_CHAT_SET.addAll(selectableChat);
+        Set<Double> selectableChat = gson.fromJson(selectableArray, HashSet.class);
+
+        for(double d : selectableChat) {
+            SELECTABLE_CHAT_SET.add((long) d);
+        }
     }
 
     public static void onTerminate() {

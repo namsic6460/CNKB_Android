@@ -728,12 +728,12 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getFieldDistance(Location location) {
-        return (int) Math.sqrt(Math.pow(this.location.getFieldX().get() - this.location.getFieldX().get(), 2) +
+        return (int) Math.sqrt(Math.pow(this.location.getFieldX().get() - location.getFieldX().get(), 2) +
                 Math.pow(location.getFieldY().get() - this.location.getFieldX().get(), 2));
     }
 
     public int getMapDistance(Location location) {
-        return (int) Math.sqrt(Math.pow(this.location.getX().get() - this.location.getX().get(), 2) +
+        return (int) Math.sqrt(Math.pow(this.location.getX().get() - location.getX().get(), 2) +
                 Math.pow(location.getY().get() - this.location.getY().get(), 2));
     }
 

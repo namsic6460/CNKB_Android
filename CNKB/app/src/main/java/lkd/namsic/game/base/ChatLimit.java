@@ -2,7 +2,6 @@ package lkd.namsic.game.base;
 
 import androidx.annotation.Nullable;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,7 +56,7 @@ public class ChatLimit {
             }
 
             LocalDateTime time = LocalDateTime.now();
-            flag = limitHour.isInRange(time.getHour());
+            flag = this.limitHour.isInRange(time.getHour());
         }
 
         return flag;

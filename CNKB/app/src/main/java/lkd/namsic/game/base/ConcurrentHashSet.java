@@ -15,11 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import lombok.ToString;
-
-@ToString
 public class ConcurrentHashSet<T> implements Set<T>, Serializable {
-
 
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Set<T> set;
