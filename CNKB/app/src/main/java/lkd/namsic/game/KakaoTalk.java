@@ -1,4 +1,4 @@
-package lkd.namsic.service;
+package lkd.namsic.game;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -15,10 +15,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.game.Config;
-import lkd.namsic.game.Emoji;
-import lkd.namsic.game.ObjectList;
-import lkd.namsic.game.Variable;
 import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.WaitResponse;
@@ -28,6 +24,7 @@ import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.MapClass;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.MainActivity;
+import lkd.namsic.service.KakaoTalkListener;
 import lkd.namsic.setting.Logger;
 
 public class KakaoTalk {
@@ -80,17 +77,15 @@ public class KakaoTalk {
 
                     if (player != null) {
                         playerCommand(player, command, room, isGroupChat, session);
+
+                        if(player.getDoing().equals(Doing.WAIT_RESPONSE)) {
+                            checkResponseChat(player, msg);
+                        }
+
+                        Config.unloadObject(player);
                     } else {
                         nonPlayerCommand(sender, image, command, room, isGroupChat, session);
                     }
-                }
-
-                if(player != null) {
-                    if(player.getDoing().equals(Doing.WAIT_RESPONSE)) {
-                        checkResponseChat(player, msg);
-                    }
-
-                    Config.unloadObject(player);
                 }
             } catch (Exception e) {
                 Logger.e("onChat", e);
@@ -109,10 +104,10 @@ public class KakaoTalk {
 
     private static void playerCommand(@NonNull Player player, @NonNull String command,
                                          @NonNull String room, boolean isGroupChat, @NonNull Notification.Action session) {
-        player.checkNewDay();
-
         player.setRecentRoom(room);
         player.setGroup(isGroupChat);
+
+        player.checkNewDay();
 
         try {
             List<String> commands = Arrays.asList(command.split(" "));
@@ -258,7 +253,7 @@ public class KakaoTalk {
                 }
             }
         } catch (WeirdCommandException | DoingFilterException | ObjectNotFoundException e) {
-            player.replyPlayer(Objects.requireNonNull(e.getMessage()));
+            player.replyPlayer("[오류]\n" + Objects.requireNonNull(e.getMessage()));
         } catch (NumberFormatException e) {
             player.replyPlayer("숫자를 입력해야합니다");
         }
@@ -280,7 +275,7 @@ public class KakaoTalk {
 
             if (Arrays.asList("회원가입", "가입", "register").contains(first)) {
                 if (second == null) {
-                    throw new WeirdCommandException();
+                    throw new WeirdCommandException("닉네임을 입력해주세요");
                 }
 
                 if(Config.NICKNAME_LIST.contains(second)) {
