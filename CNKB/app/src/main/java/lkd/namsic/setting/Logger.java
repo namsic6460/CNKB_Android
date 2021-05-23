@@ -19,6 +19,14 @@ public class Logger {
     static volatile String logs = "";
 
     public static synchronized void i(String title, String text) {
+        if(title.equals("FileManager")) {
+            if (Config.IGNORE_FILE_LOG) {
+                return;
+            }
+
+            text = text.replaceFirst(FileManager.PATH, "");
+        }
+
         log(title, text, "INFO");
         Log.i(title, text);
     }

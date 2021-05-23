@@ -9,11 +9,11 @@ import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Base64;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
+import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.setting.Logger;
 import lkd.namsic.MainActivity;
 

@@ -20,7 +20,7 @@ import lkd.namsic.game.enums.Id;
 
 public class FileManager extends Application {
 
-    private final static String PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CNKB";
+    public final static String PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CNKB";
     public final static String CONFIG_PATH = PATH + "/config.json";
     public final static String LOG_PATH = PATH + "/logs";
     public final static String DATA_PATH = PATH + "/data";
@@ -82,7 +82,7 @@ public class FileManager extends Application {
         char[] c = new char[(int) file.length()];
         bufferedReader.read(c);
         bufferedReader.close();
-        Logger.i("FileManger", "read - " + file.getPath());
+        Logger.i("FileManager", "read - " + file.getPath());
 
         return new String(c).trim();
     }
@@ -106,7 +106,7 @@ public class FileManager extends Application {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
             bufferedWriter.write(data.trim());
             bufferedWriter.close();
-            Logger.i("FileManger", "save - " + path + "\n" + data);
+            Logger.i("FileManager", "save - " + path + "\n" + data);
         } catch (Exception e) {
             Logger.e("FileManager(path : " + path + ")", e);
         }
