@@ -80,17 +80,6 @@ public class AiEntity extends Entity {
         }
     }
 
-    @Override
-    public boolean canFight(@NonNull Entity enemy) {
-        List<Doing> doingList = Doing.fightList();
-
-        if(doingList.contains(this.doing)) {
-            return doingList.contains(enemy.getDoing());
-        } else {
-            return false;
-        }
-    }
-
     @NonNull
     @Override
     public EquipType equip(long equipId) {
@@ -107,14 +96,14 @@ public class AiEntity extends Entity {
 
     public void setDropPercent(EquipType equipType, double percent) {
         if(percent < 0 || percent > 1) {
-            throw new NumberRangeException(percent, 0, 1);
+            throw new NumberRangeException(percent, 0D, 1D);
         }
 
         this.dropPercent.put(equipType, percent);
     }
 
     public double getDropPercent(EquipType equipType) {
-        return this.dropPercent.getOrDefault(equipType, 1D);
+        return this.dropPercent.getOrDefault(equipType, 0D);
     }
 
     public void addDropPercent(EquipType equipType, double percent) {
