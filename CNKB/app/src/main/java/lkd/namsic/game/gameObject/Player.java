@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.common.collect.BiMap;
 
@@ -43,7 +44,7 @@ import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.exception.WeirdDataException;
 import lkd.namsic.game.Variable;
-import lkd.namsic.service.KakaoTalk;
+import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -64,6 +65,11 @@ public class Player extends Entity {
     @NonNull
     final
     String image;
+
+    //Doing before fight
+    @Setter
+    @Nullable
+    Doing prevDoing = null;
 
     final Set<String> title = new ConcurrentHashSet<>();
 
@@ -130,6 +136,7 @@ public class Player extends Entity {
         this.setBasicStat(StatType.HP, 100);
         this.setBasicStat(StatType.MAXMN, 10);
         this.setBasicStat(StatType.MN, 10);
+        this.setBasicStat(StatType.ATK, 10);
 
         this.setMap(this.getLocation(), 1, true);
     }
@@ -163,11 +170,11 @@ public class Player extends Entity {
                 Emoji.GOLD + ": " + this.getMoney() + "G\n" +
                 Emoji.HEART + ": " + this.getDisplayHp() + "\n" +
                 Emoji.MANA + ": " + this.getStat(StatType.MN) + "/" + this.getStat(StatType.MAXMN) + "\n" +
-                Emoji.WORLD + ": " + Config.getMapData(this.location).getName() + "(" + this.location.toCoordString() + ")\n" +
+                Emoji.WORLD + ": " + Config.getMapData(this.location).getName() + "(" + this.location.toString() + ")\n" +
                 Emoji.LV + ": " + this.lv.get() + "Lv (" + this.getExp().get() + "/" + this.getTotalNeedExp() + ")\n" +
                 Emoji.SP + ": " + this.sp.get() + "\n" +
                 Emoji.ADV + ": " + this.adv.get() + "\n" +
-                Emoji.HOME + ": " + Config.getMapData(this.baseLocation).getName() + "(" + this.baseLocation.toCoordString() + ")",
+                Emoji.HOME + ": " + Config.getMapData(this.baseLocation).getName() + "(" + this.baseLocation.toString() + ")",
                 innerMsg.toString());
     }
 
@@ -519,6 +526,10 @@ public class Player extends Entity {
             try {
                 moveMap = Config.loadMap(x, y);
 
+                if(moveMap.getName().equals(Config.INCOMPLETE)) {
+                    throw new WeirdCommandException("미완성 맵으로는 이동할 수 없습니다");
+                }
+
                 try {
                     this.setMap(location, true);
                 } catch (NumberRangeException e) {
@@ -531,7 +542,7 @@ public class Player extends Entity {
                     }
                 }
 
-                this.replyPlayer("이동을 완료했습니다\n현재 좌표: " + this.location.toCoordString());
+                this.replyPlayer("이동을 완료했습니다\n현재 좌표: " + this.location.toString());
             } finally {
                 if(moveMap != null) {
                     Config.unloadMap(moveMap);
@@ -555,7 +566,7 @@ public class Player extends Entity {
         }
 
         this.setField(x, y);
-        this.replyPlayer("이동을 완료했습니다\n현재 좌표: " + this.location.toCoordString());
+        this.replyPlayer("이동을 완료했습니다\n현재 좌표: " + this.location.toString());
     }
 
     public boolean canUse(long itemId) {
@@ -1972,27 +1983,15 @@ public class Player extends Entity {
 
     @Override
     public boolean canFight(@NonNull Entity enemy) {
-        List<Doing> doingList = Doing.fightList();
-
-        if(doingList.contains(this.doing) && this.isPvp()) {
-            if(enemy.getId().getId().equals(Id.PLAYER) && !((Player) enemy).isPvp()) {
-                return false;
-            }
-
-            return doingList.contains(enemy.getDoing());
-        } else {
-            return false;
-        }
+        return super.canFight(enemy) && this.isPvp();
     }
 
     @Override
-    public boolean startFight(@NonNull Set<Entity> enemies) {
-        if(super.startFight(enemies)) {
-            this.replyPlayer("적 " + enemies.size() + "명 과의 전투가 시작되었습니다", this.getBattleMsg());
-            return true;
-        } else {
-            return false;
-        }
+    public void startFight(@NonNull Set<Entity> enemies) {
+        super.startFight(enemies);
+        this.prevDoing = this.doing;
+
+        this.replyPlayer("적 " + enemies.size() + "명 과의 전투가 시작되었습니다", this.getBattleMsg());
     }
 
 }

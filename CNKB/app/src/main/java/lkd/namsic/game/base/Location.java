@@ -24,7 +24,7 @@ public class Location implements Serializable {
     }
 
     public Location(int x, int y, int fieldX, int fieldY) {
-        new Location(x, y);
+        this(x, y);
         this.fieldX.set(fieldX);
         this.fieldY.set(fieldY);
     }
@@ -78,7 +78,7 @@ public class Location implements Serializable {
     @NonNull
     @Override
     public String toString() {
-        return "x: " + x.get() + ", y: " + y.get() + ", fieldX: " + fieldX.get() + ", fieldY: " + fieldY.get();
+        return this.toMapString() + "-" + this.toFieldString();
     }
 
     @NonNull
@@ -86,8 +86,5 @@ public class Location implements Serializable {
 
     @NonNull
     public String toFieldString() { return fieldX.get() + "-" + fieldY.get(); }
-
-    @NonNull
-    public String toCoordString() { return this.toMapString() + "-" + this.toFieldString(); }
 
 }

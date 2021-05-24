@@ -61,6 +61,8 @@ public class Config {
     public static final Map<Id, ConcurrentHashMap<Long, Long>> OBJECT_COUNT = new ConcurrentHashMap<>();
     public static final Map<Id, ConcurrentHashSet<Long>> DELETE_LIST = new ConcurrentHashMap<>();
 
+    public static boolean IGNORE_FILE_LOG = false;
+
     public static final Map<String, MapClass> MAP = new ConcurrentHashMap<>();
     public static final Map<String, Long> PLAYER_COUNT = new ConcurrentHashMap<>();
 
@@ -96,6 +98,7 @@ public class Config {
     public static final long MAX_DELAY_TIME = 5000;
     public static final long MIN_PAUSE_TIME = 2000;
     public static final long MAX_PAUSE_TIME = 5000;
+    public static final int MAX_SPAWN_COUNT = 16;
 
     public static final double TOTAL_MONEY_LOSE_RANDOM = 0.1;
     public static final double TOTAL_MONEY_LOSE_MIN = 0.05;
@@ -104,7 +107,9 @@ public class Config {
     public static final int ITEM_DROP = 4;
     public static final double ITEM_DROP_PERCENT = 0.95;
 
-    public static final int MAX_EVADE = 95;
+    public static final int MAX_EVADE = 90;
+
+    public static final String INCOMPLETE = "Incomplete";
 
     private static boolean initialized = false;
     public static void init() {
@@ -217,6 +222,9 @@ public class Config {
         t.getId().setObjectId(objectId);
         ID_COUNT.put(id, objectId + 1);
 
+        Config.unloadObject(t);
+        Logger.i("newObject", id.toString() + "-" + objectId);
+
         return t;
     }
 
@@ -301,12 +309,16 @@ public class Config {
                 }
 
                 if(gameObject instanceof Entity) {
-                    MapClass map = Config.loadMap(Config.MIN_MAP_X, Config.MIN_MAP_Y);
-                    map.addEntity((Entity) gameObject);
-                    Config.unloadMap(map);
+                    Entity entity = (Entity) gameObject;
 
-                    if(gameObject instanceof Player) {
-                        Player player = (Player) gameObject;
+                    if(entity.getLocation() != null) {
+                        MapClass map = Config.loadMap(entity.getLocation());
+                        map.addEntity(entity);
+                        Config.unloadMap(map);
+                    }
+
+                    if(id.equals(Id.PLAYER)) {
+                        Player player = (Player) entity;
                         PLAYER_LIST.put(player.getId().getObjectId(), new HashMap<String, String>() {{
                             put("sender", player.getSender());
                             put("image", player.getImage());
@@ -390,7 +402,11 @@ public class Config {
             return null;
         }
 
+        Logger.i("path", path);
+        Logger.i("data", jsonString);
+
         Player player = fromJson(jsonString, Player.class);
+
         long objectId = player.getId().getObjectId();
         Long objectCount = OBJECT_COUNT.get(Id.PLAYER).get(objectId);
 
@@ -398,8 +414,13 @@ public class Config {
             OBJECT.get(Id.PLAYER).put(objectId, player);
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, 1L);
         } else {
+            Logger.i("ExistGet", OBJECT.get(Id.PLAYER).toString());
             player = (Player) OBJECT.get(Id.PLAYER).get(objectId);
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, objectCount + 1);
+        }
+
+        if(player.getNickName().equals("u")) {
+            throw new RuntimeException();
         }
 
         return player;
@@ -419,10 +440,6 @@ public class Config {
             }
 
             MapClass map = fromJson(jsonString, MapClass.class);
-
-            if(!(map.getMapType().equals(MapType.COUNTRY) || map.getMapType().equals(MapType.UNDERGROUND_CITY))) {
-                map.spawnMonster();
-            }
 
             MAP.put(fileName, map);
             PLAYER_COUNT.put(fileName, 1L);

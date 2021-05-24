@@ -11,6 +11,8 @@ public enum StatType {
     ATK("공격력"),
     MATK("마법 공격력"),
     AGI("민첩"),
+    ATS("공격속도"),
+    ATR("공격 사거리"),
     DEF("방어력"),
     MDEF("마법 방어력"),
     BRE("방어 관통력"),

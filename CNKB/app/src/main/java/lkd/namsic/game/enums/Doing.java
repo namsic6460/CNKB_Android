@@ -11,6 +11,7 @@ public enum Doing {
     BUY,
     CHAT,
     FIGHT,
+    FIGHT_ONE,
     FISH,
     EXPLORE,
     MINE,
@@ -24,6 +25,7 @@ public enum Doing {
         List<Doing> doingList = new ArrayList<>();
         doingList.add(Doing.NONE);
         doingList.add(Doing.EXPLORE);
+        doingList.add(Doing.FIGHT);
 
         return doingList;
     }

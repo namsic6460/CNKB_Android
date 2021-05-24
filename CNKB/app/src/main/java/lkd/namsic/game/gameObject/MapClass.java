@@ -1,10 +1,7 @@
 package lkd.namsic.game.gameObject;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -20,8 +17,8 @@ import lkd.namsic.game.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.exception.NumberRangeException;
-import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdDataException;
+import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -45,7 +42,10 @@ public class MapClass {
 
     final Location location = new Location();
 
-    Map<Id, Map<Long, Double>> spawnMonster = new ConcurrentHashMap<>();
+    Set<Long> spawnMonster = new ConcurrentHashSet<>();
+    Map<Long, Integer> spawnMaxCount = new ConcurrentHashMap<>();
+    Set<Long> spawnBoss = new ConcurrentHashSet<>();
+    Map<Id, Map<Long, Double>> spawnPercent = new ConcurrentHashMap<>();
 
     //This part can be frequently changed
     final Map<Location, Long> money = new ConcurrentHashMap<>();
@@ -60,6 +60,9 @@ public class MapClass {
         this.entity.put(Id.MONSTER, new ConcurrentHashSet<>());
         this.entity.put(Id.BOSS, new ConcurrentHashSet<>());
         this.entity.put(Id.NPC, new ConcurrentHashSet<>());
+
+        this.spawnPercent.put(Id.MONSTER, new ConcurrentHashMap<>());
+        this.spawnPercent.put(Id.BOSS, new ConcurrentHashMap<>());
     }
 
     @NonNull
@@ -222,7 +225,7 @@ public class MapClass {
 
     public void addEntity(Entity entity) {
         if(!entity.getLocation().equalsMap(this.location)) {
-            throw new WeirdDataException(this.location, location);
+            throw new WeirdDataException(this.location, entity.getLocation());
         }
 
         this.getEntity(entity.id.getId()).add(entity.id.getObjectId());
@@ -232,38 +235,31 @@ public class MapClass {
         this.getEntity(entity.id.getId()).remove(entity.id.getObjectId());
     }
 
-    public void setSpawnMonster(Id id, long monsterId, double percent) {
-        if(!(id.equals(Id.MONSTER) || id.equals(Id.BOSS))) {
-            throw new UnhandledEnumException(id);
-        }
-
+    public void setSpawnMonster(long monsterId, double percent, int maxCount) {
         if(percent < 0 || percent > 1) {
             throw new NumberRangeException(percent, 0, 1);
         }
 
-        Config.checkId(id, monsterId);
-
-        Map<Long, Double> spawnMonster = this.spawnMonster.get(id);
-        if(spawnMonster == null) {
-            spawnMonster = new HashMap<>();
-            spawnMonster.put(monsterId, percent);
-            this.spawnMonster.put(id, spawnMonster);
-        } else {
-            spawnMonster.put(monsterId, percent);
+        if(maxCount < 1 || maxCount > Config.MAX_SPAWN_COUNT) {
+            throw new NumberRangeException(maxCount, 1, Config.MAX_SPAWN_COUNT);
         }
+
+        Config.checkId(Id.MONSTER, monsterId);
+
+        this.spawnMonster.add(monsterId);
+        this.spawnPercent.get(Id.MONSTER).put(monsterId, percent);
+        this.spawnMaxCount.put(monsterId, maxCount);
     }
 
-    public double getSpawnMonster(Id id, long monsterId) {
-        Map<Long, Double> spawnMonster = this.spawnMonster.get(id);
-        if(spawnMonster == null) {
-            return 0;
-        } else {
-            return spawnMonster.getOrDefault(monsterId, 0D);
+    public void setSpawnBoss(long bossId, double percent) {
+        if(percent < 0 || percent > 1) {
+            throw new NumberRangeException(percent, 0, 1);
         }
-    }
 
-    public void addSpawnMonster(Id id, long monsterId, double percent) {
-        this.setSpawnMonster(id, monsterId, this.getSpawnMonster(id, monsterId) + percent);
+        Config.checkId(Id.BOSS, bossId);
+
+        this.spawnBoss.add(bossId);
+        this.spawnPercent.get(Id.BOSS).put(bossId, percent);
     }
 
     public void spawnMonster() {
@@ -273,30 +269,42 @@ public class MapClass {
 
         Random random = new Random();
 
-        Id id;
-        long monsterId;
         double percent;
+        int spawnCount;
 
-        for(Map.Entry<Id, Map<Long, Double>> entry : this.spawnMonster.entrySet()) {
-            id = entry.getKey();
+        for(long monsterId : spawnMonster) {
+            percent = this.spawnPercent.get(Id.MONSTER).get(monsterId);
+            spawnCount = random.nextInt(this.spawnMaxCount.get(monsterId)) + 1;
 
-            for(Map.Entry<Long, Double> monsterEntry : entry.getValue().entrySet()) {
-                monsterId = monsterEntry.getKey();
-                percent = monsterEntry.getValue();
+            if(random.nextDouble() < percent || percent == 1) {
+                for(int count = 0; count < spawnCount; count++) {
+                    int fieldX = random.nextInt(Config.MAX_FIELD_X) + 1;
+                    int fieldY = random.nextInt(Config.MAX_FIELD_Y) + 1;
 
-                if(random.nextDouble() < percent || percent == 1) {
-                    int fieldX = random.nextInt(Config.MAX_FIELD_X + 1);
-                    int fieldY = random.nextInt(Config.MAX_FIELD_Y + 1);
-
-                    AiEntity newEntity = Config.newObject(Config.getData(id, monsterId));
-                    newEntity.setMap(this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
-                    this.addEntity(newEntity);
-                    Config.unloadObject(newEntity);
-
-                    if(id.equals(Id.BOSS)) {
-                        break;
-                    }
+                    Monster monster = Config.newObject(Config.getData(Id.MONSTER, monsterId));
+                    monster.location = new Location();
+                    monster.setMap(this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
+                    this.addEntity(monster);
+                    Config.unloadObject(monster);
                 }
+            }
+        }
+
+        for(long bossId : spawnBoss) {
+            percent = this.spawnPercent.get(Id.MONSTER).get(bossId);
+
+            if(random.nextDouble() < percent || percent == 1) {
+                int fieldX = random.nextInt(Config.MAX_FIELD_X) + 1;
+                int fieldY = random.nextInt(Config.MAX_FIELD_Y) + 1;
+
+                Boss boss = Config.newObject(Config.getData(Id.BOSS, bossId));
+                boss.location = new Location();
+                boss.setMap(this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
+                this.addEntity(boss);
+                Config.unloadObject(boss);
+
+                //Boss must exist only one
+                break;
             }
         }
     }
