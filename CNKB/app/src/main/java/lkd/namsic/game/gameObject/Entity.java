@@ -21,6 +21,7 @@ import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.event.DeathEvent;
 import lkd.namsic.game.event.EarnEvent;
@@ -30,6 +31,7 @@ import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.UnhandledEnumException;
+import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,7 +46,8 @@ public abstract class Entity extends NamedObject {
     final LimitInteger lv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
     final LimitLong money = new LimitLong(0, 0L, null);
 
-    final Location location = new Location();
+    @Setter
+    Location location = new Location();
 
     @Setter
     @NonNull
@@ -68,6 +71,8 @@ public abstract class Entity extends NamedObject {
 
     protected Entity(@NonNull String name) {
         super(name);
+        this.setBasicStat(StatType.ATS, 100);
+        this.setBasicStat(StatType.ATR, 1);
     }
 
     public boolean setMoney(long money) {
@@ -221,6 +226,12 @@ public abstract class Entity extends NamedObject {
                 }
 
                 moveMap.addEntity(this);
+
+                if(this.id.getId().equals(Id.PLAYER)) {
+                    if(!(moveMap.getMapType().equals(MapType.COUNTRY) || moveMap.getMapType().equals(MapType.UNDERGROUND_CITY))) {
+                        moveMap.spawnMonster();
+                    }
+                }
             } finally {
                 if(moveMap != null) {
                     Config.unloadMap(moveMap);
@@ -609,15 +620,11 @@ public abstract class Entity extends NamedObject {
         }
     }
 
-    public abstract boolean canFight(@NonNull Entity enemy);
+    public boolean canFight(@NonNull Entity enemy) {
+        return Doing.fightList().contains(this.doing);
+    }
 
-    public boolean startFight(@NonNull Set<Entity> enemies) {
-        for(Entity enemy : enemies) {
-            if(!enemy.canFight(enemy)) {
-                return false;
-            }
-        }
-
+    public void startFight(@NonNull Set<Entity> enemies) {
         this.setDoing(Doing.FIGHT);
 
         Id id = this.id.getId();
@@ -631,11 +638,9 @@ public abstract class Entity extends NamedObject {
 
             if(enemy.id.getId().equals(Id.PLAYER)) {
                 Player player = (Player) enemy;
-                player.replyPlayer(this.getName() + " 와(과) 의 강제 전투가 시작되었습니다", player.getBattleMsg());
+                player.replyPlayer(this.getName() + " 와(과) 의 전투가 시작되었습니다", player.getBattleMsg());
             }
         });
-
-        return true;
     }
 
     public void endFight() {
@@ -673,13 +678,12 @@ public abstract class Entity extends NamedObject {
 
         this.revalidateBuff();
 
-        boolean evade = true;
+        boolean evade = false;
         if(canEvade) {
-            evade = random.nextInt(100) < Math.min(
-                    this.getStat(StatType.ACC) - entity.getStat(StatType.EVA), Config.MAX_EVADE);
+            evade = random.nextInt(100) < Math.min(entity.getStat(StatType.EVA) - this.getStat(StatType.ACC), Config.MAX_EVADE);
         }
 
-        if(evade) {
+        if(!evade) {
             int def = entity.getStat(StatType.DEF) - this.getStat(StatType.BRE);
             int mdef = entity.getStat(StatType.MDEF) - this.getStat(StatType.MBRE);
 
@@ -729,12 +733,12 @@ public abstract class Entity extends NamedObject {
 
     public int getFieldDistance(Location location) {
         return (int) Math.sqrt(Math.pow(this.location.getFieldX().get() - location.getFieldX().get(), 2) +
-                Math.pow(location.getFieldY().get() - this.location.getFieldX().get(), 2));
+                Math.pow(this.location.getFieldY().get() - location.getFieldX().get(), 2));
     }
 
     public int getMapDistance(Location location) {
         return (int) Math.sqrt(Math.pow(this.location.getX().get() - location.getX().get(), 2) +
-                Math.pow(location.getY().get() - this.location.getY().get(), 2));
+                Math.pow(this.location.getY().get() - location.getY().get(), 2));
     }
 
     public void setVariable(Variable variable, Object value) {
@@ -792,6 +796,11 @@ public abstract class Entity extends NamedObject {
     @Override
     public String getName() {
         return this.name + " (Lv." + this.getLv().get() + ")";
+    }
+
+    @NonNull
+    public String getRealName() {
+        return this.name;
     }
 
 }
