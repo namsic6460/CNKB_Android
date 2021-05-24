@@ -105,6 +105,10 @@ public class ObjectList {
             .put("(Myth) 폐어", 93L)
             .build();
 
+    public final static BiMap<String, Long> monsterList = new ImmutableBiMap.Builder<String, Long>()
+            .put("양", 1L)
+            .build();
+
     public final static BiMap<String, Long> questList = new ImmutableBiMap.Builder<String, Long>()
             .put("광부의 일", 1L)
             .put("쓰레기 수거", 2L)

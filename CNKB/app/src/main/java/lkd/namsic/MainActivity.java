@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onInitClick(View view) {
-        ObjectMaker.start();
+        ObjectMaker.start((Button) view);
     }
 
     public static void toast(final String msg) {

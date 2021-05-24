@@ -1,19 +1,23 @@
 package lkd.namsic.game;
 
 import android.util.Log;
+import android.widget.Button;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import lkd.namsic.MainActivity;
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
+import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.gameObject.Chat;
 import lkd.namsic.game.gameObject.Item;
 import lkd.namsic.game.gameObject.MapClass;
+import lkd.namsic.game.gameObject.Monster;
 import lkd.namsic.game.gameObject.Npc;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.gameObject.Quest;
@@ -21,26 +25,34 @@ import lkd.namsic.setting.Logger;
 
 public class ObjectMaker {
 
-    public static void start() {
+    public static void start(Button button) {
         Logger.i("ObjectMaker", "Making objects...");
 
         Thread thread = new Thread(() -> {
+            MainActivity.mainActivity.runOnUiThread(() -> button.setEnabled(false));
+
             try {
+                Config.IGNORE_FILE_LOG = true;
+
                 makeItem();
                 makeEquip();
+                makeMonster();
                 makeMap();
                 makeChat();
                 makeQuest();
                 makeNpc();
 
+                Config.IGNORE_FILE_LOG = false;
                 Logger.i("ObjectMaker", "Object making is done!");
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.e("namsic!", Config.errorString(e));
                 Logger.e("ObjectMaker", e);
-                System.exit(-1);
+            } finally {
+                MainActivity.mainActivity.runOnUiThread(() -> button.setEnabled(true));
             }
         });
+
         MainActivity.startThread(thread);
     }
 
@@ -662,6 +674,21 @@ public class ObjectMaker {
         Logger.i("ObjectMaker", "Equipment making is done!");
     }
 
+    private static void makeMonster() {
+        Monster monster = new Monster("양");
+        monster.getId().setObjectId(ObjectList.monsterList.get(monster.getRealName()));
+        monster.getLv().set(2);
+        monster.setLocation(null);
+        monster.setBasicStat(StatType.MAXHP, 50);
+        monster.setBasicStat(StatType.HP, 20);
+        monster.setBasicStat(StatType.ATK, 3);
+        monster.setBasicStat(StatType.DEF, 5);
+        Config.unloadObject(monster);
+
+        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 2L));
+        Logger.i("ObjectMaker", "Monster making is done!");
+    }
+
     private static void makeMap() {
         MapClass map = new MapClass(ObjectList.mapList.get("0-0"));
         map.setMapType(MapType.COUNTRY);
@@ -674,7 +701,7 @@ public class ObjectMaker {
         Config.unloadMap(map);
 
         for(int y = 2; y <= 10; y++) {
-            map = new MapClass(ObjectList.mapList.get("0-" + y));
+            map = new MapClass(ObjectList.mapList.getOrDefault("0-" + y, Config.INCOMPLETE));
             map.getLocation().setMap(0, y);
             map.setMapType(MapType.FIELD);
             map.getLocation().set(0, y, 1, 1);
@@ -684,6 +711,7 @@ public class ObjectMaker {
         map = new MapClass(ObjectList.mapList.get("1-0"));
         map.setMapType(MapType.FIELD);
         map.getLocation().set(1, 0, 1, 1);
+        map.setSpawnMonster(1L, 1D, 4);
         Config.unloadMap(map);
 
         map = new MapClass(ObjectList.mapList.get("1-1"));
@@ -697,12 +725,20 @@ public class ObjectMaker {
                     continue;
                 }
 
-                map = new MapClass(ObjectList.mapList.get(x + "-" + y));
+                map = new MapClass(ObjectList.mapList.getOrDefault(x + "-" + y, Config.INCOMPLETE));
                 map.getLocation().setMap(x, y);
                 map.setMapType(MapType.FIELD);
                 map.getLocation().set(x, y, 1, 1);
                 Config.unloadMap(map);
             }
+        }
+
+        Player player;
+        for(Map<String, String> playerMap : Config.PLAYER_LIST.values()) {
+            player = Config.loadPlayer(playerMap.get("sender"), playerMap.get("image"));
+            map = Config.loadMap(player.getLocation());
+            map.addEntity(player);
+            Config.unloadMap(map);
         }
 
         Logger.i("ObjectMaker", "Map making is done!");
@@ -827,7 +863,25 @@ public class ObjectMaker {
         chat.getText().add("빨리 구해와줬군! 여기 보상이네");
         Config.unloadObject(chat);
 
-        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 14L));
+        chat = new Chat();
+        chat.getId().setObjectId(14L);
+        chat.getText().add("좋은 아침이네 __nickname!\n그래 무슨 일인가?");
+        chat.setBaseMsg(true);
+        Config.unloadObject(chat);
+
+        chat = new Chat();
+        chat.getId().setObjectId(15L);
+        chat.getText().add("점심은 먹었나 __nickname?\n그래 무슨 일로 왔나?");
+        chat.setBaseMsg(true);
+        Config.unloadObject(chat);
+
+        chat = new Chat();
+        chat.getId().setObjectId(16L);
+        chat.getText().add("한적한 저녁이군\n무슨 일로 왔나 __nickname?");
+        chat.setBaseMsg(true);
+        Config.unloadObject(chat);
+
+        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 17L));
         Logger.i("ObjectMaker", "Chat making is done!");
    }
 
@@ -868,17 +922,34 @@ public class ObjectMaker {
         npc.getId().setObjectId(3L);
         npc.getLocation().set(0, 0, 16, 16);
         npc.setFirstChat(5L);
+
+        //Common Chat
         npc.setCommonChat(new ChatLimit(), 6L);
-        npc.setChat(new ChatLimit(), 7L);
 
         ChatLimit chatLimit = new ChatLimit();
+        chatLimit.getLimitHour().set(7, 11);
+        npc.setCommonChat(chatLimit, 14L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitHour().set(12, 14);
+        npc.setCommonChat(chatLimit, 15L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitHour().set(18, 22);
+        npc.setCommonChat(chatLimit, 16L);
+        //-----
+
+        //Chat
+        npc.setChat(new ChatLimit(), 7L);
+
+        chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(1L);
         npc.setChat(chatLimit, 8L);
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(2L);
         npc.setChat(chatLimit, 9L);
-
+        //-----
         Config.unloadObject(npc);
 
         Config.ID_COUNT.put(Id.NPC, Math.max(Config.ID_COUNT.get(Id.NPC), 4L));
