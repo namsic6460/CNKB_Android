@@ -274,6 +274,29 @@ public class KakaoTalk {
                     } else {
                         throw new DoingFilterException();
                     }
+                } else if (first.equals("전투") || first.equals("fight")) {
+                    Doing doing = player.getDoing();
+
+                    if(doing.equals(Doing.NONE)) {
+                        if(second == null) {
+                            throw new WeirdCommandException("전투 대상을 선택해주세요");
+                        }
+                        
+                        if(!player.tryFight(second)) {
+                            player.replyPlayer("해당 상대와의 전투가 불가능한 상태입니다",
+                                    "대상이 플레이어인 경우, 본인 또는 대상의 pvp가 꺼져있을 수 있습니다\n" +
+                                            "또는 대상이 현재 다른 행동을 하고 있을 수 있습니다\n" +
+                                            "또는 일부 전투의 경우 제 3자의 개입이 불가능할 수도 있습니다");
+                        }
+                    } else if(Doing.fightList().contains(doing)) {
+                        if(second == null) {
+                            throw new WeirdCommandException();
+                        }
+
+                        player.fightCommand(second, third);
+                    } else {
+                        throw new DoingFilterException();
+                    }
                 }
             }
         } catch (WeirdCommandException | DoingFilterException | ObjectNotFoundException e) {

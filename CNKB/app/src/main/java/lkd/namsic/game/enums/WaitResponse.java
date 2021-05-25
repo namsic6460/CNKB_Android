@@ -1,5 +1,7 @@
 package lkd.namsic.game.enums;
 
+import androidx.annotation.NonNull;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +23,18 @@ public enum WaitResponse {
         this.list = list;
     }
 
+    @NonNull
+    public static WaitResponse parseResponse(@NonNull String response) {
+        if(YES.list.contains(response)) {
+            return YES;
+        } else if(NO.list.contains(response)) {
+            return NO;
+        } else {
+            return ANYTHING;
+        }
+    }
+
+    @NonNull
     public String getDisplay() {
         if(this.equals(ANYTHING)) {
             return "아무 채팅이나 입력해주세요";

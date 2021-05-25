@@ -446,51 +446,51 @@ public class Player extends Entity {
         }
     }
 
-    @NonNull
-    public String getBattleMsg() {
-        StringBuilder builder = new StringBuilder("---적 목록---\n");
-
-        Id id;
-        Entity enemy;
-
-        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : this.enemies.entrySet()) {
-            id = entry.getKey();
-
-            for(long objectId : entry.getValue()) {
-                builder.append(id.getValue());
-                builder.append(".");
-                builder.append(objectId);
-                builder.append(" - ");
-
-                enemy = Config.getData(id, objectId);
-                builder.append(" (");
-                builder.append(this.getFieldDistance(enemy.getLocation()));
-                builder.append("m) ");
-                builder.append(enemy.getName());
-                builder.append("\n");
-            }
-        }
-
-        builder.append("\n---전투 명령어---\n");
-        builder.append("(공격/attack/atk) [대상] : [\"대상\" 또는 \"가장 가까운 적\"] 에게 기본 공격을 합니다\n");
-        builder.append("(방어/defence/def) : 다음 피해가 기본 공격일 경우, 공격을 방어하고 체력과 마나를 일부 회복합니다\n");
-        builder.append("(이동/move) (e/w/s/n) [1~3] : 동/서/남/북의 방향으로 [\"3칸\" 또는 \"지정한 거리\"] 만큼 최대한 이동합니다\n");
-        builder.append("(필드/field) : 필드 정보를 표시합니다\n");
-        builder.append("(스킬/skill) 목록 [o] : [\"보유한 또는 \"사용 가능한\"] 스킬 목록을 확인합니다\n");
-        builder.append("(스킬/skill) 사용 (스킬 번호) [대상] : 스킬 번호에 해당하는 스킬을 [\"대상\" 또는 \"가장 가까운 적\"] 에게 사용합니다\n");
-        builder.append("(아이템/item) 사용 (아이템 번호) (대상) : 아이템 번호에 해당하는 아이템을 대상(본인 : \"s\")에게 사용합니다\n");
-        builder.append("(도망/run) : 거점으로의 도망을 시도합니다. 실패 시 최대 체력의 10%에 해당하는 피해를 입습니다");
-        builder.append("(사망하지는 않습니다)(실패 시 15초간 사용이 불가능해집니다)\n");
-        builder.append("(카운터/counter) [대상] : (보스한정) [\"대상\" 또는 \"가장 가까운 보스\"] 의 스킬을 반사합니다");
-
-        return builder.toString();
-    }
+//    @NonNull
+//    public String getBattleMsg() {
+//        StringBuilder builder = new StringBuilder("---적 목록---\n");
+//
+//        Id id;
+//        Entity enemy;
+//
+//        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : this.enemies.entrySet()) {
+//            id = entry.getKey();
+//
+//            for(long objectId : entry.getValue()) {
+//                builder.append(id.getValue());
+//                builder.append(".");
+//                builder.append(objectId);
+//                builder.append(" - ");
+//
+//                enemy = Config.getData(id, objectId);
+//                builder.append(" (");
+//                builder.append(this.getFieldDistance(enemy.getLocation()));
+//                builder.append("m) ");
+//                builder.append(enemy.getName());
+//                builder.append("\n");
+//            }
+//        }
+//
+//        builder.append("\n---전투 명령어---\n");
+//        builder.append("(공격/attack/atk) [대상] : [\"대상\" 또는 \"가장 가까운 적\"] 에게 기본 공격을 합니다\n");
+//        builder.append("(방어/defence/def) : 다음 피해가 기본 공격일 경우, 공격을 방어하고 체력과 마나를 일부 회복합니다\n");
+//        builder.append("(이동/move) (e/w/s/n) [1~3] : 동/서/남/북의 방향으로 [\"3칸\" 또는 \"지정한 거리\"] 만큼 최대한 이동합니다\n");
+//        builder.append("(필드/field) : 필드 정보를 표시합니다\n");
+//        builder.append("(스킬/skill) 목록 [o] : [\"보유한 또는 \"사용 가능한\"] 스킬 목록을 확인합니다\n");
+//        builder.append("(스킬/skill) 사용 (스킬 번호) [대상] : 스킬 번호에 해당하는 스킬을 [\"대상\" 또는 \"가장 가까운 적\"] 에게 사용합니다\n");
+//        builder.append("(아이템/item) 사용 (아이템 번호) (대상) : 아이템 번호에 해당하는 아이템을 대상(본인 : \"s\")에게 사용합니다\n");
+//        builder.append("(도망/run) : 거점으로의 도망을 시도합니다. 실패 시 최대 체력의 10%에 해당하는 피해를 입습니다");
+//        builder.append("(사망하지는 않습니다)(실패 시 15초간 사용이 불가능해집니다)\n");
+//        builder.append("(카운터/counter) [대상] : (보스한정) [\"대상\" 또는 \"가장 가까운 보스\"] 의 스킬을 반사합니다");
+//
+//        return builder.toString();
+//    }
 
     public int getMovableDistance() {
         return (int) Math.sqrt(2 + this.getStat(StatType.AGI) / 4D);
     }
 
-    public void moveMap(String locationStr) {
+    public void moveMap(@NonNull String locationStr) {
         Location location;
         int x, y;
 
@@ -551,7 +551,7 @@ public class Player extends Entity {
         }
     }
 
-    public void moveField(String locationStr) {
+    public void moveField(@NonNull String locationStr) {
         String[] split = locationStr.split("-");
         if(split.length != 2) {
             throw new WeirdCommandException("좌표를 정확하게 입력해주세요\n(예시 : " +
@@ -578,7 +578,7 @@ public class Player extends Entity {
         }
     }
 
-    public boolean useItem(long itemId, @NonNull List<GameObject> other) {
+    public boolean use(long itemId, @NonNull List<GameObject> other) {
         Config.checkId(Id.ITEM, itemId);
 
         boolean isCancelled;
@@ -1629,137 +1629,11 @@ public class Player extends Entity {
         this.addLog(LogData.QUEST_CLEARED, 1);
     }
 
-    public int getClearedQuest(long questId) {
-        return this.clearedQuest.getOrDefault(questId, 0);
+    public boolean tryFight(@NonNull String target) {
+        return false;
     }
 
-    public void setChatCount(long npcId, long count) {
-        Config.checkId(Id.NPC, npcId);
-
-        if(count < 0) {
-            throw new NumberRangeException(count, 0);
-        }
-
-        if(count != 0) {
-            this.chatCount.put(npcId, count);
-        } else {
-            this.chatCount.remove(npcId);
-        }
-    }
-
-    public long getChatCount(long npcId) {
-        return this.chatCount.getOrDefault(npcId, 0L);
-    }
-
-    public void addChatCount(long npcId, long count) {
-        this.setChatCount(npcId, this.getChatCount(npcId) + count);
-    }
-
-    public void setResponseChat(@NonNull WaitResponse waitResponse, long chatId) {
-        if(chatId == 0) {
-            this.responseChat.remove(waitResponse);
-        } else {
-            Config.checkId(Id.CHAT, chatId);
-            this.responseChat.put(waitResponse, chatId);
-        }
-    }
-
-    public long getResponseChat(@NonNull WaitResponse waitResponse) {
-        return this.responseChat.getOrDefault(waitResponse, 0L);
-    }
-
-    public void setAnyResponseChat(@NonNull String response, long chatId) {
-        if(chatId == 0) {
-            this.anyResponseChat.remove(response);
-        } else {
-            Config.checkId(Id.CHAT, chatId);
-            this.anyResponseChat.put(response, chatId);
-        }
-    }
-
-    public long getAnyResponseChat(@NonNull String response) {
-        return this.anyResponseChat.getOrDefault(response, 0L);
-    }
-
-    public void setMagic(@NonNull MagicType magicType, int lv) {
-        if(lv == 0) {
-            this.magic.remove(magicType);
-        } else {
-            if(lv < Config.MIN_MAGIC_LV || lv > Config.MAX_MAGIC_LV) {
-                throw new NumberRangeException(lv, Config.MIN_MAGIC_LV, Config.MAX_MAGIC_LV);
-            }
-
-            this.magic.put(magicType, lv);
-        }
-    }
-
-    public int getMagic(@NonNull MagicType magicType) {
-        return this.magic.getOrDefault(magicType, Config.MIN_MAGIC_LV);
-    }
-
-    public void addMagic(@NonNull MagicType magicType, int lv) {
-        this.setMagic(magicType, this.getMagic(magicType) + lv);
-    }
-
-    public void setResist(@NonNull MagicType magicType, int lv) {
-        if(lv == 0) {
-            this.resist.remove(magicType);
-        } else {
-            if(lv < Config.MIN_MAGIC_LV || lv > Config.MAX_MAGIC_LV) {
-                throw new NumberRangeException(lv, Config.MIN_MAGIC_LV, Config.MAX_MAGIC_LV);
-            }
-
-            this.resist.put(magicType, lv);
-        }
-    }
-
-    public int getResist(@NonNull MagicType magicType) {
-        return this.resist.getOrDefault(magicType, Config.MIN_MAGIC_LV);
-    }
-
-    public void addResist(@NonNull MagicType magicType, int lv) {
-        this.setResist(magicType, this.getResist(magicType) + lv);
-    }
-
-    public void setCloseRate(long npcId, int closeRate) {
-        Config.checkId(Id.NPC, npcId);
-
-        this.addLog(LogData.TOTAL_CLOSERATE, closeRate - this.getCloseRate(npcId));
-
-        if(closeRate == 0) {
-            this.closeRate.remove(npcId);
-        } else {
-            this.closeRate.put(npcId, closeRate);
-            this.setLog(LogData.MAX_CLOSERATE, Math.max(this.getLog(LogData.MAX_CLOSERATE), closeRate));
-        }
-    }
-
-    public int getCloseRate(long npcId) {
-        return this.closeRate.getOrDefault(npcId, 0);
-    }
-
-    public void addCloseRate(long npcId, int closeRate) {
-        this.setCloseRate(npcId, this.getCloseRate(npcId) + closeRate);
-    }
-
-    public void setLog(@NonNull LogData logData, long count) {
-        if(count == 0) {
-            this.log.remove(logData);
-        } else {
-            this.log.put(logData, count);
-        }
-
-        this.log.put(LogData.LOG_COUNT, this.getLog(LogData.LOG_COUNT) + 1);
-        Logger.i("LogData", this.getName() + " {" + logData.toString() + " : " + count + "}");
-    }
-
-    public long getLog(@NonNull LogData logData) {
-        return this.log.getOrDefault(logData, 0L);
-    }
-
-    public void addLog(@NonNull LogData logData, long count) {
-        this.setLog(logData, this.getLog(logData) + count);
-    }
+    public void fightCommand(@NonNull String command, @Nullable String subCommand) {}
 
     public boolean canEquip(long equipId) {
         Equipment equipment = null;
@@ -1858,6 +1732,129 @@ public class Player extends Entity {
                 Config.unloadObject(equipment);
             }
         }
+    }
+
+    public int getClearedQuest(long questId) {
+        return this.clearedQuest.getOrDefault(questId, 0);
+    }
+
+    public void setChatCount(long npcId, long count) {
+        Config.checkId(Id.NPC, npcId);
+
+        if(count < 0) {
+            throw new NumberRangeException(count, 0);
+        }
+
+        if(count != 0) {
+            this.chatCount.put(npcId, count);
+        } else {
+            this.chatCount.remove(npcId);
+        }
+    }
+
+    public long getChatCount(long npcId) {
+        return this.chatCount.getOrDefault(npcId, 0L);
+    }
+
+    public void addChatCount(long npcId, long count) {
+        this.setChatCount(npcId, this.getChatCount(npcId) + count);
+    }
+
+    public long getResponseChat(@NonNull WaitResponse waitResponse) {
+        return this.responseChat.getOrDefault(waitResponse, 0L);
+    }
+
+    public void setAnyResponseChat(@NonNull String response, long chatId) {
+        if(chatId == 0) {
+            this.anyResponseChat.remove(response);
+        } else {
+            Config.checkId(Id.CHAT, chatId);
+            this.anyResponseChat.put(response, chatId);
+        }
+    }
+
+    public long getAnyResponseChat(@NonNull String response) {
+        return this.anyResponseChat.getOrDefault(response, 0L);
+    }
+
+    public void setMagic(@NonNull MagicType magicType, int lv) {
+        if(lv == 0) {
+            this.magic.remove(magicType);
+        } else {
+            if(lv < Config.MIN_MAGIC_LV || lv > Config.MAX_MAGIC_LV) {
+                throw new NumberRangeException(lv, Config.MIN_MAGIC_LV, Config.MAX_MAGIC_LV);
+            }
+
+            this.magic.put(magicType, lv);
+        }
+    }
+
+    public int getMagic(@NonNull MagicType magicType) {
+        return this.magic.getOrDefault(magicType, Config.MIN_MAGIC_LV);
+    }
+
+    public void addMagic(@NonNull MagicType magicType, int lv) {
+        this.setMagic(magicType, this.getMagic(magicType) + lv);
+    }
+
+    public void setResist(@NonNull MagicType magicType, int lv) {
+        if(lv == 0) {
+            this.resist.remove(magicType);
+        } else {
+            if(lv < Config.MIN_MAGIC_LV || lv > Config.MAX_MAGIC_LV) {
+                throw new NumberRangeException(lv, Config.MIN_MAGIC_LV, Config.MAX_MAGIC_LV);
+            }
+
+            this.resist.put(magicType, lv);
+        }
+    }
+
+    public int getResist(@NonNull MagicType magicType) {
+        return this.resist.getOrDefault(magicType, Config.MIN_MAGIC_LV);
+    }
+
+    public void addResist(@NonNull MagicType magicType, int lv) {
+        this.setResist(magicType, this.getResist(magicType) + lv);
+    }
+
+    public void setCloseRate(long npcId, int closeRate) {
+        Config.checkId(Id.NPC, npcId);
+
+        this.addLog(LogData.TOTAL_CLOSERATE, closeRate - this.getCloseRate(npcId));
+
+        if(closeRate == 0) {
+            this.closeRate.remove(npcId);
+        } else {
+            this.closeRate.put(npcId, closeRate);
+            this.setLog(LogData.MAX_CLOSERATE, Math.max(this.getLog(LogData.MAX_CLOSERATE), closeRate));
+        }
+    }
+
+    public int getCloseRate(long npcId) {
+        return this.closeRate.getOrDefault(npcId, 0);
+    }
+
+    public void addCloseRate(long npcId, int closeRate) {
+        this.setCloseRate(npcId, this.getCloseRate(npcId) + closeRate);
+    }
+
+    public void setLog(@NonNull LogData logData, long count) {
+        if(count == 0) {
+            this.log.remove(logData);
+        } else {
+            this.log.put(logData, count);
+        }
+
+        this.log.put(LogData.LOG_COUNT, this.getLog(LogData.LOG_COUNT) + 1);
+        Logger.i("LogData", this.getName() + " {" + logData.toString() + " : " + count + "}");
+    }
+
+    public long getLog(@NonNull LogData logData) {
+        return this.log.getOrDefault(logData, 0L);
+    }
+
+    public void addLog(@NonNull LogData logData, long count) {
+        this.setLog(logData, this.getLog(logData) + count);
     }
 
     @Override
@@ -1972,7 +1969,7 @@ public class Player extends Entity {
     }
 
     @Override
-    public void onKill(Entity entity) {
+    public void onKill(@NonNull Entity entity) {
         long prevExp = this.exp.get();
         long exp = getKillExp(entity.lv.get());
         this.addExp(exp);
@@ -1991,7 +1988,7 @@ public class Player extends Entity {
         super.startFight(enemies);
         this.prevDoing = this.doing;
 
-        this.replyPlayer("적 " + enemies.size() + "명 과의 전투가 시작되었습니다", this.getBattleMsg());
+        this.replyPlayer("적 " + enemies.size() + "명 과의 전투가 시작되었습니다");
     }
 
 }

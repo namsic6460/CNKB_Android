@@ -21,11 +21,20 @@ public enum Doing {
     WAIT_RESPONSE;
 
     @NonNull
-    public static List<Doing> fightList() {
+    public static List<Doing> fightableList() {
         List<Doing> doingList = new ArrayList<>();
         doingList.add(Doing.NONE);
         doingList.add(Doing.EXPLORE);
         doingList.add(Doing.FIGHT);
+
+        return doingList;
+    }
+
+    @NonNull
+    public static List<Doing> fightList() {
+        List<Doing> doingList = new ArrayList<>();
+        doingList.add(Doing.FIGHT);
+        doingList.add(Doing.FIGHT_ONE);
 
         return doingList;
     }
