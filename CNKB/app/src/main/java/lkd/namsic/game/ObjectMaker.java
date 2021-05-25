@@ -5,7 +5,6 @@ import android.widget.Button;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import lkd.namsic.MainActivity;
@@ -734,8 +733,8 @@ public class ObjectMaker {
         }
 
         Player player;
-        for(Map<String, String> playerMap : Config.PLAYER_LIST.values()) {
-            player = Config.loadPlayer(playerMap.get("sender"), playerMap.get("image"));
+        for(String[] playerData : Config.PLAYER_LIST.values()) {
+            player = Config.loadPlayer(playerData[0], playerData[1]);
             map = Config.loadMap(player.getLocation());
             map.addEntity(player);
             Config.unloadMap(map);

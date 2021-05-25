@@ -31,7 +31,6 @@ import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.UnhandledEnumException;
-import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -414,9 +413,9 @@ public abstract class Entity extends NamedObject {
 
     public abstract void onDeath();
 
-    public abstract void onKill(Entity entity);
+    public abstract void onKill(@NonNull Entity entity);
 
-    public long getEquip(EquipType equipType) {
+    public long getEquip(@NonNull EquipType equipType) {
         return this.equip.getOrDefault(equipType, 0L);
     }
 
@@ -621,7 +620,7 @@ public abstract class Entity extends NamedObject {
     }
 
     public boolean canFight(@NonNull Entity enemy) {
-        return Doing.fightList().contains(this.doing);
+        return Doing.fightableList().contains(this.doing);
     }
 
     public void startFight(@NonNull Set<Entity> enemies) {
@@ -638,7 +637,7 @@ public abstract class Entity extends NamedObject {
 
             if(enemy.id.getId().equals(Id.PLAYER)) {
                 Player player = (Player) enemy;
-                player.replyPlayer(this.getName() + " 와(과) 의 전투가 시작되었습니다", player.getBattleMsg());
+                player.replyPlayer(this.getName() + " 와(과) 의 전투가 시작되었습니다");
             }
         });
     }

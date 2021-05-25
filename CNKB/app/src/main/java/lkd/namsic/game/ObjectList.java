@@ -1,4 +1,4 @@
-package lkd.namsic.game;
+ package lkd.namsic.game;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -107,6 +107,9 @@ public class ObjectList {
 
     public final static BiMap<String, Long> monsterList = new ImmutableBiMap.Builder<String, Long>()
             .put("양", 1L)
+            .build();
+
+    public final static BiMap<String, Long> bossList = new ImmutableBiMap.Builder<String, Long>()
             .build();
 
     public final static BiMap<String, Long> questList = new ImmutableBiMap.Builder<String, Long>()
