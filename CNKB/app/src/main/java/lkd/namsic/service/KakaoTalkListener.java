@@ -13,6 +13,7 @@ import android.util.Base64;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
+import lkd.namsic.game.Config;
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.setting.Logger;
 import lkd.namsic.MainActivity;
@@ -74,12 +75,7 @@ public class KakaoTalkListener extends NotificationListenerService {
                             image = Base64.encodeToString(baos.toByteArray(), 0);
                             int imageLength = image.length();
                             image = image.substring(200, 250);
-                            image = image.replaceAll("\\\\", "").replaceAll("/", "")
-                                    .replaceAll(":", "").replaceAll("\\*", "")
-                                    .replaceAll("\\?", "").replaceAll("\"", "")
-                                    .replaceAll("<", "").replaceAll(">", "")
-                                    .replaceAll("\\|", "").replaceAll("\r", "")
-                                    .replaceAll("\n", "").replaceAll(" ", "_");
+                            image = Config.getRegex(image, "-");
                             image = image + "+" + image.hashCode() + "+" + imageLength;
                         }
 

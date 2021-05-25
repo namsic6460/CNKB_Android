@@ -58,7 +58,7 @@ public class AiEntity extends Entity {
     }
 
     @Override
-    public void onKill(Entity entity) {
+    public void onKill(@NonNull Entity entity) {
         long gap = this.lv.get() - entity.lv.get();
 
         this.revalidateBuff();

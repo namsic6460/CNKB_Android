@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
-import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
@@ -60,14 +59,16 @@ public class Config {
     public static final Map<Id, ConcurrentHashMap<Long, GameObject>> OBJECT = new ConcurrentHashMap<>();
     public static final Map<Id, ConcurrentHashMap<Long, Long>> OBJECT_COUNT = new ConcurrentHashMap<>();
     public static final Map<Id, ConcurrentHashSet<Long>> DELETE_LIST = new ConcurrentHashMap<>();
+    public static final Set<Long> DISCARD_LIST = new ConcurrentHashSet<>();
 
     public static boolean IGNORE_FILE_LOG = false;
 
     public static final Map<String, MapClass> MAP = new ConcurrentHashMap<>();
     public static final Map<String, Long> PLAYER_COUNT = new ConcurrentHashMap<>();
 
+    private static final String REGEX = "[^A-Za-z-_0-9ㄱ-ㅎㅏ-ㅣ가-힣\\s]|[\n]|[\n]";
     public static final Set<String> NICKNAME_LIST = new ConcurrentHashSet<>();
-    public static final Map<Long, Map<String, String>> PLAYER_LIST = new ConcurrentHashMap<>();
+    public static final Map<Long, String[]> PLAYER_LIST = new ConcurrentHashMap<>();
 
     public static final Set<Long> SELECTABLE_CHAT_SET = new ConcurrentHashSet<>();
 
@@ -151,10 +152,7 @@ public class Config {
                 json = FileManager.read(playerFile);
                 Player player = fromJson(json, Player.class);
                 NICKNAME_LIST.add(player.getNickName());
-                PLAYER_LIST.put(player.getId().getObjectId(), new HashMap<String, String>() {{
-                    put("sender", player.getSender());
-                    put("image", player.getImage());
-                }});
+                PLAYER_LIST.put(player.getId().getObjectId(), new String[] {player.getSender(), player.getImage()});
             } catch (Exception e) {
                 Logger.e("Config.init", e);
             }
@@ -279,55 +277,61 @@ public class Config {
 
         Long objectCount = OBJECT_COUNT.get(id).get(objectId);
         objectCount = objectCount == null ? 0 : objectCount;
+        boolean discardFlag = false;
 
         if(objectCount > 1) {
             OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
         } else {
             String jsonString = toJson(gameObject);
 
-            String path;
+            String path = "";
             if(id.equals(Id.PLAYER)) {
-                Player player = (Player) gameObject;
-                path = getPlayerPath(player.getSender(), player.getImage());
+                if(DISCARD_LIST.contains(objectId)) {
+                    discardFlag = true;
+                } else {
+                    Player player = (Player) gameObject;
+                    path = getPlayerPath(player.getSender(), player.getImage());
+                }
             } else {
                 path = getPath(id, objectId);
             }
 
-            if(objectCount == 1) {
-                OBJECT.get(id).remove(objectId);
-                OBJECT_COUNT.get(id).remove(objectId);
+            if(!discardFlag) {
+                if (objectCount == 1) {
+                    OBJECT.get(id).remove(objectId);
+                    OBJECT_COUNT.get(id).remove(objectId);
 
-                if(DELETE_LIST.get(id).contains(objectId)) {
-                    FileManager.delete(path);
-                    return;
-                }
-            } else if(objectCount == 0) {
-                if(id.equals(Id.CHAT)) {
-                    if(((Chat) gameObject).getName() != null) {
-                        SELECTABLE_CHAT_SET.add(objectId);
+                    if (DELETE_LIST.get(id).contains(objectId)) {
+                        FileManager.delete(path);
+                        return;
+                    }
+                } else if (objectCount == 0) {
+                    if (id.equals(Id.CHAT)) {
+                        if (((Chat) gameObject).getName() != null) {
+                            SELECTABLE_CHAT_SET.add(objectId);
+                        }
+                    }
+
+                    if (gameObject instanceof Entity) {
+                        Entity entity = (Entity) gameObject;
+
+                        if (entity.getLocation() != null) {
+                            MapClass map = Config.loadMap(entity.getLocation());
+                            map.addEntity(entity);
+                            Config.unloadMap(map);
+                        }
+
+                        if (id.equals(Id.PLAYER)) {
+                            Player player = (Player) entity;
+                            PLAYER_LIST.put(player.getId().getObjectId(), new String[] {player.getSender(), player.getImage()});
+                        }
                     }
                 }
 
-                if(gameObject instanceof Entity) {
-                    Entity entity = (Entity) gameObject;
-
-                    if(entity.getLocation() != null) {
-                        MapClass map = Config.loadMap(entity.getLocation());
-                        map.addEntity(entity);
-                        Config.unloadMap(map);
-                    }
-
-                    if(id.equals(Id.PLAYER)) {
-                        Player player = (Player) entity;
-                        PLAYER_LIST.put(player.getId().getObjectId(), new HashMap<String, String>() {{
-                            put("sender", player.getSender());
-                            put("image", player.getImage());
-                        }});
-                    }
-                }
+                FileManager.save(path, jsonString);
+            } else if(objectCount == 1) {
+                DISCARD_LIST.remove(objectId);
             }
-
-            FileManager.save(path, jsonString);
         }
     }
 
@@ -338,6 +342,8 @@ public class Config {
 
         Player originalPlayer = fromJson(jsonString, Player.class);
         OBJECT.get(Id.PLAYER).put(player.getId().getObjectId(), originalPlayer);
+        unloadObject(originalPlayer);
+        DISCARD_LIST.add(player.getId().getObjectId());
 
         Logger.w("discardPlayer", "Player discarded - " + player.getName());
     }
@@ -366,8 +372,8 @@ public class Config {
     @NonNull
     public synchronized static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
         if(id.equals(Id.PLAYER)) {
-            Map<String, String> playerData = PLAYER_LIST.get(objectId);
-            return (T) loadPlayer(playerData.get("sender"), playerData.get("image"));
+            String[] playerData = PLAYER_LIST.get(objectId);
+            return (T) loadPlayer(playerData[0], playerData[1]);
         }
 
         checkId(id, objectId);
@@ -580,6 +586,12 @@ public class Config {
         }
 
         return builder.toString();
+    }
+
+    public static String getRegex(@NonNull String string, @NonNull String replacement) {
+        return string.replaceAll(REGEX, replacement)
+                .replaceAll("[ ]{2,}", " ")
+                .trim();
     }
 
 }

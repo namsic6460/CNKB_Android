@@ -2,8 +2,6 @@ package lkd.namsic;
 
 import org.junit.Test;
 
-import lkd.namsic.game.base.Location;
-
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -11,12 +9,16 @@ import lkd.namsic.game.base.Location;
  */
 public class ExampleUnitTest {
     @Test
-    public void addition_isCorrect() {
-        Location location1 = new Location(0, 0);
-        Location location2 = new Location(0, 0);
-        Location location3 = new Location(0, 1);
+    public void test() {
+        String value = "abc*-/+=%52#$<script>으악 ㅁㄴㅇㄹ 와\\ 샌즈\nanc</scr\r\nipt>시작      끝";
+        String regex = "[^A-Za-z-_0-9ㄱ-ㅎㅏ-ㅣ가-힣\\s]|[\r]|[\n]";
 
-        System.out.println(location1.equalsMap(location2));
-        System.out.println(location1.equalsMap(location3));
+        String newValue = value.replaceAll(regex, "-")
+                .replaceAll("[ ]{2,}", "- ")
+                .trim();
+
+        System.out.println("Equal: " + value.equals(newValue));
+        System.out.println(value);
+        System.out.println(newValue);
     }
 }

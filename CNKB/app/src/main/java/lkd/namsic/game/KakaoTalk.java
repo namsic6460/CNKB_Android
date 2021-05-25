@@ -52,8 +52,13 @@ public class KakaoTalk {
             soloSessions.put(room, session);
         }
 
+        if(msg.equals("n test")) {
+            reply(session, "Success");
+            return;
+        }
+
         final boolean isCommand = msg.startsWith("n ") || msg.startsWith("ㅜ ");
-        final String command = isCommand ? msg.substring(2).toLowerCase() : null;
+        final String command = isCommand ? msg.substring(2) : null;
 
         Thread gameThread = new Thread(() -> {
             Player player = null;
@@ -73,10 +78,10 @@ public class KakaoTalk {
                 player = Config.loadPlayer(sender, image);
 
                 if(isCommand) {
-                    otherCommand(command, session);
+                    otherCommand(command.toLowerCase(), session);
 
                     if (player != null) {
-                        playerCommand(player, command, room, isGroupChat, session);
+                        playerCommand(player, command.toLowerCase(), room, isGroupChat, session);
 
                         if(player.getDoing().equals(Doing.WAIT_RESPONSE)) {
                             checkResponseChat(player, msg);
@@ -102,8 +107,8 @@ public class KakaoTalk {
         MainActivity.startThread(gameThread);
     }
 
-    private static void playerCommand(@NonNull Player player, @NonNull String command,
-                                         @NonNull String room, boolean isGroupChat, @NonNull Notification.Action session) {
+    private static void playerCommand(@NonNull Player player, @NonNull String command, @NonNull String room,
+                                      boolean isGroupChat, @NonNull Notification.Action session) {
         player.setRecentRoom(room);
         player.setGroup(isGroupChat);
 
@@ -195,11 +200,25 @@ public class KakaoTalk {
                                 highPriorityItems.remove(itemId);
                             }
                         }
+                    } else if(second.equals("pvp")) {
+                        checkDoing(player);
+
+                        if(third == null) {
+                            player.replyPlayer("현재 PVP가 " + (player.isPvp() ? "활성화" : "비활성화") + "되어있습니다");
+                        } else {
+                            if (third.equals("켜기") || third.equals("on")) {
+                                player.setPvp(true);
+                                player.replyPlayer("PVP가 활성화되었습니다");
+                            } else if (third.equals("끄기") || third.equals("off")) {
+                                player.setPvp(false);
+                                player.replyPlayer("PVP가 비활성화되었습니다");
+                            }
+                        }
                     }
                 } else if(first.equals("이동") || first.equals("move")) {
                     checkDoing(player);
 
-                    if(third == null) {
+                    if(second == null) {
                         throw new WeirdCommandException();
                     }
 
@@ -207,9 +226,14 @@ public class KakaoTalk {
                         String locationStr = fourth == null ? third : third + " " + fourth;
                         player.moveMap(locationStr.trim());
                     } else if(second.equals("필드") || second.equals("field")) {
+                        if(third == null) {
+                            throw new WeirdCommandException();
+                        }
+
                         player.moveField(third);
                     } else {
-                        throw new WeirdCommandException();
+                        String locationStr = third == null ? second : second + " " + third;
+                        player.moveMap(locationStr.trim());
                     }
                 } else if (first.equals("광질") || first.equals("mine")) {
                     boolean isTutorial = player.getObjectVariable(Variable.IS_TUTORIAL);
@@ -265,29 +289,59 @@ public class KakaoTalk {
         try {
             List<String> commands = Arrays.asList(command.split(" "));
 
-            String first = null;
-            String second = null;
-
-            try {
-                first = commands.get(0);
-                second = commands.get(1);
-            } catch (IndexOutOfBoundsException ignore) {}
+            String first = commands.get(0).toLowerCase();
 
             if (Arrays.asList("회원가입", "가입", "register").contains(first)) {
-                if (second == null) {
-                    throw new WeirdCommandException("닉네임을 입력해주세요");
+                String nickName = command.replace(first + " ", "");
+
+                if (nickName == null) {
+                    throw new WeirdCommandException("닉네임을 입력해주세요\n" +
+                            "(예시 : " + Emoji.focus("n 회원가입 남식") + ")");
                 }
 
-                if(Config.NICKNAME_LIST.contains(second)) {
-                    reply(session, "[" + second + "]\n동일한 닉네임을 지닌 플레이어가 존재합니다.\n" +
+                String nickNameCheck = Config.getRegex(nickName, "");
+                if(!nickName.equals(nickNameCheck)) {
+                    reply(session, "닉네임에 허용되지 않는 문자가 포함되어 있습니다\n" +
+                                    "상세 내용은 전체보기에서 확인해주세요",
+                            "입력받은 닉네임 : " + nickName + "\n" +
+                                    "변경되어야 하는 닉네임: " + nickNameCheck + "\n\n" +
+                                    "[닉네임 규칙]\n" +
+                                    "1. 영어 대소문자\n" +
+                                    "2. 한글\n" +
+                                    "3. 숫자\n" +
+                                    "4. 하이픈(-)\n" +
+                                    "5. 언더바(_)\n" +
+                                    "6. 연속 공백은 최대 1칸" +
+                                    "7. 길이는 2~16자");
+                    return;
+                }
+
+                int length = nickName.length();
+                if(length < 2 || length > 16) {
+                    throw new WeirdCommandException("닉네임의 길이가 2~16자가 되도록 변경해주세요\n" +
+                            "현재 " + length + "자 입니다");
+                }
+
+                if(Config.NICKNAME_LIST.contains(nickName)) {
+                    throw new WeirdCommandException("[" + nickName + "]\n동일한 닉네임을 지닌 플레이어가 존재합니다.\n" +
                             "닉네임을 변경한 후 다시 시도해주세요");
                 }
 
-                Player player = new Player(sender, second, image, room);
+                if(ObjectList.npcList.containsKey(nickName)) {
+                    throw new WeirdCommandException("[" + nickName + "]\n동일한 닉네임을 지닌 NPC가 존재합니다.\n" +
+                            "닉네임을 변경한 후 다시 시도해주세요");
+                }
+
+                if(ObjectList.monsterList.containsKey(nickName) || ObjectList.bossList.containsKey(nickName)) {
+                    throw new WeirdCommandException("[" + nickName + "]\n동일한 닉네임을 지닌 몬스터가 존재합니다.\n" +
+                            "닉네임을 변경한 후 다시 시도해주세요");
+                }
+
+                Player player = new Player(sender, nickName, image, room);
                 player.setGroup(isGroupChat);
                 player.setVariable(Variable.IS_TUTORIAL, true);
 
-                Config.NICKNAME_LIST.add(second);
+                Config.NICKNAME_LIST.add(nickName);
 
                 player.replyPlayer("회원가입에 성공하였습니다!");
                 player.startChat(1L, 1L);
@@ -312,22 +366,24 @@ public class KakaoTalk {
                             "*(개발자/dev) : 개발자 정보를 표시합니다\n" +
                             "\n---유저 명령어---\n" +
                             "(정보/info/i) : 내 정보를 표시합니다\n" +
+                            "(가방/인벤토리/inventory/inven) [{페이지}] : 현재 인벤토리를 확인합니다\n" +
                             "(대화/chat) ({NPC 이름}) : 해당 NPC 와 대화를 합니다\n" +
                             "(맵/map) : 현재 위치 정보를 표시합니다\n" +
                             "(맵/map) (목록/list) : 이동 가능한 주변 맵의 정보를 표시합니다\n" +
-                            "(이동/move) (맵/map) ({x좌표}-{y좌표}) : 해당 좌표의 지역으로 이동합니다(예시 : " +
-                            Emoji.focus("n move map 2-3") + ")\n" +
-                            "(이동/move) ({맵 이름}) : 해당 맵으로 이동합니다(예시 : " +
+                            "(이동/move) [맵/map] ({x좌표}-{y좌표}) : 해당 좌표의 지역으로 이동합니다(예시 : " +
+                            Emoji.focus("n move 2-3") + ")\n" +
+                            "(이동/move) [맵/map] ({맵 이름}) : 해당 맵으로 이동합니다(예시 : " +
                             Emoji.focus("n move map 시작의 마을") + ")\n" +
                             "(이동/move) (필드/field) ({x좌표}-{y좌표}) : 해당 좌표의 필드 위치로 이동합니다(예시 : " +
                             Emoji.focus("n move field 16-10") + ")\n" +
                             "(광질/mine) : 광질을 합니다(약 1초 소요)(마을에서만 가능)\n" +
                             "(낚시/fish) : 낚시를 합니다(추가 명령 필요)(강 또는 바다에서만 가능)\n" +
-                            "(가방/인벤토리/inventory/inven) [{페이지}] : 현재 인벤토리를 확인합니다\n" +
-                            "(설정/setting/set) (가방/인벤토리/inventory/inven) (추가/add) ({아이템 이름}) : " +
-                            "해당 아이템을 인벤토리 표시 우선순위로 설정합니다\n" +
-                            "(설정/setting/set) (가방/인벤토리/inventory/inven) (제거/remove) ({아이템 이름}) : " +
-                            "해당 아이템을 인벤토리 표시 우선순위에서 해제합니다");
+                            "(전투/fight) ({닉네임}/{좌표}/{몬스터 이름}) : 대상과의 전투를 시작합니다\n" +
+                            "*(설정/setting/set) (가방/인벤토리/inventory/inven) (추가/add) ({아이템 이름}) : " +
+                            "해당 아이템을 인벤토리 표시 우선순위 목록에 추가합니다\n" +
+                            "*(설정/setting/set) (가방/인벤토리/inventory/inven) (제거/remove) ({아이템 이름}) : " +
+                            "해당 아이템을 인벤토리 표시 우선순위 목록에서 제거합니다\n" +
+                            "(설정/setting/set) (pvp) [켜기/on/끄기/off] : pvp 설정을 확인하거나 활성화 또는 비활성화합니다");
         } else if(command.equals("개발자") || command.equals("dev")) {
             reply(session, "---개발자 정보---\n닉네임 : 남식(namsic)",
                     "메일 : namsic6460@gmail.com\n" +
@@ -345,19 +401,17 @@ public class KakaoTalk {
         } else {
             response = msg;
         }
-        
-        for(Map.Entry<WaitResponse, Long> entry : player.getResponseChat().entrySet()) {
-            if(entry.getKey().getList().contains(response)) {
-                player.startChat(entry.getValue(), player.getWaitNpcId());
-                return;
-            }
+
+        WaitResponse waitResponse = WaitResponse.parseResponse(response);
+        long chatId = player.getResponseChat(waitResponse);
+        if(chatId != 0L) {
+            player.startChat(chatId, player.getWaitNpcId());
+            return;
         }
 
-        for(Map.Entry<String, Long> entry : player.getAnyResponseChat().entrySet()) {
-            if(entry.getKey().equals(response)) {
-                player.startChat(entry.getValue(), player.getWaitNpcId());
-                return;
-            }
+        chatId = player.getAnyResponseChat(response);
+        if(chatId != 0L) {
+            player.startChat(chatId, player.getWaitNpcId());
         }
     }
 
