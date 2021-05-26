@@ -587,7 +587,7 @@ public class Player extends Entity {
 
         if (!isCancelled) {
             this.addLog(LogData.TOTAL_ITEM_USED, 1);
-            item.getUse().use(this, other);
+            Objects.requireNonNull(item.getUse()).use(this, other);
             this.addItem(itemId, -1);
         }
 
@@ -1630,6 +1630,13 @@ public class Player extends Entity {
     }
 
     public boolean tryFight(@NonNull String target) {
+        Long playerId = Config.PLAYER_ID.get(target);
+        if(playerId != null) {
+
+        } else {
+
+        }
+
         return false;
     }
 

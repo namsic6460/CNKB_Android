@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.enums.Doing;
+import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.exception.DoingFilterException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
@@ -345,7 +346,7 @@ public class KakaoTalk {
                             "현재 " + length + "자 입니다");
                 }
 
-                if(Config.NICKNAME_LIST.contains(nickName)) {
+                if(Config.PLAYER_ID.get(nickName) != null) {
                     throw new WeirdCommandException("[" + nickName + "]\n동일한 닉네임을 지닌 플레이어가 존재합니다.\n" +
                             "닉네임을 변경한 후 다시 시도해주세요");
                 }
@@ -364,7 +365,10 @@ public class KakaoTalk {
                 player.setGroup(isGroupChat);
                 player.setVariable(Variable.IS_TUTORIAL, true);
 
-                Config.NICKNAME_LIST.add(nickName);
+                long objectId = Config.ID_COUNT.get(Id.PLAYER);
+                player.getId().setObjectId(objectId);
+                Config.PLAYER_ID.put(nickName, objectId);
+                Config.ID_COUNT.put(Id.PLAYER, objectId + 1);
 
                 player.replyPlayer("회원가입에 성공하였습니다!");
                 player.startChat(1L, 1L);

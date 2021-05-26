@@ -15,12 +15,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashMap;
 
+import lkd.namsic.MainActivity;
 import lkd.namsic.game.Config;
 import lkd.namsic.game.enums.Id;
 
 public class FileManager extends Application {
 
-    public final static String PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CNKB";
+    public final static String PATH = MainActivity.mainActivity.getExternalFilesDir(null).getAbsolutePath() + "/CNKB";
     public final static String CONFIG_PATH = PATH + "/config.json";
     public final static String LOG_PATH = PATH + "/logs";
     public final static String DATA_PATH = PATH + "/data";

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -66,8 +67,8 @@ public class Config {
     public static final Map<String, MapClass> MAP = new ConcurrentHashMap<>();
     public static final Map<String, Long> PLAYER_COUNT = new ConcurrentHashMap<>();
 
-    private static final String REGEX = "[^A-Za-z-_0-9ㄱ-ㅎㅏ-ㅣ가-힣\\s]|[\n]|[\n]";
-    public static final Set<String> NICKNAME_LIST = new ConcurrentHashSet<>();
+    private static final String REGEX = "[^A-Za-z-_0-9ㄱ-ㅎㅏ-ㅣ가-힣\\s]|[\n]|[\r]";
+    public static final Map<String, Long> PLAYER_ID = new ConcurrentHashMap<>();
     public static final Map<Long, String[]> PLAYER_LIST = new ConcurrentHashMap<>();
 
     public static final Set<Long> SELECTABLE_CHAT_SET = new ConcurrentHashSet<>();
@@ -143,22 +144,27 @@ public class Config {
     }
 
     public static void loadPlayers() {
-        File folder = new File(FileManager.DATA_PATH_MAP.get(Id.PLAYER));
-        File[] players = folder.listFiles();
+        File folder = new File(Objects.requireNonNull(FileManager.DATA_PATH_MAP.get(Id.PLAYER)));
+        File[] players = Objects.requireNonNull(folder.listFiles());
 
         String json;
         for(File playerFile : players) {
             try {
                 json = FileManager.read(playerFile);
                 Player player = fromJson(json, Player.class);
-                NICKNAME_LIST.add(player.getNickName());
-                PLAYER_LIST.put(player.getId().getObjectId(), new String[] {player.getSender(), player.getImage()});
+
+                long objectId = player.getId().getObjectId();
+                String nickName = player.getNickName();
+
+                PLAYER_ID.put(nickName, objectId);
+                PLAYER_LIST.put(objectId, new String[] {player.getSender(), player.getImage()});
             } catch (Exception e) {
                 Logger.e("Config.init", e);
             }
         }
     }
 
+    @NonNull
     public static JsonObject createConfig() {
         JsonObject jsonObject = new JsonObject();
 
@@ -174,7 +180,7 @@ public class Config {
     }
 
     @SuppressWarnings("unchecked")
-    public static void parseConfig(JsonObject jsonObject) {
+    public static void parseConfig(@NonNull JsonObject jsonObject) {
         JsonObject idObject = jsonObject.getAsJsonObject("id");
 
         String idName;
@@ -212,6 +218,7 @@ public class Config {
         }
     }
 
+    @NonNull
     public static <T extends GameObject> T newObject(@NonNull T t) {
         Id id = t.getId().getId();
         long objectId = ID_COUNT.get(id);
@@ -220,17 +227,17 @@ public class Config {
         t.getId().setObjectId(objectId);
         ID_COUNT.put(id, objectId + 1);
 
-        Config.unloadObject(t);
+        unloadObject(t);
         Logger.i("newObject", id.toString() + "-" + objectId);
 
         return t;
     }
 
-    public static void deleteAiEntity(AiEntity entity) {
+    public static void deleteAiEntity(@NonNull AiEntity entity) {
         Id id = entity.getId().getId();
         long objectId = entity.getId().getObjectId();
 
-        long count = OBJECT_COUNT.get(id).get(objectId);
+        long count = OBJECT_COUNT.get(id).getOrDefault(objectId, 0L);
         if(count == 0) {
             FileManager.delete(getPath(id, objectId));
             Logger.w("deleteAiEntity", id + "-" + objectId + " has 0 count");
@@ -303,6 +310,7 @@ public class Config {
 
                     if (DELETE_LIST.get(id).contains(objectId)) {
                         FileManager.delete(path);
+                        DELETE_LIST.get(id).remove(objectId);
                         return;
                     }
                 } else if (objectCount == 0) {
@@ -334,7 +342,6 @@ public class Config {
             }
         }
     }
-
 
     public synchronized static void discardPlayer(@NonNull Player player) {
         String path = getPlayerPath(player.getSender(), player.getImage());
@@ -373,7 +380,7 @@ public class Config {
     public synchronized static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
         if(id.equals(Id.PLAYER)) {
             String[] playerData = PLAYER_LIST.get(objectId);
-            return (T) loadPlayer(playerData[0], playerData[1]);
+            return (T) Objects.requireNonNull(loadPlayer(playerData[0], playerData[1]));
         }
 
         checkId(id, objectId);
@@ -395,7 +402,7 @@ public class Config {
             return t;
         } else {
             OBJECT_COUNT.get(id).put(objectId, objectCount + 1);
-            return (T) OBJECT.get(id).get(objectId);
+            return (T) Objects.requireNonNull(OBJECT.get(id).get(objectId));
         }
     }
 
@@ -421,7 +428,7 @@ public class Config {
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, 1L);
         } else {
             Logger.i("ExistGet", OBJECT.get(Id.PLAYER).toString());
-            player = (Player) OBJECT.get(Id.PLAYER).get(objectId);
+            player = (Player) Objects.requireNonNull(OBJECT.get(Id.PLAYER).get(objectId));
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, objectCount + 1);
         }
 
