@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.KakaoTalk;
-import lkd.namsic.game.ObjectList;
-import lkd.namsic.game.Variable;
+import lkd.namsic.game.config.ObjectList;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;

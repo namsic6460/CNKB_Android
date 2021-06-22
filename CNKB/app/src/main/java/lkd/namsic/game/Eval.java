@@ -24,6 +24,7 @@ import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.gameObject.GameObject;
 import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.config.Config;
 
 public class Eval {
 

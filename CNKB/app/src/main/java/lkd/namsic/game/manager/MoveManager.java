@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import lkd.namsic.game.Config;
-import lkd.namsic.game.Emoji;
-import lkd.namsic.game.ObjectList;
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
+import lkd.namsic.game.config.ObjectList;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;

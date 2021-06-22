@@ -12,7 +12,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashMap;
 
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 
 public class FileManager {

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.MainActivity;
 
 public class Logger {

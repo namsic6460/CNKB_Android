@@ -1,4 +1,4 @@
-package lkd.namsic.game;
+package lkd.namsic.game.config;
 
 import android.util.Log;
 import android.widget.Button;

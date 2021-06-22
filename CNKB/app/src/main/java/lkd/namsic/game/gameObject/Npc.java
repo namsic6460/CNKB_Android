@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.enums.Id;

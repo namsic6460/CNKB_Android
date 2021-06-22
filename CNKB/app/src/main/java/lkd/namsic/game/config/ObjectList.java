@@ -1,4 +1,4 @@
- package lkd.namsic.game;
+ package lkd.namsic.game.config;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;

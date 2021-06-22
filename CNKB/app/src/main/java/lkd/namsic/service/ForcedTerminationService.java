@@ -6,7 +6,7 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.setting.Logger;
 import lkd.namsic.MainActivity;
 

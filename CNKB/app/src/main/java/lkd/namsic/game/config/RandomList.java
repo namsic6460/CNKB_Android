@@ -1,4 +1,4 @@
-package lkd.namsic.game;
+package lkd.namsic.game.config;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -10,7 +10,7 @@ import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.RangeInteger;
 import lkd.namsic.game.base.RangeIntegerMap;
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;

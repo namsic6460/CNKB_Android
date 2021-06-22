@@ -7,9 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import lkd.namsic.game.Config;
-import lkd.namsic.game.RandomList;
-import lkd.namsic.game.Variable;
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.RandomList;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;

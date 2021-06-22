@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 
 import java.io.Serializable;
 
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lombok.Getter;
 
 @Getter

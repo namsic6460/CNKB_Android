@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Map;
 
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;

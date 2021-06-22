@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MonsterType;

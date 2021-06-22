@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 
 public class ExampleUnitTest {

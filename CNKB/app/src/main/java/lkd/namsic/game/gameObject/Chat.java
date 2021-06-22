@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lkd.namsic.game.Variable;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.base.LimitId;
 import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.exception.NumberRangeException;

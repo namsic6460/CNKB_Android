@@ -16,12 +16,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.game.Emoji;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;

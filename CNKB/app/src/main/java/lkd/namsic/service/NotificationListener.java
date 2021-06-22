@@ -13,7 +13,7 @@ import android.util.Base64;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.setting.Logger;
 import lkd.namsic.MainActivity;

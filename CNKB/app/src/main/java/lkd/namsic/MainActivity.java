@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import lkd.namsic.game.Config;
-import lkd.namsic.game.ObjectCreator;
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.ObjectCreator;
 import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.service.ForcedTerminationService;
 import lkd.namsic.setting.FileManager;

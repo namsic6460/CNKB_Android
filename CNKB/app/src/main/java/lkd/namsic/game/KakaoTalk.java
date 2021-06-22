@@ -16,8 +16,10 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.MainActivity;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.exception.DoingFilterException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
@@ -31,6 +33,8 @@ import lkd.namsic.game.manager.FishManager;
 import lkd.namsic.game.manager.ItemManager;
 import lkd.namsic.game.manager.MineManager;
 import lkd.namsic.game.manager.MoveManager;
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.ObjectList;
 import lkd.namsic.service.NotificationListener;
 import lkd.namsic.setting.Logger;
 

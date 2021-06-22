@@ -12,9 +12,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.game.Config;
-import lkd.namsic.game.Emoji;
-import lkd.namsic.game.Variable;
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitInteger;

@@ -3,7 +3,7 @@ package lkd.namsic.game.exception;
 import java.util.Map;
 
 import lkd.namsic.game.base.LimitClass;
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 
 public class NumberRangeException extends RuntimeException {
 

@@ -5,11 +5,11 @@ import androidx.annotation.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
-import lkd.namsic.game.RandomList;
+import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.RangeInteger;
 import lkd.namsic.game.base.RangeIntegerMap;
-import lkd.namsic.game.Config;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
