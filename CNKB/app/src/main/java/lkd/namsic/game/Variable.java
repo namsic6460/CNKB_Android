@@ -2,12 +2,20 @@ package lkd.namsic.game;
 
 public enum Variable {
 
+    IS_TUTORIAL,
+    HIGH_PRIORITY_ITEM,
+    MINE,
     FISH,
     FISH_WAIT_TYPE,
     FISH_MAP,
     FISH_SKILL,
-    MINE,
-    HIGH_PRIORITY_ITEM,
-    IS_TUTORIAL
+    IS_TURN,
+    FIGHT_WAIT_TYPE,
+    FIGHT_TARGET_MAX_INDEX,
+    FIGHT_TARGET_INDEX,
+    IS_DEFENCING,
+    IS_FIGHT_RESPONSE,
+    ADVENTURE_FIGHT,
+    ADVENTURE_WAIT_TYPE,
 
 }

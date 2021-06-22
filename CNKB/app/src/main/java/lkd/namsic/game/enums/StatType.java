@@ -23,7 +23,7 @@ public enum StatType {
     ACC("정확도");
 
     @Getter
-    String displayName;
+    private final String displayName;
 
     StatType(String displayName) {
         this.displayName = displayName;

@@ -1,58 +1,110 @@
 package lkd.namsic.game.gameObject;
 
 import android.app.Notification;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.common.collect.BiMap;
-
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.MainActivity;
 import lkd.namsic.game.Emoji;
-import lkd.namsic.game.ObjectList;
-import lkd.namsic.game.Percent;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.Config;
 import lkd.namsic.game.enums.Doing;
-import lkd.namsic.game.enums.FishWaitType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MagicType;
-import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
-import lkd.namsic.game.event.ItemUseEvent;
-import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
-import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.exception.WeirdDataException;
-import lkd.namsic.game.Variable;
 import lkd.namsic.game.KakaoTalk;
+import lkd.namsic.game.manager.MoveManager;
+import lkd.namsic.game.manager.QuestManager;
 import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class Player extends Entity {
+
+    private final static QuestManager questManager = QuestManager.getInstance();
+    private final static MoveManager moveManager = MoveManager.getInstance();
+
+    public static void replyPlayers(@NonNull Set<Player> players, @Nullable String msg) {
+        replyPlayers(players, msg, null);
+    }
+
+    public static void replyPlayersExcept(@NonNull Set<Player> players, @Nullable String msg, @Nullable Player except) {
+        replyPlayersExcept(players, msg, null, except);
+    }
+
+    public static void replyPlayersExcepts(@NonNull Set<Player> players, @Nullable String msg, @NonNull Set<Player> excepts) {
+        replyPlayersExcepts(players, msg, null, excepts);
+    }
+
+    public static void replyPlayers(@NonNull Set<Player> players, @Nullable String msg, @Nullable String innerMsg) {
+        replyPlayersExcept(players, msg, innerMsg, null);
+    }
+
+    public static void replyPlayersExcept(@NonNull Set<Player> players, @Nullable String msg,
+                                          @Nullable String innerMsg, @Nullable Player except) {
+        Set<Player> excepts = new HashSet<>();
+        excepts.add(except);
+        replyPlayersExcepts(players, msg, innerMsg, excepts);
+    }
+
+    public static void replyPlayersExcepts(@NonNull Set<Player> players, @Nullable String msg,
+                                          @Nullable String innerMsg, @NonNull Set<Player> excepts) {
+        Map<Notification.Action, Set<Player>> sessions = new HashMap<>();
+
+        Set<Player> playerSet;
+        for(Player player : players) {
+            if(excepts.contains(player)) {
+                continue;
+            }
+
+            Notification.Action session = player.getSession();
+            playerSet = sessions.get(session);
+
+            if(playerSet == null) {
+                playerSet = new HashSet<>();
+                playerSet.add(player);
+                sessions.put(session, playerSet);
+            } else {
+                playerSet.add(player);
+            }
+        }
+
+        for(Map.Entry<Notification.Action, Set<Player>> entry : sessions.entrySet()) {
+            playerSet = entry.getValue();
+
+            if(playerSet.size() == 1) {
+                ((Player) playerSet.toArray()[0]).replyPlayer(msg, innerMsg);
+                continue;
+            }
+
+            StringBuilder builder = new StringBuilder("[");
+            for(Player player : playerSet) {
+                builder.append(player.getNickName())
+                        .append(", ");
+            }
+
+            KakaoTalk.reply(entry.getKey(), builder.substring(0, builder.length() - 2) + "]\n" + msg);
+        }
+    }
 
     @NonNull
     final
@@ -66,10 +118,8 @@ public class Player extends Entity {
     final
     String image;
 
-    //Doing before fight
     @Setter
-    @Nullable
-    Doing prevDoing = null;
+    Doing prevDoing = Doing.NONE;
 
     final Set<String> title = new ConcurrentHashSet<>();
 
@@ -80,8 +130,12 @@ public class Player extends Entity {
     @NonNull
     String recentRoom;
 
-    @Setter
-    boolean pvp = false;
+    boolean pvp = true;
+
+    int pvpEnableYear = 0;
+    int pvpEnableDay = 0;
+    boolean pvpEnabled = false;
+    boolean checkPvp = false;
 
     @Setter
     boolean isGroup = true;
@@ -101,18 +155,23 @@ public class Player extends Entity {
     final Set<Long> achieve = new ConcurrentHashSet<>();
     final Set<Long> research = new ConcurrentHashSet<>();
 
+    final Set<Long> itemRecipe = new ConcurrentHashSet<>();
+    final Set<Long> equipRecipe = new ConcurrentHashSet<>();
+
     //QuestId - Clear ChatId
     final Map<Long, Long> quest = new ConcurrentHashMap<>();
     final Map<Long, ConcurrentHashSet<Long>> questNpc = new ConcurrentHashMap<>();
     final Map<Long, Integer> clearedQuest = new ConcurrentHashMap<>();
 
-    Map<Long, Long> chatCount = new ConcurrentHashMap<>();
-    Map<WaitResponse, Long> responseChat = new ConcurrentHashMap<>();
-    Map<String, Long> anyResponseChat = new ConcurrentHashMap<>();
+    final Map<Long, Long> chatCount = new ConcurrentHashMap<>();
+    final Map<WaitResponse, Long> responseChat = new ConcurrentHashMap<>();
+    final Map<String, Long> anyResponseChat = new ConcurrentHashMap<>();
+
+    @Setter
     long waitNpcId;
 
-    Map<MagicType, Integer> magic = new ConcurrentHashMap<>();
-    Map<MagicType, Integer> resist = new ConcurrentHashMap<>();
+    final Map<MagicType, Integer> magic = new ConcurrentHashMap<>();
+    final Map<MagicType, Integer> resist = new ConcurrentHashMap<>();
 
     final Map<Long, Integer> closeRate = new ConcurrentHashMap<>();
 
@@ -137,274 +196,13 @@ public class Player extends Entity {
         this.setBasicStat(StatType.MAXMN, 10);
         this.setBasicStat(StatType.MN, 10);
         this.setBasicStat(StatType.ATK, 10);
-
-        this.setMap(this.getLocation(), 1, true);
     }
 
-    //[테스트 칭호] 남식(Lv.123)
-    @NonNull
-    @Override
-    public String getName() {
-        return "[" + this.getCurrentTitle() + "] " + this.getNickName() + " (Lv." + this.getLv().get() + ")";
-    }
-
-    public void displayInfo() {
-        StringBuilder innerMsg = new StringBuilder();
-
-        if(this.doing.equals(Doing.WAIT_RESPONSE)) {
-            innerMsg.append(this.getDisplayResponse())
-                    .append("\n\n");
-        }
-
-        innerMsg.append(this.getDisplayStat())
-                .append("\n\n")
-                .append(this.getDisplayQuest())
-                .append("\n\n")
-                .append(this.getDisplayMagic())
-                .append("\n\n달성한 업적 개수: ")
-                .append(this.achieve.size())
-                .append("\n연구 완료 개수: ")
-                .append(this.research.size());
-
-        this.replyPlayer("===내 정보===\n" +
-                Emoji.GOLD + ": " + this.getMoney() + "G\n" +
-                Emoji.HEART + ": " + this.getDisplayHp() + "\n" +
-                Emoji.MANA + ": " + this.getStat(StatType.MN) + "/" + this.getStat(StatType.MAXMN) + "\n" +
-                Emoji.WORLD + ": " + Config.getMapData(this.location).getName() + "(" + this.location.toString() + ")\n" +
-                Emoji.LV + ": " + this.lv.get() + "Lv (" + this.getExp().get() + "/" + this.getTotalNeedExp() + ")\n" +
-                Emoji.SP + ": " + this.sp.get() + "\n" +
-                Emoji.ADV + ": " + this.adv.get() + "\n" +
-                Emoji.HOME + ": " + Config.getMapData(this.baseLocation).getName() + "(" + this.baseLocation.toString() + ")",
-                innerMsg.toString());
-    }
-
-    public String getDisplayHp() {
-        int maxHp = this.getStat(StatType.MAXHP);
-        int hp = this.getStat(StatType.HP);
-
-        double percent = 10.0 * hp / maxHp;
-        double dec = percent % 1;
-        int filled = (int) percent;
-
-        StringBuilder output = new StringBuilder("[");
-
-        for(int i = 0; i < filled; i++) {
-            output.append(Emoji.FILLED_HEART);
-        }
-
-        output.append(Emoji.HALF_HEART[(int) Math.round(dec * 8)]);
-
-        for(int i = 9; i > filled; i--) {
-            output.append("  ");
-        }
-
-        return output + "] (" + hp + "/" + maxHp + ")";
-    }
-
-    public String getDisplayResponse() {
-        StringBuilder builder = new StringBuilder("---대기중인 대답---\n");
-
-        for(WaitResponse waitResponse : this.responseChat.keySet()) {
-            builder.append(waitResponse.getDisplay())
-                    .append("\n");
-        }
-
-        if(!anyResponseChat.isEmpty()) {
-            builder.append("\n(다른 메세지 목록)");
-
-            String waitResponse;
-            for(String response : anyResponseChat.keySet()) {
-                if(response.startsWith("__")) {
-                    waitResponse = response.replace("__", "(ㅜ/n) ");
-                } else {
-                    waitResponse = response;
-                }
-
-                builder.append("\n")
-                        .append(waitResponse);
-            }
-        }
-
-        return builder.toString();
-    }
-
-    public String getDisplayStat() {
-        StringBuilder builder = new StringBuilder("---스텟---");
-        for(StatType statType : StatType.values()) {
-            builder.append("\n")
-                    .append(statType.getDisplayName())
-                    .append(": ")
-                    .append(this.getStat(statType));
-        }
-
-        return builder.toString();
-    }
-
-    public String getDisplayQuest() {
-        StringBuilder builder = new StringBuilder("---퀘스트 목록---");
-
-        if(this.quest.isEmpty()) {
-            return builder.toString() + "\n현재 진행중인 퀘스트 없음";
-        }
-
-        for(long questId : this.quest.keySet()) {
-            Quest quest = Config.getData(Id.QUEST, questId);
-
-            builder.append("\n[")
-                    .append(questId)
-                    .append("] ")
-                    .append(quest.getName());
-
-            Long npcId = quest.npcId.get();
-            if(!npcId.equals(0L)) {
-                Npc npc = Config.getData(Id.NPC, npcId);
-
-                builder.append(" (NPC: ")
-                        .append(npc.getName())
-                        .append(")");
-            }
-        }
-
-        return builder.toString();
-    }
-
-    public String getDisplayMagic() {
-        StringBuilder builder = new StringBuilder("---마법 정보---");
-
-        for(MagicType magicType : MagicType.values()) {
-            builder.append("\n")
-                    .append(magicType.toString())
-                    .append(": ")
-                    .append(this.getMagic(magicType))
-                    .append("Lv, 저항: ")
-                    .append(this.getResist(magicType))
-                    .append("Lv");
-        }
-
-        return builder.toString();
-    }
-
-    public void displayInventory(int page) {
-        if(this.inventory.isEmpty()) {
-            this.replyPlayer("---인벤토리---\n인벤토리가 비어있습니다...");
-            return;
-        }
-
-        int maxPage = (int) Math.ceil(this.inventory.size() / 30D);
-
-        if(page < 1 || page > maxPage) {
-            throw new WeirdCommandException(page + "페이지 부터 " + maxPage + "페이지 범위 내의 숫자를 입력해주세요");
-        }
-
-        List<Long> highPriorityItems = this.getListVariable(Variable.HIGH_PRIORITY_ITEM);
-        BiMap<Long, String> inverseMap = ObjectList.itemList.inverse();
-
-        StringBuilder msgBuilder = new StringBuilder("---인벤토리---\n[")
-                .append(page)
-                .append("페이지 /")
-                .append(maxPage)
-                .append("페이지]");
-
-        if(highPriorityItems == null) {
-            highPriorityItems = new ArrayList<>();
-            this.setVariable(Variable.HIGH_PRIORITY_ITEM, highPriorityItems);
-            msgBuilder.append("\n우선 표시 설정된 아이템이 없습니다");
-        } else {
-            for(long itemId : highPriorityItems) {
-                msgBuilder.append("\n")
-                        .append(inverseMap.get(itemId))
-                        .append(": ")
-                        .append(this.getItem(itemId))
-                        .append("개");
-            }
-        }
-
-        StringBuilder innerMsgBuilder = new StringBuilder();
-
-        int count = 0;
-        Set<Long> sortedKeys = new TreeSet<>(this.inventory.keySet());
-        for(long itemId : sortedKeys) {
-            if(highPriorityItems.contains(itemId)) {
-                continue;
-            }
-
-            innerMsgBuilder.append(inverseMap.get(itemId))
-                    .append(": ")
-                    .append(this.getItem(itemId))
-                    .append("개\n");
-            count++;
-
-            if(count == 30) {
-                break;
-            }
-        }
-
-        this.replyPlayer(msgBuilder.toString(), innerMsgBuilder.toString());
-    }
-
-    public void displayMapList() {
-        int movableDistance = this.getMovableDistance();
-
-        StringBuilder msg = new StringBuilder("---이동 가능한 가까운 맵 목록---");
-        StringBuilder innerMsg = new StringBuilder("---이동 가능한 먼 맵 목록---");
-        
-        boolean flag;
-        StringBuilder builder = null;
-
-        int currentX = this.location.getX().get();
-        int currentY = this.location.getY().get();
-
-        int distance;
-        MapClass map;
-
-        int minX = Math.max(Config.MIN_MAP_X, currentX - movableDistance);
-        int maxX = Math.min(Config.MAX_MAP_X, currentX + movableDistance);
-        int minY = Math.max(Config.MIN_MAP_Y, currentY - movableDistance);
-        int maxY = Math.min(Config.MAX_MAP_Y, currentY + movableDistance);
-
-        for(int x = minX; x <= maxX; x++) {
-            for(int y = minY; y <= maxY; y++) {
-                flag = false;
-                
-                if(x == currentX && y == currentY) {
-                    continue;
-                }
-
-                if(x >= currentX - 1 && x <= currentX + 1 && y >= currentY - 1 && y <= currentY + 1) {
-                    builder = msg;
-                    distance = 1;
-                    flag = true;
-                } else {
-                    distance = this.getMapDistance(new Location(x, y));
-
-                    if (movableDistance <= distance) {
-                        builder = innerMsg;
-                        flag = true;
-                    }
-                }
-                
-                if(flag) {
-                    map = Config.getMapData(x, y);
-
-                    builder.append("\n")
-                            .append(map.getName())
-                            .append("(")
-                            .append(map.getLocation().toMapString())
-                            .append(") (거리: ")
-                            .append(distance)
-                            .append(")");
-                }
-            }
-        }
-
-        this.replyPlayer(msg.toString(), innerMsg.toString());
-    }
-
-    public void addTitle(String title) {
+    public void addTitle(@NonNull String title) {
         this.title.add(title);
     }
 
-    public void setCurrentTitle(String title) {
+    public void setCurrentTitle(@NonNull String title) {
         if(this.title.contains(title)) {
             this.currentTitle = title;
         } else {
@@ -412,12 +210,26 @@ public class Player extends Entity {
         }
     }
 
-    public void replyPlayer(@NonNull String msg) {
+    public void replyPlayer(@Nullable String msg) {
         KakaoTalk.reply(this.getSession(), this.getName() + "\n" + msg);
     }
 
-    public void replyPlayer(@NonNull String msg, @NonNull String innerMsg) {
+    public void replyPlayer(@Nullable String msg, @Nullable String innerMsg) {
+        msg = msg == null ? "" : msg;
         KakaoTalk.reply(this.getSession(), this.getName() + "\n" + msg, innerMsg);
+    }
+
+    public void checkTime() {
+        if(this.checkPvp) {
+            LocalDateTime now = LocalDateTime.now();
+            int year = now.getYear();
+            int day = now.getDayOfYear();
+
+            if(year >= this.pvpEnableDay || day >= this.pvpEnableDay) {
+                this.setPvp(true, null);
+                this.pvpEnabled = true;
+            }
+        }
     }
 
     public void checkNewDay() {
@@ -429,6 +241,13 @@ public class Player extends Entity {
             this.lastDay = day;
             this.lastYear = year;
             this.newDay();
+        }
+
+        if(this.pvpEnabled) {
+            LocalDateTime pvpEnabledTime = LocalDateTime.of(this.pvpEnableYear, 1, 1, 0, 0)
+                    .plusDays(this.pvpEnableDay);
+            replyPlayer("PvP가 " + pvpEnabledTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "에 활성화되었습니다");
+            this.pvpEnabled = false;
         }
     }
 
@@ -446,184 +265,6 @@ public class Player extends Entity {
         }
     }
 
-//    @NonNull
-//    public String getBattleMsg() {
-//        StringBuilder builder = new StringBuilder("---적 목록---\n");
-//
-//        Id id;
-//        Entity enemy;
-//
-//        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : this.enemies.entrySet()) {
-//            id = entry.getKey();
-//
-//            for(long objectId : entry.getValue()) {
-//                builder.append(id.getValue());
-//                builder.append(".");
-//                builder.append(objectId);
-//                builder.append(" - ");
-//
-//                enemy = Config.getData(id, objectId);
-//                builder.append(" (");
-//                builder.append(this.getFieldDistance(enemy.getLocation()));
-//                builder.append("m) ");
-//                builder.append(enemy.getName());
-//                builder.append("\n");
-//            }
-//        }
-//
-//        builder.append("\n---전투 명령어---\n");
-//        builder.append("(공격/attack/atk) [대상] : [\"대상\" 또는 \"가장 가까운 적\"] 에게 기본 공격을 합니다\n");
-//        builder.append("(방어/defence/def) : 다음 피해가 기본 공격일 경우, 공격을 방어하고 체력과 마나를 일부 회복합니다\n");
-//        builder.append("(이동/move) (e/w/s/n) [1~3] : 동/서/남/북의 방향으로 [\"3칸\" 또는 \"지정한 거리\"] 만큼 최대한 이동합니다\n");
-//        builder.append("(필드/field) : 필드 정보를 표시합니다\n");
-//        builder.append("(스킬/skill) 목록 [o] : [\"보유한 또는 \"사용 가능한\"] 스킬 목록을 확인합니다\n");
-//        builder.append("(스킬/skill) 사용 (스킬 번호) [대상] : 스킬 번호에 해당하는 스킬을 [\"대상\" 또는 \"가장 가까운 적\"] 에게 사용합니다\n");
-//        builder.append("(아이템/item) 사용 (아이템 번호) (대상) : 아이템 번호에 해당하는 아이템을 대상(본인 : \"s\")에게 사용합니다\n");
-//        builder.append("(도망/run) : 거점으로의 도망을 시도합니다. 실패 시 최대 체력의 10%에 해당하는 피해를 입습니다");
-//        builder.append("(사망하지는 않습니다)(실패 시 15초간 사용이 불가능해집니다)\n");
-//        builder.append("(카운터/counter) [대상] : (보스한정) [\"대상\" 또는 \"가장 가까운 보스\"] 의 스킬을 반사합니다");
-//
-//        return builder.toString();
-//    }
-
-    public int getMovableDistance() {
-        return (int) Math.sqrt(2 + this.getStat(StatType.AGI) / 4D);
-    }
-
-    public void moveMap(@NonNull String locationStr) {
-        Location location;
-        int x, y;
-
-        String[] split = locationStr.split("-");
-        if(split.length != 2) {
-            String loc = ObjectList.mapList.inverse().get(locationStr);
-
-            if(loc == null) {
-                throw new WeirdCommandException("좌표를 또는 맵의 이름을 정확하게 입력해주세요\n(예시 : " +
-                        Emoji.focus("0-1") + " 또는 " + Emoji.focus("시작의 마을") + ")");
-            }
-
-            split = loc.split("-");
-        }
-
-        x = Integer.parseInt(split[0]);
-        y = Integer.parseInt(split[1]);
-        location = new Location(x, y);
-
-        if(location.equalsMap(this.location)) {
-            throw new WeirdCommandException("현재 위치로는 이동할 수 없습니다");
-        }
-
-        int dis = this.getMapDistance(location);
-        int movableDis = this.getMovableDistance();
-
-        if(dis > movableDis) {
-            throw new WeirdCommandException("이동 가능한 거리보다 먼 거리에 있는 좌표입니다\n" +
-                    "이동 가능 거리 : " + movableDis + ", 실제 거리: " + dis);
-        } else {
-            MapClass moveMap = null;
-
-            try {
-                moveMap = Config.loadMap(x, y);
-
-                if(moveMap.getName().equals(Config.INCOMPLETE)) {
-                    throw new WeirdCommandException("미완성 맵으로는 이동할 수 없습니다");
-                }
-
-                try {
-                    this.setMap(location, true);
-                } catch (NumberRangeException e) {
-                    if(Objects.requireNonNull(e.getMessage()).endsWith(Integer.toString(Config.MAX_LV))) {
-                        this.replyPlayer("해당 지역으로 이동하기 위한 요구 레벨이 부족합니다\n현재 레벨: " +
-                                this.lv.get() + ", 요구 레벨: " + moveMap.getRequireLv().get());
-                        return;
-                    } else {
-                        throw e;
-                    }
-                }
-
-                this.replyPlayer("이동을 완료했습니다\n현재 좌표: " + this.location.toString());
-            } finally {
-                if(moveMap != null) {
-                    Config.unloadMap(moveMap);
-                }
-            }
-        }
-    }
-
-    public void moveField(@NonNull String locationStr) {
-        String[] split = locationStr.split("-");
-        if(split.length != 2) {
-            throw new WeirdCommandException("좌표를 정확하게 입력해주세요\n(예시 : " +
-                    Emoji.focus("0-1") + ")");
-        }
-
-        int x = Integer.parseInt(split[0]);
-        int y = Integer.parseInt(split[1]);
-
-        if(new Location(0, 0, x, y).equalsField(this.location)) {
-            throw new WeirdCommandException("현재 위치로는 이동할 수 없습니다");
-        }
-
-        this.setField(x, y);
-        this.replyPlayer("이동을 완료했습니다\n현재 좌표: " + this.location.toString());
-    }
-
-    public boolean canUse(long itemId) {
-        if(this.getItem(itemId) > 0) {
-            Item item = Config.getData(Id.ITEM, itemId);
-            return item.getUse() != null;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean use(long itemId, @NonNull List<GameObject> other) {
-        Config.checkId(Id.ITEM, itemId);
-
-        boolean isCancelled;
-        Item item = Config.getData(Id.ITEM, itemId);
-        isCancelled = ItemUseEvent.handleEvent(this.events.get(ItemUseEvent.getName()), new Object[]{item});
-
-        if (!isCancelled) {
-            this.addLog(LogData.TOTAL_ITEM_USED, 1);
-            Objects.requireNonNull(item.getUse()).use(this, other);
-            this.addItem(itemId, -1);
-        }
-
-        return isCancelled;
-    }
-
-    public boolean canEat(long itemId) {
-        if(this.getItem(itemId) > 0) {
-            Item item = Config.getData(Id.ITEM, itemId);
-            return item.isFood();
-        } else {
-            return false;
-        }
-    }
-
-    public void eat(long itemId) {
-        Item item = Config.getData(Id.ITEM, itemId);
-
-        if(item.isFood()) {
-            this.addItem(itemId, -1);
-            this.addLog(LogData.EAT, 1);
-
-            for(Map.Entry<Long, HashMap<StatType, Integer>> entry : item.getEatBuff().entrySet()) {
-                for(Map.Entry<StatType, Integer> statEntry : entry.getValue().entrySet()) {
-                    this.addBuff(entry.getKey(), statEntry.getKey(), statEntry.getValue());
-                }
-            }
-
-            this.revalidateBuff();
-
-            this.replyPlayer(item.getName() + "을 먹었습니다\n남은 개수 : " + this.getItem(itemId));
-        } else {
-            throw new WeirdDataException(Id.ITEM, itemId);
-        }
-    }
-
     public void addExp(long exp) {
         if(exp < 0) {
             throw new NumberRangeException(0, 0);
@@ -634,7 +275,6 @@ public class Player extends Entity {
         this.exp.add(exp);
         this.addLog(LogData.TOTAL_EXP, exp);
 
-        long requiredExp;
         int startLv = this.lv.get();
         int endLv;
 
@@ -642,19 +282,20 @@ public class Player extends Entity {
             return;
         }
 
+        long needExp, currentExp;
         while(true) {
-            requiredExp = this.getRequiredExp();
+            needExp = this.getNeedExp();
+            currentExp = this.exp.get();
 
-            if(requiredExp == 0) {
-                this.lvUp(requiredExp);
+            if(needExp < currentExp) {
+                this.lvUp(needExp);
             } else {
                 endLv = this.lv.get();
 
                 if(startLv != endLv) {
-                    this.replyPlayer(
-                            "레벨 업!(" + startLv + "->" + endLv + ")",
-                            "현재 경험치 : " + this.exp.get() + "\n현재 스텟 포인트 : " + this.sp.get()
-                    );
+                    this.replyPlayer("레벨 업!(" + startLv + "->" + endLv + ")\n" +
+                            Emoji.EXP + ": " + this.exp.get() + "\n" +
+                            Emoji.SP + ": " + this.sp.get());
                 }
 
                 break;
@@ -662,15 +303,11 @@ public class Player extends Entity {
         }
     }
 
-    public long getRequiredExp() {
-        return this.getTotalNeedExp() - this.getExp().get();
+    public long getNeedExp() {
+        return this.getNeedExp(this.lv.get());
     }
 
-    public long getTotalNeedExp() {
-        return this.getTotalNeedExp(this.lv.get());
-    }
-
-    public long getTotalNeedExp(int lv) {
+    public long getNeedExp(int lv) {
         long needExp;
         if (lv <= 100) {
             needExp = 10_000 + 5_000 * lv;
@@ -691,7 +328,7 @@ public class Player extends Entity {
 
     public long getKillExp(int enemyLv) {
         int lv = this.lv.get();
-        long exp = 5000 + (long) ((this.getTotalNeedExp(enemyLv) * 0.00001) + (this.getTotalNeedExp() * 0.00001));
+        long exp = 5000 + (long) ((this.getNeedExp(enemyLv) * 0.00001) + (this.getNeedExp() * 0.00001));
 
         int gap = lv - enemyLv;
         if(Math.abs(gap) > 10 && lv > 10) {
@@ -707,198 +344,51 @@ public class Player extends Entity {
         return exp;
     }
 
-    public void lvUp(long requiredExp) {
+    public void lvUp(long needExp) {
         this.lv.add(1);
         this.sp.add(5);
-        this.exp.add(-1 * requiredExp);
+        this.exp.add(-1 * needExp);
     }
 
-    public void startChat(@NonNull String npcName) {
-        Long npcId = ObjectList.npcList.get(npcName);
-        MapClass map = Config.getMapData(this.location);
+    public int getMovableDistance() {
+        return (int) Math.sqrt(2 + this.getStat(StatType.AGI) / 4D);
+    }
 
-        if(npcId == null || !map.getEntity(Id.NPC).contains(npcId)) {
-            throw new WeirdCommandException("해당 NPC 를 찾을 수 없습니다\n" +
-                    "존재하지 않거나 현재 맵에 없는 NPC 일 수 있습니다\n" +
-                    "현재 위치 정보를 확인해보세요");
-        }
-
-        Set<Long> questSet = this.questNpc.get(npcId);
-        if(questSet != null) {
-            for (long questId : questSet) {
-                if (this.canClearQuest(questId)) {
-                    this.startChat(this.quest.get(questId), npcId);
-                    this.clearQuest(questId, npcId);
-                    return;
-                }
-            }
-        }
-
-        Npc npc = Config.getData(Id.NPC, npcId);
-        long chatCount = this.getChatCount(npcId);
-
-        if(chatCount == 0 && npc.firstChat != null) {
-            this.startChat(npc.firstChat, npcId);
+    public void setPvp(boolean enable, @Nullable Integer day) {
+        if(enable) {
+            this.pvp = true;
+            this.checkPvp = false;
+            this.pvpEnableYear = 0;
+            this.pvpEnableDay = 0;
+            
+            this.replyPlayer("PvP를 활성화했습니다");
         } else {
-            npc.startChat(this);
-        }
-    }
-
-    public void startChat(long chatId, long npcId) {
-        Config.checkId(Id.CHAT, chatId);
-        this.setDoing(Doing.CHAT);
-
-        Chat chat = Config.getData(Id.CHAT, chatId);
-        Npc npc = Config.getData(Id.NPC, npcId);
-        Notification.Action session = this.getSession();
-
-        Thread thread = new Thread(() -> {
-            try {
-                Thread.sleep(chat.delayTime.get());
-            } catch (InterruptedException e) {
-                Log.e("Player.startChat - chat Thread", Config.errorString(e));
-                return;
+            if(day == null) {
+                throw new NullPointerException();
             }
 
-            long pauseTime = chat.getPauseTime().get();
-            String preString = "[" + npc.getName() + " -> " + this.getNickName() + "]\n";
-
-            List<String> texts = chat.getText();
-            int size = texts.size() - 1;
-            for(int i = 0; i <= size; i++) {
-                KakaoTalk.reply(session, preString + texts.get(i).replaceAll("__nickname", this.getNickName())
-                        .replaceAll("__lv", this.getLv().get().toString()));
-
-                try {
-                    if(i != size) {
-                        Thread.sleep(pauseTime);
-                    }
-                } catch (InterruptedException e) {
-                    Log.e("Player.startChat - chat Thread", Config.errorString(e));
-                    return;
-                }
-            }
-
-            this.addMoney(chat.getMoney().get());
-
-            for(Map.Entry<Long, Integer> entry : chat.getItem().entrySet()) {
-                this.addItem(entry.getKey(), entry.getValue());
-            }
-
-            for(long equipId : chat.getEquipment()) {
-                this.addEquip(equipId);
-            }
-
-            for(Map.Entry<Variable, Integer> entry : chat.getVariable().entrySet()) {
-                this.addVariable(entry.getKey(), entry.getValue());
-            }
-
-            long questId = chat.getQuestId().get();
-            if(questId != 0) {
-                this.addQuest(chat.getQuestId().get());
-            }
-
-            Location tpLocation = chat.getTpLocation();
-            if(!this.getLocation().equals(tpLocation)) {
-                this.setMap(chat.getTpLocation(), false);
-            }
-
-            if(chat.isBaseMsg()) {
-                this.responseChat.clear();
-                this.anyResponseChat.clear();
-
-                Set<Long> availableChat = npc.getAvailableChat(this);
-
-                if(availableChat.isEmpty()) {
-                    this.replyPlayer("가능한 대화가 없습니다");
-                    this.setDoing(Doing.NONE);
-                    return;
-                }
-
-                int index = 0;
-                String indexStr;
-                Chat chatData;
-                StringBuilder builder = new StringBuilder("대화를 선택해주세요\n");
-                for(long availableChatId : availableChat) {
-                    chatData = Config.getData(Id.CHAT, availableChatId);
-                    indexStr = Integer.toString(index++);
-
-                    builder.append("\n")
-                            .append(indexStr)
-                            .append(": ")
-                            .append(chatData.getName());
-
-                    this.setAnyResponseChat(indexStr, availableChatId);
-                }
-
-                this.waitNpcId = npcId;
-                this.setDoing(Doing.WAIT_RESPONSE);
-
-                this.replyPlayer(builder.toString().trim());
+            long itemId;
+            if(day == 1) {
+                itemId = 94L;
+            } else if(day == 7) {
+                itemId = 95L;
             } else {
-                if (chat.getResponseChat().isEmpty() && chat.getAnyResponseChat().isEmpty()) {
-                    this.setDoing(Doing.NONE);
-                } else {
-                    long noneChatId = chat.getResponseChat(WaitResponse.NONE);
-                    if (noneChatId != 0) {
-                        if (chatId == noneChatId) {
-                            throw new InvalidNumberException(noneChatId);
-                        }
-
-                        this.startChat(noneChatId, npcId);
-                        return;
-                    }
-
-                    this.waitNpcId = npcId;
-                    this.responseChat = new ConcurrentHashMap<>(chat.getResponseChat());
-                    this.anyResponseChat = new ConcurrentHashMap<>(chat.getAnyResponseChat());
-
-                    boolean isTutorial = this.getObjectVariable(Variable.IS_TUTORIAL);
-                    if(!isTutorial) {
-                        StringBuilder builder = new StringBuilder("대답을 입력해주세요\n");
-
-                        if (!chat.getResponseChat().isEmpty()) {
-                            builder.append("\n");
-
-                            for (WaitResponse waitResponse : chat.getResponseChat().keySet()) {
-                                builder.append(waitResponse.getDisplay())
-                                        .append("\n");
-                            }
-                        }
-
-                        if (!chat.getAnyResponseChat().isEmpty()) {
-                            builder.append("\n(다른 메세지 목록)");
-
-                            String waitResponse;
-                            for (String response : chat.getAnyResponseChat().keySet()) {
-                                if (response.startsWith("__")) {
-                                    waitResponse = response.replace("__", "(ㅜ/n) ");
-                                } else {
-                                    waitResponse = response;
-                                }
-
-                                builder.append("\n")
-                                        .append(waitResponse);
-                            }
-                        }
-
-                        this.replyPlayer(builder.toString().trim());
-                    }
-
-                    this.setDoing(Doing.WAIT_RESPONSE);
-                }
+                throw new RuntimeException();
             }
-        });
+            
+            if(this.getItem(itemId) > 0) {
+                LocalDateTime enableTime = LocalDateTime.now().plusDays(day + 1);
 
-        this.addLog(LogData.CHAT, 1);
-        this.addChatCount(npcId, 1);
-        thread.start();
+                this.pvp = false;
+                this.checkPvp = true;
+                this.pvpEnableYear = enableTime.getYear();
+                this.pvpEnableDay = enableTime.getDayOfYear();
+                this.addItem(itemId, -1);
 
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            Logger.e("player.chatThread", e);
-            throw new RuntimeException(e);
+                this.replyPlayer("PvP를 " + day + "일간 비활성화 했습니다");
+            } else {
+                this.replyPlayer("PvP를 비활성화 하기 위한 아이템이 부족합니다");
+            }
         }
     }
 
@@ -998,12 +488,6 @@ public class Player extends Entity {
 
             flag = quest.limitLv.isInRange(this.lv.get()) && quest.limitCloseRate.isInRange(this.closeRate)
                     && this.checkStatRange(quest.limitStat.getMin(), quest.limitStat.getMax());
-
-            if(flag) {
-                if(clearedQuest.containsKey(questId)) {
-                    flag = quest.isRepeatable();
-                }
-            }
         } finally {
             if(quest != null) {
                 Config.unloadObject(quest);
@@ -1017,7 +501,7 @@ public class Player extends Entity {
         Quest quest = Config.getData(Id.QUEST, questId);
 
         this.quest.put(questId, quest.getChatId().get());
-        this.addLog(LogData.QUEST_RECEIVED, 1);
+        this.addLog(LogData.QUEST_RECEIVE, 1);
 
         long questNpcId = quest.getNpcId().get();
         ConcurrentHashSet<Long> questNpcSet = this.questNpc.get(questNpcId);
@@ -1030,617 +514,6 @@ public class Player extends Entity {
             questNpcSet.add(questId);
         }
     }
-
-    public boolean canMine() {
-        return Config.getMapData(this.location).getMapType().equals(MapType.COUNTRY);
-    }
-
-    public void mine() {
-        this.setDoing(Doing.MINE);
-        this.addLog(LogData.MINED, 1);
-
-        int mineLv = this.getVariable(Variable.MINE);
-
-        double randomPercent = Math.random() * 100;
-
-        List<Double> percents = new ArrayList<>();
-        for(List<Double> minePercent : Percent.MINE_PERCENT) {
-            percents.add(minePercent.get(mineLv));
-        }
-
-        List<Long> output = Arrays.asList(20L, 21L, 0L, 0L, 0L, 31L, 33L, 0L, 0L, 0L, 43L, 0L);
-
-        double percent;
-        long itemId = 0;
-        for(int itemTier = 0; itemTier < percents.size(); itemTier++) {
-            percent = percents.get(itemTier);
-
-            if(randomPercent < percent) {
-                itemId = output.get(itemTier);
-
-                if(itemId == 0) {
-                    long[] itemList;
-
-                    switch(itemTier) {
-                        case 2:
-                            itemList = new long[]{23L, 24L, 25L, 26L};
-                            break;
-                        case 3:
-                            itemList = new long[]{27L, 28L};
-                            break;
-                        case 4:
-                            itemList = new long[]{29L, 30L};
-                            break;
-                        case 7:
-                            itemList = new long[]{34L, 35L};
-                            break;
-                        case 8:
-                            itemList = new long[]{36L, 37L};
-                            break;
-                        case 9:
-                            itemList = new long[]{39L, 40L};
-                            break;
-                        case 11:
-                            itemList = new long[]{44L, 45L, 46L};
-                            break;
-                        default:
-                            throw new InvalidNumberException(itemTier);
-                    }
-
-                    itemId = itemList[new Random().nextInt(itemList.length)];
-                }
-
-                break;
-            } else {
-                randomPercent -= percent;
-            }
-        }
-
-        try {
-            Thread.sleep(new Random().nextInt(1000));
-        } catch (InterruptedException e) {
-            Logger.e("player.mineThread", e);
-            return;
-        }
-
-        int count = this.getItem(itemId);
-        this.addItem(itemId, 1);
-
-        Item item = Config.getData(Id.ITEM, itemId);
-        this.replyPlayer(item.getName() + "을 캤습니다!\n아이템 개수 : " + count + " -> " + (count + 1));
-
-        if(this.checkMineLevel()) {
-            this.addVariable(Variable.MINE, 1);
-            this.replyPlayer("광업 레벨이 올랐습니다!\n광업 레벨: " + mineLv + " -> " + (mineLv + 1));
-        }
-
-        this.setDoing(Doing.NONE);
-    }
-
-    public boolean checkMineLevel() {
-        int mineLv = this.getVariable(Variable.MINE);
-        long mined = this.getLog(LogData.MINED);
-        int requireCount;
-
-        if(mineLv == 8) {
-            return false;
-        }
-
-        switch (mineLv) {
-            case 0:
-                requireCount = 30;
-                break;
-            case 1:
-                requireCount = 200;
-                break;
-            case 2:
-                requireCount = 1000;
-                break;
-            case 3:
-                requireCount = 5000;
-                break;
-            case 4:
-                requireCount = 20_000;
-                break;
-            case 5:
-                requireCount = 100_000;
-                break;
-            case 6:
-                requireCount = 1_000_000;
-                break;
-            case 7:
-                requireCount = 10_000_000;
-                break;
-            default:
-                throw new NumberRangeException(mineLv, 0, 7);
-        }
-
-        return mined >= requireCount;
-    }
-
-    public boolean canFish() {
-        MapType mapType = Config.getMapData(this.location).getMapType();
-        return mapType.equals(MapType.SEA) || mapType.equals(MapType.RIVER);
-    }
-
-    public void fish() {
-        this.setDoing(Doing.FISH);
-        this.addLog(LogData.FISH, 1);
-
-        int fishLv = this.getVariable(Variable.FISH);
-
-        double randomPercent = Math.random() * 100;
-
-        List<Double> percents = new ArrayList<>();
-        for(List<Double> fishPercent : Percent.FISH_PERCENT) {
-            percents.add(fishPercent.get(fishLv));
-        }
-
-        Random random = new Random();
-
-        int itemTier = 0;
-        long itemId = 0;
-        int commandCount = 0;
-        double percent;
-        for(; itemTier < percents.size(); itemTier++) {
-            percent = percents.get(itemTier);
-
-            if(randomPercent < percent) {
-                if (randomPercent < percents.get(itemTier)) {
-                    long[] itemList;
-
-                    switch (itemTier) {
-                        case 0:
-                            itemList = new long[]{1L, 2L, 58L, 59L};
-                            commandCount = random.nextInt(2);
-                            break;
-                        case 1:
-                            itemList = new long[]{60L, 61L, 62L, 63L, 64L};
-                            commandCount = random.nextInt(6);
-                            break;
-                        case 2:
-                            itemList = new long[]{65L, 66L, 67L, 68L, 69L, 70L};
-                            commandCount = random.nextInt(8) + 1;
-                            break;
-                        case 3:
-                            itemList = new long[]{71L, 72L, 73L, 74L, 75L, 76L, 77L, 78L, 79L, 80L};
-                            commandCount = random.nextInt(8) + 3;
-                            break;
-                        case 4:
-                            itemList = new long[]{81L, 82L, 83L, 84L, 85L, 86L, 87L};
-                            commandCount = random.nextInt(10) + 6;
-                            break;
-                        case 5:
-                            itemList = new long[]{88L, 89L, 90L, 91L};
-                            commandCount = random.nextInt(6) + 10;
-                            break;
-                        case 6:
-                            itemList = new long[]{92L, 93L};
-                            commandCount = random.nextInt(11) + 20;
-                            break;
-                        default:
-                            throw new NumberRangeException(itemTier, 0, 6);
-                    }
-
-                    itemId = itemList[random.nextInt(itemList.length)];
-                }
-
-                break;
-            } else {
-                randomPercent -= percent;
-            }
-        }
-
-        this.startFishThread(itemId, itemTier, commandCount);
-    }
-
-    public void startFishThread(long itemId, int itemTier, int commandCount) {
-        Random random = new Random();
-
-        this.setVariable(Variable.FISH_WAIT_TYPE, FishWaitType.NONE);
-        this.replyPlayer("낚시를 시작합니다");
-
-        Thread thread = new Thread(() -> {
-            FishWaitType lastWaitType = null;
-            FishWaitType waitType;
-
-            for(int i = commandCount; i >= 0; i--) {
-                if(i == 0) {
-                    waitType = FishWaitType.CATCH;
-                } else {
-                    int randomWaitTypeIdx;
-
-                    if(lastWaitType == null || lastWaitType.equals(FishWaitType.SHAKE) || lastWaitType.equals(FishWaitType.WAIT)) {
-                        randomWaitTypeIdx = random.nextInt(4);
-                        waitType = new FishWaitType[]{
-                                FishWaitType.SHAKE, FishWaitType.WAIT, FishWaitType.PULL, FishWaitType.RESIST
-                        }[randomWaitTypeIdx];
-                    } else {
-                        randomWaitTypeIdx = random.nextInt(2);
-                        waitType = new FishWaitType[]{
-                                FishWaitType.PULL, FishWaitType.RESIST
-                        }[randomWaitTypeIdx];
-                    }
-                }
-
-                lastWaitType = waitType;
-
-                try {
-                    Thread.sleep(random.nextInt(3000) + 5000);
-                } catch (InterruptedException e) {
-                    Logger.e("Player.fishThread", e);
-                    throw new RuntimeException(e.getMessage());
-                }
-
-                this.setVariable(Variable.FISH_WAIT_TYPE, waitType);
-
-                String message;
-                if(waitType.equals(FishWaitType.SHAKE)) {
-                    message = "아직 특별한 느낌이 없습니다\n낚싯대를 흔들어 물고기를 유혹해봅시다\n" +
-                            Emoji.focus("(ㅜ/n) (낚시/fish) (흔들기/shake)");
-                } else if(waitType.equals(FishWaitType.WAIT)) {
-                    message = "미세한 무언가가 느껴집니다...\n확실히 물릴때까지 기다려봅시다\n" +
-                            Emoji.focus("(ㅜ/n) (낚시/fish) (기다리기/wait)");
-                } else if(waitType.equals(FishWaitType.PULL)) {
-                    message = "걸린 것 같습니다!\n힘차게 당겨봅시다\n" +
-                            Emoji.focus("(ㅜ/n) (낚시/fish) (당기기/pull)");
-                } else if(waitType.equals(FishWaitType.RESIST)) {
-                    message = "이런! 잘못하면 낚싯대가 망가지겠네요\n최대한 버텨봅시다\n" +
-                            Emoji.focus("(ㅜ/n) (낚시/fish) (버티기/resist)");
-                } else {
-                    message = "지금입니다, 당기세요!\n" +
-                            Emoji.focus("(ㅜ/n) (낚시/fish) (잡기/catch)");
-                }
-
-                this.replyPlayer(message);
-
-                synchronized (this) {
-                    try {
-                        this.wait(5000);
-                    } catch (InterruptedException e) {
-                        Logger.e("Player.fishThread - wait", e);
-                        throw new RuntimeException(e.getMessage());
-                    }
-
-                    this.notifyAll();
-                }
-
-                FishWaitType response = this.getObjectVariable(Variable.FISH_WAIT_TYPE);
-
-                if(response.equals(FishWaitType.NONE)) {
-                    if(i == 0) {
-                        this.addItem(itemId, 1);
-                        this.setDoing(Doing.NONE);
-
-                        if(itemTier != 0) {
-                            this.addVariable(Variable.FISH_SKILL, 1);
-
-                            Map<Long, Integer> fishMap = this.getMapVariable(Variable.FISH_MAP);
-
-                            if (fishMap == null) {
-                                fishMap = new ConcurrentHashMap<>();
-                                this.setVariable(Variable.FISH_MAP, fishMap);
-                            }
-
-                            int fishCount = fishMap.getOrDefault(itemId, 0) + 1;
-                            fishMap.put(itemId, fishCount);
-
-                            if(fishCount == 1) {
-                                int skillIncrease = 2 * itemTier * itemTier;
-                                this.replyPlayer("새로운 물고기를 낚았습니다!\n낚시 숙련도 + " + skillIncrease);
-
-                                this.addVariable(Variable.FISH_SKILL, skillIncrease);
-                            }
-
-                            int skillIncrease = 0;
-                            if(fishCount == 10) {
-                                skillIncrease = 5;
-                            } else if(fishCount == 50) {
-                                skillIncrease = 10;
-                            } else if(fishCount == 100 || fishCount % 500 == 0) {
-                                skillIncrease = 50;
-                            }
-
-                            if(skillIncrease != 0) {
-                                this.replyPlayer("해당 물고기를 " + fishCount + "회 낚았습니다!\n낚시 숙련도 + " + skillIncrease);
-                                this.addVariable(Variable.FISH_SKILL, skillIncrease);
-                            }
-                        }
-
-                        int fishLv = this.getVariable(Variable.FISH);
-                        if(checkFishLevel()) {
-                            this.addVariable(Variable.FISH, 1);
-                            this.setVariable(Variable.FISH_SKILL, 0);
-                            this.replyPlayer("낚시 레벨이 올랐습니다!\n낚시 레벨: " + fishLv + " -> " + (fishLv + 1));
-                        }
-
-                        int fishSkill = this.getVariable(Variable.FISH_SKILL);
-
-                        this.getVariable().remove(Variable.FISH_WAIT_TYPE);
-                        this.replyPlayer("낚시 성공!\n" +
-                                "낚은 아이템: " + ObjectList.itemList.inverse().get(itemId) + "\n" +
-                                "현재 보유 개수: " + this.getItem(itemId) + "개\n" +
-                                "현재 낚시 숙련도: " + fishSkill);
-
-                        return;
-                    } else {
-                        this.replyPlayer("성공적으로 물고기를 컨트롤했습니다!");
-                    }
-                } else {
-                    int fishSkill = this.getVariable(Variable.FISH_SKILL);
-
-                    String failMessage = "이런... 물고기를 놓쳐버렸습니다";
-                    if(fishSkill > 0) {
-                        if(random.nextInt(2) == 0) {
-                            this.setVariable(Variable.FISH_SKILL, fishSkill - 1);
-                            failMessage = failMessage + "\n낚시 숙련도 -1";
-                        }
-                    }
-
-                    this.setDoing(Doing.NONE);
-
-                    this.replyPlayer(failMessage);
-                    return;
-                }
-            }
-        });
-
-        MainActivity.startThread(thread);
-
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            Log.e("Player.fishThread", Config.errorString(e));
-        }
-    }
-
-    public void fishCommand(String command) {
-        FishWaitType waitType = this.getObjectVariable(Variable.FISH_WAIT_TYPE);
-        FishWaitType response;
-
-        switch (command) {
-            case "흔들기":
-            case "shake":
-                response = FishWaitType.SHAKE;
-                break;
-            case "기다리기":
-            case "wait":
-                response = FishWaitType.WAIT;
-                break;
-            case "당기기":
-            case "pull":
-                response = FishWaitType.PULL;
-                break;
-            case "버티기":
-            case "resist":
-                response = FishWaitType.RESIST;
-                break;
-            case "잡기":
-            case "catch":
-                response = FishWaitType.CATCH;
-                break;
-            default:
-                throw new WeirdCommandException();
-        }
-
-        if(waitType.equals(response)) {
-            this.setVariable(Variable.FISH_WAIT_TYPE, FishWaitType.NONE);
-        }
-
-        synchronized (this) {
-            this.notifyAll();
-        }
-    }
-
-    public boolean checkFishLevel() {
-        int fishLv = this.getVariable(Variable.FISH);
-        int fishSkill = this.getVariable(Variable.FISH_SKILL);
-        int requireSkill;
-
-        if(fishLv == 8) {
-            return false;
-        }
-
-        switch (fishLv) {
-            case 0:
-                requireSkill = 20;
-                break;
-            case 1:
-                requireSkill = 50;
-                break;
-            case 2:
-                requireSkill = 100;
-                break;
-            case 3:
-                requireSkill = 500;
-                break;
-            case 4:
-                requireSkill = 1000;
-                break;
-            case 5:
-                requireSkill = 5000;
-                break;
-            case 6:
-                requireSkill = 10000;
-                break;
-            case 7:
-                requireSkill = 20000;
-                break;
-            default:
-                throw new NumberRangeException(fishLv, 0, 7);
-        }
-
-        return fishSkill >= requireSkill;
-    }
-
-    public boolean canClearQuest(long questId) {
-        Config.checkId(Id.QUEST, questId);
-        Long chatId = this.quest.get(questId);
-
-        if(chatId == null) {
-            throw new ObjectNotFoundException(Id.QUEST, questId);
-        }
-
-        Quest quest = Config.getData(Id.QUEST, questId);
-
-        return this.getMoney() >= quest.getNeedMoney().get() &&
-                Config.compareMap(this.inventory, quest.getNeedItem(), true) &&
-                this.compareStat(quest.getNeedStat()) &&
-                Config.compareMap(this.getCloseRate(), quest.getNeedCloseRate(), true);
-    }
-
-    public void clearQuest(long questId, long npcId) {
-        Config.checkId(Id.QUEST, questId);
-        Config.checkId(Id.NPC, npcId);
-        Long chatId = this.quest.get(questId);
-
-        if(chatId == null) {
-            throw new ObjectNotFoundException(Id.QUEST, questId);
-        }
-
-        long totalMoney = 0;
-        long totalExp;
-        int totalAdv;
-        Map<Long, Integer> totalItem = new HashMap<>();
-        Map<StatType, Integer> totalStat = new HashMap<>();
-        Map<Long, Integer> totalCloseRate = new HashMap<>();
-
-        //Remove Need Things
-        Quest quest = Config.getData(Id.QUEST, questId);
-
-        this.addMoney(-1 * quest.getNeedMoney().get());
-        totalMoney -= quest.getNeedMoney().get();
-
-        long longKey;
-        int value;
-        for(Map.Entry<Long, Integer> entry : quest.getNeedItem().entrySet()) {
-            longKey = entry.getKey();
-            value = -1 * entry.getValue();
-
-            this.addItem(longKey, value);
-            totalItem.put(longKey, value);
-        }
-
-        StatType statTypeKey;
-        for(Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
-            statTypeKey = entry.getKey();
-            value = -1 * entry.getValue();
-
-            this.addBasicStat(statTypeKey, value);
-            totalStat.put(statTypeKey, value);
-        }
-
-        for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
-            longKey = entry.getKey();
-            value = -1 * entry.getValue();
-
-            this.addCloseRate(longKey, value);
-            totalCloseRate.put(longKey, value);
-        }
-
-        //Add Reward Things
-        this.addMoney(quest.getRewardMoney().get());
-        totalMoney += quest.getRewardMoney().get();
-
-        this.addExp(quest.getRewardExp().get());
-        totalExp = quest.getRewardExp().get();
-
-        this.adv.add(quest.getRewardAdv().get());
-        totalAdv = quest.getRewardAdv().get();
-
-        for(Map.Entry<Long, Integer> entry : quest.getRewardItem().entrySet()) {
-            longKey = entry.getKey();
-            value = entry.getValue();
-
-            this.addItem(longKey, value);
-            totalItem.put(longKey, totalItem.getOrDefault(longKey, 0) + value);
-        }
-
-        for(Map.Entry<StatType, Integer> entry : quest.getRewardStat().entrySet()) {
-            statTypeKey = entry.getKey();
-            value = entry.getValue();
-
-            this.addBasicStat(statTypeKey, value);
-            totalStat.put(statTypeKey, totalStat.getOrDefault(statTypeKey, 0) + value);
-        }
-
-        for(Map.Entry<Long, Integer> entry : quest.getRewardCloseRate().entrySet()) {
-            longKey = entry.getKey();
-            value = entry.getValue();
-
-            this.addCloseRate(longKey, value);
-            totalCloseRate.put(longKey, totalCloseRate.getOrDefault(longKey, 0) + value);
-        }
-
-        StringBuilder innerMsg = new StringBuilder("---아이템 현황---");
-
-        if(totalItem.isEmpty()) {
-            innerMsg.append("\n변경된 아이템이 없습니다");
-        } else {
-            BiMap<Long, String> itemBiMap = ObjectList.itemList.inverse();
-            for (Map.Entry<Long, Integer> entry : totalItem.entrySet()) {
-                innerMsg.append("\n")
-                        .append(itemBiMap.get(entry.getKey()))
-                        .append(": ")
-                        .append(Config.getIncrease(entry.getValue()));
-            }
-        }
-
-        innerMsg.append("\n\n---스텟 현황---");
-        if(totalStat.isEmpty()) {
-            innerMsg.append("\n변경된 스텟이 없습니다");
-        } else {
-            for (Map.Entry<StatType, Integer> entry : totalStat.entrySet()) {
-                innerMsg.append("\n")
-                        .append(entry.getKey().getDisplayName())
-                        .append(": ")
-                        .append(Config.getIncrease(entry.getValue()));
-            }
-        }
-
-        innerMsg.append("\n\n---친밀도 현황---");
-        if(totalCloseRate.isEmpty()) {
-            innerMsg.append("\n변경된 친밀도가 없습니다");
-        } else {
-            BiMap<Long, String> npcBiMap = ObjectList.npcList.inverse();
-            for (Map.Entry<Long, Integer> entry : totalCloseRate.entrySet()) {
-                innerMsg.append("\n")
-                        .append(npcBiMap.get(entry.getKey()))
-                        .append(": ")
-                        .append(Config.getIncrease(entry.getValue()));
-            }
-        }
-
-        String msg = "===퀘스트 클리어 결과===\n" +
-                Emoji.GOLD + ": " + Config.getIncrease(totalMoney) + "\n" +
-                Emoji.EXP + ": " + Config.getIncrease(totalExp) + "\n" +
-                Emoji.ADV + ": " + Config.getIncrease(totalAdv);
-        this.replyPlayer(msg, innerMsg.toString());
-
-        this.clearedQuest.put(questId, this.getClearedQuest(questId) + 1);
-        this.quest.remove(questId);
-
-        Set<Long> questNpcSet = this.questNpc.get(npcId);
-        questNpcSet.remove(questId);
-        if(questNpcSet.isEmpty()) {
-            this.questNpc.remove(npcId);
-        }
-
-        this.addLog(LogData.QUEST_CLEARED, 1);
-    }
-
-    public boolean tryFight(@NonNull String target) {
-        Long playerId = Config.PLAYER_ID.get(target);
-        if(playerId != null) {
-
-        } else {
-
-        }
-
-        return false;
-    }
-
-    public void fightCommand(@NonNull String command, @Nullable String subCommand) {}
 
     public boolean canEquip(long equipId) {
         Equipment equipment = null;
@@ -1698,7 +571,7 @@ public class Player extends Entity {
     public boolean reinforce(long equipId, Map<StatType, Integer> increaseReinforceStat,
                              Map<StatType, Integer> increaseMinLimitStat, Map<StatType, Integer> increaseMaxLimitStat) {
         this.setDoing(Doing.REINFORCE);
-        this.addLog(LogData.REINFORCE_TRIED, 1);
+        this.addLog(LogData.REINFORCE_TRY, 1);
 
         Random random = new Random();
         double percent = random.nextDouble();
@@ -1721,7 +594,7 @@ public class Player extends Entity {
             if(percent < reinforcePercent) {
                 equipment.successReinforce(increaseReinforceStat, increaseMinLimitStat, increaseMaxLimitStat);
 
-                this.addLog(LogData.REINFORCE_SUCCEED, 1);
+                this.addLog(LogData.REINFORCE_SUCCESS, 1);
 
                 int reinforceCount = equipment.reinforceCount.get();
                 this.replyPlayer("강화에 성공헀습니다!\n" + reinforceCount + "강 -> " + (reinforceCount + 1) + "강");
@@ -1889,39 +762,36 @@ public class Player extends Entity {
     }
 
     @Override
-    public boolean setField(int fieldX, int fieldY, int distance) {
-        boolean isCancelled = super.setField(fieldX, fieldY, distance);
-
-        if(!isCancelled) {
-            this.addLog(LogData.FIELD_MOVE_DISTANCE, distance);
-        }
-
-        return isCancelled;
-    }
-
-    @Override
-    public boolean setMap(int x, int y, int fieldX, int fieldY, int distance, boolean isToBase) {
-        boolean isCancelled = super.setMap(x, y, fieldX, fieldY, distance, isToBase);
-
-        if(!isCancelled) {
-            this.addLog(LogData.MAP_MOVE_DISTANCE, distance);
-        }
-
-        return isCancelled;
-    }
-
-    @Override
     public void setBuff(long time, @NonNull StatType statType, int stat) {
         super.setBuff(time, statType, stat);
-        this.addLog(LogData.BUFF_RECEIVED, 1);
+        this.addLog(LogData.BUFF_RECEIVE, 1);
     }
 
     @Override
     public void onDeath() {
-        this.endFight();
-
         this.setBasicStat(StatType.HP, 1);
+
+        MapClass map = null;
+        try {
+            map = Config.loadMap(this.location);
+            map.removeEntity(this);
+        } finally {
+            if(map != null) {
+                Config.unloadMap(map);
+            }
+        }
+
         this.location.set(this.baseLocation);
+
+        map = null;
+        try {
+            map = Config.loadMap(this.baseLocation);
+            map.addEntity(this);
+        } finally {
+            if(map != null) {
+                Config.unloadMap(map);
+            }
+        }
 
         this.getBuff().clear();
         this.getBuffStat().clear();
@@ -1929,7 +799,7 @@ public class Player extends Entity {
         Random random = new Random();
         double loseMoneyPercent = random.nextDouble() * Config.TOTAL_MONEY_LOSE_RANDOM + Config.TOTAL_MONEY_LOSE_MIN;
         double dropPercent = random.nextDouble() * Config.MONEY_DROP_RANDOM + Config.MONEY_DROP_MIN;
-        int dropItem = random.nextInt(Config.ITEM_DROP);
+        int dropItemCount = random.nextInt(Config.ITEM_DROP_COUNT);
 
         long totalLoseMoney = (long) (this.getMoney() * loseMoneyPercent);
         long dropMoney = (long) (totalLoseMoney * dropPercent);
@@ -1939,20 +809,20 @@ public class Player extends Entity {
         this.addMoney(loseMoney);
 
         StringBuilder dropItemBuilder = new StringBuilder("G\n\n---떨어트린 아이템 목록---\n");
-        StringBuilder loseItemBuilder = new StringBuilder("\n---잃어버린 아이템 목록---\n");
+        StringBuilder loseItemBuilder = new StringBuilder("\n---사라진 아이템 목록---\n");
 
         List<Long> keys;
         long itemId;
         int count;
-        for(int i = 0; i < dropItem; i++) {
+        for(int i = 0; i < dropItemCount; i++) {
             keys = new ArrayList<>(this.inventory.keySet());
             itemId = keys.get(random.nextInt(keys.size()));
-            count = random.nextInt(this.getItem(itemId));
+            count = Math.min(random.nextInt(this.getItem(itemId)) + 1, Config.MAX_ITEM_DROP_COUNT);
 
             Item item = Config.getData(Id.ITEM, itemId);
             String itemName = item.getName();
 
-            if(random.nextDouble() < Config.ITEM_DROP_PERCENT) {
+            if(random.nextDouble() < Config.ITEM_DROP_LOSE_PERCENT) {
                 this.dropItem(itemId, count);
 
                 dropItemBuilder.append(itemName);
@@ -1971,7 +841,7 @@ public class Player extends Entity {
 
         String innerMsg = "떨어트린 돈 : " + dropMoney + "G\n잃어버린 돈 : " + loseMoney
                 + dropItemBuilder.toString() + loseItemBuilder.toString();
-        this.replyPlayer("사망했습니다...", innerMsg);
+        this.replyPlayer("당신은 사망했습니다...", innerMsg);
         this.addLog(LogData.DEATH, 1);
     }
 
@@ -1987,15 +857,29 @@ public class Player extends Entity {
 
     @Override
     public boolean canFight(@NonNull Entity enemy) {
-        return super.canFight(enemy) && this.isPvp();
+        if(enemy.id.getId().equals(Id.PLAYER)) {
+            return super.canFight(enemy) && this.isPvp() && ((Player) enemy).isPvp();
+        } else {
+            return super.canFight(enemy);
+        }
+    }
+
+    //[테스트 칭호] 남식(Lv.123)
+    @NonNull
+    @Override
+    public String getName() {
+        return "[" + this.getCurrentTitle() + "] " + this.getNickName() + " (Lv." + this.getLv().get() + ")";
+    }
+
+    @NonNull
+    @Override
+    public String getRealName() {
+        return this.getNickName();
     }
 
     @Override
-    public void startFight(@NonNull Set<Entity> enemies) {
-        super.startFight(enemies);
-        this.prevDoing = this.doing;
-
-        this.replyPlayer("적 " + enemies.size() + "명 과의 전투가 시작되었습니다");
+    public int hashCode() {
+        return super.hashCode();
     }
 
 }

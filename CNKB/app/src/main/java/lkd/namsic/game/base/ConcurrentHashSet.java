@@ -229,4 +229,10 @@ public class ConcurrentHashSet<T> implements Set<T>, Serializable {
         }
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return this.set.toString();
+    }
+
 }

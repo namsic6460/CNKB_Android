@@ -13,12 +13,16 @@ import lkd.namsic.game.Config;
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.exception.InvalidNumberException;
+import lkd.namsic.game.manager.ChatManager;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class Npc extends AiEntity {
+public class Npc extends Entity {
+
+    private static final ChatManager chatManager = ChatManager.getInstance();
 
     @Nullable
     Long firstChat = null;
@@ -28,12 +32,16 @@ public class Npc extends AiEntity {
 
     public Npc(@NonNull String name) {
         super(name);
-
         this.id.setId(Id.NPC);
     }
 
     public void setCommonChat(@NonNull ChatLimit chatLimit, long chatId) {
         Config.checkId(Id.CHAT, chatId);
+
+        Chat chat = Config.getData(Id.CHAT, chatId);
+        if(chat.getQuestId().get() != 0) {
+            throw new InvalidNumberException(0);
+        }
 
         ConcurrentHashSet<Long> chatSet = this.commonChat.get(chatLimit);
         if(chatSet == null) {
@@ -75,10 +83,18 @@ public class Npc extends AiEntity {
     public Set<Long> getAvailableChat(@NonNull Player player) {
         Set<Long> availableSet = new HashSet<>();
 
+        Chat chat;
         for(Map.Entry<ChatLimit, ConcurrentHashSet<Long>> entry : this.chat.entrySet()) {
             if(entry.getKey().isAvailable(player)) {
                 for(long chatId : entry.getValue()) {
-                    if(Config.SELECTABLE_CHAT_SET.contains(chatId)) {
+                    chat = Config.getData(Id.CHAT, chatId);
+                    long questId = chat.getQuestId().get();
+
+                    if(questId != 0) {
+                        if(player.canAddQuest(questId)) {
+                            availableSet.add(chatId);
+                        }
+                    } else {
                         availableSet.add(chatId);
                     }
                 }
@@ -90,8 +106,23 @@ public class Npc extends AiEntity {
 
     public void startChat(@NonNull Player player) {
         Set<Long> availableCommonSet = this.getAvailableCommonChat(player);
+        if(availableCommonSet.isEmpty()) {
+            player.replyPlayer("해당 NPC 와 할 수 있는 대화가 없습니다");
+            return;
+        }
+        
         long chatId = (long) availableCommonSet.toArray()[new Random().nextInt(availableCommonSet.size())];
-        player.startChat(chatId, this.getId().getObjectId());
+        chatManager.startChat(player, chatId, this.getId().getObjectId());
+    }
+
+    @Override
+    public void onDeath() {
+        throw new RuntimeException("Why onDeath in NPC?");
+    }
+
+    @Override
+    public void onKill(@NonNull Entity entity) {
+        throw new RuntimeException("Why onKill in NPC?");
     }
 
 }

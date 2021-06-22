@@ -6,6 +6,7 @@ import lombok.NonNull;
 public class InvalidNumberException extends RuntimeException {
 
     @Getter
+    final
     Object value;
 
     public InvalidNumberException(@NonNull Object value) {

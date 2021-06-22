@@ -24,10 +24,11 @@ public class ForcedTerminationService extends Service {
         Logger.saveLog();
 
         MainActivity.threadCleaner.cancel();
-        Config.onTerminate();
+        Config.save();
         for(Thread thread : MainActivity.threads) {
             if (thread.isAlive()) {
                 thread.interrupt();
+
                 try {
                     thread.join(1000);
                 } catch (InterruptedException ignored) {}
@@ -38,6 +39,6 @@ public class ForcedTerminationService extends Service {
         MainActivity.threadCleaner.cancel();
 
         MainActivity.toast("Stopped");
-        stopSelf();
+        this.stopSelf();
     }
 }

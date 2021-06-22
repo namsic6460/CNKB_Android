@@ -55,6 +55,11 @@ public enum MagicType {
     /**
      * 침묵
      */
-    DARK
+    DARK,
+
+    /**
+     * 디버프 해제
+      */
+    LIGHT
 
 }

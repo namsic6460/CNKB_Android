@@ -1,8 +1,5 @@
 package lkd.namsic.setting;
 
-import android.app.Application;
-import android.os.Environment;
-
 import androidx.annotation.NonNull;
 
 import com.google.gson.JsonObject;
@@ -15,13 +12,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashMap;
 
-import lkd.namsic.MainActivity;
 import lkd.namsic.game.Config;
 import lkd.namsic.game.enums.Id;
 
-public class FileManager extends Application {
+public class FileManager {
 
-    public final static String PATH = MainActivity.mainActivity.getExternalFilesDir(null).getAbsolutePath() + "/CNKB";
+//    public final static String PATH = MainActivity.mainActivity.getExternalFilesDir(null).getAbsolutePath() + "/CNKB";
+    public final static String PATH = "/storage/emulated/0/CNKB";
     public final static String CONFIG_PATH = PATH + "/config.json";
     public final static String LOG_PATH = PATH + "/logs";
     public final static String DATA_PATH = PATH + "/data";

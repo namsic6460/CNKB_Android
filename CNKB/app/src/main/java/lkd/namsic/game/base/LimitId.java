@@ -33,7 +33,7 @@ public class LimitId implements LimitClass<Long> {
         long maxValue = Objects.requireNonNull(Config.ID_COUNT.get(id));
 
         if(setValue < 0 || value >= maxValue) {
-            throw new NumberRangeException(this);
+            throw new NumberRangeException(setValue, this);
         }
 
         this.value = setValue;

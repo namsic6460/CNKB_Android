@@ -15,15 +15,9 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class Quest extends NamedObject {
-
-    @Setter
-    boolean isRepeatable = false;
 
     final RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);
     final RangeIntegerMap<Long> limitCloseRate = new RangeIntegerMap<>(

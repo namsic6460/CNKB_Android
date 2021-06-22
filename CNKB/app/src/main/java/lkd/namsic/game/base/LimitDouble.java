@@ -38,9 +38,9 @@ public class LimitDouble implements LimitClass<Double> {
     @Override
     public void set(@NonNull Double setValue) {
         if (min != null && setValue < min) {
-            throw new NumberRangeException(this);
+            throw new NumberRangeException(setValue, this);
         } else if (max != null && setValue > max) {
-            throw new NumberRangeException(this);
+            throw new NumberRangeException(setValue, this);
         }
 
         this.value = setValue;

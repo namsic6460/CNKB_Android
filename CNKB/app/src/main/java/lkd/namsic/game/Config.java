@@ -1,5 +1,7 @@
 package lkd.namsic.game;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -41,6 +43,8 @@ import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.gameObject.Quest;
 import lkd.namsic.game.gameObject.Research;
 import lkd.namsic.game.gameObject.Skill;
+import lkd.namsic.game.json.LocationDeserializer;
+import lkd.namsic.game.json.LocationSerializer;
 import lkd.namsic.game.json.NpcDeserializer;
 import lkd.namsic.game.json.NpcSerializer;
 import lkd.namsic.setting.FileManager;
@@ -51,6 +55,8 @@ public class Config {
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcSerializer())
             .registerTypeAdapter(Npc.class, new NpcDeserializer())
+            .registerTypeAdapter(Location.class, new LocationSerializer())
+            .registerTypeAdapter(Location.class, new LocationDeserializer())
             .setVersion(1.0)
             .create();
 
@@ -92,13 +98,15 @@ public class Config {
     public static final double REINFORCE_FLOOR_MULTIPLE = 0.025;
     public static final int MIN_LV = 1;
     public static final int MAX_LV = 999;
+    public static final int MIN_AI_INCREASE = 0;
     public static final int MIN_SP = 0;
     public static final int MAX_SP = 100;
     public static final int MIN_MAGIC_LV = 1;
     public static final int MAX_MAGIC_LV = 10;
     public static final long MIN_DELAY_TIME = 500;
     public static final long MAX_DELAY_TIME = 5000;
-    public static final long MIN_PAUSE_TIME = 2000;
+//    public static final long MIN_PAUSE_TIME = 2000;     //REAL TIME
+    public static final long MIN_PAUSE_TIME = 500;      //DEBUG
     public static final long MAX_PAUSE_TIME = 5000;
     public static final int MAX_SPAWN_COUNT = 16;
 
@@ -106,14 +114,22 @@ public class Config {
     public static final double TOTAL_MONEY_LOSE_MIN = 0.05;
     public static final double MONEY_DROP_RANDOM = 0.5;
     public static final double MONEY_DROP_MIN = 0.2;
-    public static final int ITEM_DROP = 4;
-    public static final double ITEM_DROP_PERCENT = 0.95;
+    public static final int ITEM_DROP_COUNT = 4;
+    public static final int MAX_ITEM_DROP_COUNT = 5;
+    public static final double ITEM_DROP_LOSE_PERCENT = 0.95;
 
     public static final int MAX_EVADE = 90;
+    
+    public static final int FISH_DELAY_TIME = 3000;
+    public static final long FISH_DELAY_TIME_OFFSET = 5000;
+    public static final long FISH_WAIT_TIME = 5000;
+    public static final long FIGHT_WAIT_TIME = 30000;
+    public static final int ADVENTURE_COUNT = 5;
+    public static final long ADVENTURE_WAIT_TIME = 30000;
+    public static final int EXPLORE_HARD_SUCCESS_PERCENT = 20;
 
     public static final String INCOMPLETE = "Incomplete";
 
-    private static boolean initialized = false;
     public static void init() {
         ID_CLASS.put(Id.ACHIEVE, Achieve.class);
         ID_CLASS.put(Id.BOSS, Boss.class);
@@ -126,13 +142,6 @@ public class Config {
         ID_CLASS.put(Id.QUEST, Quest.class);
         ID_CLASS.put(Id.RESEARCH, Research.class);
         ID_CLASS.put(Id.SKILL, Skill.class);
-
-        if(initialized) {
-            Logger.i("Config.init", "Returned");
-            return;
-        }
-
-        initialized = true;
 
         for(Id id : Id.values()) {
             ID_COUNT.put(id, 1L);
@@ -162,6 +171,8 @@ public class Config {
                 Logger.e("Config.init", e);
             }
         }
+
+        ID_COUNT.put(Id.PLAYER, (long) players.length);
     }
 
     @NonNull
@@ -198,7 +209,7 @@ public class Config {
         }
     }
 
-    public static void onTerminate() {
+    public static void save() {
         try {
             for(Id id : Id.values()) {
                 List<GameObject> objectCopy = new ArrayList<>(OBJECT.get(id).values());
@@ -224,6 +235,7 @@ public class Config {
         long objectId = ID_COUNT.get(id);
 
         t = t.newObject();
+
         t.getId().setObjectId(objectId);
         ID_COUNT.put(id, objectId + 1);
 
@@ -242,18 +254,17 @@ public class Config {
             FileManager.delete(getPath(id, objectId));
             Logger.w("deleteAiEntity", id + "-" + objectId + " has 0 count");
         } else {
+            Logger.i("deleteAiEntity", id + "-" + objectId + " added");
             DELETE_LIST.get(entity.getId().getId()).add(entity.getId().getObjectId());
+
+            for(long equipId : entity.getEquipInventory()) {
+                DELETE_LIST.get(Id.EQUIPMENT).add(equipId);
+            }
         }
     }
 
     public static void checkId(@NonNull Id id, long objectId) throws NumberRangeException {
-        String path;
-
-        if(id.equals(Id.PLAYER)) {
-            throw new UnhandledEnumException(id);
-        } else {
-            path = Config.getPath(id, objectId);
-        }
+        String path = Config.getPath(id, objectId);
 
         File file = new File(path);
         if(!file.exists()) {
@@ -275,7 +286,12 @@ public class Config {
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T> T fromJson(@NonNull String jsonString, @NonNull Class<?> c) {
-        return (T) gson.fromJson(jsonString, c);
+        try {
+            return (T) gson.fromJson(jsonString, c);
+        } catch (Exception e) {
+            Log.e("namsic!", jsonString);
+            throw e;
+        }
     }
 
     public synchronized static void unloadObject(@NonNull GameObject gameObject) {
@@ -308,6 +324,8 @@ public class Config {
                     OBJECT.get(id).remove(objectId);
                     OBJECT_COUNT.get(id).remove(objectId);
 
+                    Logger.i("FileManager", "Object unloaded - [" + id + ", " + objectId + "]");
+
                     if (DELETE_LIST.get(id).contains(objectId)) {
                         FileManager.delete(path);
                         DELETE_LIST.get(id).remove(objectId);
@@ -334,6 +352,8 @@ public class Config {
                             PLAYER_LIST.put(player.getId().getObjectId(), new String[] {player.getSender(), player.getImage()});
                         }
                     }
+
+                    Logger.i("FileManager", "New object unloaded");
                 }
 
                 FileManager.save(path, jsonString);
@@ -402,6 +422,7 @@ public class Config {
             return t;
         } else {
             OBJECT_COUNT.get(id).put(objectId, objectCount + 1);
+            Logger.i("loadObject(" + objectCount + ")", objectId + " - " + objectId);
             return (T) Objects.requireNonNull(OBJECT.get(id).get(objectId));
         }
     }
@@ -415,10 +436,8 @@ public class Config {
             return null;
         }
 
-        Logger.i("path", path);
-        Logger.i("data", jsonString);
-
         Player player = fromJson(jsonString, Player.class);
+        player.checkTime();
 
         long objectId = player.getId().getObjectId();
         Long objectCount = OBJECT_COUNT.get(Id.PLAYER).get(objectId);
@@ -427,7 +446,7 @@ public class Config {
             OBJECT.get(Id.PLAYER).put(objectId, player);
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, 1L);
         } else {
-            Logger.i("ExistGet", OBJECT.get(Id.PLAYER).toString());
+            Logger.i("loadPlayer(" + objectCount + ")", sender);
             player = (Player) Objects.requireNonNull(OBJECT.get(Id.PLAYER).get(objectId));
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, objectCount + 1);
         }
@@ -534,7 +553,12 @@ public class Config {
 
     @NonNull
     private static String getPath(@NonNull Id id, long objectId) {
-        return FileManager.DATA_PATH_MAP.get(id) + objectId + ".json";
+        if(id.equals(Id.PLAYER)) {
+            String[] playerData = PLAYER_LIST.get(objectId);
+            return getPlayerPath(playerData[0], playerData[1]);
+        } else {
+            return FileManager.DATA_PATH_MAP.get(id) + objectId + ".json";
+        }
     }
 
     @NonNull

@@ -18,7 +18,7 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdDataException;
-import lkd.namsic.setting.Logger;
+import lkd.namsic.game.manager.MoveManager;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -26,6 +26,8 @@ import lombok.ToString;
 @Getter
 @ToString
 public class MapClass {
+
+    private static final MoveManager moveManager = MoveManager.getInstance();
 
     @Setter
     @NonNull
@@ -42,10 +44,10 @@ public class MapClass {
 
     final Location location = new Location();
 
-    Set<Long> spawnMonster = new ConcurrentHashSet<>();
-    Map<Long, Integer> spawnMaxCount = new ConcurrentHashMap<>();
-    Set<Long> spawnBoss = new ConcurrentHashSet<>();
-    Map<Id, Map<Long, Double>> spawnPercent = new ConcurrentHashMap<>();
+    final Set<Long> spawnMonster = new ConcurrentHashSet<>();
+    final Map<Long, Integer> spawnMaxCount = new ConcurrentHashMap<>();
+    final Set<Long> spawnBoss = new ConcurrentHashSet<>();
+    final Map<Id, Map<Long, Double>> spawnPercent = new ConcurrentHashMap<>();
 
     //This part can be frequently changed
     final Map<Location, Long> money = new ConcurrentHashMap<>();
@@ -67,7 +69,7 @@ public class MapClass {
 
     @NonNull
     public String getInfo() {
-        return this.name + "(요구 레벨: " + requireLv.get() + ") [" + this.mapType.toString() + "]\n" +
+        return this.name + "(요구 레벨: " + requireLv.get() + ") [" + this.mapType.getMapName() + "]\n" +
                 Emoji.WORLD + ": " + this.location.toMapString() + "\n" +
                 Emoji.MONSTER + ": " + this.getEntity(Id.MONSTER).size() + ", " +
                 Emoji.BOSS + ": " + this.getEntity(Id.BOSS).size();
@@ -262,7 +264,7 @@ public class MapClass {
         this.spawnPercent.get(Id.BOSS).put(bossId, percent);
     }
 
-    public void spawnMonster() {
+    public void spawn() {
         if(!(this.getEntity(Id.MONSTER).isEmpty() && this.getEntity(Id.BOSS).isEmpty())) {
             return;
         }
@@ -278,12 +280,13 @@ public class MapClass {
 
             if(random.nextDouble() < percent || percent == 1) {
                 for(int count = 0; count < spawnCount; count++) {
-                    int fieldX = random.nextInt(Config.MAX_FIELD_X) + 1;
-                    int fieldY = random.nextInt(Config.MAX_FIELD_Y) + 1;
+                    int fieldX = random.nextInt(Config.MAX_FIELD_X - 4) + 5;
+                    int fieldY = random.nextInt(Config.MAX_FIELD_Y - 4) + 5;
 
                     Monster monster = Config.newObject(Config.getData(Id.MONSTER, monsterId));
+                    monster.randomLevel();
                     monster.location = new Location();
-                    monster.setMap(this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
+                    moveManager.setMap(monster, this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
                     this.addEntity(monster);
                     Config.unloadObject(monster);
                 }
@@ -298,8 +301,9 @@ public class MapClass {
                 int fieldY = random.nextInt(Config.MAX_FIELD_Y) + 1;
 
                 Boss boss = Config.newObject(Config.getData(Id.BOSS, bossId));
+                boss.randomLevel();
                 boss.location = new Location();
-                boss.setMap(this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
+                moveManager.setMap(boss, this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
                 this.addEntity(boss);
                 Config.unloadObject(boss);
 

@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,7 +36,7 @@ public class Item extends NamedObject {
 
     final LimitInteger handleLv = new LimitInteger(Config.MIN_HANDLE_LV, Config.MIN_HANDLE_LV, Config.MAX_HANDLE_LV);
 
-    final Set<Map<Long, Integer>> recipe = new HashSet<>();
+    final Set<Map<Long, Integer>> recipe = new LinkedHashSet<>();
 
     public Item(@NonNull String name, @NonNull String description) {
         super(name);

@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
+import lkd.namsic.game.RandomList;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.RangeInteger;
 import lkd.namsic.game.base.RangeIntegerMap;
@@ -21,170 +22,6 @@ import lombok.ToString;
 @ToString
 public class Equipment extends Item {
 
-    //Handle Level - {Reinforce Level, Lv Increase}
-    private final static Map<Integer, Map<Integer, Integer>> LV_INCREASE = new HashMap<Integer, Map<Integer, Integer>>() {{
-        put(1, new HashMap<Integer, Integer>() {{
-            int[] values = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 10, 10, 20};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(2, new HashMap<Integer, Integer>() {{
-            int[] values = {0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 10, 10, 20, 25};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(3, new HashMap<Integer, Integer>() {{
-            int[] values = {0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 10, 15, 25, 35};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(4, new HashMap<Integer, Integer>() {{
-            int[] values = {0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 10, 15, 20, 30, 40};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(5, new HashMap<Integer, Integer>() {{
-            int[] values = {0, 0, 0, 0, 0, 0, 5, 5, 10, 10, 15, 20, 30, 40, 50};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(6, new HashMap<Integer, Integer>() {{
-            int[] values = {0, 0, 0, 0, 0, 5, 5, 10, 10, 15, 15, 25, 35, 45, 60};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(7, new HashMap<Integer, Integer>() {{
-            int[] values = {0, 0, 0, 0, 5, 5, 10, 10, 15, 20, 25, 30, 40, 55, 65};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(8, new HashMap<Integer, Integer>() {{
-            int[] values = {0, 0, 0, 5, 5, 10, 10, 15, 20, 25, 35, 45, 60, 80, 100};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(9, new HashMap<Integer, Integer>() {{
-            int[] values = {0, 0, 0, 10, 10, 15, 20, 30, 30, 50, 50, 70, 80, 100, 100};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(10, new HashMap<Integer, Integer>() {{
-            int[] values = {0, 5, 5, 10, 10, 15, 20, 30, 40, 55, 70, 90, 100, 120, 150};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(11, new HashMap<Integer, Integer>() {{
-            int[] values = {0, 10, 10, 20, 30, 50, 50, 50, 70, 100, 100, 100, 120, 150, 200};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(12, new HashMap<Integer, Integer>() {{
-            int[] values = {10, 20, 20, 30, 50, 70, 80, 100, 110, 130, 150, 150, 170, 200, 250};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(13, new HashMap<Integer, Integer>() {{
-            int[] values = {10, 20, 30, 50, 70, 100, 100, 120, 140, 160, 180, 200, 250, 300, 500};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-    }};
-
-    //Handle Level - {Reinforce Level, Reinforce Success Percent}
-    private final static Map<Integer, Map<Integer, Double>> PERCENT = new HashMap<Integer, Map<Integer, Double>>() {{
-        put(1, new HashMap<Integer, Double>() {{
-            double[] values = {1, 1, 1, 1, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.65, 0.55, 0.45, 0.3, 0.15};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(2, new HashMap<Integer, Double>() {{
-            double[] values = {1, 1, 1, 1, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.65, 0.55, 0.45, 0.3, 0.15};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(3, new HashMap<Integer, Double>() {{
-            double[] values = {1, 1, 1, 1, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.65, 0.55, 0.45, 0.3, 0.15};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(4, new HashMap<Integer, Double>() {{
-            double[] values = {1, 1, 1, 1, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.65, 0.55, 0.45, 0.3, 0.15};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(5, new HashMap<Integer, Double>() {{
-            double[] values = {1, 1, 1, 1, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.65, 0.55, 0.45, 0.3, 0.15};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(6, new HashMap<Integer, Double>() {{
-            double[] values = {1, 1, 1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5, 0.5, 0.3, 0.1, 0.1, 0.05, 0.01};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(7, new HashMap<Integer, Double>() {{
-            double[] values = {1, 1, 1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5, 0.5, 0.3, 0.1, 0.1, 0.05, 0.01};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(8, new HashMap<Integer, Double>() {{
-            double[] values = {1, 1, 1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5, 0.5, 0.3, 0.1, 0.1, 0.05, 0.01};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(9, new HashMap<Integer, Double>() {{
-            double[] values = {1, 0.9, 0.8, 0.7, 0.5, 0.5, 0.5, 0.35, 0.2, 0.1, 0.1, 0.1, 0.01, 0.005, 0.001};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(10, new HashMap<Integer, Double>() {{
-            double[] values = {1, 0.9, 0.8, 0.7, 0.5, 0.5, 0.5, 0.35, 0.2, 0.1, 0.1, 0.1, 0.01, 0.005, 0.001};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(11, new HashMap<Integer, Double>() {{
-            double[] values = {0.5, 0.5, 0.5, 0.4, 0.3, 0.2, 0.1, 0.03, 0.03, 0.03, 0.01, 0.01, 0.001, 0.0003, 0.0003};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(12, new HashMap<Integer, Double>() {{
-            double[] values = {0.5, 0.5, 0.5, 0.4, 0.3, 0.2, 0.1, 0.02, 0.02, 0.01, 0.01, 0.001, 0.0002, 0.0002, 0.0001};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-        put(13, new HashMap<Integer, Double>() {{
-            double[] values = {0.5, 0.4, 0.3, 0.2, 0.1, 0.05, 0.03, 0.02, 0.01, 0.003, 0.002, 0.001, 0.0001, 0.0001, 0.0001};
-            for(int i = 0; i < 15; i++) {
-                put(i + 1, values[i]);
-            }
-        }});
-    }};
-
     public static int getLvIncrease(int handleLv, int nextReinforceCount) {
         if(handleLv < Config.MIN_HANDLE_LV || handleLv > Config.MAX_HANDLE_LV) {
             throw new NumberRangeException(handleLv, Config.MIN_HANDLE_LV, Config.MAX_HANDLE_LV);
@@ -194,7 +31,7 @@ public class Equipment extends Item {
             throw new NumberRangeException(nextReinforceCount, Config.MIN_REINFORCE_COUNT, Config.MAX_REINFORCE_COUNT);
         }
 
-        return LV_INCREASE.get(handleLv).get(nextReinforceCount);
+        return RandomList.REINFORCE_LV_INCREASE.get(handleLv).get(nextReinforceCount);
     }
 
     @Setter
@@ -224,7 +61,7 @@ public class Equipment extends Item {
     }
 
     public double getReinforcePercent() {
-        double basicPercent = PERCENT.get(this.handleLv.get()).get(this.reinforceCount.get() + 1);
+        double basicPercent = RandomList.REINFORCE_PERCENT.get(this.handleLv.get()).get(this.reinforceCount.get() + 1);
         double value = this.reinforcePercent + basicPercent * (Config.REINFORCE_FLOOR_MULTIPLE * this.getReinforceFloor().get());
         return Math.min(Math.floor(value * 10000) / 10000, 1);
     }

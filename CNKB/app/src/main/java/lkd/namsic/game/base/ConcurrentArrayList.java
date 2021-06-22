@@ -355,4 +355,10 @@ public class ConcurrentArrayList<T> implements List<T>, Serializable {
         }
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return this.list.toString();
+    }
+    
 }

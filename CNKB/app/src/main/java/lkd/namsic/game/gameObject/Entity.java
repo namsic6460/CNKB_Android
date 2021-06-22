@@ -1,6 +1,7 @@
 package lkd.namsic.game.gameObject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.Config;
+import lkd.namsic.game.Emoji;
 import lkd.namsic.game.Variable;
 import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.base.ConcurrentHashSet;
@@ -21,12 +23,10 @@ import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
-import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.event.DeathEvent;
 import lkd.namsic.game.event.EarnEvent;
 import lkd.namsic.game.event.Event;
-import lkd.namsic.game.event.MoveEvent;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
@@ -74,6 +74,33 @@ public abstract class Entity extends NamedObject {
         this.setBasicStat(StatType.ATR, 1);
     }
 
+    public String getDisplayHp() {
+        return this.getDisplayHp(this.getStat(StatType.HP));
+    }
+
+    //AlphaDo 님의 체력바 소스를 참고했음을 알립니다
+    public String getDisplayHp(int hp) {
+        int maxHp = this.getStat(StatType.MAXHP);
+
+        double percent = 10.0 * hp / maxHp;
+        double dec = percent % 1;
+        int filled = (int) percent;
+
+        StringBuilder output = new StringBuilder("[");
+
+        for(int i = 0; i < filled; i++) {
+            output.append(Emoji.FILLED_HEART);
+        }
+
+        output.append(Emoji.HALF_HEART[(int) Math.round(dec * 8)]);
+
+        for(int i = 9; i > filled; i--) {
+            output.append("  ");
+        }
+
+        return output.toString() + "] (" + hp + "/" + maxHp + ")";
+    }
+
     public boolean setMoney(long money) {
         boolean isCancelled = false;
 
@@ -112,141 +139,6 @@ public abstract class Entity extends NamedObject {
         Config.unloadMap(map);
     }
 
-    public boolean setField(int fieldX, int fieldY) {
-        return setField(fieldX, fieldY, this.getFieldDistance(new Location(0, 0, fieldX, fieldY)));
-    }
-
-    public boolean setField(int fieldX, int fieldY, int distance) {
-        if(distance < 0) {
-            throw new NumberRangeException(distance, 0);
-        }
-
-        boolean isCancelled = MoveEvent.handleEvent(this.events.get(MoveEvent.getName()), new Object[]{distance, true});
-
-        if(!isCancelled) {
-            this.location.setField(fieldX, fieldY);
-
-            MapClass map = null;
-
-            try {
-                map = Config.loadMap(this.location);
-
-                long money = map.getMoney(this.location);
-                if(money != 0) {
-                    this.addMoney(money);
-                    map.money.remove(this.location);
-                }
-
-                Map<Long, Integer> item = map.getItem().get(location);
-                if(item != null) {
-                    for(Map.Entry<Long, Integer> entry : item.entrySet()) {
-                        this.addItem(entry.getKey(), entry.getValue());
-                    }
-
-                    map.item.remove(location);
-                }
-
-                Set<Long> equip = map.getEquip().get(location);
-                if(equip != null) {
-                    for (long equipId : equip) {
-                        this.addEquip(equipId);
-                    }
-
-                    map.getEquip().remove(this.location);
-                }
-            } finally {
-                if(map != null) {
-                    Config.unloadMap(map);
-                }
-            }
-        }
-
-        return isCancelled;
-    }
-
-    public boolean setMap(int x, int y) {
-        return this.setMap(new Location(x, y),true);
-    }
-
-    public boolean setMap(int x, int y, int fieldX, int fieldY) {
-        return this.setMap(new Location(x, y, fieldX, fieldY), getMapDistance(new Location(x, y)), false);
-    }
-
-    public boolean setMap(Location location) {
-        return this.setMap(location, false);
-    }
-
-    public boolean setMap(Location location, boolean isToBase) {
-        return this.setMap(location, getMapDistance(location), isToBase);
-    }
-
-    public boolean setMap(Location location, int distance, boolean isToBase) {
-        if(isToBase) {
-            return this.setMap(location.getX().get(), location.getY().get(), 1, 1, distance,true);
-        } else {
-            return this.setMap(location.getX().get(), location.getY().get(),
-                    location.getFieldX().get(), location.getFieldY().get(), distance, false);
-        }
-    }
-
-    public boolean setMap(int x, int y, int fieldX, int fieldY, int distance, boolean isToBase) {
-        if(distance <= 0) {
-            throw new NumberRangeException(distance, 1);
-        }
-
-        boolean isCancelled = MoveEvent.handleEvent(this.events.get(MoveEvent.getName()), new Object[]{distance, false});
-
-        if(!isCancelled) {
-            MapClass prevMap = null;
-
-            try {
-                prevMap = Config.loadMap(this.location);
-                prevMap.removeEntity(this);
-            } finally {
-                if(prevMap != null) {
-                    Config.unloadMap(prevMap);
-                }
-            }
-
-            MapClass moveMap = null;
-
-            try {
-                moveMap = Config.loadMap(x, y);
-
-                if(this.lv.get() < moveMap.getRequireLv().get()) {
-                    throw new NumberRangeException(this.lv.get(), moveMap.getRequireLv().get(), Config.MAX_LV);
-                }
-
-                this.location.setMap(x, y);
-                if(isToBase) {
-                    this.setField(moveMap.getLocation().getFieldX().get(), moveMap.getLocation().getFieldY().get());
-                } else {
-                    this.setField(fieldX, fieldY);
-                }
-
-                moveMap.addEntity(this);
-
-                if(this.id.getId().equals(Id.PLAYER)) {
-                    if(!(moveMap.getMapType().equals(MapType.COUNTRY) || moveMap.getMapType().equals(MapType.UNDERGROUND_CITY))) {
-                        moveMap.spawnMonster();
-                    }
-                }
-            } finally {
-                if(moveMap != null) {
-                    Config.unloadMap(moveMap);
-                }
-            }
-        }
-
-        return isCancelled;
-    }
-
-    public void addSkill(@NonNull Set<Long> skill) {
-        for(long skillId : skill) {
-            this.addSkill(skillId);
-        }
-    }
-
     public void addSkill(long skillId) {
         Config.checkId(Id.SKILL, skillId);
         this.skill.add(skillId);
@@ -278,6 +170,10 @@ public abstract class Entity extends NamedObject {
             if(stat > maxMn) {
                 stat = maxMn;
             }
+        } else if(statType.equals(StatType.MAXHP)) {
+            if(stat < 1) {
+                throw new NumberRangeException(stat, 1);
+            }
         }
 
         if(!isCancelled) {
@@ -285,18 +181,19 @@ public abstract class Entity extends NamedObject {
 
             if(isDeath) {
                 this.onDeath();
+                return true;
             }
         }
 
-        return isCancelled;
+        return false;
     }
 
     public int getBasicStat(@NonNull StatType statType) {
         return this.basicStat.getOrDefault(statType, 0);
     }
 
-    public void addBasicStat(@NonNull StatType statType, int stat) {
-        this.setBasicStat(statType, this.getBasicStat(statType) + stat);
+    public boolean addBasicStat(@NonNull StatType statType, int stat) {
+        return this.setBasicStat(statType, this.getBasicStat(statType) + stat);
     }
 
     public void setEquipStat(@NonNull StatType statType, int stat) {
@@ -329,10 +226,6 @@ public abstract class Entity extends NamedObject {
 
     public int getBuffStat(@NonNull StatType statType) {
         return this.buffStat.getOrDefault(statType, 0);
-    }
-
-    public void addBuffStat(@NonNull StatType statType, int stat) {
-        this.setBuffStat(statType, this.getBuffStat(statType) + stat);
     }
 
     public int getStat(@NonNull StatType statType) {
@@ -588,7 +481,6 @@ public abstract class Entity extends NamedObject {
         if(enemySet == null) {
             enemySet = new ConcurrentHashSet<>();
             enemySet.add(objectId);
-
             this.enemies.put(id, enemySet);
         } else {
             enemySet.add(objectId);
@@ -620,62 +512,22 @@ public abstract class Entity extends NamedObject {
     }
 
     public boolean canFight(@NonNull Entity enemy) {
-        return Doing.fightableList().contains(this.doing);
+        List<Doing> fightableList = Doing.fightableList();
+        return fightableList.contains(this.doing) && fightableList.contains(enemy.doing);
     }
 
-    public void startFight(@NonNull Set<Entity> enemies) {
-        this.setDoing(Doing.FIGHT);
-
-        Id id = this.id.getId();
-        long objectId = this.id.getObjectId();
-
-        enemies.forEach(enemy -> {
-            this.addEnemy(enemy.id.getId(), enemy.id.getObjectId());
-
-            enemy.addEnemy(id, objectId);
-            enemy.setDoing(Doing.FIGHT);
-
-            if(enemy.id.getId().equals(Id.PLAYER)) {
-                Player player = (Player) enemy;
-                player.replyPlayer(this.getName() + " 와(과) 의 전투가 시작되었습니다");
-            }
-        });
+    public boolean attack(@NonNull Entity entity, boolean printOnDeath) {
+        return this.damage(entity, this.getStat(StatType.ATK), 0, 0, true, printOnDeath);
     }
 
-    public void endFight() {
-        Id id;
-        Entity enemy = null;
-
-        for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : this.enemies.entrySet()) {
-            id = entry.getKey();
-
-            for(long enemyId : entry.getValue()) {
-                try {
-                    enemy = Config.loadObject(id, enemyId);
-
-                    this.removeEnemy(id, enemyId);
-                    enemy.removeEnemy(this.id.getId(), this.id.getObjectId());
-                    
-                    if(id.equals(Id.PLAYER)) {
-                        ((Player) enemy).replyPlayer("전투가 종료되었습니다");
-                    }
-                } finally {
-                    if(enemy != null) {
-                        Config.unloadObject(enemy);
-                    }
-                }
-            }
-        }
-
-        if(this.id.getId().equals(Id.PLAYER)) {
-            ((Player) this).replyPlayer("전투가 종료되었습니다");
-        }
-    }
-
-    public boolean damage(Entity entity, int physicDmg, int magicDmg, int staticDmg, boolean canEvade) {
+    public boolean damage(@NonNull Entity entity, int physicDmg, int magicDmg, int staticDmg, boolean canEvade, boolean printOnDeath) {
         Random random = new Random();
 
         this.revalidateBuff();
+
+        if(entity instanceof Monster && this.id.getId().equals(Id.PLAYER)) {
+            ((Monster) entity).getAngryPlayers().add(this.id.getObjectId());
+        }
 
         boolean evade = false;
         if(canEvade) {
@@ -689,45 +541,67 @@ public abstract class Entity extends NamedObject {
             physicDmg = Math.max(physicDmg - def, 0);
             magicDmg = Math.max(magicDmg - mdef, 0);
 
+            int heal = 0;
+            boolean isDefencing = entity.getObjectVariable(Variable.IS_DEFENCING, false);
+            if(isDefencing) {
+                heal = (int) (physicDmg * (new Random().nextInt(41) + 30) / 100D);
+                physicDmg = 0;
+
+                entity.addBasicStat(StatType.HP, heal);
+                entity.setVariable(Variable.IS_DEFENCING, false);
+            }
+
             int dra = physicDmg * this.getStat(StatType.DRA) / 100;
             int mdra = magicDmg * this.getStat(StatType.MDRA) / 100;
 
             int totalDmg = physicDmg + magicDmg + staticDmg;
             int totalDra = dra + mdra;
 
-            entity.addBasicStat(StatType.HP, -1 * totalDmg);
+            boolean isDeath = entity.addBasicStat(StatType.HP, -1 * totalDmg);
             this.addBasicStat(StatType.HP, totalDra);
 
-            int hp = entity.getStat(StatType.HP);
-            int selfHp = this.getStat(StatType.HP);
-            String innerMsg = "총 데미지 : " + totalDmg + "\n총 흡수량 : " + totalDra + "\n";
+            String hp;
+            if(isDeath) {
+                hp = entity.getDisplayHp(0);
+            } else {
+                hp = entity.getDisplayHp();
+            }
 
-            if(hp == 0 || hp == 1 && entity.id.getId().equals(Id.PLAYER)) {
+            if(!isDeath || (isDeath && printOnDeath)) {
+                String selfHp = this.getDisplayHp();
+                String innerMsg = "총 데미지: " + totalDmg + "\n총 흡수량: " + totalDra + "\n";
+
+                if (this.id.getId().equals(Id.PLAYER)) {
+                    ((Player) this).replyPlayer("공격에 성공했습니다\n적 체력: " + hp,
+                            innerMsg + "남은 체력: " + selfHp);
+                }
+
+                if (entity.id.getId().equals(Id.PLAYER)) {
+                    String msg = this.getName() + " 에게 공격당했습니다!\n남은 체력: " + hp;
+
+                    if (isDefencing) {
+                        msg += "\n방어로 인해 회복한 체력: " + heal;
+                    }
+
+                    ((Player) entity).replyPlayer(msg, innerMsg + "적 체력: " + selfHp);
+                }
+            }
+
+            if(isDeath) {
                 this.onKill(entity);
+                return true;
             }
-
-            if(this.id.getId().equals(Id.PLAYER)) {
-                ((Player) this).replyPlayer("공격에 성공했습니다\n적 체력 : " + hp,
-                        innerMsg + "남은 체력 : " + selfHp);
-            }
-
-            if(entity.id.getId().equals(Id.PLAYER)) {
-                ((Player) entity).replyPlayer(this.getName() + " 에게 공격당했습니다!\n남은 체력 : " + hp,
-                        innerMsg + "적 체력 : " + selfHp);
-            }
-
-            return true;
         } else {
-            if(this.getId().getId().equals(Id.PLAYER)) {
+            if (this.getId().getId().equals(Id.PLAYER)) {
                 ((Player) this).replyPlayer("공격이 빗나갔습니다");
             }
 
-            if(entity.id.getId().equals(Id.PLAYER)) {
+            if (entity.id.getId().equals(Id.PLAYER)) {
                 ((Player) entity).replyPlayer(this.getName() + " 의 공격을 피했습니다");
             }
-
-            return false;
         }
+
+        return false;
     }
 
     public int getFieldDistance(Location location) {
@@ -744,6 +618,10 @@ public abstract class Entity extends NamedObject {
         this.variable.put(variable, value);
     }
 
+    public void removeVariable(Variable variable) {
+        this.variable.remove(variable);
+    }
+
     public int getVariable(Variable variable) {
         Object value = this.variable.getOrDefault(variable, 0);
 
@@ -755,32 +633,63 @@ public abstract class Entity extends NamedObject {
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T> T getObjectVariable(Variable variable) {
         return (T) this.variable.get(variable);
     }
 
-    public List<Long> getListVariable(Variable variable) {
-        List<String> list = this.getObjectVariable(variable);
-        if(list == null) {
-            return new ArrayList<>();
-        }
+    @SuppressWarnings("unchecked")
+    @NonNull
+    public <T> T getObjectVariable(Variable variable, T defaultValue) {
+        return (T) this.variable.getOrDefault(variable, defaultValue);
+    }
 
+    @SuppressWarnings("unchecked")
+    @NonNull
+    public List<Long> getListVariable(Variable variable) {
+        List<?> list = this.getObjectVariable(variable);
         List<Long> outputList = new ArrayList<>();
 
-        for(String element : list) {
-            outputList.add(Long.parseLong(element));
+        if(list == null) {
+            outputList = new ArrayList<>();
+            this.setVariable(variable, outputList);
+            return outputList;
+        }
+
+        if(!list.isEmpty()) {
+            if(list.toArray()[0] instanceof Double) {
+                for (Object element : list) {
+                    outputList.add(((Double) element).longValue());
+                }
+            } else {
+                return (List<Long>) list;
+            }
         }
 
         this.setVariable(variable, outputList);
         return outputList;
     }
 
+    @SuppressWarnings("unchecked")
+    @NonNull
     public Map<Long, Integer> getMapVariable(Variable variable) {
-        Map<String, Double> map = this.getObjectVariable(variable);
+        Map<?, ?> map = this.getObjectVariable(variable);
         Map<Long, Integer> outputMap = new HashMap<>();
 
-        for(Map.Entry<String, Double> entry : map.entrySet()) {
-            outputMap.put((long) Double.parseDouble(entry.getKey()), entry.getValue().intValue());
+        if(map == null) {
+            outputMap = new HashMap<>();
+            this.setVariable(variable, outputMap);
+            return outputMap;
+        }
+
+        if(!map.isEmpty()) {
+            if(map.keySet().toArray()[0] instanceof String) {
+                for (Map.Entry<?, ?> entry : map.entrySet()) {
+                    outputMap.put((long) Double.parseDouble((String) entry.getKey()), ((Double) entry.getValue()).intValue());
+                }
+            } else {
+                return (Map<Long, Integer>) map;
+            }
         }
 
         this.setVariable(variable, outputMap);

@@ -31,8 +31,8 @@ public class NumberRangeException extends RuntimeException {
         super("Value: " + value + "L, Min: " + minValue + "L, Max: " + maxValue + "L");
     }
 
-    public NumberRangeException(LimitClass<?> limitClass) {
-        super(limitClass.toString());
+    public <T> NumberRangeException(T value, LimitClass<T> limitClass) {
+        super(value + " - " + limitClass.toString());
     }
 
     public NumberRangeException(Object key, Integer minValue, Integer maxValue) {

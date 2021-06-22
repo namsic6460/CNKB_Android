@@ -18,16 +18,34 @@ import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.setting.Logger;
 import lkd.namsic.MainActivity;
 
-public class KakaoTalkListener extends NotificationListenerService {
+public class NotificationListener extends NotificationListenerService {
+
+    private static boolean isCreated = false;
 
     @SuppressLint("StaticFieldLeak")
     public static Context context;
 
     @Override
     public void onCreate() {
-        super.onCreate();
+        if(isCreated) {
+            this.onDestroy();
+
+            MainActivity.toast("Noti Service Already Started");
+            return;
+        } else {
+            super.onCreate();
+
+            isCreated = true;
+            MainActivity.toast("Noti Service Started");
+        }
 
         context = getApplicationContext();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        MainActivity.toast("Noti Service Stopped");
     }
 
     @Override
@@ -47,6 +65,7 @@ public class KakaoTalkListener extends NotificationListenerService {
                             action.title.toString().toLowerCase().contains("reply") ||
                             action.title.toString().toLowerCase().contains("답장")) {
                         Bundle data = sbn.getNotification().extras;
+
                         String room, sender, msg, image;
                         Bitmap bitmap;
                         boolean isGroupChat = false;
@@ -64,6 +83,12 @@ public class KakaoTalkListener extends NotificationListenerService {
 
                         if (msg.equals("null")) {
                             msg = "";
+                        }
+
+                        int length = msg.length();
+                        if(!msg.startsWith("n eval") && length > 100) {
+                            Logger.i("KakaoTalkListener", "Returned by length(" + length + ")");
+                            return;
                         }
 
                         if(bitmap == null) {

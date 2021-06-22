@@ -42,9 +42,9 @@ public class LimitLong implements LimitClass<Long> {
     @Override
     public void set(@NonNull Long setValue) {
         if (min != null && setValue < min) {
-            throw new NumberRangeException(this);
+            throw new NumberRangeException(setValue, this);
         } else if (max != null && setValue > max) {
-            throw new NumberRangeException(this);
+            throw new NumberRangeException(setValue, this);
         }
 
         this.value = setValue;

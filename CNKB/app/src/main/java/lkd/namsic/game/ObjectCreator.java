@@ -3,6 +3,8 @@ package lkd.namsic.game;
 import android.util.Log;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
@@ -11,6 +13,7 @@ import lkd.namsic.MainActivity;
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
+import lkd.namsic.game.enums.MonsterType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.gameObject.Chat;
@@ -20,9 +23,12 @@ import lkd.namsic.game.gameObject.Monster;
 import lkd.namsic.game.gameObject.Npc;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.gameObject.Quest;
+import lkd.namsic.game.manager.ItemManager;
 import lkd.namsic.setting.Logger;
 
-public class ObjectMaker {
+public class ObjectCreator {
+
+    private static final ItemManager itemManager = ItemManager.getInstance();
 
     public static void start(Button button) {
         Logger.i("ObjectMaker", "Making objects...");
@@ -33,16 +39,18 @@ public class ObjectMaker {
             try {
                 Config.IGNORE_FILE_LOG = true;
 
-                makeItem();
-                makeEquip();
-                makeMonster();
-                makeMap();
-                makeChat();
-                makeQuest();
-                makeNpc();
+                createItems();
+                createEquips();
+                createMonsters();
+                createMaps();
+                createChats();
+                createQuests();
+                createNpc();
 
                 Config.IGNORE_FILE_LOG = false;
                 Logger.i("ObjectMaker", "Object making is done!");
+
+                Config.save();
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.e("namsic!", Config.errorString(e));
@@ -55,67 +63,86 @@ public class ObjectMaker {
         MainActivity.startThread(thread);
     }
 
-    private static void makeItem() {
-        Item item = new Item("돌멩이", "평범한 돌멩이다");
+    private static void createItem(@NonNull String name, @NonNull String description) {
+        Item item = new Item(name, description);
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
         Config.unloadObject(item);
+    }
 
-        item = new Item("나뭇가지", "평범한 나뭇가지다");
+    private static void createItem(@NonNull String name, @NonNull String description, int handleLv) {
+        Item item = new Item(name, description);
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.getHandleLv().set(handleLv);
         Config.unloadObject(item);
+    }
 
-        item = new Item("나뭇잎", "평범한 나뭇잎이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        Config.unloadObject(item);
+    private static void createItems() {
+        Item item;
 
-        item = new Item("잡초", "평범한 잡초다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        Config.unloadObject(item);
+        createItem("돌멩이", "평범한 돌멩이다");
+        createItem("나뭇가지", "평범한 나뭇가지다");
+        createItem("나뭇잎", "평범한 나뭇잎이다");
+        createItem("잡초", "평범한 잡초다");
 
         item = new Item("골드 주머니", "골드가 소량 들어간 주머니다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.setUse((user, other) -> {
-            int money = new Random().nextInt(10 * user.getLv().get()) + 50;
-            
-            user.addMoney(money);
-            if(user instanceof Player) {
-                ((Player) user).replyPlayer("골드 주머니를 사용하여 " + money + "G 를 획득했습니다");
-            }
+        item.setUse((self, other) -> {
+            int money = new Random().nextInt(100 * self.getLv().get()) + 500;
+
+            self.addMoney(money);
+            ((Player) self).replyPlayer("골드 주머니를 사용하여 " + money + "G 를 획득했습니다");
         });
         Config.unloadObject(item);
 
         item = new Item("골드 보따리", "골드가 들어간 주머니다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(3);
-        item.setUse((user, other) -> {
-            int money = new Random().nextInt(200 * user.getLv().get()) + 1000;
+        item.getHandleLv().set(5);
+        item.setUse((self, other) -> {
+            int money = new Random().nextInt(500 * self.getLv().get()) + 3000;
 
-            user.addMoney(money);
-            if(user instanceof Player) {
-                ((Player) user).replyPlayer("골드 보따리를 사용하여 " + money + "G 를 획득했습니다");
-            }
+            self.addMoney(money);
+            ((Player) self).replyPlayer("골드 보따리를 사용하여 " + money + "G 를 획득했습니다");
         });
         Config.unloadObject(item);
 
-        item = new Item("약초", "약의 기운이 있는 풀이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        Config.unloadObject(item);
+        createItem("약초", "약의 기운이 있는 풀이다");
 
         item = new Item("마나 조각", "마나의 기운이 있는 고체 마나 파편이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(101L, 3);
+        }}, true);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(102L, 3);
+        }}, true);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(103L, 3);
+        }}, true);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(104L, 3);
+        }}, true);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(105L, 3);
+        }}, true);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(106L, 3);
+        }}, true);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(107L, 3);
+        }}, true);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(108L, 3);
+        }}, true);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(109L, 3);
+        }}, true);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(110L, 3);
+        }}, true);
         Config.unloadObject(item);
 
-        item = new Item("유리조각", "유리 파편이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        Config.unloadObject(item);
-
-        item = new Item("흙", "땅에서 흔히 볼 수 있는 평번한 흙이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        Config.unloadObject(item);
-
-        item = new Item("모래", "땅에서 흔히 볼 수 있는 평번한 모래다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        Config.unloadObject(item);
+        createItem("흙", "땅에서 흔히 볼 수 있는 평번한 흙이다");
+        createItem("모래", "땅에서 흔히 볼 수 있는 평번한 모래다");
 
         item = new Item("유리", "투명한 고체 물질이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
@@ -135,7 +162,7 @@ public class ObjectMaker {
         }}, true);
         Config.unloadObject(item);
 
-        item = new Item("하급 체력포션", "최대 체력의 15%를 회복시켜주는 포션이다");
+        item = new Item("하급 체력 포션", "최대 체력의 15%를 회복시켜주는 포션이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
         item.getHandleLv().set(2);
         item.addRecipe(new HashMap<Long, Integer>() {{
@@ -151,7 +178,7 @@ public class ObjectMaker {
         }}, true);
         Config.unloadObject(item);
 
-        item = new Item("중급 체력포션", "최대 체력의 50%를 회복시켜주는 포션이다");
+        item = new Item("중급 체력 포션", "최대 체력의 50%를 회복시켜주는 포션이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
         item.getHandleLv().set(8);
         item.addRecipe(new HashMap<Long, Integer>() {{
@@ -168,7 +195,7 @@ public class ObjectMaker {
         }}, true);
         Config.unloadObject(item);
 
-        item = new Item("상급 체력포션", "체력을 모두 회복시켜주는 포션이다");
+        item = new Item("상급 체력 포션", "체력을 모두 회복시켜주는 포션이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
         item.getHandleLv().set(10);
         item.addRecipe(new HashMap<Long, Integer>() {{
@@ -185,7 +212,7 @@ public class ObjectMaker {
         }}, true);
         Config.unloadObject(item);
 
-        item = new Item("하급 마나포션", "최대 마나의 15%를 회복시켜주는 포션이다");
+        item = new Item("하급 마나 포션", "최대 마나의 15%를 회복시켜주는 포션이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
         item.getHandleLv().set(2);
         item.addRecipe(new HashMap<Long, Integer>() {{
@@ -201,7 +228,7 @@ public class ObjectMaker {
         }}, true);
         Config.unloadObject(item);
 
-        item = new Item("중급 마나포션", "최대 마나의 50%를 회복시켜주는 포션이다");
+        item = new Item("중급 마나 포션", "최대 마나의 50%를 회복시켜주는 포션이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
         item.getHandleLv().set(8);
         item.addRecipe(new HashMap<Long, Integer>() {{
@@ -218,7 +245,7 @@ public class ObjectMaker {
         }}, true);
         Config.unloadObject(item);
 
-        item = new Item("상급 마나포션", "마나를 모두 회복시켜주는 포션이다");
+        item = new Item("상급 마나 포션", "마나를 모두 회복시켜주는 포션이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
         item.getHandleLv().set(10);
         item.addRecipe(new HashMap<Long, Integer>() {{
@@ -235,64 +262,23 @@ public class ObjectMaker {
         }}, true);
         Config.unloadObject(item);
 
-        item = new Item("돌", "가장 기본적인 광석이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        Config.unloadObject(item);
+        createItem("돌", "가장 기본적인 광석이다");
 
-        item = new Item("석탄", "불이 잘 붙는 흔한 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(2);
-        Config.unloadObject(item);
+        createItem("석탄", "불이 잘 붙는 흔한 광물이다", 2);
 
-        item = new Item("석영", "약간 투명한 보석이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(3);
-        Config.unloadObject(item);
+        createItem("석영", "약간 투명한 보석이다", 3);
+        createItem("구리", "붉으스름한 광물이다", 3);
+        createItem("납", "다양한 곳에서 사용되는 광물이다", 3);
+        createItem("주석", "다양한 곳에서 사용되는 광물이다", 3);
+        createItem("니켈", "다양한 곳에서 사용되는 광물이다", 3);
 
-        item = new Item("구리", "붉으스름한 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(3);
-        Config.unloadObject(item);
+        createItem("철", "매우 많이 사용되는 일반적인 광물이다", 4);
+        createItem("리튬", "다양한 곳에서 사용되는 광물이다", 4);
 
-        item = new Item("납", "다양한 곳에서 사용되는 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(3);
-        Config.unloadObject(item);
+        createItem("청금석", "푸른색을 띄는 광물이다", 5);
+        createItem("레드스톤", "붉은색을 띄는 광물이다", 5);
 
-        item = new Item("주석", "다양한 곳에서 사용되는 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(3);
-        Config.unloadObject(item);
-
-        item = new Item("니켈", "다양한 곳에서 사용되는 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(3);
-        Config.unloadObject(item);
-
-        item = new Item("철", "매우 많이 사용되는 일반적인 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(4);
-        Config.unloadObject(item);
-
-        item = new Item("리튬", "다양한 곳에서 사용되는 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(4);
-        Config.unloadObject(item);
-
-        item = new Item("청금석", "푸른색을 띄는 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(5);
-        Config.unloadObject(item);
-
-        item = new Item("레드스톤", "붉은색을 띄는 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(5);
-        Config.unloadObject(item);
-
-        item = new Item("은", "회백색을 띄며 신비한 기운을 내뿜는 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(6);
-        Config.unloadObject(item);
+        createItem("은", "회백색을 띄며 신비한 기운을 내뿜는 광물이다", 6);
 
         item = new Item("금", "밝은 노란색을 띄는 보석이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
@@ -305,20 +291,10 @@ public class ObjectMaker {
         }}, true);
         Config.unloadObject(item);
 
-        item = new Item("발광석", "스스로 빛을 내는 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(7);
-        Config.unloadObject(item);
+        createItem("발광석", "스스로 빛을 내는 광물이다", 7);
 
-        item = new Item("화염석영", "주변의 열기를 흡수하는 석영이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(8);
-        Config.unloadObject(item);
-
-        item = new Item("암흑석영", "주변의 빛을 흡수하는 석영이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(8);
-        Config.unloadObject(item);
+        createItem("화염 석영", "주변의 열기를 흡수하는 석영이다", 8);
+        createItem("암흑 석영", "주변의 빛을 흡수하는 석영이다", 8);
 
         item = new Item("명청석", "스스로 빛을 내는 마나의 기운이 담긴 푸른 광물이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
@@ -364,15 +340,8 @@ public class ObjectMaker {
         }}, true);
         Config.unloadObject(item);
 
-        item = new Item("무연탄", "일반 석탄보다 훨씬 질이 좋은 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(10);
-        Config.unloadObject(item);
-
-        item = new Item("티타늄", "꽤나 단단한 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(10);
-        Config.unloadObject(item);
+        createItem("무연탄", "일반 석탄보다 훨씬 질이 좋은 광물이다", 10);
+        createItem("티타늄", "꽤나 단단한 광물이다", 10);
 
         item = new Item("투명석", "거의 보이지 않을 정도로 투명한 보석이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
@@ -394,11 +363,8 @@ public class ObjectMaker {
             put(41L, 3);
         }}, true);
         Config.unloadObject(item);
-
-        item = new Item("오리하르콘", "일반적으로 가장 단단하다고 여겨지는 광물이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(12);
-        Config.unloadObject(item);
+        
+        createItem("오리하르콘", "일반적으로 가장 단단하다고 여겨지는 광물이다", 12);
 
         item = new Item("적청석", "힘과 마나, 두개의 상반된 기운을 한번에 가진 광물이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
@@ -429,256 +395,188 @@ public class ObjectMaker {
         }}, true);
         Config.unloadObject(item);
         
-        item = new Item("가넷", "검붉은색을 띄는 보석이다");
+        createItem("가넷", "검붉은색을 띄는 보석이다", 11);
+        createItem("자수정", "보라색을 띄는 보석이다", 11);
+        createItem("아쿠아마린", "파란색을 띄는 보석이다", 11);
+        createItem("에메랄드", "녹색을 띄는 보석이다", 11);
+        createItem("진주", "흰색을 띄는 보석이다", 11);
+        createItem("루비", "붉은색을 띄는 보석이다", 11);
+        createItem("페리도트", "연두색을 띄는 보석이다", 11);
+        createItem("사파이어", "남색을 띄는 보석이다", 11);
+        createItem("오팔", "다양한 색을 띄는 보석이다", 11);
+        createItem("토파즈", "주황색을 띄는 보석이다", 11);
+        createItem("터키석", "청록색을 띄는 보석이다", 11);
+
+        createItem("쓰레기", "누가 이런걸 물에 버렸어?");
+        createItem("물풀", "누가 이런걸 물에 버렸어?");
+
+        createItem("(일반) 금강모치", "일반 등급의 물고기다", 2);
+        createItem("(일반) 미꾸라지", "일반 등급의 물고기다", 2);
+        createItem("(일반) 붕어", "일반 등급의 물고기다", 2);
+        createItem("(일반) 송사리", "일반 등급의 물고기다", 2);
+        createItem("(일반) 피라미", "일반 등급의 물고기다", 2);
+
+        createItem("(희귀) 망둑어", "희귀 등급의 물고기다", 3);
+        createItem("(희귀) 미꾸라지", "희귀 등급의 물고기다", 3);
+        createItem("(희귀) 배스", "희귀 등급의 물고기다", 3);
+        createItem("(희귀) 살치", "희귀 등급의 물고기다", 3);
+        createItem("(희귀) 쏘가리", "희귀 등급의 물고기다", 3);
+        createItem("(희귀) 은어", "희귀 등급의 물고기다", 3);
+
+        createItem("(특별) 강준치", "특별 등급의 물고기다", 5);
+        createItem("(특별) 망둑어", "특별 등급의 물고기다", 5);
+        createItem("(특별) 메기", "특별 등급의 물고기다", 5);
+        createItem("(특별) 뱀장어", "특별 등급의 물고기다", 5);
+        createItem("(특별) 산천어", "특별 등급의 물고기다", 5);
+        createItem("(특별) 숭어", "특별 등급의 물고기다", 5);
+        createItem("(특별) 쏘가리", "특별 등급의 물고기다", 5);
+        createItem("(특별) 연어", "특별 등급의 물고기다", 5);
+        createItem("(특별) 은어", "특별 등급의 물고기다", 5);
+        createItem("(특별) 잉어", "특별 등급의 물고기다", 5);
+
+        createItem("(유일) 강준치", "유일 등급의 물고기다", 8);
+        createItem("(유일) 메기", "유일 등급의 물고기다", 8);
+        createItem("(유일) 뱀장어", "유일 등급의 물고기다", 8);
+        createItem("(유일) 산천어", "유일 등급의 물고기다", 8);
+        createItem("(유일) 숭어", "유일 등급의 물고기다", 8);
+        createItem("(유일) 연어", "유일 등급의 물고기다", 8);
+        createItem("(유일) 잉어", "유일 등급의 물고기다", 8);
+
+        createItem("(전설) 다금바리", "전설 등급의 물고기다", 10);
+        createItem("(전설) 돗돔", "전설 등급의 물고기다", 10);
+        createItem("(전설) 자치", "전설 등급의 물고기다", 10);
+        createItem("(전설) 쿠니마스", "전설 등급의 물고기다", 10);
+
+        createItem("(신화) 실러캔스", "신화 등급의 물고기다", 12);
+        createItem("(신화) 폐어", "신화 등급의 물고기다", 12);
+
+        item = new Item("전투 비활성화권(1일)", "PvP를 1일간 비활성화 하기 위해 필요한 아이템이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(11);
+        item.setUse((self, other) -> ((Player) self).setPvp(false, 1));
         Config.unloadObject(item);
 
-        item = new Item("자수정", "보라색을 띄는 보석이다");
+        item = new Item("전투 비활성화권(7일)", "PvP를 7일간 비활성화 하기 위해 필요한 아이템이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(11);
+        item.setUse((self, other) -> ((Player) self).setPvp(false, 7));
         Config.unloadObject(item);
 
-        item = new Item("아쿠아마린", "파란색을 띄는 보석이다");
+        item = new Item("스텟 포인트", "스텟 포인트(SP)를 1 얻을 수 있게 해주는 아이템이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(11);
+        item.setUse((self, other) -> ((Player) self).getSp().add(1));
         Config.unloadObject(item);
 
-        item = new Item("에메랄드", "녹색을 띄는 보석이다");
+        item = new Item("모험 스텟", "모험 스텟(ADV)를 1 얻을 수 있게 해주는 아이템이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(11);
+        item.setUse((self, other) -> ((Player) self).getAdv().add(1));
         Config.unloadObject(item);
 
-        item = new Item("진주", "흰색을 띄는 보석이다");
+        item = new Item("하급 제작법", "장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(11);
+        item.setUse((self, other) -> itemManager.giveLowRecipe((Player) self));
         Config.unloadObject(item);
 
-        item = new Item("루비", "붉은색을 띄는 보석이다");
+        item = new Item("중급 제작법", "장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(11);
+        item.setUse((self, other) -> itemManager.giveMiddleRecipe((Player) self));
         Config.unloadObject(item);
 
-        item = new Item("페리도트", "연두색을 띄는 보석이다");
+        item = new Item("상급 제작법", "장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(11);
+        item.setUse((self, other) -> itemManager.giveHighRecipe((Player) self));
         Config.unloadObject(item);
 
-        item = new Item("사파이어", "남색을 띄는 보석이다");
+        createItem("붉은색 구체", "불의 기운을 담고 있는 구체다");
+        createItem("녹색 구체", " 독의 기운을 담고 있는 구체다");
+        createItem("연녹색 구체", "풀의 기운을 담고 있는 구체다");
+        createItem("파란색 구체", "물의 기운을 담고 있는 구체다");
+        createItem("갈색 구체", "얼음의 기운을 담고 있는 구체다");
+        createItem("회색 구체", "흙의 기운을 담고 있는 구체다");
+        createItem("은색 구체", "돌의 기운을 담고 있는 구체다");
+        createItem("연회색 구체", "반사의 기운을 담고 있는 구체다");
+        createItem("노란색 구체", "쇠의 기운을 담고 있는 구체다");
+        createItem("검은색 구체", " 마법의 기운을 담고 있는 구체다");
+        createItem("붉은색 구체", "어둠의 기운을 담고 있는 구체다");
+        createItem("흰색 구체", "빛의 기운을 담고 있는 구체다");
+
+        item = new Item("하급 경험치 포션", "경험치를 소량 제공해주는 포션이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(11);
+        item.setUse((self, other) -> {
+            long exp = new Random().nextInt(2000 * self.getLv().get()) + 20000;
+
+            Player player = (Player) self;
+            player.addExp(exp);
+            player.replyPlayer("하급 경험치 포션을 사용하여 " + exp + " 경험치를 획득했습니다");
+        });
         Config.unloadObject(item);
 
-        item = new Item("오팔", "다양한 색을 띄는 보석이다");
+        item = new Item("중급 경험치 포션", "경험치를 제공해주는 포션이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(11);
+        item.setUse((self, other) -> {
+            long exp = new Random().nextInt(10000 * self.getLv().get()) + 150_000;
+
+            Player player = (Player) self;
+            player.addExp(exp);
+            player.replyPlayer("중급 경험치 포션을 사용하여 " + exp + " 경험치를 획득했습니다");
+        });
         Config.unloadObject(item);
 
-        item = new Item("토파즈", "주황색을 띄는 보석이다");
+        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 118L));
+        Logger.i("ObjectMaker", "Item making is done!");
+
+        item = new Item("상급 경험치 포션", "경험치를 대량 제공해주는 포션이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(11);
+        item.setUse((self, other) -> {
+            long exp = new Random().nextInt(100_000 * self.getLv().get()) + 3_000_000;
+
+            Player player = (Player) self;
+            player.addExp(exp);
+            player.replyPlayer("상급 경험치 포션을 사용하여 " + exp + " 경험치를 획득했습니다");
+        });
         Config.unloadObject(item);
 
-        item = new Item("터키석", "청록색을 띄는 보석이다");
+        createItem("하급 모험의 증표", "간단한 모험을 완수했다는 증표이다");
+        createItem("중급 모험의 증표", " 모험을 완수했다는 증표이다");
+        createItem("상급 모험의 증표", "어려운 모험을 완수했다는 증표이다");
+
+        item = new Item("무색의 구체", "무슨 색이든 될 수 있는 구체이다");
         item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(11);
-        Config.unloadObject(item);
-        
-        item = new Item("쓰레기", "누가 이런걸 물에 버렸어?");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
+        item.setUse((self, other) -> {
+            long itemId = new Random().nextInt(11) + 101;
+            self.addItem(itemId, 1);
+            ((Player) self).replyPlayer(ObjectList.itemList.inverse().get(itemId) + "를 획득했습니다");
+        });
         Config.unloadObject(item);
 
-        item = new Item("물풀", "물에서 자라는 다양한 풀이다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
+        createItem("하급 강화석", "0~4강 무기를 강화할 수 있는 아이템이다");
+        createItem("중급 강화석", "5~9강 무기를 강화할 수 있는 아이템이다");
+        createItem("상급 강화석", "10~14강 무기를 강화할 수 있는 아이템이다");
 
-        item = new Item("(Common) 금강모치", "평범 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
+        createItem("하급 부적", "장착은 불가하지만 약간의 부적의 기운을 띄고 있는 종이다");
+        createItem("중급 부적", "장착은 불가하지만 부적의 기운을 띄고 있는 종이다");
+        createItem("상급 부적", "장착은 불가하지만 강한 부적의 기운을 띄고 있는 종이다");
 
-        item = new Item("(Common) 미꾸라지", "평범 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
+        createItem("보석 조각", "장착은 불가하지만 조각을 모으면 보석을 만들 수 있을 것 같다");
+        createItem("보석 연마제", "보석을 연마할 수 있는 아이템이다");
+        createItem("빛나는 보석 연마제", "중심 보석을 연마할 수 있는 아이템이다");
 
-        item = new Item("(Common) 붕어", "평범 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
+        createItem("무기 완화제", "무기의 제한 레벨을 낮출 수 있는 아이템이다");
 
-        item = new Item("(Common) 송사리", "평범 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Common) 피라미", "평범 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(UnCommon) 망둑어", "특별 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(UnCommon) 미꾸라지", "특별 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(UnCommon) 배스", "특별 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(UnCommon) 살치", "특별 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(UnCommon) 쏘가리", "특별 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(UnCommon) 은어", "특별 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Rare) 강준치", "희귀 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Rare) 망둑어", "희귀 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Rare) 메기", "희귀 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Rare) 뱀장어", "희귀 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Rare) 산천어", "희귀 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Rare) 숭어", "희귀 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Rare) 쏘가리", "희귀 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Rare) 연어", "희귀 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Rare) 은어", "희귀 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Rare) 잉어", "희귀 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Unique) 강준치", "유일 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Unique) 메기", "유일 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Unique) 뱀장어", "유일 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Unique) 산천어", "유일 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Unique) 숭어", "유일 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Unique) 연어", "유일 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Unique) 잉어", "유일 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Legendary) 다금바리", "전설 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Legendary) 돗돔", "전설 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Legendary) 자치", "전설 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Legendary) 쿠니마스", "전설 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Myth) 실러캔스", "신화 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        item = new Item("(Myth) 폐어", "신화 등급의 물고기다");
-        item.getId().setObjectId(ObjectList.itemList.get(item.getName()));
-        item.getHandleLv().set(1);
-        Config.unloadObject(item);
-
-        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 94L));
+        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 129L));
         Logger.i("ObjectMaker", "Item making is done!");
     }
 
-    private static void makeEquip() {
+    private static void createEquips() {
         Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 1L));
         Logger.i("ObjectMaker", "Equipment making is done!");
     }
 
-    private static void makeMonster() {
+    private static void createMonsters() {
         Monster monster = new Monster("양");
         monster.getId().setObjectId(ObjectList.monsterList.get(monster.getRealName()));
         monster.getLv().set(2);
         monster.setLocation(null);
-        monster.setBasicStat(StatType.MAXHP, 50);
+        monster.setType(MonsterType.MIDDLE);
+        monster.setBasicStat(StatType.MAXHP, 20);
         monster.setBasicStat(StatType.HP, 20);
         monster.setBasicStat(StatType.ATK, 3);
         monster.setBasicStat(StatType.DEF, 5);
@@ -688,7 +586,7 @@ public class ObjectMaker {
         Logger.i("ObjectMaker", "Monster making is done!");
     }
 
-    private static void makeMap() {
+    private static void createMaps() {
         MapClass map = new MapClass(ObjectList.mapList.get("0-0"));
         map.setMapType(MapType.COUNTRY);
         map.getLocation().set(0, 0, 1, 1);
@@ -735,6 +633,12 @@ public class ObjectMaker {
         Player player;
         for(String[] playerData : Config.PLAYER_LIST.values()) {
             player = Config.loadPlayer(playerData[0], playerData[1]);
+
+            if(player == null) {
+                Logger.w("ObjectMaker", "Player not found - {" + playerData[0] + ", " + playerData[1] + "}");
+                continue;
+            }
+
             map = Config.loadMap(player.getLocation());
             map.addEntity(player);
             Config.unloadMap(map);
@@ -743,14 +647,14 @@ public class ObjectMaker {
         Logger.i("ObjectMaker", "Map making is done!");
     }
 
-    private static void makeChat() {
+    private static void createChats() {
         Chat chat = new Chat();
         chat.getId().setObjectId(1L);
         chat.getText().addAll(Arrays.asList(
                 "드디어 일어났네 __nickname",
-                "아 이 소리가 어디서 들려오는지는 아직은 몰라도 될거야. 결국엔 알게 될테니까",
+                "이 소리가 어디서 들려오는지는 아직은 몰라도 되. 결국엔 알게 될테니까",
                 "어찌됬든 넌 여기서 성장해야만 해. 그리고 니가 나한테 했던 약속을 지켜야겠지",
-                "음 뭐가됬든 일단 기본적인거부터 가르쳐줄게. " + Emoji.focus("n 도움말")
+                "음 뭐가됬든 기본적인거부터 가르쳐줄게. " + Emoji.focus("n 도움말")
                         + " 을 입력해서 명령어를 살펴봐"
         ));
         chat.setAnyResponseChat("__도움말", 2, true);
@@ -763,8 +667,7 @@ public class ObjectMaker {
         chat = new Chat();
         chat.getId().setObjectId(2L);
         chat.getText().addAll(Arrays.asList(
-                "좋아, 잘 따라오고 있네",
-                "일단 네 정보부터 살펴볼 필요가 있겠지",
+                "좋아, 잘 따라오고 있네. 네 정보도 살펴봐야겠지?",
                 "명령어 목록을 보고 네 정보를 표시하는 명령어를 사용해봐",
                 "아 물론 거기 적혀있기도 하지만 네가 명령어 창을 연 것 처럼, " +
                         "모든 명령어에는 " + Emoji.focus("n") + "이나 " +
@@ -778,11 +681,10 @@ public class ObjectMaker {
         chat = new Chat();
         chat.getId().setObjectId(3L);
         chat.getText().addAll(Arrays.asList(
-                "거기 표시된 정보는 위에서부터 [돈, 체력, 마나, 현재 위치(좌표), 레벨," +
-                        " 잔여 스텟 포인트, 모험 포인트, 거점(좌표)] 야",
-                "일단 우리는 0-0-1-1, 그러니까 가장 외곽에 있는거고, 거점도 여기로 잡혀있어",
+                "기본 정보랑 상세 정보로 나뉘어서 표시되는게 보이지?",
+                "일단 너는 0-0-1-1, 그러니까 서남쪽 끝에 있는거고, 거점도 여기로 잡혀있어",
                 "거점? 아 거점은 죽으면 태어나는 장소야. 어짜피 넌 내 권능때문에 죽을 수 없거든...",
-                "마지막으로 간단한거 하나만 소개하고 가봐야겠네. 일단 마을에서는 광질을 할 수 있으니까" +
+                "마지막으로 간단한거 하나만 소개하고 가봐야겠네. 마을에서는 광질을 할 수 있으니까" +
                         " 광질 명령어를 입력해봐"
         ));
         chat.setAnyResponseChat("__광질", 4, true);
@@ -792,7 +694,7 @@ public class ObjectMaker {
         chat = new Chat();
         chat.getId().setObjectId(4L);
         chat.getText().addAll(Arrays.asList(
-                "그럼 난 이만 가볼게. 어짜피 할 일도 많고 너도 이젠 혼자서 다 할 수 있을거 같으니까",
+                "그럼 난 가볼게. 어짜피 할 일도 많고 너도 이젠 혼자서 다 할 수 있을거 같으니까",
                 "뭐라도 주고 가라고? 골드를 조금 넣어놨으니까 그거라도 써",
                 "아 그리고... ... ... (더 이상 들리지 않는다)"
         ));
@@ -879,12 +781,65 @@ public class ObjectMaker {
         chat.getText().add("한적한 저녁이군\n무슨 일로 왔나 __nickname?");
         chat.setBaseMsg(true);
         Config.unloadObject(chat);
+        
+        chat = new Chat("얼굴에 걱정이 많아보이시는데, 무슨 일 있나요?");
+        chat.getId().setObjectId(17L);
+        chat.getText().addAll(Arrays.asList(
+                "이런, 얼굴에 보였나? 사실 감기에 걸렸는데 방에 불을 아무리 떼도 추워서 말일세",
+                "아무래도 불의 기운을 좀 쥐고 있으면 괜찮아질 것 같은데...",
+                "붉은색 구체 하나만 구해줄 수 있겠나?"
+        ));
+        chat.setResponseChat(WaitResponse.YES, 10, true);
+        chat.setResponseChat(WaitResponse.NO, 18, true);
+        Config.unloadObject(chat);
+        
+        chat = new Chat();
+        chat.getId().setObjectId(18L);
+        chat.getText().add("그래 뭐... 바쁘다면 어쩔 수 없는 일이지");
+        Config.unloadObject(chat);
 
-        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 17L));
+        chat = new Chat();
+        chat.getId().setObjectId(19L);
+        chat.getText().add("고맙네! 드디어 따뜻한 방에서 쉴 수 있겠구만");
+        Config.unloadObject(chat);
+
+        chat = new Chat("오히려 얼굴이 더 안좋아지신 것 같은데요..?");
+        chat.getId().setObjectId(20L);
+        chat.getText().addAll(Arrays.asList(
+                "끄윽... 마침 잘왔네",
+                "자네가 준 붉은색 구체가 너무 강해서 오히려 역효과가 나는 모양이야..",
+                "마지막으로 마나 포션 3개만 만들어와줄 수 있겠나?"
+        ));
+        chat.setResponseChat(WaitResponse.YES, 21, true);
+        chat.setResponseChat(WaitResponse.NO, 22, true);
+        Config.unloadObject(chat);
+        
+        chat = new Chat();
+        chat.getId().setObjectId(21L);
+        chat.getText().add("자꾸 번거롭게 해서 미안하네\n최대한 빨리 구해와주게나");
+        Config.unloadObject(chat);
+
+        chat = new Chat();
+        chat.getId().setObjectId(22L);
+        chat.getText().addAll(Arrays.asList(
+                "40년만 젊었어도 직접 만들었을텐데...",
+                "있는 일만 빨리 끝내고 다시 와주게"
+        ));
+        Config.unloadObject(chat);
+
+        chat = new Chat();
+        chat.getId().setObjectId(23L);
+        chat.getText().addAll(Arrays.asList(
+                "휴 이제야 살 것 같구만\n고맙네 __nickname",
+                "이건 보상이니 받아가게나"
+        ));
+        Config.unloadObject(chat);
+
+        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 24L));
         Logger.i("ObjectMaker", "Chat making is done!");
    }
 
-   private static void makeQuest() {
+   private static void createQuests() {
        Quest quest = new Quest("광부의 일", 3L, 13L);
        quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
        quest.setNeedItem(20L, 50);
@@ -900,11 +855,25 @@ public class ObjectMaker {
        quest.getRewardExp().set(50000L);
        Config.unloadObject(quest);
 
-       Config.ID_COUNT.put(Id.QUEST, Math.max(Config.ID_COUNT.get(Id.CHAT), 3L));
+       quest = new Quest("불이 필요해!", 3L, 19L);
+       quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
+       quest.setNeedItem(101L, 1);
+       quest.setRewardCloseRate(3L, 5, true);
+       quest.getRewardMoney().set(500L);
+       Config.unloadObject(quest);
+       
+       quest = new Quest("불이 너무 강했나...?", 3L, 23L);
+       quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
+       quest.setNeedItem(17L, 3);
+       quest.setRewardCloseRate(3L, 10, true);
+       quest.getRewardItem().put(96L, 20);
+       Config.unloadObject(quest);
+
+       Config.ID_COUNT.put(Id.QUEST, Math.max(Config.ID_COUNT.get(Id.CHAT), 5L));
        Logger.i("ObjectMaker", "Quest making is done!");
    }
 
-    private static void makeNpc() {
+    private static void createNpc() {
         Npc npc = new Npc("???");
         npc.getId().setObjectId(1L);
         npc.getLv().set(Config.MAX_LV);
@@ -948,6 +917,19 @@ public class ObjectMaker {
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(2L);
         npc.setChat(chatLimit, 9L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(3L);
+        chatLimit.getClearedQuest().put(1L, 5);
+        chatLimit.getClearedQuest().put(2L, 5);
+        chatLimit.getNotClearedQuest().add(3L);
+        npc.setChat(chatLimit, 17L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(4L);
+        chatLimit.getClearedQuest().put(3L, 1);
+        chatLimit.getNotClearedQuest().add(4L);
+        npc.setChat(chatLimit, 20L);
         //-----
         Config.unloadObject(npc);
 

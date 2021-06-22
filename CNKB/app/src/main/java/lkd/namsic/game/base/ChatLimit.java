@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import lkd.namsic.game.Config;
@@ -31,7 +32,10 @@ public class ChatLimit {
     final Set<Long> runningQuest = new HashSet<>();
     final Set<Long> notRunningQuest = new HashSet<>();
 
-    RangeInteger limitHour = new RangeInteger(0, 23);
+    final Map<Long, Integer> clearedQuest = new HashMap<>();
+    final Set<Long> notClearedQuest = new HashSet<>();
+
+    final RangeInteger limitHour = new RangeInteger(0, 23);
 
     public boolean isAvailable(Player player) {
         boolean flag = this.getLimitLv().isInRange(player.getLv().get()) &&
@@ -55,8 +59,16 @@ public class ChatLimit {
                 }
             }
 
+            questSet = player.getClearedQuest().keySet();
+            for(long questId : this.notClearedQuest) {
+                if(questSet.contains(questId)) {
+                    return false;
+                }
+            }
+
             LocalDateTime time = LocalDateTime.now();
-            flag = this.limitHour.isInRange(time.getHour());
+            flag = this.limitHour.isInRange(time.getHour()) &&
+                    Config.compareMap(this.clearedQuest, player.getClearedQuest(), true);
         }
 
         return flag;

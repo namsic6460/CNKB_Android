@@ -1,6 +1,7 @@
 package lkd.namsic.game.gameObject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import lkd.namsic.game.base.IdClass;
 import lombok.Getter;
@@ -25,6 +26,18 @@ public abstract class GameObject implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(super.equals(obj)) {
+            return true;
+        } else if(obj instanceof GameObject) {
+            GameObject gameObject = (GameObject) obj;
+            return this.id.getId().equals(gameObject.id.getId()) && this.id.getObjectId() == gameObject.getId().getObjectId();
+        }
+
+        return false;
     }
 
 }

@@ -2,6 +2,7 @@ package lkd.namsic.game.enums;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,16 +12,16 @@ public enum WaitResponse {
 
     NONE(),
     ANYTHING(),
-    YES(Arrays.asList("네", "ㅇㅇ", "yes", "y")),
-    NO(Arrays.asList("아니오", "아니요", "ㄴㄴ", "no", "n"));
+    YES("네", "ㅇㅇ", "yes", "y"),
+    NO("아니오", "아니요", "ㄴㄴ", "no", "n");
 
     @Getter
-    public List<String> list;
+    private final List<String> list = new ArrayList<>();
 
     WaitResponse() {}
 
-    WaitResponse(List<String> list) {
-        this.list = list;
+    WaitResponse(String...texts) {
+        this.list.addAll(Arrays.asList(texts));
     }
 
     @NonNull

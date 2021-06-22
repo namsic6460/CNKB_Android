@@ -1,5 +1,7 @@
 package lkd.namsic.game.enums;
 
+import androidx.annotation.NonNull;
+
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lombok.Getter;
 
@@ -18,7 +20,7 @@ public enum Id {
     SKILL;
 
     @Getter
-    public String value = null;
+    private String value = null;
 
     Id() {}
 
@@ -26,7 +28,7 @@ public enum Id {
         this.value = value;
     }
 
-    public static void checkEntityId(Id id) throws UnhandledEnumException {
+    public static void checkEntityId(@NonNull Id id) throws UnhandledEnumException {
         if(!(id.equals(Id.BOSS) || id.equals(Id.MONSTER) || id.equals(Id.NPC) || id.equals(Id.PLAYER))) {
             throw new UnhandledEnumException(id);
         }

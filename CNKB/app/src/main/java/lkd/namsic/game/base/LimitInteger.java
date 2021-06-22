@@ -42,9 +42,9 @@ public class LimitInteger implements LimitClass<Integer> {
     @Override
     public void set(@NonNull Integer setValue) {
         if (min != null && setValue < min) {
-            throw new NumberRangeException(this);
+            throw new NumberRangeException(setValue, this);
         } else if (max != null && setValue > max) {
-            throw new NumberRangeException(this);
+            throw new NumberRangeException(setValue, this);
         }
 
         this.value = setValue;

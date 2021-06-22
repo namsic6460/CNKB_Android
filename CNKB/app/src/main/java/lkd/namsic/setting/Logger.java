@@ -31,22 +31,33 @@ public class Logger {
         Log.i(title, text);
     }
 
+    public static synchronized void w(String title, Throwable e) {
+        w(title, Config.errorString(e));
+    }
+
     public static synchronized void w(String title, String text) {
         log(title, text, "WARN");
         Log.w(title, text);
     }
 
     public static synchronized void e(String title, Throwable e) {
+        String errorString = Config.errorString(e);
+
         try {
-            String errorString = Config.errorString(e);
             log(title, errorString, "ERR");
             Log.e(title, errorString);
 
             MainActivity.toast("ERROR!\n" + e.getMessage());
-            FileManager.save(FileManager.LOG_PATH + "/ERROR_" + getTimeFileName(), errorString);
-        } catch (Exception _e) {
-            _e.printStackTrace();
+
+            if(title.startsWith("FileManager(path : ")) {
+                throw e;
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return;
         }
+
+        FileManager.save(FileManager.LOG_PATH + "/ERROR_" + getTimeFileName(), errorString);
     }
 
     private static synchronized void log(String title, String text, String prefix) {

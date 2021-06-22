@@ -7,6 +7,6 @@ import java.util.List;
 @FunctionalInterface
 public interface Use {
 
-    void use(Entity user, @NonNull List<GameObject> other);
+    void use(Entity self, @NonNull List<GameObject> other);
 
 }

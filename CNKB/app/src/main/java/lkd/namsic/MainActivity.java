@@ -1,21 +1,19 @@
 package lkd.namsic;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.app.ActivityCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +21,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import lkd.namsic.game.Config;
-import lkd.namsic.game.ObjectMaker;
+import lkd.namsic.game.ObjectCreator;
 import lkd.namsic.game.base.ConcurrentArrayList;
-import lkd.namsic.setting.FileManager;
 import lkd.namsic.service.ForcedTerminationService;
+import lkd.namsic.setting.FileManager;
+import lkd.namsic.setting.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,26 +53,12 @@ public class MainActivity extends AppCompatActivity {
         mainActivity = this;
 
         String[] permissions = { Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                 Manifest.permission.READ_EXTERNAL_STORAGE };
-
-        List<String> requirePermissions = new ArrayList<>();
-        for(String permission : permissions) {
-            if(!hasPermission(this, permission)) {
-                requirePermissions.add(permission);
-            }
-        }
-
-        ActivityCompat.requestPermissions(this, requirePermissions.toArray(new String[3]), 1);
-        if(!hasPermissions(permissions)) {
-            ActivityCompat.finishAffinity(this);
-        } else {
-            String notiPermission = Settings.Secure.getString(getContentResolver(), "enabled_notification_listeners");
-            if(notiPermission == null || !notiPermission.contains(this.getPackageName())) {
-                Intent intent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
-                startActivity(intent);
-                ActivityCompat.finishAffinity(this);
-            }
-        }
+                                 Manifest.permission.READ_EXTERNAL_STORAGE,
+                                 Manifest.permission.ACCESS_COARSE_LOCATION,
+                                 Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                                 Manifest.permission.ACCESS_FINE_LOCATION,
+                                 Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE };
+        ActivityCompat.requestPermissions(this, permissions, 1);
 
         setContentView(R.layout.activity_main);
 
@@ -114,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }, 0, 1000);
+
+        Logger.i("Start", "Debug 10 Started");
     }
 
     public void onSwitchClick(View view) {
@@ -127,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onInitClick(View view) {
-        ObjectMaker.start((Button) view);
+        ObjectCreator.start((Button) view);
     }
 
     public static void toast(final String msg) {
@@ -143,20 +130,6 @@ public class MainActivity extends AppCompatActivity {
         threads.add(thread);
         mainActivity.runOnUiThread(() -> threadCount.setText(String.valueOf(threads.size())));
         thread.start();
-    }
-
-    private boolean hasPermission(Context context, String permission) {
-        return ActivityCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private boolean hasPermissions(String... permissions) {
-        for (String permission : permissions) {
-            if (!hasPermission(this, permission)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
 }

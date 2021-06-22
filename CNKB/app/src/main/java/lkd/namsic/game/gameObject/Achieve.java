@@ -31,12 +31,6 @@ public class Achieve extends NamedObject {
         this.id.setId(Id.ACHIEVE);
     }
 
-    public void setRewardCloseRate(Map<Long, Integer> rewardCloseRate) {
-        for(Map.Entry<Long, Integer> entry : rewardCloseRate.entrySet()) {
-            this.setRewardCloseRate(entry.getKey(), entry.getValue());
-        }
-    }
-
     public void setRewardCloseRate(long npcId, int closeRate) {
         Config.checkId(Id.NPC, npcId);
 
@@ -60,12 +54,6 @@ public class Achieve extends NamedObject {
         this.setRewardCloseRate(npcId, this.getRewardCloseRate(npcId) + closeRate);
     }
 
-    public void setRewardItem(Map<Long, Integer> rewardItem) {
-        for(Map.Entry<Long, Integer> entry : rewardItem.entrySet()) {
-            this.setRewardItem(entry.getKey(), entry.getValue());
-        }
-    }
-
     public void setRewardItem(long itemId, int count) {
         Config.checkId(Id.ITEM, itemId);
 
@@ -87,12 +75,6 @@ public class Achieve extends NamedObject {
 
     public void addRewardItem(long npcId, int closeRate) {
         this.setRewardItem(npcId, this.getRewardItem(npcId) + closeRate);
-    }
-
-    public void setRewardStat(Map<StatType, Integer> rewardStat) {
-        for(Map.Entry<StatType, Integer> entry : rewardStat.entrySet()) {
-            this.setRewardStat(entry.getKey(), entry.getValue());
-        }
     }
 
     public void setRewardStat(StatType statType, int stat) {

@@ -1,5 +1,12 @@
 package lkd.namsic.game.enums;
 
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.Getter;
+
 public enum MapType {
 
     COUNTRY("도시"),
@@ -23,10 +30,38 @@ public enum MapType {
     HEAVEN("천국"),
     FAR_SIDE("먼 곳 어딘가");
 
-    public final String name;
+    @Getter
+    private final String mapName;
 
-    MapType(String name) {
-        this.name = name;
+    MapType(String mapName) {
+        this.mapName = mapName;
+    }
+
+    @NonNull
+    public static List<MapType> cityList() {
+        List<MapType> list = new ArrayList<>(2);
+        list.add(COUNTRY);
+        list.add(UNDERGROUND_CITY);
+
+        return list;
+    }
+
+    @NonNull
+    public static List<MapType> waterList() {
+        List<MapType> list = new ArrayList<>(2);
+        list.add(RIVER);
+        list.add(SEA);
+
+        return list;
+    }
+
+    @NonNull
+    public static List<MapType> caveList() {
+        List<MapType> list = new ArrayList<>(2);
+        list.add(CAVE);
+        list.add(HUGE_CAVE);
+
+        return list;
     }
 
 }

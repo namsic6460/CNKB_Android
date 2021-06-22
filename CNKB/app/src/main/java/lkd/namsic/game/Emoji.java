@@ -4,6 +4,7 @@ public class Emoji {
 
     public final static String OPENER = "「";
     public final static String CLOSER = "」";
+    public final static String LIST = "⚫";  //consider '-'
     public final static String GOLD = "\uD83D\uDCB0";
     public final static String HEART = "♥";
     public final static String MANA = "\uD83D\uDCA7";

@@ -13,7 +13,7 @@ public enum Doing {
     FIGHT,
     FIGHT_ONE,
     FISH,
-    EXPLORE,
+    ADVENTURE,
     MINE,
     GATHER,
     HARVEST,
@@ -22,9 +22,9 @@ public enum Doing {
 
     @NonNull
     public static List<Doing> fightableList() {
-        List<Doing> doingList = new ArrayList<>();
+        List<Doing> doingList = new ArrayList<>(3);
         doingList.add(Doing.NONE);
-        doingList.add(Doing.EXPLORE);
+        doingList.add(Doing.ADVENTURE);
         doingList.add(Doing.FIGHT);
 
         return doingList;
@@ -32,7 +32,7 @@ public enum Doing {
 
     @NonNull
     public static List<Doing> fightList() {
-        List<Doing> doingList = new ArrayList<>();
+        List<Doing> doingList = new ArrayList<>(2);
         doingList.add(Doing.FIGHT);
         doingList.add(Doing.FIGHT_ONE);
 
