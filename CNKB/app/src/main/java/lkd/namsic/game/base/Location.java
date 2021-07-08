@@ -72,7 +72,7 @@ public class Location implements Serializable {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return this.toString().hashCode();
     }
 
     @NonNull

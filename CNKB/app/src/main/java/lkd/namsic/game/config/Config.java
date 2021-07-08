@@ -3,16 +3,21 @@ package lkd.namsic.game.config;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,27 +41,26 @@ import lkd.namsic.game.gameObject.Entity;
 import lkd.namsic.game.gameObject.Equipment;
 import lkd.namsic.game.gameObject.GameObject;
 import lkd.namsic.game.gameObject.Item;
-import lkd.namsic.game.gameObject.MapClass;
+import lkd.namsic.game.gameObject.GameMap;
 import lkd.namsic.game.gameObject.Monster;
 import lkd.namsic.game.gameObject.Npc;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.gameObject.Quest;
 import lkd.namsic.game.gameObject.Research;
 import lkd.namsic.game.gameObject.Skill;
-import lkd.namsic.game.json.LocationDeserializer;
-import lkd.namsic.game.json.LocationSerializer;
-import lkd.namsic.game.json.NpcDeserializer;
-import lkd.namsic.game.json.NpcSerializer;
+import lkd.namsic.game.gameObject.Use;
+import lkd.namsic.game.json.UseAdapter;
+import lkd.namsic.game.json.LocationAdapter;
+import lkd.namsic.game.json.NpcAdapter;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.setting.Logger;
 
 public class Config {
 
     public static final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(Npc.class, new NpcSerializer())
-            .registerTypeAdapter(Npc.class, new NpcDeserializer())
-            .registerTypeAdapter(Location.class, new LocationSerializer())
-            .registerTypeAdapter(Location.class, new LocationDeserializer())
+            .registerTypeAdapter(Npc.class, new NpcAdapter())
+            .registerTypeAdapter(Location.class, new LocationAdapter())
+            .registerTypeAdapter(Use.class, new UseAdapter())
             .setVersion(1.0)
             .create();
 
@@ -70,7 +74,7 @@ public class Config {
 
     public static boolean IGNORE_FILE_LOG = false;
 
-    public static final Map<String, MapClass> MAP = new ConcurrentHashMap<>();
+    public static final Map<String, GameMap> MAP = new ConcurrentHashMap<>();
     public static final Map<String, Long> PLAYER_COUNT = new ConcurrentHashMap<>();
 
     private static final String REGEX = "[^A-Za-z-_0-9ㄱ-ㅎㅏ-ㅣ가-힣\\s]|[\n]|[\r]";
@@ -118,7 +122,14 @@ public class Config {
     public static final int MAX_ITEM_DROP_COUNT = 5;
     public static final double ITEM_DROP_LOSE_PERCENT = 0.95;
 
-    public static final int MAX_EVADE = 90;
+    public static final int RECOGNIZE_DISTANCE = 16;
+    public static final double ATTACKED_PERCENT = 0.5;
+    public static final double ATTACKED_PERCENT_INCREASE = 0.025;
+    public static final double MAX_ATTACKED_PERCENT = 0.9;
+
+    public static final int MAX_AGI = 400;
+    public static final double CRIT_PER_AGI = 0.0025;
+    public static final int MAX_EVADE = 80;
     
     public static final int FISH_DELAY_TIME = 3000;
     public static final long FISH_DELAY_TIME_OFFSET = 5000;
@@ -127,8 +138,10 @@ public class Config {
     public static final int ADVENTURE_COUNT = 5;
     public static final long ADVENTURE_WAIT_TIME = 30000;
     public static final int EXPLORE_HARD_SUCCESS_PERCENT = 20;
+    public static final int APPRAISE_LIMIT = 999;
 
     public static final String INCOMPLETE = "Incomplete";
+    public static final String[] TIERS = new String[] { "하", "중", "상" };
 
     public static void init() {
         ID_CLASS.put(Id.ACHIEVE, Achieve.class);
@@ -217,8 +230,8 @@ public class Config {
                     unloadObject(gameObject);
                 }
 
-                List<MapClass> mapCopy = new ArrayList<>(MAP.values());
-                for(MapClass map : mapCopy) {
+                List<GameMap> mapCopy = new ArrayList<>(MAP.values());
+                for(GameMap map : mapCopy) {
                     unloadMap(map);
                 }
             }
@@ -294,6 +307,35 @@ public class Config {
         }
     }
 
+    @NonNull
+    public static <T extends Serializable> String serialize(T t) {
+        byte[] serialized;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+                oos.writeObject(t);
+                serialized = baos.toByteArray();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return Base64.getEncoder().encodeToString(serialized);
+    }
+
+    @SuppressWarnings("unchecked")
+    @NonNull
+    public static <T extends Serializable> T deserialize(String byteStr) {
+        byte[] serialized = Base64.getDecoder().decode(byteStr);
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(serialized)) {
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            Object object = ois.readObject();
+
+            return (T) object;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public synchronized static void unloadObject(@NonNull GameObject gameObject) {
         Id id = gameObject.getId().getId();
         long objectId = gameObject.getId().getObjectId();
@@ -342,7 +384,7 @@ public class Config {
                         Entity entity = (Entity) gameObject;
 
                         if (entity.getLocation() != null) {
-                            MapClass map = Config.loadMap(entity.getLocation());
+                            GameMap map = Config.loadMap(entity.getLocation());
                             map.addEntity(entity);
                             Config.unloadMap(map);
                         }
@@ -375,7 +417,7 @@ public class Config {
         Logger.w("discardPlayer", "Player discarded - " + player.getName());
     }
 
-    public synchronized static void unloadMap(@NonNull MapClass map) {
+    public synchronized static void unloadMap(@NonNull GameMap map) {
         String fileName = getMapFileName(map);
         Long playerCount = PLAYER_COUNT.get(fileName);
         playerCount = playerCount == null ? 0 : playerCount;
@@ -417,23 +459,36 @@ public class Config {
 
             T t = fromJson(jsonString, ID_CLASS.get(id));
 
+            try {
+                Id.checkEntityId(id);
+                ((Entity) t).revalidateBuff();
+            } catch (UnhandledEnumException ignore) {}
+
             OBJECT.get(id).put(objectId, t);
             OBJECT_COUNT.get(id).put(objectId, 1L);
             return t;
         } else {
             OBJECT_COUNT.get(id).put(objectId, objectCount + 1);
             Logger.i("loadObject(" + objectCount + ")", objectId + " - " + objectId);
-            return (T) Objects.requireNonNull(OBJECT.get(id).get(objectId));
+
+            T t = (T) Objects.requireNonNull(OBJECT.get(id).get(objectId));
+
+            try {
+                Id.checkEntityId(id);
+                ((Entity) t).revalidateBuff();
+            } catch (UnhandledEnumException ignore) {}
+
+            return t;
         }
     }
 
-    @Nullable
+    @NonNull
     public synchronized static Player loadPlayer(@NonNull String sender, @NonNull String image) {
         String path = getPlayerPath(sender, image);
         String jsonString = FileManager.read(path);
 
         if(jsonString.equals("")) {
-            return null;
+            throw new ObjectNotFoundException(sender);
         }
 
         Player player = fromJson(jsonString, Player.class);
@@ -451,15 +506,12 @@ public class Config {
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, objectCount + 1);
         }
 
-        if(player.getNickName().equals("u")) {
-            throw new RuntimeException();
-        }
-
+        player.revalidateBuff();
         return player;
     }
 
     @NonNull
-    public synchronized static MapClass loadMap(int x, int y) {
+    public synchronized static GameMap loadMap(int x, int y) {
         String fileName = getMapFileName(x, y);
         Long playerCount = PLAYER_COUNT.get(fileName);
 
@@ -471,7 +523,7 @@ public class Config {
                 throw new ObjectNotFoundException(path);
             }
 
-            MapClass map = fromJson(jsonString, MapClass.class);
+            GameMap map = fromJson(jsonString, GameMap.class);
 
             MAP.put(fileName, map);
             PLAYER_COUNT.put(fileName, 1L);
@@ -483,7 +535,7 @@ public class Config {
     }
 
     @NonNull
-    public synchronized static MapClass loadMap(Location location) {
+    public synchronized static GameMap loadMap(Location location) {
         return loadMap(location.getX().get(), location.getY().get());
     }
 
@@ -495,13 +547,13 @@ public class Config {
         return t;
     }
 
-    public synchronized static MapClass getMapData(Location location) {
+    public synchronized static GameMap getMapData(Location location) {
         return getMapData(location.getX().get(), location.getY().get());
     }
 
     @NonNull
-    public synchronized static MapClass getMapData(int x, int y) {
-        MapClass map = loadMap(x, y);
+    public synchronized static GameMap getMapData(int x, int y) {
+        GameMap map = loadMap(x, y);
         unloadMap(map);
 
         return map;
@@ -578,7 +630,7 @@ public class Config {
     }
 
     @NonNull
-    public static String getMapFileName(MapClass map) {
+    public static String getMapFileName(GameMap map) {
         return getMapFileName(map.getLocation().getX().get(), map.getLocation().getY().get());
     }
 
@@ -587,6 +639,29 @@ public class Config {
         return FileManager.MAP_PATH + "/" + fileName;
     }
 
+    //AlphaDo 님의 체력바 소스를 참고했음을 알립니다
+    @NonNull
+    public static String getBar(int value, int maxValue) {
+        double percent = 10.0 * value / maxValue;
+        double dec = percent % 1;
+        int filled = (int) percent;
+
+        StringBuilder output = new StringBuilder("[");
+
+        for(int i = 0; i < filled; i++) {
+            output.append(Emoji.FILLED_BAR);
+        }
+
+        output.append(Emoji.HALF_BAR[(int) Math.round(dec * 8)]);
+
+        for(int i = 9; i > filled; i--) {
+            output.append("  ");
+        }
+
+        return output.toString() + "] (" + value + "/" + maxValue + ")";
+    }
+
+    @NonNull
     public static String getIncrease(int value) {
         if(value > 0) {
             return "+" + value;
@@ -597,6 +672,7 @@ public class Config {
         }
     }
 
+    @NonNull
     public static String getIncrease(long value) {
         if(value > 0) {
             return "+" + value;
@@ -607,6 +683,34 @@ public class Config {
         }
     }
 
+    public static int giveToken(long startItemId, double[][] tokenList, int index, @NonNull Player self) {
+        double random = Math.random();
+
+        double weight = 0D;
+        double percent;
+        double[] percents = tokenList[index];
+
+        for(int i = 0; i < 3; i++) {
+            percent = percents[i];
+
+            if(percent == 0) {
+                continue;
+            }
+
+            if(random < percent + weight) {
+                startItemId += i;
+                self.addItem(startItemId, 1, false);
+
+                return i;
+            } else {
+                weight += random;
+            }
+        }
+
+        return -1;
+    }
+
+    @NonNull
     public static String errorString(@NonNull Throwable throwable) {
         StringBuilder builder = new StringBuilder(throwable.getClass().getName());
         builder.append(": ");
@@ -619,6 +723,7 @@ public class Config {
         return builder.toString();
     }
 
+    @NonNull
     public static String getRegex(@NonNull String string, @NonNull String replacement) {
         return string.replaceAll(REGEX, replacement)
                 .replaceAll("[ ]{2,}", " ")

@@ -14,6 +14,7 @@ import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
+import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.gameObject.Item;
@@ -45,11 +46,14 @@ public class MineManager {
             percents.add(minePercent.get(mineLv));
         }
 
-        List<Long> output = Arrays.asList(20L, 21L, 0L, 0L, 0L, 31L, 33L, 0L, 0L, 0L, 43L, 0L);
+        List<Long> output = Arrays.asList(ItemList.STONE.getId(), ItemList.COAL.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.SILVER.getId(), ItemList.GLOW_STONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.ORICHALCON.getId(), ItemList.NONE.getId());
 
         double percent;
         long itemId = 0;
-        for(int itemTier = 0; itemTier < percents.size(); itemTier++) {
+
+        //0 ~ 11
+        int itemTier = 0;
+        for(; itemTier < percents.size(); itemTier++) {
             percent = percents.get(itemTier);
 
             if(randomPercent < percent) {
@@ -60,25 +64,27 @@ public class MineManager {
 
                     switch(itemTier) {
                         case 2:
-                            itemList = new long[]{23L, 24L, 25L, 26L};
+                            itemList = new long[]{ItemList.COPPER.getId(), ItemList.LEAD.getId(),
+                                    ItemList.TIn.getId(), ItemList.NICKEL.getId()};
                             break;
                         case 3:
-                            itemList = new long[]{27L, 28L};
+                            itemList = new long[]{ItemList.IRON.getId(), ItemList.LITHIUM.getId()};
                             break;
                         case 4:
-                            itemList = new long[]{29L, 30L};
+                            itemList = new long[]{ItemList.LAPIS.getId(), ItemList.RED_STONE.getId()};
                             break;
                         case 7:
-                            itemList = new long[]{34L, 35L};
+                            itemList = new long[]{ItemList.FIRE_QUARTZ.getId(), ItemList.DARK_QUARTZ.getId()};
                             break;
                         case 8:
-                            itemList = new long[]{36L, 37L};
+                            itemList = new long[]{ItemList.GLOW_LAPIS.getId(), ItemList.GLOW_RED_STONE.getId()};
                             break;
                         case 9:
-                            itemList = new long[]{39L, 40L};
+                            itemList = new long[]{ItemList.HARD_COAL.getId(), ItemList.TITANIUM.getId()};
                             break;
                         case 11:
-                            itemList = new long[]{44L, 45L, 46L};
+                            itemList = new long[]{ItemList.LAPIS_RED_STONE.getId(), ItemList.LANDIUM.getId(),
+                                    ItemList.AITUME.getId()};
                             break;
                         default:
                             throw new InvalidNumberException(itemTier);
@@ -97,19 +103,33 @@ public class MineManager {
             Thread.sleep(new Random().nextInt(1000));
         } catch (InterruptedException e) {
             Logger.e("player.mineThread", e);
-            return;
+            throw new RuntimeException(e.getMessage());
         }
 
         int count = self.getItem(itemId);
-        self.addItem(itemId, 1);
+        self.addItem(itemId, 1, false);
+
+        StringBuilder builder = new StringBuilder();
 
         Item item = Config.getData(Id.ITEM, itemId);
-        self.replyPlayer(item.getName() + "을 캤습니다!\n아이템 개수 : " + count + " -> " + (count + 1));
+        builder.append(item.getName())
+                .append("을 캤습니다!\n아이템 개수 : ")
+                .append(count).append(" -> ")
+                .append(count + 1)
+                .append("\n");
+
+        int token = Config.giveToken(ItemList.LOW_MINER_TOKEN.getId(), RandomList.MINE_TOKEN, itemTier, self);
+        if(token >= 0) {
+            builder.append(Config.TIERS[token])
+                    .append("급 광부의 증표 1개를 획득하였습니다\n");
+        }
 
         if(this.checkMineLevel(self)) {
             self.addVariable(Variable.MINE, 1);
-            self.replyPlayer("광업 레벨이 올랐습니다!\n광업 레벨: " + mineLv + " -> " + (mineLv + 1));
+            self.replyPlayer("광질 레벨이 올랐습니다!\n광질 레벨: " + mineLv + " -> " + (mineLv + 1));
         }
+
+        self.replyPlayer(builder.toString().trim());
 
         self.setDoing(Doing.NONE);
     }

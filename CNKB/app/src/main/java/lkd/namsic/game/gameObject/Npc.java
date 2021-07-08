@@ -3,15 +3,17 @@ package lkd.namsic.game.gameObject;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.game.config.Config;
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.ConcurrentHashSet;
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.ObjectList;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.manager.ChatManager;
@@ -33,6 +35,7 @@ public class Npc extends Entity {
     public Npc(@NonNull String name) {
         super(name);
         this.id.setId(Id.NPC);
+        this.id.setObjectId(Objects.requireNonNull(ObjectList.npcList.get(name)));
     }
 
     public void setCommonChat(@NonNull ChatLimit chatLimit, long chatId) {
@@ -41,6 +44,8 @@ public class Npc extends Entity {
         Chat chat = Config.getData(Id.CHAT, chatId);
         if(chat.getQuestId().get() != 0) {
             throw new InvalidNumberException(0);
+        } else if(!chat.isBaseMsg()) {
+            throw new RuntimeException("common chat must be base msg");
         }
 
         ConcurrentHashSet<Long> chatSet = this.commonChat.get(chatLimit);
@@ -67,21 +72,22 @@ public class Npc extends Entity {
     }
 
     @NonNull
-    private Set<Long> getAvailableCommonChat(@NonNull Player player) {
-        Set<Long> availableSet = new HashSet<>();
+    private List<Long> getAvailableCommonChat(@NonNull Player player) {
+        List<Long> list = new ArrayList<>();
 
         for(Map.Entry<ChatLimit, ConcurrentHashSet<Long>> entry : this.commonChat.entrySet()) {
             if(entry.getKey().isAvailable(player)) {
-                availableSet.addAll(entry.getValue());
+                list.addAll(entry.getValue());
             }
         }
 
-        return availableSet;
+        list.sort((o1, o2) -> o1 < o2 ? -1 : 1);
+        return list;
     }
 
     @NonNull
-    public Set<Long> getAvailableChat(@NonNull Player player) {
-        Set<Long> availableSet = new HashSet<>();
+    public List<Long> getAvailableChat(@NonNull Player player) {
+        List<Long> list = new ArrayList<>();
 
         Chat chat;
         for(Map.Entry<ChatLimit, ConcurrentHashSet<Long>> entry : this.chat.entrySet()) {
@@ -92,20 +98,21 @@ public class Npc extends Entity {
 
                     if(questId != 0) {
                         if(player.canAddQuest(questId)) {
-                            availableSet.add(chatId);
+                            list.add(chatId);
                         }
                     } else {
-                        availableSet.add(chatId);
+                        list.add(chatId);
                     }
                 }
             }
         }
 
-        return availableSet;
+        list.sort((o1, o2) -> o1 < o2 ? -1 : 1);
+        return list;
     }
 
     public void startChat(@NonNull Player player) {
-        Set<Long> availableCommonSet = this.getAvailableCommonChat(player);
+        List<Long> availableCommonSet = this.getAvailableCommonChat(player);
         if(availableCommonSet.isEmpty()) {
             player.replyPlayer("해당 NPC 와 할 수 있는 대화가 없습니다");
             return;
@@ -123,6 +130,12 @@ public class Npc extends Entity {
     @Override
     public void onKill(@NonNull Entity entity) {
         throw new RuntimeException("Why onKill in NPC?");
+    }
+
+    @NonNull
+    @Override
+    public String getName() {
+        return "[NPC] " + this.name;
     }
 
 }

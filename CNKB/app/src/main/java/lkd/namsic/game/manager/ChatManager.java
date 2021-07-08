@@ -21,7 +21,7 @@ import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Chat;
-import lkd.namsic.game.gameObject.MapClass;
+import lkd.namsic.game.gameObject.GameMap;
 import lkd.namsic.game.gameObject.Npc;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.setting.Logger;
@@ -64,7 +64,7 @@ public class ChatManager {
 
     public void startChat(@NonNull Player self,  @NonNull String npcName) {
         Long npcId = ObjectList.npcList.get(npcName);
-        MapClass map = Config.getMapData(self.getLocation());
+        GameMap map = Config.getMapData(self.getLocation());
 
         if(npcId == null || !map.getEntity(Id.NPC).contains(npcId)) {
             throw new WeirdCommandException("해당 NPC 를 찾을 수 없습니다\n" +
@@ -111,12 +111,13 @@ public class ChatManager {
                 }
 
                 long pauseTime = chat.getPauseTime().get();
-                String preString = "[" + npc.getName() + " -> " + self.getNickName() + "]\n";
+                String preString = npc.getName() + " -> " + self.getNickName() + "\n";
 
                 List<String> texts = chat.getText();
                 int size = texts.size() - 1;
                 for (int i = 0; i <= size; i++) {
-                    KakaoTalk.reply(session, preString + texts.get(i).replaceAll("__nickname", self.getNickName())
+                    KakaoTalk.reply(session, preString + texts.get(i)
+                            .replaceAll("__nickname", self.getNickName())
                             .replaceAll("__lv", self.getLv().get().toString()));
 
                     try {
@@ -132,7 +133,7 @@ public class ChatManager {
                 self.addMoney(chat.getMoney().get());
 
                 for (Map.Entry<Long, Integer> entry : chat.getItem().entrySet()) {
-                    self.addItem(entry.getKey(), entry.getValue());
+                    self.addItem(entry.getKey(), entry.getValue(), false);
                 }
 
                 for (long equipId : chat.getEquipment()) {
@@ -146,6 +147,7 @@ public class ChatManager {
                 long questId = chat.getQuestId().get();
                 if (questId != 0) {
                     self.addQuest(chat.getQuestId().get());
+                    self.replyPlayer("퀘스트 \"" + ObjectList.questList.inverse().get(questId) + "\" (을/를) 수락하였습니다");
                 }
 
                 Location tpLocation = chat.getTpLocation();
@@ -157,7 +159,7 @@ public class ChatManager {
                     self.getResponseChat().clear();
                     self.getAnyResponseChat().clear();
 
-                    Set<Long> availableChat = npc.getAvailableChat(self);
+                    List<Long> availableChat = npc.getAvailableChat(self);
 
                     if (availableChat.isEmpty()) {
                         self.replyPlayer("가능한 대화가 없습니다");
@@ -165,7 +167,7 @@ public class ChatManager {
                         return;
                     }
 
-                    int index = 0;
+                    int index = 1;
                     String indexStr;
                     Chat chatData;
                     StringBuilder builder = new StringBuilder("대화를 선택해주세요\n");

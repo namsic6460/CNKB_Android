@@ -1,9 +1,13 @@
 package lkd.namsic.game.config;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import lkd.namsic.game.enums.object_list.ItemList;
 
 public class RandomList {
 
@@ -197,311 +201,373 @@ public class RandomList {
 
     public static final Map<Integer, Map<Long, Integer>> EXPLORE_LIST = new HashMap<Integer, Map<Long, Integer>>() {{
         put(1, new HashMap<Long, Integer>() {{
-            put(1L, 150000);
-            put(2L, 150000);
-            put(3L, 150000);
-            put(4L, 150000);
-            put(10L, 150000);
-            put(11L, 150000);
-            put(7L, 100000);
+            put(ItemList.STONE.getId(), 150000);
+            put(ItemList.BRANCH.getId(), 150000);
+            put(ItemList.LEAF.getId(), 150000);
+            put(ItemList.GRASS.getId(), 150000);
+            put(ItemList.DIRT.getId(), 150000);
+            put(ItemList.SAND.getId(), 150000);
+            put(ItemList.HERB.getId(), 100000);
         }});
         put(2, new HashMap<Long, Integer>() {{
-            put(1L, 140000);
-            put(2L, 140000);
-            put(3L, 140000);
-            put(4L, 140000);
-            put(10L, 140000);
-            put(11L, 140000);
-            put(7L, 100000);
-            put(118L, 40000);
-            put(115L, 20000);
+            put(ItemList.STONE.getId(), 140000);
+            put(ItemList.BRANCH.getId(), 140000);
+            put(ItemList.LEAF.getId(), 140000);
+            put(ItemList.GRASS.getId(), 140000);
+            put(ItemList.DIRT.getId(), 140000);
+            put(ItemList.SAND.getId(), 140000);
+            put(ItemList.HERB.getId(), 100000);
+            put(ItemList.EMPTY_SPHERE.getId(), 40000);
+            put(ItemList.LOW_ADV_TOKEN.getId(), 20000);
         }});
         put(3, new HashMap<Long, Integer>() {{
-            put(1L, 100000);
-            put(2L, 100000);
-            put(3L, 100000);
-            put(4L, 100000);
-            put(10L, 100000);
-            put(11L, 100000);
-            put(7L, 100000);
-            put(118L, 50000);
-            put(115L, 50000);
-            put(14L, 100000);
-            put(17L, 100000);
+            put(ItemList.STONE.getId(), 100000);
+            put(ItemList.BRANCH.getId(), 100000);
+            put(ItemList.LEAF.getId(), 100000);
+            put(ItemList.GRASS.getId(), 100000);
+            put(ItemList.DIRT.getId(), 100000);
+            put(ItemList.SAND.getId(), 100000);
+            put(ItemList.HERB.getId(), 100000);
+            put(ItemList.EMPTY_SPHERE.getId(), 50000);
+            put(ItemList.LOW_ADV_TOKEN.getId(), 50000);
+            put(ItemList.LOW_HP_POTION.getId(), 100000);
+            put(ItemList.LOW_MP_POTION.getId(), 100000);
         }});
         put(4, new HashMap<Long, Integer>() {{
-            put(1L, 70000);
-            put(2L, 70000);
-            put(3L, 70000);
-            put(4L, 70000);
-            put(10L, 70000);
-            put(11L, 70000);
-            put(7L, 80000);
-            put(118L, 100000);
-            put(115L, 100000);
-            put(14L, 150000);
-            put(17L, 150000);
+            put(ItemList.STONE.getId(), 70000);
+            put(ItemList.BRANCH.getId(), 70000);
+            put(ItemList.LEAF.getId(), 70000);
+            put(ItemList.GRASS.getId(), 70000);
+            put(ItemList.DIRT.getId(), 70000);
+            put(ItemList.SAND.getId(), 70000);
+            put(ItemList.HERB.getId(), 80000);
+            put(ItemList.EMPTY_SPHERE.getId(), 100000);
+            put(ItemList.LOW_ADV_TOKEN.getId(), 100000);
+            put(ItemList.LOW_HP_POTION.getId(), 150000);
+            put(ItemList.LOW_MP_POTION.getId(), 150000);
         }});
         put(5, new HashMap<Long, Integer>() {{
-            put(1L, 50000);
-            put(2L, 50000);
-            put(3L, 50000);
-            put(4L, 50000);
-            put(10L, 50000);
-            put(11L, 50000);
-            put(7L, 50000);
-            put(118L, 100000);
-            put(115L, 100000);
-            put(14L, 150000);
-            put(17L, 150000);
-            put(5L, 100000);
-            put(97L, 50000);
+            put(ItemList.STONE.getId(), 50000);
+            put(ItemList.BRANCH.getId(), 50000);
+            put(ItemList.LEAF.getId(), 50000);
+            put(ItemList.GRASS.getId(), 50000);
+            put(ItemList.DIRT.getId(), 50000);
+            put(ItemList.SAND.getId(), 50000);
+            put(ItemList.HERB.getId(), 50000);
+            put(ItemList.EMPTY_SPHERE.getId(), 100000);
+            put(ItemList.LOW_ADV_TOKEN.getId(), 100000);
+            put(ItemList.LOW_HP_POTION.getId(), 150000);
+            put(ItemList.LOW_MP_POTION.getId(), 150000);
+            put(ItemList.SMALL_GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 50000);
         }});
         put(6, new HashMap<Long, Integer>() {{
-            put(1L, 50000);
-            put(2L, 50000);
-            put(3L, 50000);
-            put(4L, 50000);
-            put(10L, 50000);
-            put(11L, 50000);
-            put(7L, 50000);
-            put(118L, 100000);
-            put(115L, 50000);
-            put(116L, 50000);
-            put(14L, 100000);
-            put(17L, 100000);
-            put(5L, 100000);
-            put(97L, 50000);
-            put(112L, 50000);
-            put(98L, 50000);
+            put(ItemList.STONE.getId(), 50000);
+            put(ItemList.BRANCH.getId(), 50000);
+            put(ItemList.LEAF.getId(), 50000);
+            put(ItemList.GRASS.getId(), 50000);
+            put(ItemList.DIRT.getId(), 50000);
+            put(ItemList.SAND.getId(), 50000);
+            put(ItemList.HERB.getId(), 50000);
+            put(ItemList.EMPTY_SPHERE.getId(), 100000);
+            put(ItemList.LOW_ADV_TOKEN.getId(), 50000);
+            put(ItemList.ADV_TOKEN.getId(), 50000);
+            put(ItemList.LOW_HP_POTION.getId(), 100000);
+            put(ItemList.LOW_MP_POTION.getId(), 100000);
+            put(ItemList.SMALL_GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 50000);
+            put(ItemList.LOW_EXP_POTION.getId(), 50000);
+            put(ItemList.LOW_CRAFT_GUIDE.getId(), 50000);
         }});
         put(7, new HashMap<Long, Integer>() {{
-            put(1L, 40000);
-            put(2L, 40000);
-            put(3L, 40000);
-            put(4L, 40000);
-            put(10L, 40000);
-            put(11L, 40000);
-            put(7L, 40000);
-            put(118L, 100000);
-            put(116L, 100000);
-            put(14L, 80000);
-            put(17L, 80000);
-            put(15L, 30000);
-            put(18L, 30000);
-            put(5L, 100000);
-            put(97L, 75000);
-            put(112L, 50000);
-            put(98L, 75000);
+            put(ItemList.STONE.getId(), 40000);
+            put(ItemList.BRANCH.getId(), 40000);
+            put(ItemList.LEAF.getId(), 40000);
+            put(ItemList.GRASS.getId(), 40000);
+            put(ItemList.DIRT.getId(), 40000);
+            put(ItemList.SAND.getId(), 40000);
+            put(ItemList.HERB.getId(), 40000);
+            put(ItemList.EMPTY_SPHERE.getId(), 100000);
+            put(ItemList.ADV_TOKEN.getId(), 100000);
+            put(ItemList.LOW_HP_POTION.getId(), 80000);
+            put(ItemList.LOW_MP_POTION.getId(), 80000);
+            put(ItemList.HP_POTION.getId(), 30000);
+            put(ItemList.MP_POTION.getId(), 30000);
+            put(ItemList.SMALL_GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 75000);
+            put(ItemList.LOW_EXP_POTION.getId(), 50000);
+            put(ItemList.LOW_CRAFT_GUIDE.getId(), 75000);
         }});
         put(8, new HashMap<Long, Integer>() {{
-            put(1L, 30000);
-            put(2L, 30000);
-            put(3L, 30000);
-            put(4L, 30000);
-            put(10L, 30000);
-            put(11L, 30000);
-            put(7L, 30000);
-            put(118L, 70000);
-            put(116L, 100000);
-            put(15L, 100000);
-            put(18L, 100000);
-            put(5L, 100000);
-            put(97L, 100000);
-            put(112L, 120000);
-            put(98L, 100000);
+            put(ItemList.STONE.getId(), 30000);
+            put(ItemList.BRANCH.getId(), 30000);
+            put(ItemList.LEAF.getId(), 30000);
+            put(ItemList.GRASS.getId(), 30000);
+            put(ItemList.DIRT.getId(), 30000);
+            put(ItemList.SAND.getId(), 30000);
+            put(ItemList.HERB.getId(), 30000);
+            put(ItemList.EMPTY_SPHERE.getId(), 70000);
+            put(ItemList.ADV_TOKEN.getId(), 100000);
+            put(ItemList.HP_POTION.getId(), 100000);
+            put(ItemList.MP_POTION.getId(), 100000);
+            put(ItemList.SMALL_GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 100000);
+            put(ItemList.LOW_EXP_POTION.getId(), 120000);
+            put(ItemList.LOW_CRAFT_GUIDE.getId(), 100000);
         }});
         put(9, new HashMap<Long, Integer>() {{
-            put(1L, 20000);
-            put(2L, 20000);
-            put(3L, 20000);
-            put(4L, 20000);
-            put(10L, 20000);
-            put(11L, 20000);
-            put(7L, 20000);
-            put(118L, 50000);
-            put(116L, 100000);
-            put(15L, 100000);
-            put(18L, 100000);
-            put(5L, 60000);
-            put(97L, 100000);
-            put(112L, 150000);
-            put(119L, 50000);
-            put(122L, 50000);
-            put(98L, 100000);
+            put(ItemList.STONE.getId(), 20000);
+            put(ItemList.BRANCH.getId(), 20000);
+            put(ItemList.LEAF.getId(), 20000);
+            put(ItemList.GRASS.getId(), 20000);
+            put(ItemList.DIRT.getId(), 20000);
+            put(ItemList.SAND.getId(), 20000);
+            put(ItemList.HERB.getId(), 20000);
+            put(ItemList.EMPTY_SPHERE.getId(), 50000);
+            put(ItemList.ADV_TOKEN.getId(), 100000);
+            put(ItemList.HP_POTION.getId(), 100000);
+            put(ItemList.MP_POTION.getId(), 100000);
+            put(ItemList.SMALL_GOLD_BAG.getId(), 60000);
+            put(ItemList.ADV_STAT.getId(), 100000);
+            put(ItemList.LOW_EXP_POTION.getId(), 150000);
+            put(ItemList.LOW_REINFORCE_STONE.getId(), 50000);
+            put(ItemList.PIECE_OF_LOW_AMULET.getId(), 50000);
+            put(ItemList.LOW_CRAFT_GUIDE.getId(), 100000);
         }});
         put(10, new HashMap<Long, Integer>() {{
-            put(1L, 30000);
-            put(2L, 30000);
-            put(3L, 30000);
-            put(4L, 30000);
-            put(10L, 30000);
-            put(11L, 30000);
-            put(7L, 30000);
-            put(118L, 40000);
-            put(116L, 100000);
-            put(15L, 100000);
-            put(18L, 100000);
-            put(5L, 50000);
-            put(97L, 100000);
-            put(112L, 100000);
-            put(119L, 50000);
-            put(122L, 50000);
-            put(98L, 100000);
+            put(ItemList.STONE.getId(), 30000);
+            put(ItemList.BRANCH.getId(), 30000);
+            put(ItemList.LEAF.getId(), 30000);
+            put(ItemList.GRASS.getId(), 30000);
+            put(ItemList.DIRT.getId(), 30000);
+            put(ItemList.SAND.getId(), 30000);
+            put(ItemList.HERB.getId(), 30000);
+            put(ItemList.EMPTY_SPHERE.getId(), 40000);
+            put(ItemList.ADV_TOKEN.getId(), 100000);
+            put(ItemList.HP_POTION.getId(), 100000);
+            put(ItemList.MP_POTION.getId(), 100000);
+            put(ItemList.SMALL_GOLD_BAG.getId(), 50000);
+            put(ItemList.ADV_STAT.getId(), 100000);
+            put(ItemList.LOW_EXP_POTION.getId(), 100000);
+            put(ItemList.LOW_REINFORCE_STONE.getId(), 50000);
+            put(ItemList.PIECE_OF_LOW_AMULET.getId(), 50000);
+            put(ItemList.LOW_CRAFT_GUIDE.getId(), 100000);
         }});
         put(11, new HashMap<Long, Integer>() {{
-            put(1L, 10000);
-            put(2L, 10000);
-            put(3L, 10000);
-            put(4L, 10000);
-            put(10L, 10000);
-            put(11L, 10000);
-            put(7L, 10000);
-            put(118L, 30000);
-            put(116L, 50000);
-            put(117L, 20000);
-            put(15L, 100000);
-            put(18L, 100000);
-            put(5L, 50000);
-            put(6L, 10000);
-            put(97L, 100000);
-            put(112L, 30000);
-            put(113L, 100000);
-            put(119L, 100000);
-            put(122L, 100000);
-            put(98L, 80000);
-            put(99L, 60000);
+            put(ItemList.STONE.getId(), 10000);
+            put(ItemList.BRANCH.getId(), 10000);
+            put(ItemList.LEAF.getId(), 10000);
+            put(ItemList.GRASS.getId(), 10000);
+            put(ItemList.DIRT.getId(), 10000);
+            put(ItemList.SAND.getId(), 10000);
+            put(ItemList.HERB.getId(), 10000);
+            put(ItemList.EMPTY_SPHERE.getId(), 30000);
+            put(ItemList.ADV_TOKEN.getId(), 50000);
+            put(ItemList.HIGH_ADV_TOKEN.getId(), 20000);
+            put(ItemList.HP_POTION.getId(), 100000);
+            put(ItemList.MP_POTION.getId(), 100000);
+            put(ItemList.SMALL_GOLD_BAG.getId(), 50000);
+            put(ItemList.GOLD_BAG.getId(), 10000);
+            put(ItemList.ADV_STAT.getId(), 100000);
+            put(ItemList.LOW_EXP_POTION.getId(), 30000);
+            put(ItemList.EXP_POTION.getId(), 100000);
+            put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
+            put(ItemList.PIECE_OF_LOW_AMULET.getId(), 100000);
+            put(ItemList.LOW_CRAFT_GUIDE.getId(), 80000);
+            put(ItemList.CRAFT_GUIDE.getId(), 60000);
         }});
         put(12, new HashMap<Long, Integer>() {{
-            put(118L, 10000);
-            put(117L, 50000);
-            put(15L, 50000);
-            put(18L, 50000);
-            put(16L, 100000);
-            put(19L, 100000);
-            put(6L, 100000);
-            put(97L, 100000);
-            put(113L, 100000);
-            put(119L, 100000);
-            put(122L, 100000);
-            put(98L, 80000);
-            put(99L, 60000);
+            put(ItemList.EMPTY_SPHERE.getId(), 10000);
+            put(ItemList.HIGH_ADV_TOKEN.getId(), 50000);
+            put(ItemList.HP_POTION.getId(), 50000);
+            put(ItemList.MP_POTION.getId(), 50000);
+            put(ItemList.HIGH_HP_POTION.getId(), 100000);
+            put(ItemList.HIGH_MP_POTION.getId(), 100000);
+            put(ItemList.GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 100000);
+            put(ItemList.EXP_POTION.getId(), 100000);
+            put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
+            put(ItemList.PIECE_OF_LOW_AMULET.getId(), 100000);
+            put(ItemList.LOW_CRAFT_GUIDE.getId(), 80000);
+            put(ItemList.CRAFT_GUIDE.getId(), 60000);
         }});
         put(13, new HashMap<Long, Integer>() {{
-            put(117L, 100000);
-            put(15L, 50000);
-            put(18L, 50000);
-            put(16L, 100000);
-            put(19L, 100000);
-            put(6L, 100000);
-            put(97L, 100000);
-            put(113L, 100000);
-            put(119L, 100000);
-            put(122L, 100000);
-            put(99L, 100000);
+            put(ItemList.HIGH_ADV_TOKEN.getId(), 100000);
+            put(ItemList.HP_POTION.getId(), 50000);
+            put(ItemList.MP_POTION.getId(), 50000);
+            put(ItemList.HIGH_HP_POTION.getId(), 100000);
+            put(ItemList.HIGH_MP_POTION.getId(), 100000);
+            put(ItemList.GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 100000);
+            put(ItemList.EXP_POTION.getId(), 100000);
+            put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
+            put(ItemList.PIECE_OF_LOW_AMULET.getId(), 100000);
+            put(ItemList.CRAFT_GUIDE.getId(), 100000);
         }});
         put(14, new HashMap<Long, Integer>() {{
-            put(117L, 100000);
-            put(15L, 25000);
-            put(18L, 25000);
-            put(16L, 100000);
-            put(19L, 100000);
-            put(6L, 100000);
-            put(97L, 100000);
-            put(113L, 100000);
-            put(119L, 100000);
-            put(122L, 100000);
-            put(123L, 50000);
-            put(99L, 100000);
+            put(ItemList.HIGH_ADV_TOKEN.getId(), 100000);
+            put(ItemList.HP_POTION.getId(), 25000);
+            put(ItemList.MP_POTION.getId(), 25000);
+            put(ItemList.HIGH_HP_POTION.getId(), 100000);
+            put(ItemList.HIGH_MP_POTION.getId(), 100000);
+            put(ItemList.GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 100000);
+            put(ItemList.EXP_POTION.getId(), 100000);
+            put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
+            put(ItemList.PIECE_OF_LOW_AMULET.getId(), 100000);
+            put(ItemList.PIECE_OF_AMULET.getId(), 50000);
+            put(ItemList.CRAFT_GUIDE.getId(), 100000);
         }});
         put(15, new HashMap<Long, Integer>() {{
-            put(117L, 100000);
-            put(16L, 100000);
-            put(19L, 100000);
-            put(6L, 100000);
-            put(97L, 100000);
-            put(113L, 100000);
-            put(119L, 100000);
-            put(123L, 100000);
-            put(99L, 100000);
-            put(125L, 50000);
-            put(126L, 50000);
+            put(ItemList.HIGH_ADV_TOKEN.getId(), 100000);
+            put(ItemList.HIGH_HP_POTION.getId(), 100000);
+            put(ItemList.HIGH_MP_POTION.getId(), 100000);
+            put(ItemList.GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 100000);
+            put(ItemList.EXP_POTION.getId(), 100000);
+            put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
+            put(ItemList.PIECE_OF_AMULET.getId(), 100000);
+            put(ItemList.CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.PIECE_OF_GEM.getId(), 50000);
+            put(ItemList.GEM_ABRASIVE_MATERIAL.getId(), 50000);
         }});
         put(16, new HashMap<Long, Integer>() {{
-            put(117L, 100000);
-            put(16L, 100000);
-            put(19L, 100000);
-            put(6L, 100000);
-            put(97L, 50000);
-            put(113L, 100000);
-            put(114L, 50000);
-            put(119L, 100000);
-            put(120L, 50000);
-            put(123L, 50000);
-            put(99L, 50000);
-            put(125L, 50000);
-            put(126L, 50000);
-            put(128L, 50000);
+            put(ItemList.HIGH_ADV_TOKEN.getId(), 100000);
+            put(ItemList.HIGH_HP_POTION.getId(), 100000);
+            put(ItemList.HIGH_MP_POTION.getId(), 100000);
+            put(ItemList.GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 50000);
+            put(ItemList.EXP_POTION.getId(), 100000);
+            put(ItemList.HIGH_EXP_POTION.getId(), 50000);
+            put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
+            put(ItemList.REINFORCE_STONE.getId(), 50000);
+            put(ItemList.PIECE_OF_AMULET.getId(), 50000);
+            put(ItemList.CRAFT_GUIDE.getId(), 50000);
+            put(ItemList.PIECE_OF_GEM.getId(), 50000);
+            put(ItemList.GEM_ABRASIVE_MATERIAL.getId(), 50000);
+            put(ItemList.WEAPON_SAFENER.getId(), 50000);
         }});
         put(17, new HashMap<Long, Integer>() {{
-            put(117L, 100000);
-            put(16L, 100000);
-            put(19L, 100000);
-            put(6L, 100000);
-            put(97L, 50000);
-            put(113L, 50000);
-            put(114L, 50000);
-            put(120L, 100000);
-            put(123L, 50000);
-            put(124L, 50000);
-            put(99L, 50000);
-            put(100L, 50000);
-            put(125L, 50000);
-            put(126L, 50000);
-            put(128L, 50000);
+            put(ItemList.HIGH_ADV_TOKEN.getId(), 100000);
+            put(ItemList.HIGH_HP_POTION.getId(), 100000);
+            put(ItemList.HIGH_MP_POTION.getId(), 100000);
+            put(ItemList.GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 50000);
+            put(ItemList.EXP_POTION.getId(), 50000);
+            put(ItemList.HIGH_EXP_POTION.getId(), 50000);
+            put(ItemList.REINFORCE_STONE.getId(), 100000);
+            put(ItemList.PIECE_OF_AMULET.getId(), 50000);
+            put(ItemList.PIECE_OF_HIGH_AMULET.getId(), 50000);
+            put(ItemList.CRAFT_GUIDE.getId(), 50000);
+            put(ItemList.HIGH_CRAFT_GUIDE.getId(), 50000);
+            put(ItemList.PIECE_OF_GEM.getId(), 50000);
+            put(ItemList.GEM_ABRASIVE_MATERIAL.getId(), 50000);
+            put(ItemList.WEAPON_SAFENER.getId(), 50000);
         }});
         put(18, new HashMap<Long, Integer>() {{
-            put(117L, 100000);
-            put(16L, 100000);
-            put(19L, 100000);
-            put(6L, 100000);
-            put(97L, 50000);
-            put(114L, 100000);
-            put(120L, 100000);
-            put(124L, 100000);
-            put(100L, 100000);
-            put(125L, 50000);
-            put(126L, 50000);
-            put(128L, 50000);
+            put(ItemList.HIGH_ADV_TOKEN.getId(), 100000);
+            put(ItemList.HIGH_HP_POTION.getId(), 100000);
+            put(ItemList.HIGH_MP_POTION.getId(), 100000);
+            put(ItemList.GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 50000);
+            put(ItemList.HIGH_EXP_POTION.getId(), 100000);
+            put(ItemList.REINFORCE_STONE.getId(), 100000);
+            put(ItemList.PIECE_OF_HIGH_AMULET.getId(), 100000);
+            put(ItemList.HIGH_CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.PIECE_OF_GEM.getId(), 50000);
+            put(ItemList.GEM_ABRASIVE_MATERIAL.getId(), 50000);
+            put(ItemList.WEAPON_SAFENER.getId(), 50000);
         }});
         put(19, new HashMap<Long, Integer>() {{
-            put(16L, 100000);
-            put(19L, 100000);
-            put(6L, 100000);
-            put(97L, 50000);
-            put(114L, 100000);
-            put(120L, 100000);
-            put(121L, 100000);
-            put(124L, 100000);
-            put(100L, 100000);
-            put(125L, 50000);
-            put(126L, 50000);
-            put(128L, 50000);
+            put(ItemList.HIGH_HP_POTION.getId(), 100000);
+            put(ItemList.HIGH_MP_POTION.getId(), 100000);
+            put(ItemList.GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 50000);
+            put(ItemList.HIGH_EXP_POTION.getId(), 100000);
+            put(ItemList.REINFORCE_STONE.getId(), 100000);
+            put(ItemList.HIGH_REINFORCE_STONE.getId(), 100000);
+            put(ItemList.PIECE_OF_HIGH_AMULET.getId(), 100000);
+            put(ItemList.HIGH_CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.PIECE_OF_GEM.getId(), 50000);
+            put(ItemList.GEM_ABRASIVE_MATERIAL.getId(), 50000);
+            put(ItemList.WEAPON_SAFENER.getId(), 50000);
         }});
         put(20, new HashMap<Long, Integer>() {{
-            put(16L, 100000);
-            put(19L, 100000);
-            put(6L, 100000);
-            put(97L, 50000);
-            put(114L, 100000);
-            put(120L, 100000);
-            put(121L, 100000);
-            put(124L, 100000);
-            put(100L, 100000);
-            put(125L, 50000);
-            put(127L, 50000);
-            put(128L, 50000);
+            put(ItemList.HIGH_HP_POTION.getId(), 100000);
+            put(ItemList.HIGH_MP_POTION.getId(), 100000);
+            put(ItemList.GOLD_BAG.getId(), 100000);
+            put(ItemList.ADV_STAT.getId(), 50000);
+            put(ItemList.HIGH_EXP_POTION.getId(), 100000);
+            put(ItemList.REINFORCE_STONE.getId(), 100000);
+            put(ItemList.HIGH_REINFORCE_STONE.getId(), 100000);
+            put(ItemList.PIECE_OF_HIGH_AMULET.getId(), 100000);
+            put(ItemList.HIGH_CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.PIECE_OF_GEM.getId(), 50000);
+            put(ItemList.GLOW_GEM_ABRASIVE_MATERIAL.getId(), 50000);
+            put(ItemList.WEAPON_SAFENER.getId(), 50000);
         }});
     }};
+
+    public static final double[][] HUNTER_TOKEN = new double[][] {
+            { 0.1, 0, 0 },
+            { 0.1, 0.05, 0 },
+            { 0, 0.1, 0 },
+            { 0, 0.15, 0 },
+            { 0, 0.2, 0 },
+            { 0, 0.25, 0 },
+            { 0, 0.3, 0 },
+            { 0, 0.25, 0.05 },
+            { 0, 0.2, 0.1 },
+            { 0, 0.1, 0.2 }
+    };
+
+    public static final double[][] FISH_TOKEN = new double[][] {
+            {}, //Empty
+            { 0.1, 0, 0 },
+            { 0.05, 0.05, 0 },
+            { 0.05, 0.1, 0 },
+            { 0, 0.15, 0.02 },
+            { 0, 0.2, 0.05 },
+            { 0, 0.15, 0.1 }
+    };
+
+    public static final double[][] MINE_TOKEN = new double[][] {
+            { 0.02, 0, 0},
+            { 0.05, 0, 0},
+            { 0.08, 0, 0},
+            { 0.11, 0, 0},
+            { 0.15, 0.02, 0},
+            { 0.15, 0.05, 0},
+            { 0.13, 0.08, 0},
+            { 0.1, 0.1, 0},
+            { 0.05, 0.15, 0},
+            { 0.03, 0.15, 0},
+            { 0, 0.15, 0.03},
+            { 0, 0.12, 0.07}
+    };
+
+    public static final List<Long> jewelries = new ArrayList<Long>() {{
+        for(int i = 0; i < 100; i++) {
+            this.add(ItemList.QUARTZ.getId());
+        }
+
+        for (int i = 0; i < 50; i++) {
+            this.add(ItemList.GOLD.getId());
+        }
+
+        for(int i = 0; i < 20; i++) {
+            this.add(ItemList.WHITE_GOLD.getId());
+        }
+
+        this.add(ItemList.DIAMOND.getId());
+        this.add(ItemList.ORICHALCON.getId());
+        for(long itemId = ItemList.GARNET.getId(); itemId <= ItemList.TURQUOISE.getId(); itemId++) {
+            this.add(itemId);
+        }
+    }};
+
+    public static long getRandomJewelry() {
+        return jewelries.get(new Random().nextInt(jewelries.size()));
+    }
 
 }

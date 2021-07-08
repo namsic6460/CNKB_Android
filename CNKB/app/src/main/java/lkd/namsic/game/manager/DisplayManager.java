@@ -2,8 +2,6 @@ package lkd.namsic.game.manager;
 
 import androidx.annotation.NonNull;
 
-import com.google.common.collect.BiMap;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,9 +18,10 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
+import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Item;
-import lkd.namsic.game.gameObject.MapClass;
+import lkd.namsic.game.gameObject.GameMap;
 import lkd.namsic.game.gameObject.Npc;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.gameObject.Quest;
@@ -35,33 +34,35 @@ public class DisplayManager {
         return instance;
     }
 
-    public void displayInfo(@NonNull Player self) {
+    public void displayItemInfo(@NonNull Player self, @NonNull Player target) {
         StringBuilder innerMsg = new StringBuilder();
 
-        if(self.getDoing().equals(Doing.WAIT_RESPONSE)) {
-            innerMsg.append(this.getDisplayResponse(self))
-                    .append("\n\n");
+        if(self.equals(target)) {
+            if (target.getDoing().equals(Doing.WAIT_RESPONSE)) {
+                innerMsg.append(this.getDisplayResponse(target))
+                        .append("\n\n");
+            }
         }
 
-        innerMsg.append(this.getDisplayStat(self))
+        innerMsg.append(this.getDisplayStat(target))
                 .append("\n\n")
-                .append(this.getDisplayQuest(self))
+                .append(this.getDisplayQuest(target))
                 .append("\n\n")
-                .append(this.getDisplayMagic(self))
+                .append(this.getDisplayMagic(target))
                 .append("\n\n달성한 업적 개수: ")
-                .append(self.getAchieve().size())
+                .append(target.getAchieve().size())
                 .append("\n연구 완료 개수: ")
-                .append(self.getResearch().size());
+                .append(target.getResearch().size());
 
         self.replyPlayer("===내 정보===\n" +
-                        Emoji.GOLD + " 골드: " + self.getMoney() + "G\n" +
-                        Emoji.HEART + " 체력: " + self.getDisplayHp() + "\n" +
-                        Emoji.MANA + " 마나: " + self.getStat(StatType.MN) + "/" + self.getStat(StatType.MAXMN) + "\n" +
-                        Emoji.WORLD + " 위치: " + Config.getMapData(self.getLocation()).getName() + "(" + self.getLocation().toString() + ")\n" +
-                        Emoji.LV + " 레벨: " + self.getLv().get() + "Lv (" + self.getExp().get() + "/" + self.getNeedExp() + ")\n" +
-                        Emoji.SP + " 스텟 포인트: " + self.getSp().get() + "\n" +
-                        Emoji.ADV + " 모험 포인트: " + self.getAdv().get() + "\n" +
-                        Emoji.HOME + " 거점: " + Config.getMapData(self.getBaseLocation()).getName() + "(" + self.getBaseLocation().toString() + ")",
+                        Emoji.GOLD + " 골드: " + target.getMoney() + "G\n" +
+                        Emoji.HEART + " 체력: " + target.getDisplayHp() + "\n" +
+                        Emoji.MANA + " 마나: " + target.getDisplayMn() + "\n" +
+                        Emoji.WORLD + " 위치: " + Config.getMapData(target.getLocation()).getName() + "(" + target.getLocation().toString() + ")\n" +
+                        Emoji.LV + " 레벨: " + target.getDisplayLv() + "\n" +
+                        Emoji.SP + " 스텟 포인트: " + target.getSp().get() + "\n" +
+                        Emoji.ADV + " 모험 포인트: " + target.getAdv().get() + "\n" +
+                        Emoji.HOME + " 거점: " + Config.getMapData(target.getBaseLocation()).getName() + "(" + target.getBaseLocation().toString() + ")",
                 innerMsg.toString());
     }
 
@@ -93,6 +94,8 @@ public class DisplayManager {
     }
 
     public String getDisplayStat(@NonNull Player self) {
+        self.revalidateBuff();
+
         StringBuilder builder = new StringBuilder("---스텟---");
         for(StatType statType : StatType.values()) {
             builder.append("\n")
@@ -161,7 +164,6 @@ public class DisplayManager {
         }
 
         List<Long> highPriorityItems = self.getListVariable(Variable.HIGH_PRIORITY_ITEM);
-        BiMap<Long, String> inverseMap = ObjectList.itemList.inverse();
 
         StringBuilder msg = new StringBuilder("---인벤토리---\n[")
                 .append(page)
@@ -174,7 +176,7 @@ public class DisplayManager {
         } else {
             for(long itemId : highPriorityItems) {
                 msg.append("\n")
-                        .append(inverseMap.get(itemId))
+                        .append(ItemList.findById(itemId))
                         .append(": ")
                         .append(self.getItem(itemId))
                         .append("개");
@@ -191,7 +193,7 @@ public class DisplayManager {
                 continue;
             }
 
-            innerMsg.append(inverseMap.get(itemId))
+            innerMsg.append(ItemList.findById(itemId))
                     .append(": ")
                     .append(self.getItem(itemId))
                     .append("개\n");
@@ -218,7 +220,7 @@ public class DisplayManager {
         int currentY = self.getLocation().getY().get();
 
         int distance;
-        MapClass map;
+        GameMap map;
 
         int minX = Math.max(Config.MIN_MAP_X, currentX - movableDistance);
         int maxX = Math.min(Config.MAX_MAP_X, currentX + movableDistance);
@@ -266,19 +268,14 @@ public class DisplayManager {
     public void displayRecipes(@NonNull Player self, boolean isItem) {
         StringBuilder msg;
 
-        BiMap<Long, String> inverseMap;
         List<Long> sortedList;
 
         if(isItem) {
-            inverseMap = ObjectList.itemList.inverse();
-
             sortedList = new ArrayList<>(self.getItemRecipe());
             Collections.sort(sortedList);
 
             msg = new StringBuilder("---아이템 목록---");
         } else {
-            inverseMap = ObjectList.equipList.inverse();
-
             sortedList = new ArrayList<>(self.getEquipRecipe());
             Collections.sort(sortedList);
 
@@ -304,7 +301,8 @@ public class DisplayManager {
                 for (long itemId : highPriorityItems) {
                     if (self.getItemRecipe().contains(itemId)) {
                         flag = true;
-                        msg.append("\n").append(inverseMap.get(itemId));
+                        msg.append("\n")
+                                .append(ItemList.findById(itemId));
                     }
                 }
             }
@@ -318,11 +316,11 @@ public class DisplayManager {
                     continue;
                 }
 
-                innerMsg.append(inverseMap.get(itemId)).append("\n");
+                innerMsg.append(ItemList.findById(itemId)).append("\n");
             }
         } else {
             for(long equipId : sortedList) {
-                innerMsg.append(inverseMap.get(equipId)).append("\n");
+                innerMsg.append(ObjectList.equipList.inverse().get(equipId)).append("\n");
             }
         }
 
@@ -331,7 +329,7 @@ public class DisplayManager {
 
     public void displayRecipe(@NonNull Player self, @NonNull String itemName) {
         boolean isItem = true;
-        Long itemId = ObjectList.itemList.get(itemName);
+        Long itemId = ItemList.findByName(itemName);
         Set<Long> recipeSet;
 
         if(itemId == null) {
@@ -359,6 +357,7 @@ public class DisplayManager {
                 .append(itemName)
                 .append("의 제작법---");
 
+        int index = 1;
         Item item = Config.getData(isItem ? Id.ITEM : Id.EQUIPMENT, itemId);
         for(Map<Long, Integer> recipe : item.getRecipe()) {
             int size = recipe.size();
@@ -369,14 +368,14 @@ public class DisplayManager {
             int resultCount = 1;
 
             msg.append("\n")
-                    .append(Emoji.LIST)
-                    .append(" ");
+                    .append(index++)
+                    .append(". ");
 
             for(Map.Entry<Long, Integer> entry : recipe.entrySet()) {
                 count++;
 
                 tempItemId = entry.getKey();
-                if(tempItemId == 0L) {
+                if(tempItemId == ItemList.NONE.getId()) {
                     resultCount = entry.getValue();
                     continue;
                 }
@@ -399,6 +398,59 @@ public class DisplayManager {
         }
 
         self.replyPlayer(msg.toString());
+    }
+
+    public void displayItemInfo(@NonNull Player self, @NonNull String itemName) {
+        Id id = Id.ITEM;
+        Long itemId = ItemList.findByName(itemName);
+
+        if(itemId == null) {
+            id = Id.EQUIPMENT;
+            itemId = ObjectList.equipList.get(itemName);
+
+            if(itemId == null) {
+                throw new WeirdCommandException("알 수 없는 아이템 또는 장비입니다");
+            }
+        }
+
+        Item item = Config.getData(id, itemId);
+        self.replyPlayer("[" + item.getName() + "]\n" + item.getDescription());
+    }
+
+    public void displayStatInfo(@NonNull Player self) {
+        self.replyPlayer("스텟에 관한 정보는 전체보기로 확인해주세요",
+                "---스텟 정보---\n" +
+                        Emoji.LIST + " 최대 체력(MaxHp) : 대상이 가질 수 있는 최대량의 체력을 나타냅니다 (" +
+                        StatType.MAXHP.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 체력(Hp) : 대상이 현재 가지고 있는 체력을 나타냅니다 (-)\n" +
+                        Emoji.LIST + " 최대 마나(MaxMn) : 대상이 가질 수 있는 최대량의 마나를 나타냅니다 (" +
+                        StatType.MAXMN.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 마나(Mn) : 대상이 현재 가지고 있는 마나를 나타냅니다 (-)\n" +
+                        Emoji.LIST + " 공격력(Atk) : 대상의 물리 공격력을 나타냅니다 (" +
+                        StatType.ATK.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 마법 공격력(MAtk) : 대상의 마법 공격력을 나타냅니다 (" +
+                        StatType.MATK.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 민첩(Agi) : 치명타 확률을 나타냅니다 (스텟 1당 치명타 확률 " + (Config.CRIT_PER_AGI * 100) + "%) (" +
+                        StatType.AGI.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 공격 속도(Ats) : 전투에서 턴을 가져올 상대적 우선권 나타냅니다 (" +
+                        StatType.ATS.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 방어력(DEF) : 물리 데미지를 방어하는 수치를 나타냅니다 (" +
+                        StatType.DEF.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 마법 방어력(MDef) : 마법 데미지를 방어하는 수치를 나타냅니다 (" +
+                        StatType.MDEF.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 방어 관통력(Bre) : 공격 시 대상의 방어력을 상쇄하는 수치를 나타냅니다 (" +
+                        StatType.BRE.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 마법 관통력(MBre) : 공격 시 대상의 마법 방어력을 상쇄하는 수치를 나타냅니다 (" +
+                        StatType.MBRE.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 흡수력(Dra) : 공격 시 최종 물리 데미지의 일부 %를 회복하는 수치를 나타냅니다 (최대: 100) (" +
+                        StatType.DRA.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 마법 흡수력(MDra) : 공격 시 최종 마법 데미지의 일부 %를 회복하는 수치를 나타냅니다 (최대: 100) (" +
+                        StatType.MDRA.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 회피(Eva) : 공격을 회피할 수 있는 수치를 나타냅니다 (회피 - 정확도 <= " + Config.MAX_EVADE + ") (" +
+                        StatType.EVA.getUseSp() + "SP)\n" +
+                        Emoji.LIST + " 정확도(Acc) : 공격 시 대상의 회피를 상쇄하는 수치를 나타냅니다 (" +
+                        StatType.ACC.getUseSp() + "SP)"
+        );
     }
 
 }

@@ -53,10 +53,13 @@ public class Equipment extends Item {
     final Map<StatType, Integer> reinforceStat = new HashMap<>();
 
     public Equipment(@NonNull EquipType equipType, @NonNull String name, @NonNull String description) {
-        super(name, description);
-        this.id.setId(Id.EQUIPMENT);
-        this.reinforcePercent = this.getReinforcePercent();
+        super(name);
+        this.description = description;
 
+        this.id.setId(Id.EQUIPMENT);
+
+        this.reinforcePercent = this.getReinforcePercent();
+        this.description = description;
         this.equipType = equipType;
     }
 
@@ -144,4 +147,9 @@ public class Equipment extends Item {
         this.reinforcePercent = this.getReinforcePercent();
     }
 
+    @NonNull
+    @Override
+    public String getName() {
+        return super.getName() + " (+" + this.reinforceCount.get() + ")";
+    }
 }

@@ -44,8 +44,8 @@ public class NotificationListener extends NotificationListenerService {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         MainActivity.toast("Noti Service Stopped");
+        this.stopSelf();
     }
 
     @Override

@@ -40,7 +40,7 @@ public class Quest extends NamedObject {
     final Map<Long, Integer> rewardCloseRate = new HashMap<>();
 
     final LimitId npcId = new LimitId(0, Id.NPC);
-    final LimitId chatId = new LimitId(0, Id.QUEST);
+    final LimitId chatId = new LimitId(0, Id.CHAT);
 
     public Quest(@NonNull String name, long npcId, long chatId) {
         super(name);

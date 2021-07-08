@@ -16,19 +16,20 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.UnhandledEnumException;
+import lombok.AccessLevel;
 import lombok.Getter;
 
+@Getter
 public abstract class AiEntity extends Entity {
 
-    @Getter
-    @NonNull
     final LimitInteger maxIncrease = new LimitInteger(Config.MIN_AI_INCREASE, Config.MIN_AI_INCREASE, null);
 
+    @Getter(AccessLevel.NONE)
     private int currentIncrease = 0;
 
-    @Getter
-    @NonNull
-    final Map<EquipType, Double> dropPercent = new ConcurrentHashMap<>();
+    final Map<Long, Double> itemDropPercent = new ConcurrentHashMap<>();
+    final Map<Long, Integer> itemDropMinCount = new ConcurrentHashMap<>();
+    final Map<EquipType, Double> equipDropPercent = new ConcurrentHashMap<>();
 
     public AiEntity(@NonNull String name) {
         super(name);
@@ -37,55 +38,100 @@ public abstract class AiEntity extends Entity {
     @NonNull
     public EquipType equip(long equipId, double dropPercent) {
         EquipType equipType = super.equip(equipId);
-        this.setDropPercent(equipType, dropPercent);
+        this.setEquipDropPercent(equipType, dropPercent);
 
         return equipType;
     }
 
-    public void setDropPercent(EquipType equipType, double percent) {
+    public void setItemDrop(long itemId, double percent, int minCount, int maxCount) {
+        this.setItem(itemId, maxCount);
+        this.setItemDropPercent(itemId, percent);
+
+        if(minCount != 1) {
+            this.setItemDropMinCount(itemId, minCount);
+        }
+    }
+
+    public void setItemDropPercent(long itemId, double percent) {
         if(percent < 0 || percent > 1) {
             throw new NumberRangeException(percent, 0D, 1D);
         }
 
-        this.dropPercent.put(equipType, percent);
+        this.itemDropPercent.put(itemId, percent);
     }
 
-    public double getDropPercent(EquipType equipType) {
-        return this.dropPercent.getOrDefault(equipType, 0D);
+    public double getItemDropPercent(long itemId) {
+        return this.itemDropPercent.getOrDefault(itemId, 0D);
     }
 
-    public void addDropPercent(EquipType equipType, double percent) {
-        this.setDropPercent(equipType, this.getDropPercent(equipType) + percent);
+    public void addItemDropPercent(long itemId, double percent) {
+        this.setItemDropPercent(itemId, this.getItemDropPercent(itemId) + percent);
+    }
+
+    public void setItemDropMinCount(long itemId, int minCount) {
+        if(minCount < 1) {
+            throw new NumberRangeException(minCount, 1);
+        }
+
+        this.itemDropMinCount.put(itemId, minCount);
+    }
+
+    public int getItemDropMinCount(long itemId) {
+        return this.itemDropMinCount.getOrDefault(itemId, 1);
+    }
+
+    public void addItemDropMinCount(long itemId, int minCount) {
+        this.setItemDropMinCount(itemId, this.getItemDropMinCount(itemId) + minCount);
+    }
+
+    public void setEquipDropPercent(@NonNull EquipType equipType, double percent) {
+        if(percent < 0 || percent > 1) {
+            throw new NumberRangeException(percent, 0D, 1D);
+        }
+
+        this.equipDropPercent.put(equipType, percent);
+    }
+
+    public double getEquipDropPercent(@NonNull EquipType equipType) {
+        return this.equipDropPercent.getOrDefault(equipType, 0D);
+    }
+
+    public void addEquipDropPercent(@NonNull EquipType equipType, double percent) {
+        this.setEquipDropPercent(equipType, this.getEquipDropPercent(equipType) + percent);
     }
 
     @Override
     public void onDeath() {
-        MapClass map = null;
+        super.onDeath();
 
-        try {
-            map = Config.loadMap(this.location);
-            map.removeEntity(this);
-        } finally {
-            if(map != null) {
-                Config.unloadMap(map);
+        long money = this.getMoney();
+        if(money > 0L) {
+            this.dropMoney(money);
+        }
+
+        double dropPercent;
+        Random random = new Random();
+
+        long itemId;
+        int minCount, count;
+        Map<Long, Integer> itemCopy = new HashMap<>(this.inventory);
+        for(Map.Entry<Long, Integer> entry : itemCopy.entrySet()) {
+            itemId = entry.getKey();
+            count = entry.getValue();
+
+            dropPercent = this.getItemDropPercent(itemId);
+
+            if(random.nextDouble() < dropPercent) {
+                minCount = this.getItemDropMinCount(itemId);
+                this.dropItem(itemId, random.nextInt(count) + minCount);
             }
         }
 
-        if(this.getMoney() > 0L) {
-            this.dropMoney(this.getMoney());
-        }
-
-        Map<Long, Integer> itemCopy = new HashMap<>(this.inventory);
-        for(Map.Entry<Long, Integer> entry : itemCopy.entrySet()) {
-            this.dropItem(entry.getKey(), entry.getValue());
-        }
-
         Equipment equip;
-        Random random = new Random();
         Set<Long> equipCopy = new HashSet<>(this.equipInventory);
         for(Long equipId : equipCopy) {
             equip = Config.getData(Id.EQUIPMENT, equipId);
-            double dropPercent = this.getDropPercent(equip.getEquipType());
+            dropPercent = this.getEquipDropPercent(equip.getEquipType());
 
             if(random.nextDouble() < dropPercent) {
                 this.dropEquip(equipId);

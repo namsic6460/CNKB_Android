@@ -19,9 +19,10 @@ import lkd.namsic.game.enums.AdventureWaitType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
+import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Item;
-import lkd.namsic.game.gameObject.MapClass;
+import lkd.namsic.game.gameObject.GameMap;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.setting.Logger;
 
@@ -34,7 +35,7 @@ public class AdventureManager {
     }
 
     public void tryAdventure(@NonNull Player self) {
-        MapClass map = Config.getMapData(self.getLocation());
+        GameMap map = Config.getMapData(self.getLocation());
 
         MapType mapType = map.getMapType();
         if(MapType.cityList().contains(mapType)) {
@@ -171,7 +172,7 @@ public class AdventureManager {
                         throw new NullPointerException();
                     }
 
-                    self.addItem(itemId, 1);
+                    self.addItem(itemId, 1, false);
                     msg = adventureType.getSuccessMsg() + "\n난관을 성공적으로 해결하여 보상을 획득했습니다";
 
                     Item item = Config.getData(Id.ITEM, itemId);
@@ -423,7 +424,7 @@ public class AdventureManager {
                 break;
 
             default:
-                throw new RuntimeException("Unreachable code");
+                throw new UnhandledEnumException(adventureType);
         }
 
         int tier;
@@ -451,9 +452,9 @@ public class AdventureManager {
         AdventureWaitType response = AdventureWaitType.parseWaitType(command);
 
         self.setVariable(Variable.ADVENTURE_WAIT_TYPE, response);
+        self.setVariable(Variable.IS_FIGHT_RESPONSE, false);
 
         synchronized (self) {
-            self.setVariable(Variable.IS_FIGHT_RESPONSE, false);
             self.notifyAll();
         }
     }

@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,7 +14,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.config.Config;
-import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.base.ConcurrentHashSet;
@@ -25,7 +25,7 @@ import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.event.DeathEvent;
-import lkd.namsic.game.event.EarnEvent;
+import lkd.namsic.game.event.MoneyChangeEvent;
 import lkd.namsic.game.event.Event;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
@@ -58,8 +58,8 @@ public abstract class Entity extends NamedObject {
     final Map<StatType, Integer> equipStat = new ConcurrentHashMap<>();
     final Map<StatType, Integer> buffStat = new ConcurrentHashMap<>();
 
-    final Map<EquipType, Long> equip = new ConcurrentHashMap<>();
-    final Map<Long, ConcurrentHashMap<StatType, Integer>> buff = new ConcurrentHashMap<>();
+    final Map<EquipType, Long> equipped = new ConcurrentHashMap<>();
+    final Map<Long, Map<StatType, Integer>> buff = new ConcurrentHashMap<>();
     final Map<Long, Integer> inventory = new ConcurrentHashMap<>();
     final Set<Long> equipInventory = new ConcurrentHashSet<>();
 
@@ -68,47 +68,37 @@ public abstract class Entity extends NamedObject {
 
     final Map<Variable, Object> variable = new ConcurrentHashMap<>();
 
+    final Location lastDeathLoc = new Location();
+    long lastDropMoney = 0L;
+    final Map<Long, Integer> lastDropItem = new HashMap<>();
+    final Set<Long> lastDropEquip = new HashSet<>();
+
     protected Entity(@NonNull String name) {
         super(name);
         this.setBasicStat(StatType.ATS, 100);
-        this.setBasicStat(StatType.ATR, 1);
     }
 
+    public int getMovableDistance() {
+        return (int) Math.sqrt(2 + this.getStat(StatType.AGI) / 4D);
+    }
+
+    @NonNull
     public String getDisplayHp() {
         return this.getDisplayHp(this.getStat(StatType.HP));
     }
 
-    //AlphaDo 님의 체력바 소스를 참고했음을 알립니다
+    @NonNull
     public String getDisplayHp(int hp) {
-        int maxHp = this.getStat(StatType.MAXHP);
+        return Config.getBar(hp, this.getStat(StatType.MAXHP));
+    }
 
-        double percent = 10.0 * hp / maxHp;
-        double dec = percent % 1;
-        int filled = (int) percent;
-
-        StringBuilder output = new StringBuilder("[");
-
-        for(int i = 0; i < filled; i++) {
-            output.append(Emoji.FILLED_HEART);
-        }
-
-        output.append(Emoji.HALF_HEART[(int) Math.round(dec * 8)]);
-
-        for(int i = 9; i > filled; i--) {
-            output.append("  ");
-        }
-
-        return output.toString() + "] (" + hp + "/" + maxHp + ")";
+    @NonNull
+    public String getDisplayMn() {
+        return Config.getBar(this.getStat(StatType.MN), this.getStat(StatType.MAXMN));
     }
 
     public boolean setMoney(long money) {
-        boolean isCancelled = false;
-
-        long gap = money - this.getMoney();
-        if(gap > 0) {
-            isCancelled = EarnEvent.handleEvent(this.events.get(EarnEvent.getName()), new Object[]{gap});
-        }
-
+        boolean isCancelled = MoneyChangeEvent.handleEvent(this, this.events.get(MoneyChangeEvent.getName()), money);
         if (!isCancelled) {
             this.money.set(money);
         }
@@ -133,10 +123,19 @@ public abstract class Entity extends NamedObject {
             throw new NumberRangeException(money, 1, currentMoney);
         }
 
+        this.lastDropMoney = money;
         this.addMoney(-1 * money);
-        MapClass map = Config.loadMap(this.location);
-        map.addMoney(this.location, money);
-        Config.unloadMap(map);
+
+        GameMap map = null;
+
+        try {
+            map = Config.loadMap(this.location);
+            map.addMoney(this.location, money);
+        } finally {
+            if (map != null) {
+                Config.unloadMap(map);
+            }
+        }
     }
 
     public void addSkill(long skillId) {
@@ -162,7 +161,7 @@ public abstract class Entity extends NamedObject {
                 stat = maxHp;
             } else if(stat <= 0) {
                 isDeath = true;
-                isCancelled = DeathEvent.handleEvent(this.events.get(DeathEvent.getName()), new Object[]{this.getStat(StatType.HP), stat});
+                isCancelled = DeathEvent.handleEvent(this, this.events.get(DeathEvent.getName()), this.getStat(StatType.HP), stat);
             }
         } else if(statType.equals(StatType.MN)) {
             int maxMn = this.getStat(StatType.MAXMN);
@@ -173,6 +172,10 @@ public abstract class Entity extends NamedObject {
         } else if(statType.equals(StatType.MAXHP)) {
             if(stat < 1) {
                 throw new NumberRangeException(stat, 1);
+            }
+        } else if(statType.equals(StatType.MAXMN)) {
+            if(stat < 0) {
+                throw new NumberRangeException(stat, 0);
             }
         }
 
@@ -304,12 +307,28 @@ public abstract class Entity extends NamedObject {
         return true;
     }
 
-    public abstract void onDeath();
+    public void onDeath() {
+        this.lastDeathLoc.set(this.location);
+        this.lastDropMoney = 0L;
+        this.lastDropItem.clear();
+        this.lastDropEquip.clear();
+
+        GameMap map = null;
+
+        try {
+            map = Config.loadMap(this.location);
+            map.removeEntity(this);
+        } finally {
+            if(map != null) {
+                Config.unloadMap(map);
+            }
+        }
+    }
 
     public abstract void onKill(@NonNull Entity entity);
 
-    public long getEquip(@NonNull EquipType equipType) {
-        return this.equip.getOrDefault(equipType, 0L);
+    public long getEquipped(@NonNull EquipType equipType) {
+        return this.equipped.getOrDefault(equipType, 0L);
     }
 
     @NonNull
@@ -317,7 +336,7 @@ public abstract class Entity extends NamedObject {
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
         EquipType equipType = equipment.getEquipType();
 
-        if (equip.containsKey(equipType)) {
+        if (equipped.containsKey(equipType)) {
             this.unEquip(equipType);
         }
 
@@ -325,24 +344,23 @@ public abstract class Entity extends NamedObject {
             this.setEquipStat(statType, this.getEquipStat(statType) + equipment.getStat(statType));
         }
 
-        this.equip.put(equipType, equipId);
+        this.equipped.put(equipType, equipId);
 
         return equipType;
     }
 
     public void unEquip(@NonNull EquipType equipType) {
-        Long equipId = equip.get(equipType);
+        Long equipId = equipped.get(equipType);
         if(equipId == null) {
             throw new ObjectNotFoundException(equipType);
         }
 
-        Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
-
+        Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
         for(StatType statType : StatType.values()) {
-            this.setEquipStat(statType, this.getEquipStat(statType) - equipment.getStat(statType));
+            this.addEquipStat(statType, equipment.getStat(statType) * -1);
         }
 
-        this.equip.remove(equipType);
+        this.equipped.remove(equipType);
     }
 
     public void setBuff(long time, @NonNull StatType statType, int stat) {
@@ -354,7 +372,7 @@ public abstract class Entity extends NamedObject {
             throw new InvalidNumberException(stat);
         }
 
-        ConcurrentHashMap<StatType, Integer> buffTimeMap = this.buff.get(time);
+        Map<StatType, Integer> buffTimeMap = this.buff.get(time);
         if(buffTimeMap != null) {
             Integer buffStat = buffTimeMap.get(statType);
 
@@ -368,9 +386,9 @@ public abstract class Entity extends NamedObject {
             buffTimeMap.put(statType, stat);
 
             this.buff.put(time, buffTimeMap);
-
-            this.setBuffStat(statType, this.getBuffStat(statType) + stat);
         }
+
+        this.setBuffStat(statType, this.getBuffStat(statType) + stat);
     }
 
     public int getBuff(long time, @NonNull StatType statType) {
@@ -383,25 +401,27 @@ public abstract class Entity extends NamedObject {
         return 0;
     }
 
-    public void addBuff(long time, @NonNull StatType statType, int stat) {
-        this.setBuff(time, statType, this.getBuff(time, statType) + stat);
+    public void addBuff(long duration, @NonNull StatType statType, int stat) {
+        this.setBuff(duration, statType, this.getBuff(duration, statType) + stat);
     }
 
     public void revalidateBuff() {
-        long time;
-        long currentTime = System.currentTimeMillis();
+        if(!this.buff.isEmpty()) {
+            long currentTime = System.currentTimeMillis();
 
-        for(Map.Entry<Long, ConcurrentHashMap<StatType, Integer>> entry : this.buff.entrySet()) {
-            time = entry.getKey();
+            long time;
+            for (Map.Entry<Long, Map<StatType, Integer>> entry : this.buff.entrySet()) {
+                time = entry.getKey();
 
-            if(time < currentTime) {
-                StatType statType;
-                for(Map.Entry<StatType, Integer> buffEntry : entry.getValue().entrySet()) {
-                    statType = buffEntry.getKey();
-                    this.setBuffStat(statType, this.getBuffStat(statType) - buffEntry.getValue());
+                if (time < currentTime) {
+                    StatType statType;
+                    for (Map.Entry<StatType, Integer> buffEntry : entry.getValue().entrySet()) {
+                        statType = buffEntry.getKey();
+                        this.setBuffStat(statType, this.getBuffStat(statType) - buffEntry.getValue());
+                    }
+
+                    this.buff.remove(time);
                 }
-
-                this.buff.remove(time);
             }
         }
     }
@@ -426,7 +446,18 @@ public abstract class Entity extends NamedObject {
     }
 
     public void addItem(long itemId, int count) {
-        this.setItem(itemId, this.getItem(itemId) + count);
+        this.addItem(itemId, count, count > 0);
+    }
+
+    public void addItem(long itemId, int count, boolean print) {
+        int currCount = this.getItem(itemId) + count;
+        this.setItem(itemId, currCount);
+
+        if(print && this.id.getId().equals(Id.PLAYER)) {
+            Item item = Config.getData(Id.ITEM, itemId);
+            ((Player) this).replyPlayer(item.getName() + " " + count + "개를 획득헀습니다\n" +
+                    "현재 개수: " + currCount);
+        }
     }
 
     public void dropItem(long itemId, int count) {
@@ -436,8 +467,10 @@ public abstract class Entity extends NamedObject {
             throw new NumberRangeException(count, 1, itemCount);
         }
 
-        this.addItem(itemId, -1 * count);
-        MapClass map = Config.loadMap(this.location);
+        this.addItem(itemId, count * -1);
+        this.lastDropItem.put(itemId, this.lastDropItem.getOrDefault(itemId, 0) + count);
+
+        GameMap map = Config.loadMap(this.location);
         map.addItem(this.location, itemId, count);
         Config.unloadMap(map);
     }
@@ -456,7 +489,7 @@ public abstract class Entity extends NamedObject {
             throw new ObjectNotFoundException(Id.EQUIPMENT, equipId);
         }
 
-        for(Map.Entry<EquipType, Long> entry : this.equip.entrySet()) {
+        for(Map.Entry<EquipType, Long> entry : this.equipped.entrySet()) {
             if(entry.getValue().equals(equipId)) {
                 this.unEquip(entry.getKey());
                 break;
@@ -468,7 +501,9 @@ public abstract class Entity extends NamedObject {
 
     public void dropEquip(long equipId) {
         this.removeEquip(equipId);
-        MapClass map = Config.loadMap(this.location);
+        this.lastDropEquip.add(equipId);
+
+        GameMap map = Config.loadMap(this.location);
         map.addEquip(this.location, equipId);
         Config.unloadMap(map);
     }
@@ -535,8 +570,8 @@ public abstract class Entity extends NamedObject {
         }
 
         if(!evade) {
-            int def = entity.getStat(StatType.DEF) - this.getStat(StatType.BRE);
-            int mdef = entity.getStat(StatType.MDEF) - this.getStat(StatType.MBRE);
+            int def = Math.max(entity.getStat(StatType.DEF) - this.getStat(StatType.BRE), 0);
+            int mdef = Math.max(entity.getStat(StatType.MDEF) - this.getStat(StatType.MBRE), 0);
 
             physicDmg = Math.max(physicDmg - def, 0);
             magicDmg = Math.max(magicDmg - mdef, 0);
@@ -551,11 +586,18 @@ public abstract class Entity extends NamedObject {
                 entity.setVariable(Variable.IS_DEFENCING, false);
             }
 
-            int dra = physicDmg * this.getStat(StatType.DRA) / 100;
-            int mdra = magicDmg * this.getStat(StatType.MDRA) / 100;
+            int dra = physicDmg * Math.max(this.getStat(StatType.DRA), 1) / 100;
+            int mdra = magicDmg * Math.max(this.getStat(StatType.MDRA), 1) / 100;
 
             int totalDmg = physicDmg + magicDmg + staticDmg;
             int totalDra = dra + mdra;
+
+            boolean isCrit = false;
+            int agi = this.getStat(StatType.AGI);
+            if(random.nextDouble() < agi * Config.CRIT_PER_AGI) {
+                isCrit = true;
+                totalDmg *= 2;
+            }
 
             boolean isDeath = entity.addBasicStat(StatType.HP, -1 * totalDmg);
             this.addBasicStat(StatType.HP, totalDra);
@@ -567,17 +609,25 @@ public abstract class Entity extends NamedObject {
                 hp = entity.getDisplayHp();
             }
 
-            if(!isDeath || (isDeath && printOnDeath)) {
+            if(!isDeath || printOnDeath) {
                 String selfHp = this.getDisplayHp();
                 String innerMsg = "총 데미지: " + totalDmg + "\n총 흡수량: " + totalDra + "\n";
 
                 if (this.id.getId().equals(Id.PLAYER)) {
-                    ((Player) this).replyPlayer("공격에 성공했습니다\n적 체력: " + hp,
-                            innerMsg + "남은 체력: " + selfHp);
+                    String msg = "공격에 성공했습니다\n적 체력: " + hp;
+                    if(isCrit) {
+                        msg = "[치명타!] " + msg;
+                    }
+
+                    ((Player) this).replyPlayer(msg, innerMsg + "남은 체력: " + selfHp);
                 }
 
-                if (entity.id.getId().equals(Id.PLAYER)) {
+                //Used instanceof because of warning
+                if (entity instanceof Player) {
                     String msg = this.getName() + " 에게 공격당했습니다!\n남은 체력: " + hp;
+                    if(isCrit) {
+                        msg = "[치명타!] " + msg;
+                    }
 
                     if (isDefencing) {
                         msg += "\n방어로 인해 회복한 체력: " + heal;
@@ -596,7 +646,8 @@ public abstract class Entity extends NamedObject {
                 ((Player) this).replyPlayer("공격이 빗나갔습니다");
             }
 
-            if (entity.id.getId().equals(Id.PLAYER)) {
+            //Used instanceof because of warning
+            if (entity instanceof Player) {
                 ((Player) entity).replyPlayer(this.getName() + " 의 공격을 피했습니다");
             }
         }

@@ -2,22 +2,28 @@ package lkd.namsic.game.manager;
 
 import androidx.annotation.NonNull;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.config.ObjectList;
-import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.event.MoveEvent;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.gameObject.Boss;
 import lkd.namsic.game.gameObject.Entity;
-import lkd.namsic.game.gameObject.MapClass;
+import lkd.namsic.game.gameObject.Equipment;
+import lkd.namsic.game.gameObject.Item;
+import lkd.namsic.game.gameObject.GameMap;
+import lkd.namsic.game.gameObject.Monster;
 import lkd.namsic.game.gameObject.Player;
 
 public class MoveManager {
@@ -37,46 +43,124 @@ public class MoveManager {
             throw new NumberRangeException(distance, 0);
         }
 
-        boolean isCancelled = MoveEvent.handleEvent(self.getEvents().get(MoveEvent.getName()), new Object[]{distance, true});
+        boolean isCancelled = MoveEvent.handleEvent(self, self.getEvents().get(MoveEvent.getName()), distance, true);
 
         if(!isCancelled) {
-            if(self.getId().getId().equals(Id.PLAYER)) {
+            if (self.getId().getId().equals(Id.PLAYER)) {
                 ((Player) self).addLog(LogData.FIELD_MOVE_DISTANCE, distance);
             }
 
             self.getLocation().setField(fieldX, fieldY);
 
-            MapClass map = null;
+            GameMap map = Config.loadMap(self.getLocation());
 
-            try {
-                map = Config.loadMap(self.getLocation());
+            long money = map.getMoney(self.getLocation());
+            if (money != 0) {
+                self.addMoney(money);
+                map.getMoney().remove(self.getLocation());
+            }
 
-                long money = map.getMoney(self.getLocation());
-                if(money != 0) {
-                    self.addMoney(money);
-                    map.getMoney().remove(self.getLocation());
+            boolean gotItem = false;
+            boolean gotEquip = false;
+            StringBuilder innerBuilder = new StringBuilder("---획득한 아이템---");
+
+            Map<Long, Integer> itemMap = map.getItem().get(self.getLocation());
+            if (itemMap != null) {
+                long itemId;
+                int count;
+                Item item;
+
+                for (Map.Entry<Long, Integer> entry : itemMap.entrySet()) {
+                    itemId = entry.getKey();
+                    count = entry.getValue();
+
+                    gotItem = true;
+                    self.addItem(itemId, count, false);
+
+                    item = Config.getData(Id.ITEM, itemId);
+                    innerBuilder.append("\n")
+                            .append(item.getName())
+                            .append(" ")
+                            .append(count)
+                            .append("개");
                 }
 
-                Map<Long, Integer> item = map.getItem().get(self.getLocation());
-                if(item != null) {
-                    for(Map.Entry<Long, Integer> entry : item.entrySet()) {
-                        self.addItem(entry.getKey(), entry.getValue());
+                map.getItem().remove(self.getLocation());
+            }
+
+            if (!gotItem) {
+                innerBuilder.append("\n획득한 아이템이 없습니다");
+            }
+
+            innerBuilder.append("\n\n---획득한 장비---");
+
+            Set<Long> equipSet = map.getEquip().get(self.getLocation());
+            if (equipSet != null) {
+                Equipment equipment;
+
+                for (long equipId : equipSet) {
+                    gotEquip = true;
+                    self.addEquip(equipId);
+
+                    equipment = Config.getData(Id.EQUIPMENT, equipId);
+                    innerBuilder.append("\n")
+                            .append(equipment.getName());
+                }
+
+                map.getEquip().remove(self.getLocation());
+            }
+
+            if (!gotEquip) {
+                innerBuilder.append("\n획득한 장비가 없습니다");
+            }
+
+            if (gotItem || gotEquip) {
+                if (self.getId().getId().equals(Id.PLAYER)) {
+                    ((Player) self).replyPlayer("필드에서 무언가를 주웠습니다", innerBuilder.toString());
+                }
+            }
+
+            if (self.getId().getId().equals(Id.PLAYER)) {
+                Set<Long> attackMonsters = new HashSet<>();
+                Set<Long> attackBosses = new HashSet<>();
+
+                Monster monster;
+                for (long monsterId : map.getEntity(Id.MONSTER)) {
+                    monster = Config.getData(Id.MONSTER, monsterId);
+
+                    if (self.getFieldDistance(monster.getLocation()) <= Config.RECOGNIZE_DISTANCE) {
+                        double attackedPercent = Math.min(Config.ATTACKED_PERCENT + (monster.getLv().get() -
+                                self.getLv().get()) * Config.ATTACKED_PERCENT_INCREASE, Config.MAX_ATTACKED_PERCENT);
+
+                        if (Math.random() < attackedPercent) {
+                            attackMonsters.add(monsterId);
+                        }
+                    }
+                }
+
+                Boss boss;
+                for (long bossId : map.getEntity(Id.BOSS)) {
+                    boss = Config.getData(Id.BOSS, bossId);
+
+                    if (self.getFieldDistance(boss.getLocation()) <= Config.RECOGNIZE_DISTANCE) {
+                        attackBosses.add(bossId);
+                    }
+                }
+
+                Config.unloadMap(map);
+
+                if (!(attackMonsters.isEmpty() && attackBosses.isEmpty())) {
+                    Map<Id, Set<Long>> enemies = new HashMap<>();
+
+                    if (!attackMonsters.isEmpty()) {
+                        enemies.put(Id.MONSTER, attackMonsters);
                     }
 
-                    map.getItem().remove(self.getLocation());
-                }
-
-                Set<Long> equip = map.getEquip().get(self.getLocation());
-                if(equip != null) {
-                    for (long equipId : equip) {
-                        self.addEquip(equipId);
+                    if (!attackBosses.isEmpty()) {
+                        enemies.put(Id.BOSS, attackBosses);
                     }
 
-                    map.getEquip().remove(self.getLocation());
-                }
-            } finally {
-                if(map != null) {
-                    Config.unloadMap(map);
+                    FightManager.getInstance().startFight((Player) self, enemies);
                 }
             }
         }
@@ -114,14 +198,14 @@ public class MoveManager {
             throw new NumberRangeException(distance, 1);
         }
 
-        boolean isCancelled = MoveEvent.handleEvent(self.getEvents().get(MoveEvent.getName()), new Object[]{distance, false});
+        boolean isCancelled = MoveEvent.handleEvent(self, self.getEvents().get(MoveEvent.getName()), distance, false);
 
         if(!isCancelled) {
             if(self.getId().getId().equals(Id.PLAYER)) {
                 ((Player) self).addLog(LogData.MAP_MOVE_DISTANCE, distance);
             }
 
-            MapClass prevMap = null;
+            GameMap prevMap = null;
 
             try {
                 prevMap = Config.loadMap(self.getLocation());
@@ -132,7 +216,7 @@ public class MoveManager {
                 }
             }
 
-            MapClass moveMap = null;
+            GameMap moveMap = null;
 
             try {
                 moveMap = Config.loadMap(x, y);
@@ -151,8 +235,8 @@ public class MoveManager {
                 moveMap.addEntity(self);
 
                 if(self.getId().getId().equals(Id.PLAYER)) {
-                    if(!MapType.cityList().contains(moveMap.getMapType())) {
-                        moveMap.spawn();
+                    if(!MapType.cityList().contains(moveMap.getMapType()) && moveMap.canRespawn()) {
+                        moveMap.respawn();
                     }
                 }
             } finally {
@@ -201,7 +285,7 @@ public class MoveManager {
             throw new WeirdCommandException("이동 가능한 거리보다 먼 거리에 있는 좌표입니다\n" +
                     "이동 가능 거리 : " + movableDis + ", 실제 거리: " + dis);
         } else {
-            MapClass moveMap = null;
+            GameMap moveMap = null;
 
             try {
                 moveMap = Config.loadMap(x, y);
@@ -235,19 +319,23 @@ public class MoveManager {
         String[] split = locationStr.split("-");
         if(split.length != 2) {
             throw new WeirdCommandException("좌표를 정확하게 입력해주세요\n(예시 : " +
-                    Emoji.focus("0-1") + ")");
+                    Emoji.focus("1-2") + ")");
         }
 
-        int x = Integer.parseInt(split[0]);
-        int y = Integer.parseInt(split[1]);
+        int x, y;
+        Location location;
 
         try {
-            if (new Location(0, 0, x, y).equalsField(self.getLocation())) {
-                throw new WeirdCommandException("현재 위치로는 이동할 수 없습니다");
-            }
+            x = Integer.parseInt(split[0]);
+            y = Integer.parseInt(split[1]);
+            location = new Location(0, 0, x, y);
         } catch (NumberRangeException e) {
-            throw new WeirdCommandException("좌표를 정확하게 입력해주세요\n(예시 : " +
-                    Emoji.focus("0-1") + ")");
+            throw new WeirdCommandException("필드는 " + Config.MIN_FIELD_X + "-" + Config.MIN_FIELD_Y + " 부터 " +
+                    Config.MAX_FIELD_X + "-" + Config.MAX_FIELD_Y + " 의 범위로만 이동할 수 있습니다");
+        }
+
+        if (location.equalsField(self.getLocation())) {
+            throw new WeirdCommandException("현재 위치로는 이동할 수 없습니다");
         }
 
         this.setField(self, x, y);

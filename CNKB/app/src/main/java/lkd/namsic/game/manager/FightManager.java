@@ -1,7 +1,6 @@
 package lkd.namsic.game.manager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,22 +12,25 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
-import lkd.namsic.game.config.Config;
-import lkd.namsic.game.config.Emoji;
-import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.Location;
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.FightWaitType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.Variable;
+import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Boss;
 import lkd.namsic.game.gameObject.Entity;
-import lkd.namsic.game.gameObject.MapClass;
+import lkd.namsic.game.gameObject.Equipment;
+import lkd.namsic.game.gameObject.GameMap;
+import lkd.namsic.game.gameObject.Item;
 import lkd.namsic.game.gameObject.Monster;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.setting.Logger;
@@ -42,7 +44,7 @@ public class FightManager {
     }
 
     public boolean tryFight(@NonNull Player self, @NonNull String targetStr) {
-        MapClass map = Config.getMapData(self.getLocation());
+        GameMap map = Config.getMapData(self.getLocation());
 
         if(MapType.cityList().contains(map.getMapType())) {
             throw new WeirdCommandException("마을에서는 전투를 할 수 없습니다");
@@ -189,11 +191,11 @@ public class FightManager {
             enemyCount++;
             enemyId = entry.getKey();
 
-            Entity enemy = null;
+            Entity enemy;
             for (long enemyObjectId : entry.getValue()) {
-                try {
-                    enemy = Config.loadObject(enemyId, enemyObjectId);
+                enemy = Config.loadObject(enemyId, enemyObjectId);
 
+                try {
                     if (enemy.getDoing().equals(Doing.FIGHT)) {
                         StringBuilder innerMsg = new StringBuilder("---추가된 적 목록---");
 
@@ -207,11 +209,9 @@ public class FightManager {
 
                             for (long newEnemyObjectId : newEntry.getValue()) {
                                 enemyCount++;
-                                Entity newEnemy = null;
+                                Entity newEnemy = Config.loadObject(newEnemyId, newEnemyObjectId);
 
                                 try {
-                                    newEnemy = Config.loadObject(newEnemyId, newEnemyObjectId);
-
                                     self.addEnemy(newEnemyId, newEnemyObjectId);
                                     newEnemy.addEnemy(Id.PLAYER, objectId);
 
@@ -223,9 +223,7 @@ public class FightManager {
                                             .append(Emoji.LIST)
                                             .append(newEnemy.getName());
                                 } finally {
-                                    if (newEnemy != null) {
-                                        Config.unloadObject(newEnemy);
-                                    }
+                                    Config.unloadObject(newEnemy);
                                 }
                             }
                         }
@@ -264,9 +262,7 @@ public class FightManager {
                         enemy.setDoing(Doing.FIGHT);
                     }
                 } finally {
-                    if (enemy != null) {
-                        Config.unloadObject(enemy);
-                    }
+                    Config.unloadObject(enemy);
                 }
             }
         }
@@ -275,13 +271,6 @@ public class FightManager {
 
         Random random = new Random();
         while (true) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Logger.e("Player.fightThread", e);
-                throw new RuntimeException(e.getMessage());
-            }
-
             //전투 중 난입을 고려하여 항상 초기화
             Set<Entity> entitySet = new HashSet<>();
             Set<Player> playerSet = new HashSet<>();
@@ -334,6 +323,13 @@ public class FightManager {
                     return;
                 }
 
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Logger.e("Player.fightThread", e);
+                    throw new RuntimeException(e.getMessage());
+                }
+
                 Entity attacker = null;
 
                 int randomValue = random.nextInt(sum);
@@ -362,13 +358,15 @@ public class FightManager {
                     int index = 1;
                     HashMap<Integer, Entity> targets = new HashMap<>();
 
-                    StringBuilder innerMsg = new StringBuilder("---행동 목록---\n")
+                    StringBuilder innerBuilder = new StringBuilder("---행동 목록---\n")
                             .append(Emoji.LIST)
                             .append(" (전투/fight/f) (공격/attack/a) [{대상}] - 대상을 공격합니다(대상 미입력 시 1번을 공격합니다)\n")
                             .append(Emoji.LIST)
                             .append(" (전투/fight/f) (방어/defence/d) - 50% 확률로 다음 피해의 물리 데미지를 막고 일정량 회복합니다\n")
                             .append(Emoji.LIST)
                             .append(" (전투/fight/f) (대기/wait/w) - 아무 행동도 하지 않습니다\n")
+                            .append(Emoji.LIST)
+                            .append(" (전투/fight/f) (아이템/item/i) {아이템 이름} - 아이템을 사용합니다(연속 사용 불가)\n")
                             .append(Emoji.LIST)
                             .append(" (전투/fight/f) (도망/도주/run/r) - 50% 확률로 도주합니다\n(예시: ")
                             .append(Emoji.focus("n 전투 공격 1"))
@@ -392,7 +390,7 @@ public class FightManager {
                         }
 
                         targets.put(index, enemy);
-                        innerMsg.append("\n")
+                        innerBuilder.append("\n")
                                 .append(index++)
                                 .append(". ")
                                 .append(enemy.getName())
@@ -406,9 +404,11 @@ public class FightManager {
                     player.setVariable(Variable.FIGHT_TARGET_MAX_INDEX, index - 1);
 
                     player.replyPlayer("당신의 턴입니다\n대상과 행동을 30초 이내에 선택해주세요",
-                            innerMsg.toString());
+                            innerBuilder.toString());
                     Player.replyPlayersExcept(playerSet, attacker.getName() + "의 턴입니다" +
                             "\n유저의 턴을 기다려주세요(최대 30초)", player);
+
+                    FightWaitType response;
 
                     synchronized (player) {
                         while (true) {
@@ -423,6 +423,22 @@ public class FightManager {
 
                             Boolean isFightResponse = player.getObjectVariable(Variable.IS_FIGHT_RESPONSE, true);
                             if (isFightResponse) {
+                                response = player.getObjectVariable(Variable.FIGHT_WAIT_TYPE, FightWaitType.NONE);
+
+                                boolean usedItem = player.getObjectVariable(Variable.FIGHT_USED_ITEM, false);
+                                if(response.equals(FightWaitType.ITEM)) {
+                                    if(usedItem) {
+                                        player.replyPlayer("아이템은 연속 사용이 불가능합니다");
+                                        continue;
+                                    }
+
+                                    player.setVariable(Variable.FIGHT_USED_ITEM, true);
+                                } else {
+                                    if(usedItem) {
+                                        player.removeVariable(Variable.FIGHT_USED_ITEM);
+                                    }
+                                }
+
                                 self.removeVariable(Variable.IS_FIGHT_RESPONSE);
                                 break;
                             }
@@ -430,7 +446,6 @@ public class FightManager {
                     }
 
                     player.setVariable(Variable.IS_TURN, false);
-                    FightWaitType response = player.getObjectVariable(Variable.FIGHT_WAIT_TYPE, FightWaitType.NONE);
                     int targetIndex = player.getVariable(Variable.FIGHT_TARGET_INDEX);
 
                     if (response.equals(FightWaitType.NONE)) {
@@ -464,12 +479,42 @@ public class FightManager {
 
                             if (isDeath) {
                                 msg += "하여 " + targetName + "(을/를) 처치했습니다!";
+
+                                innerBuilder = new StringBuilder("드롭 필드 좌표: ")
+                                        .append(target.getLastDeathLoc().toFieldString())
+                                        .append("떨어진 골드: ")
+                                        .append(target.getLastDropMoney())
+                                        .append("\n\n---떨어진 아이템---");
+
+                                if(target.getLastDropItem().isEmpty()) {
+                                    innerBuilder.append("떨어트린 아이템이 없습니다");
+                                } else {
+                                    for(Map.Entry<Long, Integer> entry : target.getLastDropItem().entrySet()) {
+                                        innerBuilder.append("\n")
+                                                .append(ItemList.findById(entry.getKey()))
+                                                .append(" ")
+                                                .append(entry.getValue())
+                                                .append("개");
+                                    }
+                                }
+
+                                innerBuilder.append("\n\n---떨어진 장비---");
+
+                                if(target.getLastDropEquip().isEmpty()) {
+                                    innerBuilder.append("떨어트린 장비가 없습니다");
+                                } else {
+                                    for(long equipId : target.getLastDropEquip()) {
+                                        innerBuilder.append("\n")
+                                                .append(((Equipment) Config.getData(Id.EQUIPMENT, equipId)).getName());
+                                    }
+                                }
+
                                 this.endFight(target);
+                                Player.replyPlayersExcepts(playerSet, msg, innerBuilder.toString(), excepts);
                             } else {
                                 msg += "했습니다\n\n" + targetName + "의 남은 체력\n" + target.getDisplayHp();
+                                Player.replyPlayersExcepts(playerSet, msg, excepts);
                             }
-
-                            Player.replyPlayersExcepts(playerSet, msg, excepts);
 
                             if (isDeath && target.equals(self)) {
                                 for (Entity entity : entitySet) {
@@ -492,6 +537,14 @@ public class FightManager {
                                 Player.replyPlayersExcept(playerSet, player.getNickName() +
                                         "(은/는) 방어 태세로의 전환을 시도했으나 실패했습니다", player);
                             }
+
+                            break;
+                        case ITEM:
+                            long itemId = Objects.requireNonNull(player.getObjectVariable(Variable.FIGHT_ITEM_ID));
+
+                            ItemManager.getInstance().use(player, itemId, 1);
+                            Player.replyPlayersExcept(playerSet, player.getNickName() + "(이/가) " +
+                                    ItemList.findById(itemId) + "(을/를) 사용했습니다", player);
 
                             break;
                         case RUN:
@@ -531,7 +584,38 @@ public class FightManager {
 
                             if (isDeath) {
                                 msg += "\n" + player.getName() + "(이/가) 사망했습니다";
+
+                                StringBuilder innerBuilder = new StringBuilder("드롭 필드 좌표: ")
+                                        .append(player.getLastDeathLoc().toFieldString())
+                                        .append("떨어진 골드: ")
+                                        .append(player.getLastDropMoney())
+                                        .append("\n\n---떨어진 아이템---");
+
+                                if(player.getLastDropItem().isEmpty()) {
+                                    innerBuilder.append("떨어트린 아이템이 없습니다");
+                                } else {
+                                    for(Map.Entry<Long, Integer> entry : player.getLastDropItem().entrySet()) {
+                                        innerBuilder.append("\n")
+                                                .append(ItemList.findById(entry.getKey()))
+                                                .append(" ")
+                                                .append(entry.getValue())
+                                                .append("개");
+                                    }
+                                }
+
+                                innerBuilder.append("\n\n---떨어진 장비---");
+
+                                if(player.getLastDropEquip().isEmpty()) {
+                                    innerBuilder.append("떨어트린 장비가 없습니다");
+                                } else {
+                                    for(long equipId : player.getLastDropEquip()) {
+                                        innerBuilder.append("\n")
+                                                .append(((Equipment) Config.getData(Id.EQUIPMENT, equipId)).getName());
+                                    }
+                                }
+
                                 this.endFight(player);
+                                Player.replyPlayersExcept(playerSet, msg, innerBuilder.toString(), player);
                             } else {
                                 msg += "\n[ " + player.getName() + "의 남은 체력 ]\n" + player.getDisplayHp();
                             }
@@ -560,17 +644,17 @@ public class FightManager {
         }
     }
 
-    public void fightCommand(@NonNull Player self, @NonNull String command, @Nullable String subCommand) {
+    public void fightCommand(@NonNull Player self, @NonNull String command, @NonNull String subCommand) {
         boolean isTurn = self.getObjectVariable(Variable.IS_TURN, false);
         if(!isTurn) {
             self.replyPlayer("현재 당신의 턴이 아닙니다.\n턴이 종료될 때까지 기다려주세요");
             return;
         }
         
-        FightWaitType response = FightWaitType.parseWaitType(command);
+        FightWaitType response = FightWaitType.parseWaitType(command, subCommand);
 
         if(response.equals(FightWaitType.ATTACK)) {
-            if(subCommand == null) {
+            if(subCommand.equals("")) {
                 self.setVariable(Variable.FIGHT_TARGET_INDEX, 1);
             } else {
                 int index = Integer.parseInt(subCommand);
@@ -590,6 +674,26 @@ public class FightManager {
                 self.replyPlayer("이미 방어태세입니다");
                 return;
             }
+        } else if(response.equals(FightWaitType.ITEM)) {
+            Long itemId = ItemList.findByName(subCommand);
+            if(itemId == null) {
+                throw new WeirdCommandException("알 수 없는 아이템 이름입니다");
+            }
+
+            Item item = Config.getData(Id.ITEM, itemId);
+            if(item.getUse() == null) {
+                throw new WeirdCommandException("사용이 불가능한 아이템입니다");
+            }
+
+            if(self.getItem(itemId) == 0) {
+                throw new WeirdCommandException("해당 아이템을 보유하고 있지 않습니다");
+            }
+
+            if(itemId >= ItemList.LOW_EXP_POTION.getId() && itemId <= ItemList.HIGH_EXP_POTION.getId()) {
+                throw new WeirdCommandException("전투중에는 경험치 포션을 사용할 수 없습니다");
+            }
+
+            self.setVariable(Variable.FIGHT_ITEM_ID, itemId);
         }
 
         self.setVariable(Variable.FIGHT_WAIT_TYPE, response);
@@ -621,17 +725,15 @@ public class FightManager {
         for(Map.Entry<Id, Set<Long>> entry : copyMap.entrySet()) {
             enemyId = entry.getKey();
 
-            Entity enemy = null;
+            Entity enemy;
             for(long enemyObjectId : entry.getValue()) {
-                try {
-                    enemy = Config.loadObject(enemyId, enemyObjectId);
+                enemy = Config.loadObject(enemyId, enemyObjectId);
 
+                try {
                     self.removeEnemy(enemyId, enemyObjectId);
                     enemy.removeEnemy(id, objectId);
                 } finally {
-                    if(enemy != null) {
-                        Config.unloadObject(enemy);
-                    }
+                    Config.unloadObject(enemy);
                 }
             }
         }

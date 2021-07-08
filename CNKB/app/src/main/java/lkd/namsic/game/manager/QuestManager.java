@@ -14,6 +14,7 @@ import lkd.namsic.game.config.ObjectList;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.gameObject.Quest;
@@ -61,14 +62,14 @@ public class QuestManager {
         //Remove Need Things
         Quest quest = Config.getData(Id.QUEST, questId);
 
-        self.addMoney(-1 * quest.getNeedMoney().get());
+        self.addMoney(quest.getNeedMoney().get() * -1);
         totalMoney -= quest.getNeedMoney().get();
 
         long longKey;
         int value;
         for(Map.Entry<Long, Integer> entry : quest.getNeedItem().entrySet()) {
             longKey = entry.getKey();
-            value = -1 * entry.getValue();
+            value = entry.getValue() * -1;
 
             self.addItem(longKey, value);
             totalItem.put(longKey, value);
@@ -77,7 +78,7 @@ public class QuestManager {
         StatType statTypeKey;
         for(Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
             statTypeKey = entry.getKey();
-            value = -1 * entry.getValue();
+            value = entry.getValue() * -1;
 
             self.addBasicStat(statTypeKey, value);
             totalStat.put(statTypeKey, value);
@@ -85,7 +86,7 @@ public class QuestManager {
 
         for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
             longKey = entry.getKey();
-            value = -1 * entry.getValue();
+            value = entry.getValue() * -1;
 
             self.addCloseRate(longKey, value);
             totalCloseRate.put(longKey, value);
@@ -105,7 +106,7 @@ public class QuestManager {
             longKey = entry.getKey();
             value = entry.getValue();
 
-            self.addItem(longKey, value);
+            self.addItem(longKey, value, false);
             totalItem.put(longKey, totalItem.getOrDefault(longKey, 0) + value);
         }
 
@@ -130,10 +131,9 @@ public class QuestManager {
         if(totalItem.isEmpty()) {
             innerMsg.append("\n변경된 아이템이 없습니다");
         } else {
-            BiMap<Long, String> itemBiMap = ObjectList.itemList.inverse();
             for (Map.Entry<Long, Integer> entry : totalItem.entrySet()) {
                 innerMsg.append("\n")
-                        .append(itemBiMap.get(entry.getKey()))
+                        .append(ItemList.findById(entry.getKey()))
                         .append(": ")
                         .append(Config.getIncrease(entry.getValue()));
             }

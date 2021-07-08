@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.ObjectCreator;
 import lkd.namsic.game.base.ConcurrentArrayList;
@@ -60,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
                                  Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE };
         ActivityCompat.requestPermissions(this, permissions, 1);
 
+        if(Logger.logCount != 0) {
+            Logger.saveLog();
+        }
+
         setContentView(R.layout.activity_main);
 
         textView = findViewById(R.id.text);
@@ -71,10 +76,13 @@ public class MainActivity extends AppCompatActivity {
 
         context = this;
         switchBtn = findViewById(R.id.switchBtn);
+        switchBtn.setChecked(isOn);
 
         Config.init();
         FileManager.initDir();
         Config.loadPlayers();
+
+        KakaoTalk.registerCommands();
 
         threadCleaner = new Timer();
         threadCleaner.scheduleAtFixedRate(new TimerTask() {
@@ -100,7 +108,41 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 0, 1000);
 
-        Logger.i("Start", "Debug 10 Started");
+        Logger.i("Start", "Debug 3 Started");
+        Logger.logCount = 0;
+        Logger.logs = "";
+    }
+
+    @Override
+    public void onBackPressed() {
+        endProgram();
+        this.finish();
+    }
+
+    public static void endProgram() {
+        MainActivity.toast("Stopping...");
+        Logger.saveLog();
+
+        MainActivity.threadCleaner.cancel();
+
+        Config.IGNORE_FILE_LOG = true;
+        Config.save();
+        Config.IGNORE_FILE_LOG = false;
+
+        for(Thread thread : MainActivity.threads) {
+            if (thread.isAlive()) {
+                thread.interrupt();
+
+                try {
+                    thread.join(1000);
+                } catch (InterruptedException ignored) {}
+            }
+        }
+
+        MainActivity.threads.clear();
+        MainActivity.threadCleaner.cancel();
+
+        MainActivity.toast("Stopped");
     }
 
     public void onSwitchClick(View view) {

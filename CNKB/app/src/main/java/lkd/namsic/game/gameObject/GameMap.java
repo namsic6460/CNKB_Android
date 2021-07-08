@@ -9,13 +9,14 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
+import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdDataException;
 import lkd.namsic.game.manager.MoveManager;
@@ -25,7 +26,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class MapClass {
+public class GameMap {
 
     private static final MoveManager moveManager = MoveManager.getInstance();
 
@@ -51,11 +52,11 @@ public class MapClass {
 
     //This part can be frequently changed
     final Map<Location, Long> money = new ConcurrentHashMap<>();
-    final Map<Location, ConcurrentHashMap<Long, Integer>> item = new ConcurrentHashMap<>();
-    final Map<Location, ConcurrentHashSet<Long>> equip = new ConcurrentHashMap<>();
-    final Map<Id, ConcurrentHashSet<Long>> entity = new ConcurrentHashMap<>();
+    final Map<Location, Map<Long, Integer>> item = new ConcurrentHashMap<>();
+    final Map<Location, Set<Long>> equip = new ConcurrentHashMap<>();
+    final Map<Id, Set<Long>> entity = new ConcurrentHashMap<>();
 
-    public MapClass(@NonNull String name) {
+    public GameMap(@NonNull String name) {
         this.name = name;
 
         this.entity.put(Id.PLAYER, new ConcurrentHashSet<>());
@@ -78,12 +79,13 @@ public class MapClass {
     @NonNull
     public String getInnerInfo() {
         StringBuilder builder = new StringBuilder("---플레이어 목록---");
-        
+
         Set<Long> playerSet = this.entity.get(Id.PLAYER);
-        Player player;
         if(playerSet.isEmpty()) {
             builder.append("\n플레이어 없음");
         } else {
+            Player player;
+
             for (long playerId : playerSet) {
                 player = Config.getData(Id.PLAYER, playerId);
                 builder.append("\n[")
@@ -99,11 +101,12 @@ public class MapClass {
         npcSet.remove(1L);
         npcSet.remove(2L);
 
-        Npc npc;
         if(npcSet.isEmpty()) {
             builder.append("\nNPC 없음");
         } else {
             for(long npcId : npcSet) {
+                Npc npc;
+
                 npc = Config.getData(Id.NPC, npcId);
                 builder.append("\n[")
                         .append(npc.getLocation().toFieldString())
@@ -112,31 +115,91 @@ public class MapClass {
             }
         }
 
-        builder.append("\n\n---무언가 감지된 좌표---");
+        builder.append("\n\n---떨어진 골드---");
 
-        Set<Location> locationSet = new HashSet<>();
-        locationSet.addAll(this.money.keySet());
-        locationSet.addAll(this.item.keySet());
-        locationSet.addAll(this.equip.keySet());
-
-        Entity entity;
-        for(long monsterId : this.getEntity(Id.MONSTER)) {
-            entity = Config.getData(Id.MONSTER, monsterId);
-            locationSet.add(entity.getLocation());
+        if(this.money.isEmpty()) {
+            builder.append("\n떨어진 골드 없음");
+        } else {
+            for (Map.Entry<Location, Long> entry : this.money.entrySet()) {
+                builder.append("\n[")
+                        .append(entry.getKey().toFieldString())
+                        .append("] ")
+                        .append(entry.getValue())
+                        .append("G");
+            }
         }
 
-        for(long bossId : this.getEntity(Id.BOSS)) {
-            entity = Config.getData(Id.BOSS, bossId);
-            locationSet.add(entity.getLocation());
+        builder.append("\n\n---떨어진 아이템---");
+
+        if(this.item.isEmpty()) {
+            builder.append("\n떨어진 아이템 없음");
+        } else {
+            Item item;
+            String locationStr;
+            for (Map.Entry<Location, Map<Long, Integer>> entry : this.item.entrySet()) {
+                locationStr = "\n[" + entry.getKey().toFieldString() + "] ";
+
+                for(Map.Entry<Long, Integer> itemEntry : entry.getValue().entrySet()) {
+                    item = Config.getData(Id.ITEM, itemEntry.getKey());
+                    builder.append(locationStr)
+                            .append(item.getName())
+                            .append(" ")
+                            .append(itemEntry.getValue())
+                            .append("개");
+                }
+            }
         }
 
-        if(locationSet.isEmpty()) {
-            return builder.toString() + "\n감지된 물체 없음";
+        builder.append("\n\n---떨어진 장비---");
+
+        if(this.equip.isEmpty()) {
+            builder.append("\n떨어진 장비 없음");
+        } else {
+            Equipment equipment;
+            String locationStr;
+            for (Map.Entry<Location, Set<Long>> entry : this.equip.entrySet()) {
+                locationStr = "\n[" + entry.getKey().toFieldString() + "] ";
+
+                for(long equipId : entry.getValue()) {
+                    equipment = Config.getData(Id.EQUIPMENT, equipId);
+                    builder.append(locationStr)
+                            .append(equipment.getName());
+                }
+            }
         }
 
-        for(Location location : locationSet) {
-            builder.append("\n")
-                    .append(location.toFieldString());
+        builder.append("\n\n---몬스터 목록---");
+
+        Set<Long> monsterSet = this.entity.get(Id.MONSTER);
+        if(monsterSet.isEmpty()) {
+            builder.append("\n몬스터 없음");
+        } else {
+            Monster monster;
+
+            for(long monsterId : monsterSet) {
+                monster = Config.getData(Id.MONSTER, monsterId);
+                builder.append("\n[")
+                        .append(monster.getLocation().toFieldString())
+                        .append("] ")
+                        .append(monster.getName());
+            }
+        }
+
+        builder.append("\n\n---보스 목록---");
+
+        Set<Long> bossSet = this.entity.get(Id.BOSS);
+        if(bossSet.isEmpty()) {
+            builder.append("\n보스 없음");
+        } else {
+            Boss boss;
+
+            for(long bossId : bossSet) {
+                boss = Config.getData(Id.BOSS, bossId);
+                builder.append("\n[")
+                        .append(boss.getLocation().toFieldString())
+                        .append("] ")
+                        .append(boss.getName());
+            }
         }
 
         return builder.toString();
@@ -151,7 +214,32 @@ public class MapClass {
             throw new NumberRangeException(money, 0);
         }
 
-        this.money.put(location, this.getMoney(location) + money);
+        Entity entity;
+        Set<Entity> entitySet = new HashSet<>();
+        for(Map.Entry<Id, Set<Long>> entry : this.entity.entrySet()) {
+            for(long objectId : entry.getValue()) {
+                entity = Config.getData(entry.getKey(), objectId);
+
+                if(entity.getLocation().equalsField(location)) {
+                    entitySet.add(entity);
+                }
+            }
+        }
+
+        if(entitySet.isEmpty()) {
+            this.money.put(location, money);
+        } else {
+            entity = (Entity) entitySet.toArray()[new Random().nextInt(entitySet.size())];
+            Id id = entity.getId().getId();
+
+            Config.loadObject(id, entity.getId().getObjectId());
+            entity.addMoney(money);
+            Config.unloadObject(entity);
+
+            if(id.equals(Id.PLAYER)) {
+                ((Player) entity).replyPlayer(money + "G 를 주웠습니다");
+            }
+        }
     }
 
     public long getMoney(Location location) {
@@ -173,18 +261,43 @@ public class MapClass {
             throw new NumberRangeException(count, 0);
         }
 
-        ConcurrentHashMap<Long, Integer> itemMap = this.item.get(location);
+        Map<Long, Integer> itemMap = this.item.get(location);
         if(count == 0) {
             if(itemMap != null) {
                 itemMap.remove(itemId);
             }
         } else {
-            if(itemMap != null) {
-                itemMap.put(itemId, count);
+            Entity entity;
+            Set<Entity> entitySet = new HashSet<>();
+            for(Map.Entry<Id, Set<Long>> entry : this.entity.entrySet()) {
+                for(long objectId : entry.getValue()) {
+                    entity = Config.getData(entry.getKey(), objectId);
+
+                    if(entity.getLocation().equalsField(location)) {
+                        entitySet.add(entity);
+                    }
+                }
+            }
+
+            if(entitySet.isEmpty()) {
+                if (itemMap != null) {
+                    itemMap.put(itemId, count);
+                } else {
+                    itemMap = new ConcurrentHashMap<>();
+                    itemMap.put(itemId, count);
+                    this.item.put(location, itemMap);
+                }
             } else {
-                itemMap = new ConcurrentHashMap<>();
-                itemMap.put(itemId, count);
-                this.item.put(location, itemMap);
+                entity = (Entity) entitySet.toArray()[new Random().nextInt(entitySet.size())];
+                Id id = entity.getId().getId();
+
+                Config.loadObject(id, entity.getId().getObjectId());
+                entity.addItem(itemId, count);
+                Config.unloadObject(entity);
+
+                if(id.equals(Id.PLAYER)) {
+                    ((Player) entity).replyPlayer(ItemList.findById(itemId) + " " + count + "개를 주웠습니다");
+                }
             }
         }
     }
@@ -210,13 +323,38 @@ public class MapClass {
 
         Config.checkId(Id.EQUIPMENT, equipId);
 
-        ConcurrentHashSet<Long> equipSet = this.equip.get(location);
-        if(equipSet == null) {
-            equipSet = new ConcurrentHashSet<>();
-            equipSet.add(equipId);
-            this.equip.put(location, equipSet);
+        Entity entity;
+        Set<Entity> entitySet = new HashSet<>();
+        for(Map.Entry<Id, Set<Long>> entry : this.entity.entrySet()) {
+            for(long objectId : entry.getValue()) {
+                entity = Config.getData(entry.getKey(), objectId);
+
+                if(entity.getLocation().equalsField(location)) {
+                    entitySet.add(entity);
+                }
+            }
+        }
+
+        if(entitySet.isEmpty()) {
+            Set<Long> equipSet = this.equip.get(location);
+            if (equipSet == null) {
+                equipSet = new ConcurrentHashSet<>();
+                equipSet.add(equipId);
+                this.equip.put(location, equipSet);
+            } else {
+                equipSet.add(equipId);
+            }
         } else {
-            equipSet.add(equipId);
+            entity = (Entity) entitySet.toArray()[new Random().nextInt(entitySet.size())];
+            Id id = entity.getId().getId();
+
+            Config.loadObject(id, entity.getId().getObjectId());
+            entity.addEquip(equipId);
+            Config.unloadObject(entity);
+
+            if(id.equals(Id.PLAYER)) {
+                ((Player) entity).replyPlayer(((Equipment) Config.getData(Id.EQUIPMENT, equipId)).getName() + " (을/를) 주웠습니다");
+            }
         }
     }
 
@@ -234,7 +372,14 @@ public class MapClass {
     }
 
     public void removeEntity(Entity entity) {
-        this.getEntity(entity.id.getId()).remove(entity.id.getObjectId());
+        Id id = entity.getId().getId();
+
+        this.getEntity(id).remove(entity.id.getObjectId());
+        if(id.equals(Id.MONSTER) || id.equals(Id.BOSS)) {
+            if(this.canRespawn()) {
+                this.respawn();
+            }
+        }
     }
 
     public void setSpawnMonster(long monsterId, double percent, int maxCount) {
@@ -264,11 +409,11 @@ public class MapClass {
         this.spawnPercent.get(Id.BOSS).put(bossId, percent);
     }
 
-    public void spawn() {
-        if(!(this.getEntity(Id.MONSTER).isEmpty() && this.getEntity(Id.BOSS).isEmpty())) {
-            return;
-        }
+    public boolean canRespawn() {
+        return this.getEntity(Id.MONSTER).isEmpty() && this.getEntity(Id.BOSS).isEmpty();
+    }
 
+    public void respawn() {
         Random random = new Random();
 
         double percent;

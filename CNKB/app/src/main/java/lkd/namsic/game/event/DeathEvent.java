@@ -6,26 +6,27 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import lkd.namsic.game.exception.EventSkipException;
+import lkd.namsic.game.gameObject.Entity;
+
 public abstract class DeathEvent extends Event {
 
-    public abstract boolean onDeath(boolean isCancelled, int beforeDeathHp, int afterDeathHp);
-
-    public static boolean handleEvent(@Nullable List<Event> events, @NonNull Object[] args) {
+    public static boolean handleEvent(@NonNull Entity self, @Nullable List<Event> events, int beforeDeathHp, int afterDeathHp) {
         boolean isCancelled = false;
-
-        int beforeDeathHp = Integer.parseInt(args[0].toString());
-        int afterDeathHp = Integer.parseInt(args[1].toString());
 
         if (events != null) {
             List<Event> removeList = new ArrayList<>();
-            for (Event deathEvent : events) {
-                isCancelled = ((DeathEvent) deathEvent).onDeath(isCancelled, beforeDeathHp, afterDeathHp);
 
-                if (deathEvent.activeCount != -1) {
-                    if (--deathEvent.activeCount == 0) {
-                        removeList.add(deathEvent);
+            for (Event deathEvent : events) {
+                try {
+                    isCancelled = ((DeathEvent) deathEvent).onDeath(self, beforeDeathHp, afterDeathHp);
+
+                    if (deathEvent.activeCount != -1) {
+                        if (--deathEvent.activeCount == 0) {
+                            removeList.add(deathEvent);
+                        }
                     }
-                }
+                } catch (EventSkipException ignore) {}
             }
 
             events.removeAll(removeList);
@@ -33,6 +34,8 @@ public abstract class DeathEvent extends Event {
 
         return isCancelled;
     }
+
+    public abstract boolean onDeath(@NonNull Entity self, int beforeDeathHp, int afterDeathHp);
 
     @NonNull
     public static String getName() {

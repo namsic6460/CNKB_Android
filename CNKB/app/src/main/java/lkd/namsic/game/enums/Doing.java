@@ -8,6 +8,7 @@ import java.util.List;
 public enum Doing {
 
     NONE,
+    APPRAISE,
     BUY,
     CHAT,
     FIGHT,

@@ -15,8 +15,7 @@ public class RangeInteger implements Serializable {
     int max;
 
     public RangeInteger(int min, int max) {
-        this.min = min;
-        this.max = max;
+        this.set(min, max);
     }
 
     public boolean isInRange(int value) {
@@ -24,6 +23,10 @@ public class RangeInteger implements Serializable {
     }
 
     public void set(int min, int max) {
+        if(min > max) {
+            throw new RuntimeException("minValue can't be bigger than maxValue");
+        }
+
         this.min = min;
         this.max = max;
     }
@@ -49,7 +52,7 @@ public class RangeInteger implements Serializable {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return (min + "_" + max).hashCode();
     }
 
 }

@@ -6,8 +6,6 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-import lkd.namsic.game.config.Config;
-import lkd.namsic.setting.Logger;
 import lkd.namsic.MainActivity;
 
 public class ForcedTerminationService extends Service {
@@ -20,25 +18,8 @@ public class ForcedTerminationService extends Service {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        MainActivity.toast("Stopping...");
-        Logger.saveLog();
-
-        MainActivity.threadCleaner.cancel();
-        Config.save();
-        for(Thread thread : MainActivity.threads) {
-            if (thread.isAlive()) {
-                thread.interrupt();
-
-                try {
-                    thread.join(1000);
-                } catch (InterruptedException ignored) {}
-            }
-        }
-
-        MainActivity.threads.clear();
-        MainActivity.threadCleaner.cancel();
-
-        MainActivity.toast("Stopped");
+        MainActivity.endProgram();
         this.stopSelf();
     }
+
 }

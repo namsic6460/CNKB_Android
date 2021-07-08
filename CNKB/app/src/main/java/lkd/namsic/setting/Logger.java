@@ -15,8 +15,8 @@ public class Logger {
 
     private static final int SAVE_COUNT = 1000;
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH.mm.ss.SSS", Locale.KOREA);
-    static volatile int logCount = 0;
-    static volatile String logs = "";
+    public static volatile int logCount = 0;
+    public static volatile String logs = "";
 
     public static synchronized void i(String title, String text) {
         if(title.equals("FileManager")) {
@@ -31,8 +31,8 @@ public class Logger {
         Log.i(title, text);
     }
 
-    public static synchronized void w(String title, Throwable e) {
-        w(title, Config.errorString(e));
+    public static synchronized void w(String title, Throwable t) {
+        w(title, Config.errorString(t));
     }
 
     public static synchronized void w(String title, String text) {
@@ -40,20 +40,21 @@ public class Logger {
         Log.w(title, text);
     }
 
-    public static synchronized void e(String title, Throwable e) {
-        String errorString = Config.errorString(e);
+    public static synchronized void e(String title, Throwable t) {
+        e(title, Config.errorString(t));
+        MainActivity.toast("ERROR!\n" + t.getMessage());
+    }
 
+    public static synchronized void e(String title, String errorString) {
         try {
             log(title, errorString, "ERR");
             Log.e(title, errorString);
 
-            MainActivity.toast("ERROR!\n" + e.getMessage());
-
             if(title.startsWith("FileManager(path : ")) {
-                throw e;
+                throw new RuntimeException(errorString);
             }
-        } catch (Throwable t) {
-            t.printStackTrace();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
             return;
         }
 
@@ -77,19 +78,19 @@ public class Logger {
     }
 
     public static void saveLog() {
-        Thread thread = new Thread(() -> {
-            if (!logs.equals("")) {
+        if (logCount != 0) {
+            Thread thread = new Thread(() -> {
                 String fileName = FileManager.LOG_PATH + "/Log - " + getTimeFileName();
                 FileManager.save(fileName, logs);
 
                 MainActivity.toast("로그 저장 완료 - " + fileName);
-            }
 
-            logCount = 0;
-            logs = "";
-        });
+                logCount = 0;
+                logs = "";
+            });
 
-        MainActivity.startThread(thread);
+            MainActivity.startThread(thread);
+        }
     }
 
     private static String getTimeFileName() {

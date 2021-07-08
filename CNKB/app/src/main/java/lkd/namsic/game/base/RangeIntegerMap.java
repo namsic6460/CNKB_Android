@@ -103,7 +103,7 @@ public class RangeIntegerMap<T> implements Serializable {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return (min.hashCode() + "" + max.hashCode()).hashCode();
     }
 
 }

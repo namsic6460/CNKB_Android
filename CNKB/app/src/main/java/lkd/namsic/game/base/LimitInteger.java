@@ -55,11 +55,6 @@ public class LimitInteger implements LimitClass<Integer> {
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
     public boolean equals(@Nullable Object obj) {
         if(obj == null) {
             return false;
@@ -70,6 +65,11 @@ public class LimitInteger implements LimitClass<Integer> {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return (min.hashCode() + "" + max.hashCode()).hashCode();
     }
 
     @NonNull

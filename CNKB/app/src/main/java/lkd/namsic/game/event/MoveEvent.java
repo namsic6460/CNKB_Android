@@ -6,26 +6,27 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import lkd.namsic.game.exception.EventSkipException;
+import lkd.namsic.game.gameObject.Entity;
+
 public abstract class MoveEvent extends Event {
 
-    public abstract boolean onMove(boolean isCancelled, int distance, boolean isField);
-
-    public static boolean handleEvent(@Nullable List<Event> events, Object[] args) {
+    public static boolean handleEvent(@NonNull Entity self, @Nullable List<Event> events, int distance, boolean isField) {
         boolean isCancelled = false;
-
-        int distance = Integer.parseInt(args[0].toString());
-        boolean isField = Boolean.parseBoolean(args[1].toString());
 
         if (events != null) {
             List<Event> removeList = new ArrayList<>();
-            for (Event moveEvent : events) {
-                isCancelled = ((MoveEvent) moveEvent).onMove(isCancelled, distance, isField);
 
-                if (moveEvent.activeCount != -1) {
-                    if (--moveEvent.activeCount == 0) {
-                        removeList.add(moveEvent);
+            for (Event moveEvent : events) {
+                try {
+                    isCancelled = ((MoveEvent) moveEvent).onMove(self, distance, isField);
+
+                    if (moveEvent.activeCount != -1) {
+                        if (--moveEvent.activeCount == 0) {
+                            removeList.add(moveEvent);
+                        }
                     }
-                }
+                } catch (EventSkipException ignore) {}
             }
 
             events.removeAll(removeList);
@@ -33,6 +34,8 @@ public abstract class MoveEvent extends Event {
 
         return isCancelled;
     }
+
+    public abstract boolean onMove(@NonNull Entity self, int distance, boolean isField);
 
     @NonNull
     public static String getName() {

@@ -1,12 +1,15 @@
 package lkd.namsic.game.gameObject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import java.io.Serializable;
 import java.util.List;
 
 @FunctionalInterface
-public interface Use {
+public interface Use extends Serializable {
 
-    void use(Entity self, @NonNull List<GameObject> other);
+    @Nullable
+    String use(Entity self, @NonNull List<GameObject> other);
 
 }

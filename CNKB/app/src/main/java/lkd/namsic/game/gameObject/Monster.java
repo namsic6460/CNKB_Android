@@ -47,7 +47,7 @@ public class Monster extends AiEntity {
                 Config.checkStatType(statType);
             } catch (UnhandledEnumException ignore) {}
 
-            this.addBasicStat(statType, Math.max((int) (this.getBasicStat(statType) * statIncrease), 0));
+            this.addBasicStat(statType, (int) (this.getBasicStat(statType) * statIncrease));
         }
 
         this.setBasicStat(StatType.HP, this.getStat(StatType.MAXHP));
@@ -63,14 +63,14 @@ public class Monster extends AiEntity {
             playerArray = players.toArray();
             output[0] = playerArray[random.nextInt(playerArray.length)];
         } else if(type.equals(MonsterType.MIDDLE)) {
-            Set<Player> retainSet = new HashSet<>();
+            Set<Player> duplicateSet = new HashSet<>();
             for(Player player : players) {
                 if(this.angryPlayers.contains(player.getId().getObjectId())) {
-                    retainSet.add(player);
+                    duplicateSet.add(player);
                 }
             }
 
-            playerArray = retainSet.toArray();
+            playerArray = duplicateSet.toArray();
             if(playerArray.length != 0) {
                 output[0] = playerArray[random.nextInt(playerArray.length)];
             } else {

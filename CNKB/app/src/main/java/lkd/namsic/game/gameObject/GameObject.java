@@ -9,8 +9,7 @@ import lombok.Getter;
 public abstract class GameObject implements Cloneable {
 
     @Getter
-    final
-    IdClass id = new IdClass();
+    final IdClass id = new IdClass();
 
     @NonNull
     @Override
@@ -38,6 +37,11 @@ public abstract class GameObject implements Cloneable {
         }
 
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
 }

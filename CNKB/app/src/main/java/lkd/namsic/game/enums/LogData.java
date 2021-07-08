@@ -6,7 +6,6 @@ public enum LogData {
     BUFF_RECEIVE,
     CHAT,
     DEATH,
-    EAT,
     ADVENTURE,
     FIELD_MOVE_DISTANCE,
     FIGHT,
@@ -26,7 +25,8 @@ public enum LogData {
     REINFORCE_TRY,
     TOTAL_CLOSERATE,
     TOTAL_EXP,
-    TOTAL_ITEM_USED,
+    TOTAL_ITEM_USE,
+    TOTAL_ITEM_EAT,
     TOTAL_MONEY
 
 }

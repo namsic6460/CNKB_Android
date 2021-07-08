@@ -51,11 +51,6 @@ public class LimitDouble implements LimitClass<Double> {
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
     public boolean equals(@Nullable Object obj) {
         if(obj == null) {
             return false;
@@ -66,6 +61,11 @@ public class LimitDouble implements LimitClass<Double> {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return (min.hashCode() + "" + max.hashCode()).hashCode();
     }
 
     @NonNull

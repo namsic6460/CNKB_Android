@@ -22,12 +22,15 @@ import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
+import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.KakaoTalk;
@@ -107,16 +110,17 @@ public class Player extends Entity {
     }
 
     @NonNull
-    final
-    String sender;
+    final LocalDateTime created = LocalDateTime.now();
+
+    @NonNull
+    final String sender;
 
     @Setter
     @NonNull
     String nickName;
 
     @NonNull
-    final
-    String image;
+    final String image;
 
     @Setter
     Doing prevDoing = Doing.NONE;
@@ -196,6 +200,11 @@ public class Player extends Entity {
         this.setBasicStat(StatType.MAXMN, 10);
         this.setBasicStat(StatType.MN, 10);
         this.setBasicStat(StatType.ATK, 10);
+    }
+
+    @NonNull
+    public String getDisplayLv() {
+        return this.lv.get() + "Lv (" + this.exp.get() + "/" + this.getNeedExp() + ")";
     }
 
     public void addTitle(@NonNull String title) {
@@ -293,9 +302,12 @@ public class Player extends Entity {
                 endLv = this.lv.get();
 
                 if(startLv != endLv) {
+                    this.setBasicStat(StatType.HP, this.getStat(StatType.MAXHP));
+                    this.setBasicStat(StatType.MN, this.getStat(StatType.MAXMN));
                     this.replyPlayer("레벨 업!(" + startLv + "->" + endLv + ")\n" +
-                            Emoji.EXP + ": " + this.exp.get() + "\n" +
-                            Emoji.SP + ": " + this.sp.get());
+                                    Emoji.EXP + " 경험치: " + this.exp.get() + "\n" +
+                                    Emoji.SP + " 스텟 포인트: " + this.sp.get(),
+                            "레벨업을 하여 체력과 마나가 모두 회복됩니다");
                 }
 
                 break;
@@ -350,10 +362,6 @@ public class Player extends Entity {
         this.exp.add(-1 * needExp);
     }
 
-    public int getMovableDistance() {
-        return (int) Math.sqrt(2 + this.getStat(StatType.AGI) / 4D);
-    }
-
     public void setPvp(boolean enable, @Nullable Integer day) {
         if(enable) {
             this.pvp = true;
@@ -367,28 +375,18 @@ public class Player extends Entity {
                 throw new NullPointerException();
             }
 
-            long itemId;
-            if(day == 1) {
-                itemId = 94L;
-            } else if(day == 7) {
-                itemId = 95L;
-            } else {
-                throw new RuntimeException();
+            if(day != 1 && day != 7) {
+                throw new InvalidNumberException(day);
             }
-            
-            if(this.getItem(itemId) > 0) {
-                LocalDateTime enableTime = LocalDateTime.now().plusDays(day + 1);
 
-                this.pvp = false;
-                this.checkPvp = true;
-                this.pvpEnableYear = enableTime.getYear();
-                this.pvpEnableDay = enableTime.getDayOfYear();
-                this.addItem(itemId, -1);
+            LocalDateTime enableTime = LocalDateTime.now().plusDays(day + 1);
 
-                this.replyPlayer("PvP를 " + day + "일간 비활성화 했습니다");
-            } else {
-                this.replyPlayer("PvP를 비활성화 하기 위한 아이템이 부족합니다");
-            }
+            this.pvp = false;
+            this.checkPvp = true;
+            this.pvpEnableYear = enableTime.getYear();
+            this.pvpEnableDay = enableTime.getDayOfYear();
+
+            this.replyPlayer("PvP를 " + day + "일간 비활성화 했습니다");
         }
     }
 
@@ -397,31 +395,81 @@ public class Player extends Entity {
         Config.checkId(Id.ACHIEVE, achieveId);
 
         if(this.achieve.add(achieveId)) {
-            Achieve achieve = null;
+            Achieve achieve = Config.getData(Id.ACHIEVE, achieveId);
 
-            try {
-                achieve = Config.loadObject(Id.ACHIEVE, achieveId);
+            this.addMoney(achieve.getRewardMoney().get());
+            this.addExp(achieve.rewardExp.get());
+            this.adv.add(achieve.rewardAdv.get());
 
-                this.addMoney(achieve.getRewardMoney().get());
-                this.addExp(achieve.rewardExp.get());
-                this.adv.add(achieve.rewardAdv.get());
+            StringBuilder innerMsg = new StringBuilder("---친밀도 현황---");
 
-                for (long npcId : achieve.getRewardCloseRate().keySet()) {
-                    this.addCloseRate(npcId, achieve.getRewardCloseRate(npcId));
-                }
+            if(achieve.rewardCloseRate.isEmpty()) {
+                innerMsg.append("\n변경된 친밀도가 없습니다");
+            } else {
+                long npcId;
+                int closeRate;
 
-                for (long itemId : achieve.getRewardItem().keySet()) {
-                    this.addItem(itemId, achieve.getRewardItem(itemId));
-                }
+                for(Map.Entry<Long, Integer> entry : achieve.rewardCloseRate.entrySet()) {
+                    npcId = entry.getKey();
+                    closeRate = entry.getValue();
 
-                for (StatType statType : achieve.getRewardStat().keySet()) {
-                    this.addBasicStat(statType, achieve.getRewardStat(statType));
-                }
-            } finally {
-                if(achieve != null) {
-                    Config.unloadObject(achieve);
+                    this.addCloseRate(npcId, closeRate);
+
+                    Npc npc = Config.getData(Id.NPC, npcId);
+                    innerMsg.append("\n")
+                            .append(npc.getName())
+                            .append(": ")
+                            .append(Config.getIncrease(closeRate));
                 }
             }
+
+            innerMsg.append("\n\n---아이템 현황---");
+
+            if(achieve.rewardItem.isEmpty()) {
+                innerMsg.append("\n변경된 아이템이 없습니다");
+            } else {
+                long itemId;
+                int count;
+
+                for(Map.Entry<Long, Integer> entry : achieve.rewardItem.entrySet()) {
+                    itemId = entry.getKey();
+                    count = entry.getValue();
+
+                    this.addItem(itemId, count, false);
+
+                    Item item = Config.getData(Id.ITEM, itemId);
+                    innerMsg.append("\n")
+                            .append(item.getName())
+                            .append(": ")
+                            .append(Config.getIncrease(count));
+                }
+            }
+
+            innerMsg.append("\n\n---스텥 현황---");
+
+            if(achieve.rewardStat.isEmpty()) {
+                innerMsg.append("\n변경된 스텟이 없습니다");
+            } else {
+                StatType statType;
+                int count;
+
+                for(Map.Entry<StatType, Integer> entry : achieve.rewardStat.entrySet()) {
+                    statType = entry.getKey();
+                    count = entry.getValue();
+
+                    this.addBasicStat(statType, count);
+                    innerMsg.append("\n")
+                            .append(statType.getDisplayName())
+                            .append(": ")
+                            .append(Config.getIncrease(count));
+                }
+            }
+
+            String msg = achieve.name + " 업적을 획득하였습니다!";
+            this.replyPlayer(msg, innerMsg.toString());
+
+            //TODO: 서비스 시 주석 해제
+//          KakaoTalk.replyGroup(this.getName() + "님이 " + msg);
         }
 
         return this;
@@ -430,71 +478,98 @@ public class Player extends Entity {
     public boolean canAddResearch(long researchId) {
         Config.checkId(Id.RESEARCH, researchId);
 
-        Research research = null;
-        boolean flag;
-
-        try {
-            research = Config.loadObject(Id.RESEARCH, researchId);
-            flag = research.getLimitLv().isInRange(this.lv.get()) && research.getNeedMoney().get() <= this.getMoney()
+        Research research = Config.getData(Id.RESEARCH, researchId);
+        return research.getLimitLv().isInRange(this.lv.get()) && research.getNeedMoney().get() <= this.getMoney()
                     && Config.compareMap(this.inventory, research.needItem, true);
-        } finally {
-            if(research != null) {
-                Config.unloadObject(research);
-            }
-        }
-
-        Config.unloadObject(research);
-
-        return flag;
     }
 
     public void addResearch(long researchId) {
         if(this.research.add(researchId)) {
-            Research research = null;
+            Research research = Config.getData(Id.RESEARCH, researchId);
 
-            try {
-                research = Config.loadObject(Id.RESEARCH, researchId);
+            this.addMoney(-1 * research.getNeedMoney().get());
 
-                this.addMoney(-1 * research.getNeedMoney().get());
+            this.addExp(research.rewardExp.get());
+            this.adv.add(research.rewardAdv.get());
 
-                this.addExp(research.rewardExp.get());
-                this.adv.add(research.rewardAdv.get());
+            StringBuilder innerMsg = new StringBuilder("---친밀도 현황---");
 
-                for (long npcId : research.getRewardCloseRate().keySet()) {
-                    this.addCloseRate(npcId, research.getRewardCloseRate(npcId));
-                }
+            if(research.rewardCloseRate.isEmpty()) {
+                innerMsg.append("\n변경된 친밀도가 없습니다");
+            } else {
+                long npcId;
+                int closeRate;
 
-                for (long itemId : research.getRewardItem().keySet()) {
-                    this.addItem(itemId, research.getRewardItem(itemId));
-                }
+                for(Map.Entry<Long, Integer> entry : research.rewardCloseRate.entrySet()) {
+                    npcId = entry.getKey();
+                    closeRate = entry.getValue();
 
-                for (StatType statType : research.getRewardStat().keySet()) {
-                    this.addBasicStat(statType, research.getRewardStat(statType));
-                }
-            } finally {
-                if(research != null) {
-                    Config.unloadObject(research);
+                    this.addCloseRate(npcId, closeRate);
+
+                    Npc npc = Config.getData(Id.NPC, npcId);
+                    innerMsg.append("\n")
+                            .append(npc.getName())
+                            .append(": ")
+                            .append(Config.getIncrease(closeRate));
                 }
             }
+
+            innerMsg.append("\n\n---아이템 현황---");
+
+            if(research.rewardItem.isEmpty()) {
+                innerMsg.append("\n변경된 아이템이 없습니다");
+            } else {
+                long itemId;
+                int count;
+
+                for(Map.Entry<Long, Integer> entry : research.rewardItem.entrySet()) {
+                    itemId = entry.getKey();
+                    count = entry.getValue();
+
+                    this.addItem(itemId, count, false);
+
+                    Item item = Config.getData(Id.ITEM, itemId);
+                    innerMsg.append("\n")
+                            .append(item.getName())
+                            .append(": ")
+                            .append(Config.getIncrease(count));
+                }
+            }
+
+            innerMsg.append("\n\n---스텥 현황---");
+
+            if(research.rewardStat.isEmpty()) {
+                innerMsg.append("\n변경된 스텟이 없습니다");
+            } else {
+                StatType statType;
+                int count;
+
+                for(Map.Entry<StatType, Integer> entry : research.rewardStat.entrySet()) {
+                    statType = entry.getKey();
+                    count = entry.getValue();
+
+                    this.addBasicStat(statType, count);
+                    innerMsg.append("\n")
+                            .append(statType.getDisplayName())
+                            .append(": ")
+                            .append(Config.getIncrease(count));
+                }
+            }
+
+            String msg = research.name + " 연구를 해금하였습니다!";
+            this.replyPlayer(msg, innerMsg.toString());
+
+            //TODO: 서비스 시 주석 해제
+//          KakaoTalk.replyGroup(this.getName() + "님이 " + msg);
         }
     }
 
     public boolean canAddQuest(long questId) {
-        Quest quest = null;
-        boolean flag;
+        Config.checkId(Id.QUEST, questId);
 
-        try {
-            quest = Config.loadObject(Id.QUEST, questId);
-
-            flag = quest.limitLv.isInRange(this.lv.get()) && quest.limitCloseRate.isInRange(this.closeRate)
-                    && this.checkStatRange(quest.limitStat.getMin(), quest.limitStat.getMax());
-        } finally {
-            if(quest != null) {
-                Config.unloadObject(quest);
-            }
-        }
-
-        return flag;
+        Quest quest = Config.getData(Id.QUEST, questId);
+        return quest.limitLv.isInRange(this.lv.get()) && quest.limitCloseRate.isInRange(this.closeRate)
+                && this.checkStatRange(quest.limitStat.getMin(), quest.limitStat.getMax());
     }
 
     public void addQuest(long questId) {
@@ -516,20 +591,11 @@ public class Player extends Entity {
     }
 
     public boolean canEquip(long equipId) {
-        Equipment equipment = null;
-        boolean flag;
+        Config.checkId(Id.EQUIPMENT, equipId);
 
-        try {
-            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
-            flag = equipment.getTotalLimitLv().isInRange(this.lv.get()) &&
-                    this.checkStatRange(equipment.getLimitStat().getMin(), equipment.getLimitStat().getMax());
-        } finally {
-            if(equipment != null) {
-                Config.unloadObject(equipment);
-            }
-        }
-
-        return flag;
+        Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+        return equipment.getTotalLimitLv().isInRange(this.lv.get()) &&
+                this.checkStatRange(equipment.getLimitStat().getMin(), equipment.getLimitStat().getMax());
     }
 
     public boolean canReinforce(long equipId, Map<StatType, Integer> increaseLimitStat) {
@@ -538,7 +604,7 @@ public class Player extends Entity {
 
             boolean flag = equipment.getReinforceCount().get() < Config.MAX_REINFORCE_COUNT;
 
-            if(flag && this.getEquip(equipment.getEquipType()) == equipId) {
+            if(flag && this.getEquipped(equipment.getEquipType()) == equipId) {
                 Map<StatType, Integer> minStat = new HashMap<>(equipment.getLimitStat().getMin());
                 Map<StatType, Integer> maxStat = new HashMap<>(equipment.getLimitStat().getMax());
 
@@ -585,13 +651,11 @@ public class Player extends Entity {
             this.setDoing(Doing.NONE);
         }
 
-        Equipment equipment = null;
+        Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
+        double reinforcePercent = equipment.getReinforcePercent();
 
         try {
-            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
-            double reinforcePercent = equipment.getReinforcePercent();
-
-            if(percent < reinforcePercent) {
+            if (percent < reinforcePercent) {
                 equipment.successReinforce(increaseReinforceStat, increaseMinLimitStat, increaseMaxLimitStat);
 
                 this.addLog(LogData.REINFORCE_SUCCESS, 1);
@@ -608,9 +672,7 @@ public class Player extends Entity {
                 return false;
             }
         } finally {
-            if (equipment != null) {
-                Config.unloadObject(equipment);
-            }
+            Config.unloadObject(equipment);
         }
     }
 
@@ -769,21 +831,12 @@ public class Player extends Entity {
 
     @Override
     public void onDeath() {
+        super.onDeath();
+
         this.setBasicStat(StatType.HP, 1);
-
-        MapClass map = null;
-        try {
-            map = Config.loadMap(this.location);
-            map.removeEntity(this);
-        } finally {
-            if(map != null) {
-                Config.unloadMap(map);
-            }
-        }
-
         this.location.set(this.baseLocation);
 
-        map = null;
+        GameMap map = null;
         try {
             map = Config.loadMap(this.baseLocation);
             map.addEntity(this);
@@ -808,34 +861,56 @@ public class Player extends Entity {
         this.dropMoney(dropMoney);
         this.addMoney(loseMoney);
 
-        StringBuilder dropItemBuilder = new StringBuilder("G\n\n---떨어트린 아이템 목록---\n");
-        StringBuilder loseItemBuilder = new StringBuilder("\n---사라진 아이템 목록---\n");
+        StringBuilder dropItemBuilder = new StringBuilder("G\n\n---떨어트린 아이템 목록---");
+        StringBuilder loseItemBuilder = new StringBuilder("\n\n---사라진 아이템 목록---");
 
-        List<Long> keys;
-        long itemId;
-        int count;
-        for(int i = 0; i < dropItemCount; i++) {
-            keys = new ArrayList<>(this.inventory.keySet());
-            itemId = keys.get(random.nextInt(keys.size()));
-            count = Math.min(random.nextInt(this.getItem(itemId)) + 1, Config.MAX_ITEM_DROP_COUNT);
+        boolean drop = false;
+        boolean lost = false;
 
-            Item item = Config.getData(Id.ITEM, itemId);
-            String itemName = item.getName();
+        if(dropItemCount != 0) {
+            List<Long> keys;
+            long itemId;
+            int count;
+            for (int i = 0; i < dropItemCount; i++) {
+                keys = new ArrayList<>(this.inventory.keySet());
 
-            if(random.nextDouble() < Config.ITEM_DROP_LOSE_PERCENT) {
-                this.dropItem(itemId, count);
+                if(keys.isEmpty()) {
+                    break;
+                }
 
-                dropItemBuilder.append(itemName);
-                dropItemBuilder.append(" ");
-                dropItemBuilder.append(count);
-                dropItemBuilder.append("개\n");
-            } else {
-                this.addItem(itemId, count);
+                itemId = keys.get(random.nextInt(keys.size()));
+                count = Math.min(random.nextInt(this.getItem(itemId)) + 1, Config.MAX_ITEM_DROP_COUNT);
 
-                loseItemBuilder.append(itemName);
-                loseItemBuilder.append(" ");
-                loseItemBuilder.append(count);
-                loseItemBuilder.append("개\n");
+                Item item = Config.getData(Id.ITEM, itemId);
+                String itemName = item.getName();
+
+                if (random.nextDouble() < Config.ITEM_DROP_LOSE_PERCENT) {
+                    drop = true;
+                    this.dropItem(itemId, count);
+
+                    dropItemBuilder.append("\n")
+                            .append(itemName)
+                            .append(" ")
+                            .append(count)
+                            .append("개");
+                } else {
+                    lost = true;
+                    this.addItem(itemId, count * -1);
+
+                    loseItemBuilder.append("\n")
+                            .append(itemName)
+                            .append(" ")
+                            .append(count)
+                            .append("개");
+                }
+            }
+
+            if(!drop) {
+                dropItemBuilder.append("\n떨어트린 아이템이 없습니다");
+            }
+
+            if(!lost) {
+                dropItemBuilder.append("\n잃어버린 아이템이 없습니다");
             }
         }
 
@@ -847,12 +922,19 @@ public class Player extends Entity {
 
     @Override
     public void onKill(@NonNull Entity entity) {
-        long prevExp = this.exp.get();
-        long exp = getKillExp(entity.lv.get());
-        this.addExp(exp);
+        this.addExp(getKillExp(entity.lv.get()));
 
-        this.replyPlayer(entity.getName() + "을 처치했습니다!\n경험치 : " + prevExp + " -> " + this.exp.get(),
-                "획득한 경험치 : " + exp);
+        String msg = entity.getName() + "을 처치했습니다!\n";
+        
+        if(!entity.id.getId().equals(Id.PLAYER)) {
+            int token = Config.giveToken(ItemList.LOW_HUNTER_TOKEN.getId(), RandomList.HUNTER_TOKEN, this.getLv().get() / 100, this);
+            
+            if(token >= 0) {
+                msg += Config.TIERS[token] + "급 사냥꾼의 증표 1개를 획득하였습니다\n";
+            }
+        }
+
+        this.replyPlayer(msg + Emoji.LV + " 레벨: " + this.getDisplayLv());
     }
 
     @Override
@@ -875,11 +957,6 @@ public class Player extends Entity {
     @Override
     public String getRealName() {
         return this.getNickName();
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 
 }

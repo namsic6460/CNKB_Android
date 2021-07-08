@@ -6,19 +6,19 @@ import androidx.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class Item extends NamedObject {
 
     @Setter
@@ -30,7 +30,7 @@ public class Item extends NamedObject {
     Use use = null;
 
     @Setter
-    private boolean isFood = false;
+    private boolean canEat = false;
 
     private final Map<Long, HashMap<StatType, Integer>> eatBuff = new HashMap<>();
 
@@ -38,9 +38,14 @@ public class Item extends NamedObject {
 
     final Set<Map<Long, Integer>> recipe = new LinkedHashSet<>();
 
+    protected Item(@NonNull String name) {
+        super(name);
+    }
+
     public Item(@NonNull String name, @NonNull String description) {
         super(name);
         this.id.setId(Id.ITEM);
+        this.id.setObjectId(Objects.requireNonNull(ItemList.findByName(name)));
 
         this.description = description;
     }
@@ -84,10 +89,6 @@ public class Item extends NamedObject {
         }
     }
 
-    public void addEatBuff(long time, @NonNull StatType statType, int stat) {
-        this.setEatBuff(time, statType, this.getEatBuff(time, statType) + stat);
-    }
-
     public void addRecipe(@NonNull Map<Long, Integer> recipe) {
         this.addRecipe(recipe, false);
     }
@@ -99,7 +100,7 @@ public class Item extends NamedObject {
             key = entry.getKey();
             value = entry.getValue();
 
-            if(!skip && key != 0L) {
+            if(!skip && key != ItemList.NONE.getId()) {
                 try {
                     Config.checkId(Id.ITEM, key);
                 } catch (NumberRangeException e) {

@@ -52,8 +52,6 @@ public class FileManager {
             }
 
             Logger.i("FileManager", "Init complete");
-            Logger.logCount = 0;
-            Logger.logs = "";
         } catch (Exception e) {
             Logger.e("FileManager", e);
         }
