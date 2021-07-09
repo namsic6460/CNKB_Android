@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import lkd.namsic.game.base.LimitId;
 import lkd.namsic.game.base.LimitInteger;
@@ -13,6 +14,7 @@ import lkd.namsic.game.base.RangeIntegerMap;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object_list.QuestList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
 
@@ -45,6 +47,7 @@ public class Quest extends NamedObject {
     public Quest(@NonNull String name, long npcId, long chatId) {
         super(name);
         this.id.setId(Id.QUEST);
+        this.id.setObjectId(Objects.requireNonNull(QuestList.findByName(name)));
 
         this.setNpcId(npcId);
         this.setChatId(chatId);

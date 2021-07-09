@@ -3,6 +3,7 @@ package lkd.namsic.game.gameObject;
 import androidx.annotation.NonNull;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MonsterType;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object_list.MonsterList;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +32,7 @@ public class Monster extends AiEntity {
     public Monster(@NonNull String name) {
         super(name);
         this.id.setId(Id.MONSTER);
+        this.id.setObjectId(Objects.requireNonNull(MonsterList.findByName(name)));
     }
 
     public void randomLevel() {

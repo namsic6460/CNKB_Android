@@ -11,13 +11,14 @@ import java.util.Set;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.KakaoTalk;
-import lkd.namsic.game.config.ObjectList;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.WaitResponse;
+import lkd.namsic.game.enums.object_list.NpcList;
+import lkd.namsic.game.enums.object_list.QuestList;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Chat;
@@ -29,8 +30,9 @@ import lkd.namsic.setting.Logger;
 public class ChatManager {
 
     private static final ChatManager instance = new ChatManager();
+
     private static final QuestManager questManager = QuestManager.getInstance();
-    private static final MoveManager moveManager = new MoveManager();
+    private static final MoveManager moveManager = MoveManager.getInstance();
 
     public static ChatManager getInstance() {
         return instance;
@@ -62,11 +64,12 @@ public class ChatManager {
         }
     }
 
-    public void startChat(@NonNull Player self,  @NonNull String npcName) {
-        Long npcId = ObjectList.npcList.get(npcName);
+    public void startChat(@NonNull Player self, @NonNull String npcName) {
+        Long npcId = NpcList.findByName(npcName);
         GameMap map = Config.getMapData(self.getLocation());
 
-        if(npcId == null || !map.getEntity(Id.NPC).contains(npcId)) {
+        if(npcId == null || !map.getEntity(Id.NPC).contains(npcId) ||
+                npcId == NpcList.SECRET.getId() || npcId == NpcList.ABEL.getId()) {
             throw new WeirdCommandException("해당 NPC 를 찾을 수 없습니다\n" +
                     "존재하지 않거나 현재 맵에 없는 NPC 일 수 있습니다\n" +
                     "현재 위치 정보를 확인해보세요");
@@ -147,11 +150,11 @@ public class ChatManager {
                 long questId = chat.getQuestId().get();
                 if (questId != 0) {
                     self.addQuest(chat.getQuestId().get());
-                    self.replyPlayer("퀘스트 \"" + ObjectList.questList.inverse().get(questId) + "\" (을/를) 수락하였습니다");
+                    self.replyPlayer("퀘스트 \"" + QuestList.findById(questId) + "\" (을/를) 수락하였습니다");
                 }
 
                 Location tpLocation = chat.getTpLocation();
-                if (!self.getLocation().equals(tpLocation)) {
+                if (tpLocation != null && !self.getLocation().equals(tpLocation)) {
                     moveManager.setMap(self, chat.getTpLocation());
                 }
 

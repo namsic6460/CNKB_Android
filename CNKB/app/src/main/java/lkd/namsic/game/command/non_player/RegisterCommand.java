@@ -8,10 +8,12 @@ import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.NonPlayerCommand;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
-import lkd.namsic.game.config.ObjectList;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.Variable;
+import lkd.namsic.game.enums.object_list.BossList;
 import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object_list.MonsterList;
+import lkd.namsic.game.enums.object_list.NpcList;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.GameMap;
 import lkd.namsic.game.gameObject.Player;
@@ -55,12 +57,12 @@ public class RegisterCommand extends NonPlayerCommand {
                     "닉네임을 변경한 후 다시 시도해주세요");
         }
 
-        if(ObjectList.npcList.containsKey(command)) {
+        if(NpcList.findByName(command) != null) {
             throw new WeirdCommandException("[" + command + "]\n동일한 닉네임을 지닌 NPC가 존재합니다.\n" +
                     "닉네임을 변경한 후 다시 시도해주세요");
         }
 
-        if(ObjectList.monsterList.containsKey(command) || ObjectList.bossList.containsKey(command)) {
+        if(MonsterList.findByName(command) != null || BossList.findByName(command) != null) {
             throw new WeirdCommandException("[" + command + "]\n동일한 닉네임을 지닌 몬스터가 존재합니다.\n" +
                     "닉네임을 변경한 후 다시 시도해주세요");
         }

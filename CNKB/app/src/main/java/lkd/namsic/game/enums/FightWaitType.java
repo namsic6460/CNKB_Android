@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.WeirdCommandException;
 
 public enum FightWaitType {

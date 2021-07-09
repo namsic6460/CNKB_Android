@@ -10,7 +10,6 @@ import java.util.Set;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
-import lkd.namsic.game.config.ObjectList;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Doing;
@@ -18,6 +17,7 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
+import lkd.namsic.game.enums.object_list.EquipList;
 import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Item;
@@ -320,7 +320,7 @@ public class DisplayManager {
             }
         } else {
             for(long equipId : sortedList) {
-                innerMsg.append(ObjectList.equipList.inverse().get(equipId)).append("\n");
+                innerMsg.append(EquipList.findById(equipId)).append("\n");
             }
         }
 
@@ -334,7 +334,7 @@ public class DisplayManager {
 
         if(itemId == null) {
             isItem = false;
-            itemId = ObjectList.equipList.get(itemName);
+            itemId = EquipList.findByName(itemName);
             recipeSet = self.getEquipRecipe();
 
             if(itemId == null) {
@@ -406,7 +406,7 @@ public class DisplayManager {
 
         if(itemId == null) {
             id = Id.EQUIPMENT;
-            itemId = ObjectList.equipList.get(itemName);
+            itemId = EquipList.findByName(itemName);
 
             if(itemId == null) {
                 throw new WeirdCommandException("알 수 없는 아이템 또는 장비입니다");

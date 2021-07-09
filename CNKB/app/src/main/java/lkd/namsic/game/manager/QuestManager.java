@@ -2,19 +2,17 @@ package lkd.namsic.game.manager;
 
 import androidx.annotation.NonNull;
 
-import com.google.common.collect.BiMap;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
-import lkd.namsic.game.config.ObjectList;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object_list.NpcList;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.gameObject.Quest;
@@ -155,10 +153,9 @@ public class QuestManager {
         if(totalCloseRate.isEmpty()) {
             innerMsg.append("\n변경된 친밀도가 없습니다");
         } else {
-            BiMap<Long, String> npcBiMap = ObjectList.npcList.inverse();
             for (Map.Entry<Long, Integer> entry : totalCloseRate.entrySet()) {
                 innerMsg.append("\n")
-                        .append(npcBiMap.get(entry.getKey()))
+                        .append(NpcList.findById(entry.getKey()))
                         .append(": ")
                         .append(Config.getIncrease(entry.getValue()));
             }

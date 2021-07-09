@@ -11,10 +11,10 @@ import java.util.Set;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
-import lkd.namsic.game.config.ObjectList;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
+import lkd.namsic.game.enums.object_list.MapList;
 import lkd.namsic.game.event.MoveEvent;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
@@ -255,23 +255,21 @@ public class MoveManager {
 
         String[] split = locationStr.split("-");
         if(split.length != 2) {
-            String loc = ObjectList.mapList.inverse().get(locationStr);
+            location = MapList.findByName(locationStr);
 
-            if(loc == null) {
+            if(location == null) {
                 throw new WeirdCommandException("좌표를 또는 맵의 이름을 정확하게 입력해주세요\n(예시 : " +
                         Emoji.focus("0-1") + " 또는 " + Emoji.focus("시작의 마을") + ")");
             }
-
-            split = loc.split("-");
-        }
-
-        try {
-            x = Integer.parseInt(split[0]);
-            y = Integer.parseInt(split[1]);
-            location = new Location(x, y);
-        } catch (NumberRangeException e) {
-            throw new WeirdCommandException("맵은 " + Config.MIN_MAP_X + "-" + Config.MIN_MAP_Y + " 부터 " +
-                    Config.MAX_MAP_X + "-" + Config.MAX_MAP_Y + " 의 범위로만 이동할 수 있습니다");
+        } else {
+            try {
+                x = Integer.parseInt(split[0]);
+                y = Integer.parseInt(split[1]);
+                location = new Location(x, y);
+            } catch (NumberRangeException e) {
+                throw new WeirdCommandException("맵은 " + Config.MIN_MAP_X + "-" + Config.MIN_MAP_Y + " 부터 " +
+                        Config.MAX_MAP_X + "-" + Config.MAX_MAP_Y + " 의 범위로만 이동할 수 있습니다");
+            }
         }
 
         if(location.equalsMap(self.getLocation())) {
@@ -288,7 +286,7 @@ public class MoveManager {
             GameMap moveMap = null;
 
             try {
-                moveMap = Config.loadMap(x, y);
+                moveMap = Config.loadMap(location);
 
                 if(moveMap.getName().equals(Config.INCOMPLETE)) {
                     throw new WeirdCommandException("미완성 맵으로는 이동할 수 없습니다");

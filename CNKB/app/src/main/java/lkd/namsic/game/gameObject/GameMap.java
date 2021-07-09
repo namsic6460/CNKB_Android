@@ -17,6 +17,7 @@ import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object_list.NpcList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdDataException;
 import lkd.namsic.game.manager.MoveManager;
@@ -98,8 +99,8 @@ public class GameMap {
         builder.append("\n\n---NPC 목록---");
 
         Set<Long> npcSet = this.entity.get(Id.NPC);
-        npcSet.remove(1L);
-        npcSet.remove(2L);
+        npcSet.remove(NpcList.SECRET.getId());
+        npcSet.remove(NpcList.ABEL.getId());
 
         if(npcSet.isEmpty()) {
             builder.append("\nNPC 없음");

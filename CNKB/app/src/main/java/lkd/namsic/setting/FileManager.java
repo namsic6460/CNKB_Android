@@ -17,7 +17,6 @@ import lkd.namsic.game.enums.Id;
 
 public class FileManager {
 
-//    public final static String PATH = MainActivity.mainActivity.getExternalFilesDir(null).getAbsolutePath() + "/CNKB";
     public final static String PATH = "/storage/emulated/0/CNKB";
     public final static String CONFIG_PATH = PATH + "/config.json";
     public final static String LOG_PATH = PATH + "/logs";

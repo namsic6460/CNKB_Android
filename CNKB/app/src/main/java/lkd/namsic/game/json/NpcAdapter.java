@@ -21,10 +21,12 @@ import lkd.namsic.game.gameObject.Npc;
 
 public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
 
+    private static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(ChatLimit.class, new ChatLimitAdapter())
+            .create();
+
     @Override
     public JsonElement serialize(Npc npc, Type typeOfSrc, JsonSerializationContext context) {
-        Gson gson = new GsonBuilder().create();
-
         JsonObject jsonObject = gson.toJsonTree(npc).getAsJsonObject();
 
         JsonArray commonChatArray = new JsonArray();
@@ -34,7 +36,7 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
         JsonObject chatLimitObject;
         JsonArray setArray;
 
-        for(Map.Entry<ChatLimit, ConcurrentHashSet<Long>> entry : npc.getCommonChat().entrySet()) {
+        for(Map.Entry<ChatLimit, ConcurrentHashSet<Long>> entry : npc.getBaseChat().entrySet()) {
             wrapArray = new JsonArray();
 
             chatLimitObject = gson.toJsonTree(entry.getKey()).getAsJsonObject();
@@ -58,7 +60,7 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
             chatArray.add(wrapArray);
         }
 
-        jsonObject.add("commonChat", commonChatArray);
+        jsonObject.add("baseChat", commonChatArray);
         jsonObject.add("chat", chatArray);
 
         return jsonObject;
@@ -67,14 +69,12 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
     @SuppressWarnings("unchecked")
     @Override
     public Npc deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
-        Gson gson = new Gson();
-
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
-        JsonArray commonChatArray = jsonObject.getAsJsonArray("commonChat");
+        JsonArray commonChatArray = jsonObject.getAsJsonArray("baseChat");
         JsonArray chatArray = jsonObject.getAsJsonArray("chat");
 
-        jsonObject.add("commonChat", null);
+        jsonObject.add("baseChat", null);
         jsonObject.add("chat", null);
 
         Npc npc = gson.fromJson(jsonObject, Npc.class);
@@ -124,7 +124,7 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
             chat.put(chatLimit, chatSet);
         }
 
-        npc.setCommonChat(commonChat);
+        npc.setBaseChat(commonChat);
         npc.setChat(chat);
 
         return npc;

@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
@@ -49,6 +50,7 @@ import lkd.namsic.game.gameObject.Quest;
 import lkd.namsic.game.gameObject.Research;
 import lkd.namsic.game.gameObject.Skill;
 import lkd.namsic.game.gameObject.Use;
+import lkd.namsic.game.json.ChatLimitAdapter;
 import lkd.namsic.game.json.UseAdapter;
 import lkd.namsic.game.json.LocationAdapter;
 import lkd.namsic.game.json.NpcAdapter;
@@ -57,10 +59,12 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
+    //TODO : compile test(serializing)
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
             .registerTypeAdapter(Location.class, new LocationAdapter())
             .registerTypeAdapter(Use.class, new UseAdapter())
+            .registerTypeAdapter(ChatLimit.class, new ChatLimitAdapter())
             .setVersion(1.0)
             .create();
 

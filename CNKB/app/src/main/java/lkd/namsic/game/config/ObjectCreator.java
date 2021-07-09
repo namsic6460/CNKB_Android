@@ -4,6 +4,7 @@ import android.util.Log;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,7 +19,12 @@ import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.MonsterType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
+import lkd.namsic.game.enums.object_list.EquipList;
 import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object_list.MapList;
+import lkd.namsic.game.enums.object_list.MonsterList;
+import lkd.namsic.game.enums.object_list.NpcList;
+import lkd.namsic.game.enums.object_list.QuestList;
 import lkd.namsic.game.gameObject.Chat;
 import lkd.namsic.game.gameObject.Item;
 import lkd.namsic.game.gameObject.GameMap;
@@ -40,19 +46,19 @@ public class ObjectCreator {
             MainActivity.mainActivity.runOnUiThread(() -> button.setEnabled(false));
 
             try {
-                //Name duplicate check
-                int totalCount = ItemList.idMap.size() + ObjectList.equipList.size();
+                //Name duplicate check(None duplicate)
+                int totalCount = ItemList.idMap.size() + EquipList.idMap.size() - 1;
 
                 Set<String> list = new HashSet<>(totalCount);
                 list.addAll(ItemList.nameMap.keySet());
-                list.addAll(ObjectList.equipList.keySet());
+                list.addAll(EquipList.nameMap.keySet());
                 if(list.size() != totalCount) {
-                    throw new RuntimeException("Duplicate item or equip name");
+                    throw new RuntimeException("Duplicate item or equip name\nCompare Size : " + list.size() +
+                            "\nTotal size : " + totalCount);
                 }
 
                 Config.IGNORE_FILE_LOG = true;
 
-                //TODO: 퀘스트, 몬스터, 장비, npc 추가
                 createItems();
                 createEquips();
                 createMonsters();
@@ -632,23 +638,18 @@ public class ObjectCreator {
 
     private static void createMonsters() {
         Monster monster = new Monster("양");
-        monster.getId().setObjectId(ObjectList.monsterList.get(monster.getRealName()));
         monster.getLv().set(2);
         monster.setLocation(null);
         monster.setType(MonsterType.MIDDLE);
 
-        //Stat
         monster.setBasicStat(StatType.MAXHP, 20);
         monster.setBasicStat(StatType.HP, 20);
         monster.setBasicStat(StatType.ATK, 3);
         monster.setBasicStat(StatType.DEF, 5);
-        //---
 
-        //Item Drop
         monster.setItemDrop(ItemList.LAMB.getId(), 0.5D, 1, 1);
         monster.setItemDrop(ItemList.SHEEP_LEATHER.getId(), 0.2D, 1, 1);
         monster.setItemDrop(ItemList.WOOL.getId(), 0.5D, 1, 3);
-        //---
 
         Config.unloadObject(monster);
 
@@ -657,31 +658,31 @@ public class ObjectCreator {
     }
 
     private static void createMaps() {
-        GameMap map = new GameMap(ObjectList.mapList.get("0-0"));
+        GameMap map = new GameMap(MapList.findByLocation(0, 0));
         map.setMapType(MapType.COUNTRY);
         map.getLocation().set(0, 0, 1, 1);
         Config.unloadMap(map);
 
-        map = new GameMap(ObjectList.mapList.get("0-1"));
+        map = new GameMap(MapList.findByLocation(0, 1));
         map.setMapType(MapType.SEA);
         map.getLocation().set(0, 1, 1, 1);
         Config.unloadMap(map);
 
         for(int y = 2; y <= 10; y++) {
-            map = new GameMap(ObjectList.mapList.getOrDefault("0-" + y, Config.INCOMPLETE));
+            map = new GameMap(Config.INCOMPLETE);
             map.getLocation().setMap(0, y);
             map.setMapType(MapType.FIELD);
             map.getLocation().set(0, y, 1, 1);
             Config.unloadMap(map);
         }
 
-        map = new GameMap(ObjectList.mapList.get("1-0"));
+        map = new GameMap(MapList.findByLocation(1, 0));
         map.setMapType(MapType.FIELD);
         map.getLocation().set(1, 0, 1, 1);
-        map.setSpawnMonster(1L, 1D, 4);
+        map.setSpawnMonster(MonsterList.SHEEP.getId(), 1D, 4);
         Config.unloadMap(map);
 
-        map = new GameMap(ObjectList.mapList.get("1-1"));
+        map = new GameMap(MapList.findByLocation(1, 1));
         map.setMapType(MapType.RIVER);
         map.getLocation().set(1, 1, 1, 1);
         Config.unloadMap(map);
@@ -692,7 +693,7 @@ public class ObjectCreator {
                     continue;
                 }
 
-                map = new GameMap(ObjectList.mapList.getOrDefault(x + "-" + y, Config.INCOMPLETE));
+                map = new GameMap(Config.INCOMPLETE);
                 map.getLocation().setMap(x, y);
                 map.setMapType(MapType.FIELD);
                 map.getLocation().set(x, y, 1, 1);
@@ -713,16 +714,21 @@ public class ObjectCreator {
         Logger.i("ObjectMaker", "Map making is done!");
     }
 
+    private static Chat createChat(@Nullable String name, long chatId, @NonNull String...texts) {
+        Chat chat = new Chat(name);
+        chat.getId().setObjectId(chatId);
+        chat.getText().addAll(Arrays.asList(texts));
+        return chat;
+    }
+
     private static void createChats() {
-        Chat chat = new Chat();
-        chat.getId().setObjectId(1L);
-        chat.getText().addAll(Arrays.asList(
+        Chat chat = createChat(null, 1L,
                 "드디어 일어났네 __nickname",
                 "이 소리가 어디서 들려오는지는 아직은 몰라도 되. 결국엔 알게 될테니까",
                 "어찌됬든 넌 여기서 성장해야만 해. 그리고 니가 나한테 했던 약속을 지켜야겠지",
-                "음 뭐가됬든 기본적인거부터 가르쳐줄게. " + Emoji.focus("n 도움말")
-                        + " 을 입력해서 명령어를 살펴봐"
-        ));
+                "음 뭐가됬든 기본적인거부터 가르쳐줄게. " + Emoji.focus("n 도움말") +
+                        " 을 입력해서 명령어를 살펴봐"
+        );
         chat.setAnyResponseChat("__도움말", 2L, true);
         chat.setAnyResponseChat("__명령어", 2L, true);
         chat.setAnyResponseChat("__?", 2L, true);
@@ -730,327 +736,313 @@ public class ObjectCreator {
         chat.setAnyResponseChat("__help", 2L, true);
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(2L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat(null, 2L,
                 "좋아, 잘 따라오고 있네. 네 정보도 살펴봐야겠지?",
                 "명령어 목록을 보고 네 정보를 표시하는 명령어를 사용해봐",
                 "아 물론 거기 적혀있기도 하지만 네가 명령어 창을 연 것 처럼, " +
                         "모든 명령어에는 " + Emoji.focus("n") + "이나 " +
-                        Emoji.focus("ㅜ") + "라는 글자가 붙으니까 기억해"
-        ));
+                        Emoji.focus("ㅜ") + "라는 글자가 붙으니까 기억해");
         chat.setAnyResponseChat("__정보", 3L, true);
         chat.setAnyResponseChat("__info", 3L, true);
         chat.setAnyResponseChat("__i", 3L, true);
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(3L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat(null, 3L,
                 "기본 정보랑 상세 정보로 나뉘어서 표시되는게 보이지?",
                 "일단 너는 0-0-1-1, 그러니까 서남쪽 끝에 있는거고, 거점도 여기로 잡혀있어",
                 "거점? 아 거점은 죽으면 태어나는 장소야. 어짜피 넌 내 권능때문에 죽을 수 없거든...",
                 "마지막으로 간단한거 하나만 소개하고 가봐야겠네. 마을에서는 광질을 할 수 있으니까" +
                         " 광질 명령어를 입력해봐"
-        ));
+        );
         chat.setAnyResponseChat("__광질", 4L, true);
         chat.setAnyResponseChat("__mine", 4L, true);
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(4L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat(null, 4L,
                 "그럼 난 가볼게. 어짜피 할 일도 많고 너도 이젠 혼자서 다 할 수 있을거 같으니까",
                 "맵 정보를 확인하면 다른 주민들 이름도 보이니까 대화도 해보고 말이야",
                 "뭐라도 주고 가라고? 골드를 조금 넣어놨으니까 그거라도 써",
                 "아 그리고... ... ... (더 이상 들리지 않는다)"
-        ));
+        );
         chat.getDelayTime().set(1500L);
         chat.getMoney().set(1000L);
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(5L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat(null, 5L,
                 "음? 못보던 얼굴이군",
                 "그래 이름이 __nickname 이라고?",
                 "난 이 '시작의 마을' 의 이장이라네. 잘 지네봄세",
                 "우리 마을은 다양한 인종이나 종족이 있지",
                 "한번 마을을 살펴보고 오는것도 좋을게야"
-        ));
+        );
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(6L);
-        chat.getText().add("그래 무슨 일인가 __nickname?");
+        chat = createChat(null, 6L, "그래 무슨 일인가 __nickname?");
         chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
-        chat = new Chat("아무일도 아닙니다");
-        chat.getId().setObjectId(7L);
-        chat.getText().add("그래그래, 무슨 일 있으면 언제나 말 걸게나");
+        chat = createChat("아무일도 아닙니다", 7L, "그래그래, 무슨 일 있으면 언제나 말 걸게나");
         Config.unloadObject(chat);
 
-        chat = new Chat("광질을 하면서 할만한 퀘스트가 있을까요?");
-        chat.getId().setObjectId(8L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat("광질을 하면서 할만한 퀘스트가 있을까요?", 8L,
                 "음, 아무래도 돌은 항상 부족해서 말이지",
                 "돌 30개만 구해다 줄 수 있겠나?"
-        ));
+        );
         chat.setResponseChat(WaitResponse.YES, 10L, true);
         chat.setResponseChat(WaitResponse.NO, 11L, true);
         Config.unloadObject(chat);
 
-        chat = new Chat("낚시를 하면서 할만한 퀘스트가 있을까요?");
-        chat.getId().setObjectId(9L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat("낚시를 하면서 할만한 퀘스트가 있을까요?", 9L,
                 "요즘 바다나 강이 너무 더러워저셔 말일세",
                 "쓰레기가 낚이는게 있으면 5개만 구해다 줄 수 있겠나?"
-        ));
+        );
         chat.setResponseChat(WaitResponse.YES, 12L, true);
         chat.setResponseChat(WaitResponse.NO, 11L, true);
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(10L);
-        chat.getText().add("고맙네! 돌을 다 구하고 다시 말을 걸어주게나");
+        chat = createChat(null, 10L, "고맙네! 돌을 다 구하고 다시 말을 걸어주게나");
         chat.getQuestId().set(1L);
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(11L);
-        chat.getText().add("그럼 어쩔 수 없지. 나중에 마음 바뀌면 다시 받아가게나");
+        chat = createChat(null,11L, "그럼 어쩔 수 없지. 나중에 마음 바뀌면 다시 받아가게나");
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(12L);
-        chat.getText().add("고맙네! 쓰레기를 다 수거하고 다시 말을 걸어주게나");
+        chat = createChat(null, 12L, "고맙네! 쓰레기를 다 수거하고 다시 말을 걸어주게나");
         chat.getQuestId().set(2L);
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(13L);
-        chat.getText().add("빨리 구해와줬군! 여기 보상이네");
+        chat = createChat(null, 13L, "빨리 구해와줬군! 여기 보상이네");
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(14L);
-        chat.getText().add("좋은 아침이네 __nickname!\n그래 무슨 일인가?");
+        chat = createChat(null, 14L, "좋은 아침이네 __nickname!\n그래 무슨 일인가?");
         chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(15L);
-        chat.getText().add("점심은 먹었나 __nickname?\n그래 무슨 일로 왔나?");
+        chat = createChat(null, 15L, "점심은 먹었나 __nickname?\n그래 무슨 일로 왔나?");
         chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(16L);
-        chat.getText().add("한적한 저녁이군\n무슨 일로 왔나 __nickname?");
+        chat = createChat(null, 16L, "한적한 저녁이군\n무슨 일로 왔나 __nickname?");
         chat.setBaseMsg(true);
         Config.unloadObject(chat);
         
-        chat = new Chat("얼굴에 걱정이 많아보이시는데, 무슨 일 있나요?");
-        chat.getId().setObjectId(17L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat("얼굴에 걱정이 많아보이시는데, 무슨 일 있나요?", 17L,
                 "이런, 얼굴에 보였나? 사실 감기에 걸렸는데 방에 불을 아무리 떼도 추워서 말일세",
                 "아무래도 불의 기운을 좀 쥐고 있으면 괜찮아질 것 같은데...",
                 "붉은색 구체 하나만 구해줄 수 있겠나?"
-        ));
+        );
         chat.setResponseChat(WaitResponse.YES, 24L, true);
         chat.setResponseChat(WaitResponse.NO, 18L, true);
         Config.unloadObject(chat);
         
-        chat = new Chat();
-        chat.getId().setObjectId(18L);
-        chat.getText().add("그래 뭐... 바쁘다면 어쩔 수 없는 일이지");
+        chat = createChat(null, 18L, "그래 뭐... 바쁘다면 어쩔 수 없는 일이지");
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(19L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat(null, 19L,
                 "드디어 따뜻한 방에서 쉴 수 있겠구만",
                 "여기 보상이네!"
-        ));
+        );
         Config.unloadObject(chat);
 
-        chat = new Chat("오히려 얼굴이 더 안좋아지신 것 같은데요..?");
-        chat.getId().setObjectId(20L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat("오히려 얼굴이 더 안좋아지신 것 같은데요..?", 20L,
                 "끄윽... 마침 잘왔네",
                 "자네가 준 붉은색 구체가 너무 강해서 오히려 역효과가 나는 모양이야..",
                 "마지막으로 하급 마나 포션 3개만 만들어와줄 수 있겠나?"
-        ));
+        );
         chat.setResponseChat(WaitResponse.YES, 21L, true);
         chat.setResponseChat(WaitResponse.NO, 22L, true);
         Config.unloadObject(chat);
         
-        chat = new Chat();
-        chat.getId().setObjectId(21L);
-        chat.getText().add("자꾸 번거롭게 해서 미안하네\n최대한 빨리 구해와주게나");
+        chat = createChat(null, 21L, "자꾸 번거롭게 해서 미안하네\n최대한 빨리 구해와주게나");
         chat.getQuestId().set(4L);
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(22L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat(null, 22L,
                 "40년만 젊었어도 직접 만들었을텐데...",
                 "있는 일만 빨리 끝내고 다시 와주게"
-        ));
+        );
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(23L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat(null, 23L,
                 "휴 이제야 살 것 같구만\n고맙네 __nickname",
                 "이건 보상이니 받아가게나"
-        ));
+        );
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(24L);
-        chat.getText().add("그래도 __nickname 자네가 구해준다니 마음이 놓이는구만");
+        chat = createChat(null, 24L, "그래도 __nickname 자네가 구해준다니 마음이 놓이는구만");
         chat.getQuestId().set(3L);
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(25L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat(null, 25L,
                 "여행자인가? 하하",
                 "반갑네, 난 이 마을 대장장이 형석이라고 한다",
                 "마을을 둘러볼거면 내 아내 '엘' 에게도 가봤나 모르겠군"
-        ));
+        );
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(26L);
-        chat.getText().add("무슨 일이지?");
+        chat = createChat(null, 26L, "무슨 일이지?");
         chat.setBaseMsg(true);
         Config.unloadObject(chat);
         
-        chat = new Chat();
-        chat.getId().setObjectId(27L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat(null, 27L,
                 "이렇게 늦은 시간에 찾아오다니",
                 "하하 역시 이 마을은 내가 없으면 안되는군",
                 "그래서 무슨 일이지?"
-        ));
+        );
         chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
-        chat = new Chat("아무일도 아닙니다");
-        chat.getId().setObjectId(28L);
-        chat.getText().add("흠... 싱겁긴");
+        chat = createChat("아무일도 아닙니다", 28L, "흠... 싱겁긴");
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(29L);
-        chat.getText().add("... 안녕하세요");
+        chat = createChat(null, 29L, "... 안녕하세요");
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(30L);
-        chat.getText().add("엄마가 모르는 사람이랑 얘기하지 말랬어요...");
+        chat = createChat(null, 30L, "엄마가 모르는 사람이랑 얘기하지 말랬어요...");
         chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
-        chat = new Chat("어... 그래");
-        chat.getId().setObjectId(31L);
-        chat.getText().add("...");
+        chat = createChat("어... 그래", 31L, "...");
         Config.unloadObject(chat);
         
-        chat = new Chat();
-        chat.getId().setObjectId(32L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat(null, 32L,
                 "음? 처음 보는 분이네요",
                 "흐응, 그런 눈으로 보는걸 보니 엘프는 처음 보시나 보네요",
                 "아무래도 인간들이 엘프를 처음 보면 그렇게 신기한 눈빛을 보내더라고요",
                 "어쨌든 마을에 있는 동안 잘 부탁드려요"
-        ));
+        );
         Config.unloadObject(chat);
         
-        chat = new Chat();
-        chat.getId().setObjectId(33L);
-        chat.getText().add("안녕하세요");
+        chat = createChat(null, 33L, "안녕하세요");
         chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
-        chat = new Chat("아 그냥 지나가다 들렀습니다");
-        chat.getId().setObjectId(34L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat("아 그냥 지나가다 들렀습니다", 34L,
                 "오늘도 부지런하시네요",
                 "가끔은 여유를 가지는 것도 좋아요",
                 "다음번에 오실 땐 꽃 사러 오세요~"
-        ));
+        );
         Config.unloadObject(chat);
         
-        chat = new Chat();
-        chat.getId().setObjectId(35L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat(null, 35L,
                 "...............",
                 "아 멍때리고 있었어 미안",
                 "__nickname 이라고? 그래 잘 부탁해",
                 "너도 시간나면 여기서 낚시나 해보라구"
-        ));
+        );
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(36L);
-        chat.getText().add("음? 왜?");
+        chat = createChat(null, 36L, "음? 왜?");
         chat.setBaseMsg(true);
         Config.unloadObject(chat);
         
-        chat = new Chat("그냥 뭐하나 싶어서");
-        chat.getId().setObjectId(37L);
-        chat.getText().addAll(Arrays.asList(
+        chat = createChat("그냥 뭐하나 싶어서", 37L,
                 "엄... 나야 뭐 항상 여기서 낚싯대나 드리우고 있지",
                 "그럼 잘가"
-        ));
+        );
         Config.unloadObject(chat);
 
-        chat = new Chat();
-        chat.getId().setObjectId(38L);
-        chat.getText().add(".....");
+        chat = createChat(null, 38L, "......");
         chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
-        chat = new Chat("이 시간까지 낚시를 하고 있는거야?");
-        chat.getId().setObjectId(39L);
-        chat.getText().add("zzz.......");
+        chat = createChat("이 시간까지 낚시를 하고 있는거야?", 39L, "zzz......");
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 39L,
+                "잠시 기다려라...",
+                "지금! 크 월척이군",
+                "낚시 방해하지말고 조용히 가라");
         Config.unloadObject(chat);
 
-        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 25L));
+        chat = createChat(null, 40L,"무슨 일로 찾아왔지");
+        chat.setBaseMsg(true);
+        Config.unloadObject(chat);
+
+        chat = createChat("어... 글쎼요?", 41L, "꺼져");
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 42L,
+                "처음 뵙는 분이네요",
+                "저는 이 마을의 광부 중 한명인 페드로 라고 합니다",
+                "잘부탁드립니다");
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 43L, "볼일 있으신가요?");
+        chat.setBaseMsg(true);
+        Config.unloadObject(chat);
+
+        chat = createChat("아무것도 아닙니다", 44L,"네네 전 또 광산으로 들어가봐야곘네요. 수고하세요");
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 45L,
+                "흠... 자네는?",
+                "__nickname 이라. 이건...? 아... 아닐세",
+                "좀 특이해보여서 말이지. 잘 부탁하네"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 46L, "할 말 있는가?");
+        chat.setBaseMsg(true);
+        Config.unloadObject(chat);
+
+        chat = createChat("아... (입이 움직이지 않는다)", 47L,
+                "아직은 이 정도 위압감도 버티기 힘든가 보군",
+                "나중에 다시 오게나"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 48L,
+                "음? 안녕 처음 보는 사람이네",
+                "나는 무명님께 가르침을 받고 있는 셀리나라고 해",
+                "앞으로 잘 부탁해"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 49L, "할 말 있어?");
+        chat.setBaseMsg(true);
+        Config.unloadObject(chat);
+
+        chat = createChat("딱히..?", 50L,
+                "할 말 없으면 수련이 끝나고 나중에 찾아와 줘",
+                "수련중에 말하기는 힘들거든",
+                "후욱... 지금도 겨우 하는거야"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat("무명은 어떤 분이셔?", 51L,
+                "그건 나도 말해주기 힘든데...",
+                "말해줄 수 있는건 정말 강하시단거 정도?"
+        );
+        Config.unloadObject(chat);
+
+        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 52L));
         Logger.i("ObjectMaker", "Chat making is done!");
    }
 
    private static void createQuests() {
-       Quest quest = new Quest("광부의 일", 3L, 13L);
-       quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
+       Quest quest = new Quest("광부의 일", NpcList.NOAH.getId(), 13L);
        quest.setNeedItem(ItemList.STONE.getId(), 30);
-       quest.setRewardCloseRate(3L, 1, true);
+       quest.setRewardCloseRate(NpcList.NOAH.getId(), 1, true);
        quest.getRewardExp().set(20000L);
        quest.getRewardMoney().set(250L);
        Config.unloadObject(quest);
 
-       quest = new Quest("쓰레기 수거", 3L, 13L);
-       quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
+       quest = new Quest("쓰레기 수거", NpcList.NOAH.getId(), 13L);
        quest.setNeedItem(ItemList.TRASH.getId(), 5);
-       quest.setRewardCloseRate(3L, 1, true);
+       quest.setRewardCloseRate(NpcList.NOAH.getId(), 1, true);
        quest.getRewardExp().set(50000L);
        Config.unloadObject(quest);
 
-       quest = new Quest("불이 필요해!", 3L, 19L);
-       quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
+       quest = new Quest("불이 필요해!", NpcList.NOAH.getId(), 19L);
        quest.setNeedItem(ItemList.RED_SPHERE.getId(), 1);
-       quest.setRewardCloseRate(3L, 5, true);
+       quest.setRewardCloseRate(NpcList.NOAH.getId(), 5, true);
        quest.getRewardMoney().set(500L);
        Config.unloadObject(quest);
        
-       quest = new Quest("불이 너무 강했나...?", 3L, 23L);
-       quest.getId().setObjectId(ObjectList.questList.get(quest.getName()));
+       quest = new Quest("불이 너무 강했나?", NpcList.NOAH.getId(), 23L);
        quest.setNeedItem(ItemList.LOW_MP_POTION.getId(), 3);
-       quest.setRewardCloseRate(3L, 10, true);
+       quest.setRewardCloseRate(NpcList.NOAH.getId(), 10, true);
        quest.getRewardItem().put(ItemList.STAT_POINT.getId(), 20);
        Config.unloadObject(quest);
 
@@ -1072,41 +1064,41 @@ public class ObjectCreator {
         npc.getLocation().set(0, 0, 16, 16);
         npc.setFirstChat(5L);
 
-        npc.setCommonChat(new ChatLimit(), 6L);
+        npc.setBaseChat(new ChatLimit(), 6L);
 
         ChatLimit chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(7, 11);
-        npc.setCommonChat(chatLimit, 14L);
+        npc.setBaseChat(chatLimit, 14L);
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(12, 14);
-        npc.setCommonChat(chatLimit, 15L);
+        npc.setBaseChat(chatLimit, 15L);
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(18, 22);
-        npc.setCommonChat(chatLimit, 16L);
+        npc.setBaseChat(chatLimit, 16L);
 
         npc.setChat(new ChatLimit(), 7L);
 
         chatLimit = new ChatLimit();
-        chatLimit.getNotRunningQuest().add(1L);
+        chatLimit.getNotRunningQuest().add(QuestList.WORK_OF_MINER.getId());
         npc.setChat(chatLimit, 8L);
 
         chatLimit = new ChatLimit();
-        chatLimit.getNotRunningQuest().add(2L);
+        chatLimit.getNotRunningQuest().add(QuestList.TRASH_COLLECTING.getId());
         npc.setChat(chatLimit, 9L);
 
         chatLimit = new ChatLimit();
-        chatLimit.getNotRunningQuest().add(3L);
-        chatLimit.getClearedQuest().put(1L, 5);
-        chatLimit.getClearedQuest().put(2L, 5);
-        chatLimit.getNotClearedQuest().add(3L);
+        chatLimit.getNotRunningQuest().add(QuestList.NEED_FIRE.getId());
+        chatLimit.getClearedQuest().put(QuestList.WORK_OF_MINER.getId(), 5);
+        chatLimit.getClearedQuest().put(QuestList.TRASH_COLLECTING.getId(), 5);
+        chatLimit.getNotClearedQuest().add(QuestList.NEED_FIRE.getId());
         npc.setChat(chatLimit, 17L);
 
         chatLimit = new ChatLimit();
-        chatLimit.getNotRunningQuest().add(4L);
-        chatLimit.getClearedQuest().put(3L, 1);
-        chatLimit.getNotClearedQuest().add(4L);
+        chatLimit.getNotRunningQuest().add(QuestList.TOO_STRONG_FIRE.getId());
+        chatLimit.getClearedQuest().put(QuestList.NEED_FIRE.getId(), 1);
+        chatLimit.getNotClearedQuest().add(QuestList.TOO_STRONG_FIRE.getId());
         npc.setChat(chatLimit, 20L);
 
         Config.unloadObject(npc);
@@ -1116,12 +1108,12 @@ public class ObjectCreator {
         npc.getLocation().set(0, 0, 40, 40);
         npc.setFirstChat(25L);
 
-        npc.setCommonChat(new ChatLimit(), 26L);
+        npc.setBaseChat(new ChatLimit(), 26L);
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(22, 23);
         chatLimit.getLimitHour2().set(0, 6);
-        npc.setCommonChat(chatLimit, 27L);
+        npc.setBaseChat(chatLimit, 27L);
 
         npc.setChat(new ChatLimit(), 28L);
 
@@ -1134,7 +1126,7 @@ public class ObjectCreator {
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(6, 23);
-        npc.setCommonChat(chatLimit, 30L);
+        npc.setBaseChat(chatLimit, 30L);
 
         npc.setChat(new ChatLimit(), 31L);
 
@@ -1147,7 +1139,7 @@ public class ObjectCreator {
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(6, 23);
-        npc.setCommonChat(chatLimit, 33L);
+        npc.setBaseChat(chatLimit, 33L);
 
         npc.setChat(new ChatLimit(), 34L);
 
@@ -1160,12 +1152,12 @@ public class ObjectCreator {
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(8, 22);
-        npc.setCommonChat(chatLimit, 36L);
+        npc.setBaseChat(chatLimit, 36L);
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(23, 23);
         chatLimit.getLimitHour2().set(0, 7);
-        npc.setCommonChat(chatLimit, 38L);
+        npc.setBaseChat(chatLimit, 38L);
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(8, 22);
@@ -1179,28 +1171,58 @@ public class ObjectCreator {
         Config.unloadObject(npc);
 
 
-        //TODO
         npc = new Npc("강태공");
         npc.getLocation().set(0, 1,32, 32);
+        npc.setFirstChat(39L);
+
+        npc.setBaseChat(new ChatLimit(), 40L);
+
+        npc.setChat(new ChatLimit(), 41L);
+
         Config.unloadObject(npc);
 
 
         npc = new Npc("페드로");
         npc.getLocation().set(0, 0,64, 64);
+        npc.setFirstChat(42L);
+
+        npc.setBaseChat(new ChatLimit(), 43L);
+
+        npc.setChat(new ChatLimit(), 44L);
+
         Config.unloadObject(npc);
 
 
         npc = new Npc("무명");
         npc.getLocation().set(1, 0,1, 1);
+        npc.setFirstChat(45L);
+
+        npc.setBaseChat(new ChatLimit(), 46L);
+
+        npc.setChat(new ChatLimit(), 47L);
+
         Config.unloadObject(npc);
 
 
         npc = new Npc("셀리나");
         npc.getLocation().set(1, 0,2, 2);
+        npc.setFirstChat(48L);
+
+        npc.setBaseChat(new ChatLimit(), 49L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitHour1().set(9, 20);
+        npc.setChat(chatLimit, 50L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitHour1().set(21, 23);
+        chatLimit.getLimitHour2().set(0, 8);
+        npc.setChat(chatLimit, 51L);
+
         Config.unloadObject(npc);
 
 
-        Config.ID_COUNT.put(Id.NPC, Math.max(Config.ID_COUNT.get(Id.NPC), 4L));
+        Config.ID_COUNT.put(Id.NPC, Math.max(Config.ID_COUNT.get(Id.NPC), 12L));
         Logger.i("ObjectMaker", "Npc making is done!");
     }
 

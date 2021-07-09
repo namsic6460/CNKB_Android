@@ -10,10 +10,10 @@ import java.util.Objects;
 import java.util.Set;
 
 import lkd.namsic.game.config.Config;
-import lkd.namsic.game.config.ObjectList;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object_list.EquipList;
 import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.event.ItemEatEvent;
 import lkd.namsic.game.event.ItemUseEvent;
@@ -170,7 +170,7 @@ public class ItemManager {
 
         if(itemId == null) {
             isItem = false;
-            itemId = ObjectList.equipList.get(itemName);
+            itemId = EquipList.findByName(itemName);
             recipeSet = self.getEquipRecipe();
 
             if(itemId == null) {
