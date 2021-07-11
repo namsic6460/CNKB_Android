@@ -39,6 +39,8 @@ public class FightManager {
 
     private static final FightManager instance = new FightManager();
 
+    private static final Map<Long, Long> preventMap = new HashMap<>();
+
     public static FightManager getInstance() {
         return instance;
     }
@@ -63,6 +65,24 @@ public class FightManager {
             }
 
             if(self.canFight(player)) {
+                long currentTime = System.currentTimeMillis();
+
+                long id = self.getId().getObjectId();
+                long preventTime = preventMap.getOrDefault(id, 0L);
+                if(preventTime > currentTime) {
+                    throw new WeirdCommandException("전투에서 도주한 후 30초 동안은 전투할 수 없습니다");
+                } else if(preventTime != 0) {
+                    preventMap.remove(id);
+                }
+
+                id = player.getId().getObjectId();
+                preventTime = preventMap.getOrDefault(id, 0L);
+                if(preventTime > currentTime) {
+                    throw new WeirdCommandException("해당 대상은 현재 전투가 불가능합니다\n(도주 성공 후 30초간 PvP 불가)");
+                } else if(preventTime != 0) {
+                    preventMap.remove(id);
+                }
+
                 this.startFight(self, player);
             } else {
                 return false;
@@ -79,7 +99,7 @@ public class FightManager {
                 fieldY = Integer.parseInt(locationStr[1]);
 
                 location = new Location(0, 0, fieldX, fieldY);
-            } catch (NumberFormatException | NumberRangeException ignore) {}
+            } catch (NumberFormatException | NumberRangeException | IndexOutOfBoundsException ignore) {}
 
             if(location != null) {
                 Set<Long> bossSet = new HashSet<>();
@@ -204,26 +224,31 @@ public class FightManager {
                             playerSet.add((Player) enemy);
                         }
 
-                        for (Map.Entry<Id, ConcurrentHashSet<Long>> newEntry : enemy.getEnemies().entrySet()) {
-                            Id newEnemyId = newEntry.getKey();
+                        boolean hasInner = true;
+                        if(enemy.getEnemies().isEmpty()) {
+                            hasInner = false;
+                        } else {
+                            for (Map.Entry<Id, ConcurrentHashSet<Long>> newEntry : enemy.getEnemies().entrySet()) {
+                                Id newEnemyId = newEntry.getKey();
 
-                            for (long newEnemyObjectId : newEntry.getValue()) {
-                                enemyCount++;
-                                Entity newEnemy = Config.loadObject(newEnemyId, newEnemyObjectId);
+                                for (long newEnemyObjectId : newEntry.getValue()) {
+                                    enemyCount++;
+                                    Entity newEnemy = Config.loadObject(newEnemyId, newEnemyObjectId);
 
-                                try {
-                                    self.addEnemy(newEnemyId, newEnemyObjectId);
-                                    newEnemy.addEnemy(Id.PLAYER, objectId);
+                                    try {
+                                        self.addEnemy(newEnemyId, newEnemyObjectId);
+                                        newEnemy.addEnemy(Id.PLAYER, objectId);
 
-                                    if (newEnemyId.equals(Id.PLAYER)) {
-                                        playerSet.add((Player) newEnemy);
+                                        if (newEnemyId.equals(Id.PLAYER)) {
+                                            playerSet.add((Player) newEnemy);
+                                        }
+
+                                        innerMsg.append("\n")
+                                                .append(Emoji.LIST)
+                                                .append(newEnemy.getName());
+                                    } finally {
+                                        Config.unloadObject(newEnemy);
                                     }
-
-                                    innerMsg.append("\n")
-                                            .append(Emoji.LIST)
-                                            .append(newEnemy.getName());
-                                } finally {
-                                    Config.unloadObject(newEnemy);
                                 }
                             }
                         }
@@ -234,8 +259,11 @@ public class FightManager {
                         Player.replyPlayers(playerSet, self.getName() + "(이/가) 전투에 난입했습니다!");
 
                         self.addLog(LogData.FIGHT_ENEMY, enemyCount);
-                        self.replyPlayer(enemy.getRealName() + "(와/과) 전투중인 다른 적들이 본인을 경계하기 시작했습니다",
-                                innerMsg.toString());
+
+                        if(hasInner) {
+                            self.replyPlayer(enemy.getRealName() + "(와/과) 전투중인 다른 적들이 본인을 경계하기 시작했습니다",
+                                    innerMsg.toString());
+                        }
 
                         return;
                     } else {
@@ -549,6 +577,8 @@ public class FightManager {
                             break;
                         case RUN:
                             if (success) {
+                                preventMap.put(attacker.getId().getObjectId(), System.currentTimeMillis() + Config.PREVENT_FIGHT_TIME);
+
                                 this.endFight(attacker);
                                 player.replyPlayer("도주에 성공하였습니다");
                                 Player.replyPlayersExcept(playerSet, player.getNickName() +

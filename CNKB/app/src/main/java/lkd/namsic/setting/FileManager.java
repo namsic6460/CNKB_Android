@@ -21,7 +21,7 @@ public class FileManager {
     public final static String CONFIG_PATH = PATH + "/config.json";
     public final static String LOG_PATH = PATH + "/logs";
     public final static String DATA_PATH = PATH + "/data";
-    public final static String MAP_PATH = DATA_PATH + "/map";
+    public final static String MAP_PATH = DATA_PATH + "/MAP";
     public final static HashMap<Id, String> DATA_PATH_MAP = new HashMap<>();
 
     public static void initDir() {
@@ -34,9 +34,15 @@ public class FileManager {
 
             String path;
             for (Id id : Id.values()) {
-                path = DATA_PATH + "/" + id.toString();
-                DATA_PATH_MAP.put(id, path + "/");
-                new File(path).mkdir();
+                if(!id.equals(Id.PLAYER)) {
+                    path = DATA_PATH + "/" + id.toString();
+                    DATA_PATH_MAP.put(id, path + "/");
+                    new File(path).mkdir();
+                } else {
+                    path = PATH + "/" + "players";
+                    DATA_PATH_MAP.put(id, path + "/");
+                    new File(path).mkdir();
+                }
             }
 
             new File(MAP_PATH).mkdir();

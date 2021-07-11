@@ -659,7 +659,6 @@ public class ObjectCreator {
 
     private static void createMaps() {
         GameMap map = new GameMap(MapList.findByLocation(0, 0));
-        map.setMapType(MapType.COUNTRY);
         map.getLocation().set(0, 0, 1, 1);
         Config.unloadMap(map);
 

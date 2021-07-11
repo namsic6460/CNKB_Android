@@ -10,11 +10,11 @@ import java.util.Random;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.config.RandomList;
-import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.FishWaitType;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
@@ -32,7 +32,7 @@ public class FishManager {
 
     public void tryFish(@NonNull Player self) {
         GameMap map = Config.getMapData(self.getLocation());
-        if(MapType.waterList().contains(map.getMapType())) {
+        if(!MapType.waterList().contains(map.getMapType())) {
             throw new WeirdCommandException("강 또는 바다에서만 낚시가 가능합니다");
         }
 
@@ -106,7 +106,7 @@ public class FishManager {
                             throw new NumberRangeException(itemTier, 0, 6);
                     }
 
-                    if(itemTier != 0) {
+                    if(itemTier == 0) {
                         itemId = itemList[random.nextInt(itemList.length)];
                     } else {
                         itemId = random.nextInt(itemCount) + startId;

@@ -158,10 +158,15 @@ public abstract class AiEntity extends Entity {
             for(StatType statType : StatType.values()) {
                 try {
                     Config.checkStatType(statType);
-                } catch (UnhandledEnumException ignore) {}
+                } catch (UnhandledEnumException e) {
+                    continue;
+                }
 
-                this.setBasicStat(statType, (int) (this.getStat(statType) * 0.05));
+                this.addBasicStat(statType, (int) (this.getStat(statType) * 0.05));
             }
+
+            this.setBasicStat(StatType.HP, this.getStat(StatType.MAXHP));
+            this.setBasicStat(StatType.MN, this.getStat(StatType.MAXMN));
         }
     }
 

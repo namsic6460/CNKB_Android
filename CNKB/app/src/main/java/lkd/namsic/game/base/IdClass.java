@@ -1,6 +1,9 @@
 package lkd.namsic.game.base;
 
+import androidx.annotation.Nullable;
+
 import java.io.Serializable;
+import java.util.Objects;
 
 import lkd.namsic.game.enums.Id;
 import lombok.Getter;
@@ -15,4 +18,18 @@ public class IdClass implements Serializable {
 
     public IdClass() {}
 
+    @Override
+    public int hashCode() {
+        return (id.hashCode() + "_" + objectId).hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(obj instanceof IdClass) {
+            IdClass idClass = (IdClass) obj;
+            return Objects.equals(idClass.id, this.id) && idClass.objectId == this.objectId;
+        } else {
+            return false;
+        }
+    }
 }

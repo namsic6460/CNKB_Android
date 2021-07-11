@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import lkd.namsic.MainActivity;
 import lkd.namsic.game.command.CommandListener;
@@ -197,7 +198,7 @@ public class KakaoTalk {
                         fourth = commands.get(3);
                     } catch (IndexOutOfBoundsException ignore) {}
 
-                    String cmd = command.replaceFirst(first, "").trim();
+                    String cmd = command.replaceFirst(Pattern.quote(first), "").trim();
 
                     if((listener = KakaoTalk.commonCommands.get(first)) != null) {
                         listener.execute(cmd, session);

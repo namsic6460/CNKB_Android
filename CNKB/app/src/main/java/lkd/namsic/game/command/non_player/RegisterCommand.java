@@ -83,15 +83,9 @@ public class RegisterCommand extends NonPlayerCommand {
             player.getItemRecipe().add(itemId);
         }
 
-        GameMap map = null;
-        try {
-            map = Config.loadMap(0, 0);
-            map.addEntity(player);
-        } finally {
-            if(map != null) {
-                Config.unloadMap(map);
-            }
-        }
+        GameMap map = Config.loadMap(0, 0);
+        map.addEntity(player);
+        Config.unloadMap(map);
 
         player.replyPlayer("회원가입에 성공하였습니다!");
         Config.unloadObject(player);

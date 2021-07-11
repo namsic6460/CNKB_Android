@@ -295,10 +295,6 @@ public class GameMap {
                 Config.loadObject(id, entity.getId().getObjectId());
                 entity.addItem(itemId, count);
                 Config.unloadObject(entity);
-
-                if(id.equals(Id.PLAYER)) {
-                    ((Player) entity).replyPlayer(ItemList.findById(itemId) + " " + count + "개를 주웠습니다");
-                }
             }
         }
     }

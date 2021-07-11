@@ -58,9 +58,11 @@ public class Eval {
             ScriptableObject.putProperty(scope, "int", int.class);
             ScriptableObject.putProperty(scope, "boolean", boolean.class);
             ScriptableObject.putProperty(scope, "double", double.class);
+            ScriptableObject.putProperty(scope, "long", long.class);
             ScriptableObject.putProperty(scope, "Integer", Integer.class);
             ScriptableObject.putProperty(scope, "Boolean", Boolean.class);
             ScriptableObject.putProperty(scope, "Double", Double.class);
+            ScriptableObject.putProperty(scope, "Long", Long.class);
             ScriptableObject.putProperty(scope, "String", String.class);
 
             ScriptableObject.putProperty(scope, "Doing", Doing.class);

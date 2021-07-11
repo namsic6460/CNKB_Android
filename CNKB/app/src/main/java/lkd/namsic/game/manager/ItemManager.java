@@ -42,8 +42,9 @@ public class ItemManager {
             throw new WeirdCommandException("사용이 불가능한 아이템입니다");
         }
 
-        if(self.getItem(itemId) == 0) {
-            throw new WeirdCommandException("해당 아이템을 보유하고 있지 않습니다\n아이템을 획득한 후 다시 사용해주세요");
+        int currentCount = self.getItem(itemId);
+        if(currentCount < count) {
+            throw new WeirdCommandException("아이템이 " + (count - currentCount) + "개 부족합니다\n아이템을 획득한 후 다시 사용해주세요");
         }
 
         return use(self, itemId, count);
@@ -103,8 +104,9 @@ public class ItemManager {
             }
         }
 
-        if(self.getItem(itemId) == 0) {
-            throw new WeirdCommandException("해당 아이템을 보유하고 있지 않습니다\n아이템을 획득한 후 다시 사용해주세요");
+        int currentCount = self.getItem(itemId);
+        if(currentCount < count) {
+            throw new WeirdCommandException("아이템이 " + (count - currentCount) + "개 부족합니다\n아이템을 획득한 후 다시 사용해주세요");
         }
 
         return eat(self, itemId, count);

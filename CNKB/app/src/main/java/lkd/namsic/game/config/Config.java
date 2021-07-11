@@ -126,6 +126,7 @@ public class Config {
     public static final int MAX_ITEM_DROP_COUNT = 5;
     public static final double ITEM_DROP_LOSE_PERCENT = 0.95;
 
+    public static final long PREVENT_FIGHT_TIME = 30000L;
     public static final int RECOGNIZE_DISTANCE = 16;
     public static final double ATTACKED_PERCENT = 0.5;
     public static final double ATTACKED_PERCENT_INCREASE = 0.025;
@@ -446,7 +447,12 @@ public class Config {
     public synchronized static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
         if(id.equals(Id.PLAYER)) {
             String[] playerData = PLAYER_LIST.get(objectId);
-            return (T) Objects.requireNonNull(loadPlayer(playerData[0], playerData[1]));
+
+            try {
+                return (T) Objects.requireNonNull(loadPlayer(playerData[0], playerData[1]));
+            } catch (NullPointerException e) {
+                throw new NullPointerException(e.getMessage() + "\n" + objectId + " " + PLAYER_LIST.toString());
+            }
         }
 
         checkId(id, objectId);
