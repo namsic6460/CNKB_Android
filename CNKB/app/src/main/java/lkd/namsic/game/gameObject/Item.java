@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import lkd.namsic.game.base.LimitInteger;
+import lkd.namsic.game.base.Use;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
@@ -51,9 +52,12 @@ public class Item extends NamedObject {
     }
 
     public void setEatBuff(long time, @NonNull StatType statType, int stat) {
-        Config.checkStatType(statType);
-        if(time < 1) {
-            throw new NumberRangeException(time, 1, Long.MAX_VALUE);
+        if(time != -1) {
+            Config.checkStatType(statType);
+
+            if(time < 1) {
+                throw new NumberRangeException(time, 1, Long.MAX_VALUE);
+            }
         }
 
         HashMap<StatType, Integer> buff = this.eatBuff.get(time);

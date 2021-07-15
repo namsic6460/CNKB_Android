@@ -20,5 +20,6 @@ public enum Variable {
     ADVENTURE_FIGHT,
     ADVENTURE_WAIT_TYPE,
     IS_APPRAISE_STOP,
+    GHOST_SWORD_1,
 
 }

@@ -1,55 +1,44 @@
 package lkd.namsic.game.enums;
 
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import lkd.namsic.game.exception.WeirdCommandException;
+import lombok.Getter;
+
 public enum EquipType {
 
-    /**
-     * 투구 - 치명타 방어
-     */
-    HELMET,
+    WEAPON("무기", "weapon"),
+    HELMET("투구", "helmet"),
+    CHESTPLATE("갑옷", "chestplate", "chest"),
+    LEGGINGS("바지", "leggings", "leg"),
+    SHOES("신발", "shoes", "shoe"),
+    RINGS("반지", "ring", "rings"),
+    EARRINGS("귀걸이", "earrings", "earring"),
+    NECKLACE("목걸이", "necklace"),
+    GEM("보석", "gem"),
+    HEART_GEM("심장 보석", "heart gem"),
+    AMULET("부적", "amulet");
 
-    /**
-     * 갑옷(상의) - 기본 방어1
-     */
-    CHESTPLATE,
+    public static EquipType findByName(@NonNull String name) {
+        for(EquipType equipType : EquipType.values()) {
+            if(equipType.getDisplayNames().contains(name)) {
+                return equipType;
+            }
+        }
 
-    /**
-     * 갑옷(하의) - 기본 방어2
-     */
-    LEGGINGS,
+        throw new WeirdCommandException("알 수 없는 장비 유형입니다");
+    }
 
-    /**
-     * 신발 - 이속, 회피, 정확성
-     */
-    SHOES,
+    @NonNull
+    @Getter
+    final List<String> displayNames = new ArrayList<>();
 
-    /**
-     * 반지 - 속성 강화
-     */
-    RING,
-
-    /**
-     * 귀걸이 - 스텟 강화1
-     */
-    EARRING,
-
-    /**
-     * 목걸이 - 스텟 강화2
-     */
-    NECKLACE,
-
-    /**
-     * 보석 - 패시브 스킬
-     */
-    GEM,
-
-    /**
-     * 액티브 스킬(보석 3개 장착 시 자동 생성)
-     */
-    HEART_GEM,
-
-    /**
-     * 부적 - 각각 특별한 효과
-     */
-    AMULET
+    EquipType(@NonNull String...displayNames) {
+        this.displayNames.addAll(Arrays.asList(displayNames));
+    }
 
 }

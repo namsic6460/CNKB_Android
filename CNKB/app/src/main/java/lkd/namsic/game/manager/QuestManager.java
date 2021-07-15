@@ -36,9 +36,9 @@ public class QuestManager {
         Quest quest = Config.getData(Id.QUEST, questId);
 
         return self.getMoney() >= quest.getNeedMoney().get() &&
-                Config.compareMap(self.getInventory(), quest.getNeedItem(), true) &&
+                Config.compareMap(self.getInventory(), quest.getNeedItem(), true, false, 0) &&
                 self.compareStat(quest.getNeedStat()) &&
-                Config.compareMap(self.getCloseRate(), quest.getNeedCloseRate(), true);
+                Config.compareMap(self.getCloseRate(), quest.getNeedCloseRate(), true, false, 0);
     }
 
     public void clearQuest(@NonNull Player self, long questId, long npcId) {

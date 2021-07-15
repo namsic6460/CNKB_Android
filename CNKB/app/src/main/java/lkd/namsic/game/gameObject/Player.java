@@ -16,12 +16,13 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.game.config.Emoji;
+import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
@@ -33,18 +34,12 @@ import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
-import lkd.namsic.game.KakaoTalk;
-import lkd.namsic.game.manager.MoveManager;
-import lkd.namsic.game.manager.QuestManager;
 import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 public class Player extends Entity {
-
-    private final static QuestManager questManager = QuestManager.getInstance();
-    private final static MoveManager moveManager = MoveManager.getInstance();
 
     public static void replyPlayers(@NonNull Set<Player> players, @Nullable String msg) {
         replyPlayers(players, msg, null);
@@ -80,6 +75,10 @@ public class Player extends Entity {
             }
 
             Notification.Action session = player.getSession();
+            if(session == null) {
+                continue;
+            }
+
             playerSet = sessions.get(session);
 
             if(playerSet == null) {
@@ -146,7 +145,7 @@ public class Player extends Entity {
 
     final Location baseLocation = new Location();
 
-    final LimitInteger sp = new LimitInteger(0, Config.MIN_SP, Config.MAX_SP);
+    final LimitInteger sp = new LimitInteger(0, Config.MIN_SP, null);
     final LimitInteger adv = new LimitInteger(0, 0, null);
     final LimitLong exp = new LimitLong(0, 0L, null);
 
@@ -265,13 +264,17 @@ public class Player extends Entity {
         this.replyPlayer("New Day!");
     }
 
-    @NonNull
-    public Notification.Action getSession() {
-        if(this.isGroup) {
-            return KakaoTalk.getGroupSession(this.recentRoom);
+    @Nullable
+    public synchronized Notification.Action getSession() {
+        Notification.Action session;
+
+        if (this.isGroup) {
+            session = KakaoTalk.getGroupSession(this.recentRoom);
         } else {
-            return KakaoTalk.getSoloSession(this.recentRoom);
+            session = KakaoTalk.getSoloSession(this.recentRoom);
         }
+
+        return session;
     }
 
     public void addExp(long exp) {
@@ -353,13 +356,17 @@ public class Player extends Entity {
             }
         }
 
-        return exp;
+        return (int) ((0.1 * enemyLv + 1) * exp);
     }
 
     public void lvUp(long needExp) {
+        Config.PLAYER_LV_RANK.remove(this.getName());
+
         this.lv.add(1);
         this.sp.add(5);
         this.exp.add(-1 * needExp);
+
+        Config.PLAYER_LV_RANK.put(this.getName(), this.lv.get());
     }
 
     public void setPvp(boolean enable, @Nullable Integer day) {
@@ -480,7 +487,7 @@ public class Player extends Entity {
 
         Research research = Config.getData(Id.RESEARCH, researchId);
         return research.getLimitLv().isInRange(this.lv.get()) && research.getNeedMoney().get() <= this.getMoney()
-                    && Config.compareMap(this.inventory, research.needItem, true);
+                    && Config.compareMap(this.inventory, research.needItem, true, false, 0);
     }
 
     public void addResearch(long researchId) {
@@ -575,10 +582,10 @@ public class Player extends Entity {
     public void addQuest(long questId) {
         Quest quest = Config.getData(Id.QUEST, questId);
 
-        this.quest.put(questId, quest.getChatId().get());
+        this.quest.put(questId, quest.getClearChatId().get());
         this.addLog(LogData.QUEST_RECEIVE, 1);
 
-        long questNpcId = quest.getNpcId().get();
+        long questNpcId = quest.getClearNpcId().get();
         ConcurrentHashSet<Long> questNpcSet = this.questNpc.get(questNpcId);
 
         if(questNpcSet == null) {
@@ -833,19 +840,6 @@ public class Player extends Entity {
     public void onDeath() {
         super.onDeath();
 
-        this.setBasicStat(StatType.HP, 1);
-        this.location.set(this.baseLocation);
-
-        GameMap map = null;
-        try {
-            map = Config.loadMap(this.baseLocation);
-            map.addEntity(this);
-        } finally {
-            if(map != null) {
-                Config.unloadMap(map);
-            }
-        }
-
         this.getBuff().clear();
         this.getBuffStat().clear();
 
@@ -862,7 +856,7 @@ public class Player extends Entity {
         this.addMoney(loseMoney);
 
         StringBuilder dropItemBuilder = new StringBuilder("G\n\n---떨어트린 아이템 목록---");
-        StringBuilder loseItemBuilder = new StringBuilder("\n\n---사라진 아이템 목록---");
+        StringBuilder loseItemBuilder = new StringBuilder("\n\n---잃어버린 아이템 목록---");
 
         boolean drop = false;
         boolean lost = false;
@@ -910,9 +904,20 @@ public class Player extends Entity {
             }
 
             if(!lost) {
-                dropItemBuilder.append("\n잃어버린 아이템이 없습니다");
+                loseItemBuilder.append("\n잃어버린 아이템이 없습니다");
             }
         }
+
+        this.setBasicStat(StatType.HP, 1);
+        this.location.set(this.baseLocation);
+
+        GameMap map = Config.loadMap(this.location);
+        map.removeEntity(this);
+        Config.unloadMap(map);
+
+        map = Config.loadMap(this.baseLocation);
+        map.addEntity(this);
+        Config.unloadMap(map);
 
         String innerMsg = "떨어트린 돈 : " + dropMoney + "G\n잃어버린 돈 : " + loseMoney
                 + dropItemBuilder.toString() + loseItemBuilder.toString();
@@ -922,24 +927,60 @@ public class Player extends Entity {
 
     @Override
     public void onKill(@NonNull Entity entity) {
-        this.addExp(getKillExp(entity.lv.get()));
+        long killExp = this.getKillExp(entity.lv.get());
+        this.addExp(killExp);
 
-        String msg = entity.getName() + "을 처치했습니다!\n";
+        String msg = entity.getName() + "을 처치했습니다!\n" +
+                Emoji.EXP + " " + Config.getIncrease(killExp) + "\n" +
+                Emoji.LV + " 레벨: " + this.getDisplayLv();
         
         if(!entity.id.getId().equals(Id.PLAYER)) {
             int token = Config.giveToken(ItemList.LOW_HUNTER_TOKEN.getId(), RandomList.HUNTER_TOKEN, this.getLv().get() / 100, this);
             
             if(token >= 0) {
-                msg += Config.TIERS[token] + "급 사냥꾼의 증표 1개를 획득하였습니다\n";
+                msg += "\n\n" + Config.TIERS[token] + "급 사냥꾼의 증표 1개를 획득하였습니다";
             }
         }
 
-        this.replyPlayer(msg + Emoji.LV + " 레벨: " + this.getDisplayLv());
+         StringBuilder innerBuilder = new StringBuilder("드롭 필드 좌표: ")
+                .append(entity.getLastDeathLoc().toFieldString())
+                .append("\n떨어진 골드: ")
+                .append(entity.getLastDropMoney())
+                .append("\n\n---떨어진 아이템---");
+
+        if(entity.getLastDropItem().isEmpty()) {
+            innerBuilder.append("\n떨어트린 아이템이 없습니다");
+        } else {
+            for(Map.Entry<Long, Integer> entry : entity.getLastDropItem().entrySet()) {
+                innerBuilder.append("\n")
+                        .append(ItemList.findById(entry.getKey()))
+                        .append(" ")
+                        .append(entry.getValue())
+                        .append("개");
+            }
+        }
+
+        innerBuilder.append("\n\n---떨어진 장비---");
+
+        if(entity.getLastDropEquip().isEmpty()) {
+            innerBuilder.append("\n떨어트린 장비가 없습니다");
+        } else {
+            for(long equipId : entity.getLastDropEquip()) {
+                innerBuilder.append("\n")
+                        .append(((Equipment) Config.getData(Id.EQUIPMENT, equipId)).getName());
+            }
+        }
+
+        this.replyPlayer(msg, innerBuilder.toString());
     }
 
     @Override
     public boolean canFight(@NonNull Entity enemy) {
         if(enemy.id.getId().equals(Id.PLAYER)) {
+            if(enemy.getLv().get() < 10) {
+                return false;
+            }
+
             return super.canFight(enemy) && this.isPvp() && ((Player) enemy).isPvp();
         } else {
             return super.canFight(enemy);

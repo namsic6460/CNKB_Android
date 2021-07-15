@@ -12,10 +12,8 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class Achieve extends NamedObject {
 
     final LimitLong rewardMoney = new LimitLong(0, 0L, null);

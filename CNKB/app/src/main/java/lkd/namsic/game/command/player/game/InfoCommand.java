@@ -13,6 +13,7 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.manager.DisplayManager;
+import lkd.namsic.game.manager.ItemDisplayManager;
 
 public class InfoCommand extends PlayerCommand {
 
@@ -21,9 +22,9 @@ public class InfoCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if(second == null || command.equals(player.getNickName())) {
-            DisplayManager.getInstance().displayItemInfo(player, player);
+            DisplayManager.getInstance().displayInfo(player, player);
         } else if(second.equals("아이템") || second.equals("item")) {
-            DisplayManager.getInstance().displayItemInfo(player, command.replace(second, "").trim());
+            ItemDisplayManager.getInstance().displayItemInfo(player, command.replace(second, "").trim());
         } else {
             Long playerId = Config.PLAYER_ID.get(command);
 
@@ -32,7 +33,7 @@ public class InfoCommand extends PlayerCommand {
             }
 
             Player target = Config.getData(Id.PLAYER, playerId);
-            DisplayManager.getInstance().displayItemInfo(player, target);
+            DisplayManager.getInstance().displayInfo(player, target);
         }
     }
 

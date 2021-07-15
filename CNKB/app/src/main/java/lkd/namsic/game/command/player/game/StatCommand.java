@@ -22,8 +22,6 @@ public class StatCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if(second == null) {
-            throw new WeirdCommandException();
-        } else if(second.equals("정보") || second.equals("info")) {
             DisplayManager.getInstance().displayStatInfo(player);
         } else {
             if(third == null) {
@@ -35,7 +33,7 @@ public class StatCommand extends PlayerCommand {
             String statStr = commands.get(commands.size() - 1);
             int stat = Integer.parseInt(statStr);
 
-            StatType statType = StatType.findByName(command.replace(statStr, "").trim());
+            StatType statType = StatType.findByName(command.replace(statStr, "").trim().toUpperCase());
             if(statType == null) {
                 throw new WeirdCommandException("알 수 없는 스텟 이름입니다");
             }

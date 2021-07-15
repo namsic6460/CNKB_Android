@@ -1,25 +1,31 @@
 package lkd.namsic.game.gameObject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-import lkd.namsic.game.config.RandomList;
+import lkd.namsic.game.base.EquipUse;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.RangeInteger;
 import lkd.namsic.game.base.RangeIntegerMap;
+import lkd.namsic.game.base.Use;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object_list.EquipList;
+import lkd.namsic.game.event.Event;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class Equipment extends Item {
 
     public static int getLvIncrease(int handleLv, int nextReinforceCount) {
@@ -34,9 +40,15 @@ public class Equipment extends Item {
         return RandomList.REINFORCE_LV_INCREASE.get(handleLv).get(nextReinforceCount);
     }
 
+    final long originalId;
+
     @Setter
     @NonNull
     EquipType equipType;
+
+    @Setter
+    @Nullable
+    EquipUse equipUse;
 
     final LimitInteger reinforceCount = new LimitInteger(Config.MIN_REINFORCE_COUNT, Config.MIN_REINFORCE_COUNT, Config.MAX_REINFORCE_COUNT);
     final LimitInteger reinforceFloor = new LimitInteger(0, 0, null);
@@ -45,6 +57,8 @@ public class Equipment extends Item {
     @Setter
     int lvDown = 0;
     double reinforcePercent;
+
+    final List<Event> events = new ArrayList<>();
 
     final RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(
             new HashMap<>(), new HashMap<>(), StatType.class
@@ -57,6 +71,10 @@ public class Equipment extends Item {
         this.description = description;
 
         this.id.setId(Id.EQUIPMENT);
+
+        long objectId = Objects.requireNonNull(EquipList.findByName(name));
+        this.id.setObjectId(objectId);
+        this.originalId = objectId;
 
         this.reinforcePercent = this.getReinforcePercent();
         this.description = description;
@@ -71,6 +89,19 @@ public class Equipment extends Item {
 
     public RangeInteger getTotalLimitLv() {
         return new RangeInteger(this.limitLv.getMin() - this.lvDown, this.limitLv.getMax() - this.lvDown);
+    }
+
+    @Deprecated
+    @Nullable
+    @Override
+    public Use getUse() {
+        throw new RuntimeException("Cannot get use in Equipment");
+    }
+
+    @Deprecated
+    @Override
+    public void setUse(@Nullable Use use) {
+        throw new RuntimeException("Cannot set use in Equipment");
     }
 
     public Equipment setBasicStat(@NonNull StatType statType, int stat) {

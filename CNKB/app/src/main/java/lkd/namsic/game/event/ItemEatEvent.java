@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
@@ -13,6 +14,11 @@ import lkd.namsic.game.gameObject.Entity;
 import lkd.namsic.game.gameObject.Item;
 
 public abstract class ItemEatEvent extends Event {
+
+    @NonNull
+    public static String getName() {
+        return "ItemEatEvent";
+    }
 
     public static boolean handleEvent(@NonNull Entity self, @Nullable List<Event> events, long itemId, int count) {
         boolean isCancelled = false;
@@ -40,11 +46,20 @@ public abstract class ItemEatEvent extends Event {
         return isCancelled;
     }
 
+    public ItemEatEvent(int activeCount) {
+        this(activeCount, null);
+    }
+
+    public ItemEatEvent(int activeCount, @Nullable Map<String, Object> variable) {
+        super(activeCount, variable);
+    }
+
     public abstract boolean onEat(@NonNull Entity self, Item item, int count);
 
     @NonNull
-    public static String getName() {
-        return "ItemEatEvent";
+    @Override
+    public String getClassName() {
+        return getName();
     }
 
 }

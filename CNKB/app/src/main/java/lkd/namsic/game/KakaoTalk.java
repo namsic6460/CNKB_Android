@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
@@ -35,6 +34,7 @@ import lkd.namsic.game.command.player.game.AppraiseCommand;
 import lkd.namsic.game.command.player.game.ChatCommand;
 import lkd.namsic.game.command.player.game.CraftCommand;
 import lkd.namsic.game.command.player.game.EatCommand;
+import lkd.namsic.game.command.player.game.EquipCommand;
 import lkd.namsic.game.command.player.game.FightCommand;
 import lkd.namsic.game.command.player.game.FishCommand;
 import lkd.namsic.game.command.player.game.InfoCommand;
@@ -42,6 +42,7 @@ import lkd.namsic.game.command.player.game.InvenCommand;
 import lkd.namsic.game.command.player.game.MapCommand;
 import lkd.namsic.game.command.player.game.MineCommand;
 import lkd.namsic.game.command.player.game.MoveCommand;
+import lkd.namsic.game.command.player.game.RankingCommand;
 import lkd.namsic.game.command.player.game.SettingCommand;
 import lkd.namsic.game.command.player.game.StatCommand;
 import lkd.namsic.game.command.player.game.UseCommand;
@@ -49,6 +50,7 @@ import lkd.namsic.game.command.player.register.PlayerRegisterCommand;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.exception.DoingFilterException;
+import lkd.namsic.game.exception.EquipUseException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Player;
@@ -58,10 +60,8 @@ import lkd.namsic.setting.Logger;
 
 public class KakaoTalk {
 
-    //TODO : Separate hard coded game objects to classes
-
-    private final static Map<String, Notification.Action> groupSessions = new ConcurrentHashMap<>();
-    private final static Map<String, Notification.Action> soloSessions = new ConcurrentHashMap<>();
+    public final static Map<String, Notification.Action> groupSessions = new ConcurrentHashMap<>();
+    public final static Map<String, Notification.Action> soloSessions = new ConcurrentHashMap<>();
 
     private static String lastSender = "";
     private static String lastMsg = "";
@@ -105,6 +105,7 @@ public class KakaoTalk {
         registerPlayerCommand(new ChatCommand(),        "대화", "chat");
         registerPlayerCommand(new CraftCommand(),       "제작", "craft");
         registerPlayerCommand(new EatCommand(),         "먹기", "eat");
+        registerPlayerCommand(new EquipCommand(),       "장비", "equip");
         registerPlayerCommand(new FightCommand(),       "전투", "fight", "f");
         registerPlayerCommand(new FishCommand(),        "낚시", "fish");
         registerPlayerCommand(new InfoCommand(),        "정보", "info", "i");
@@ -112,6 +113,7 @@ public class KakaoTalk {
         registerPlayerCommand(new MapCommand(),         "맵", "map");
         registerPlayerCommand(new MineCommand(),        "광질", "mine");
         registerPlayerCommand(new MoveCommand(),        "이동", "move");
+        registerPlayerCommand(new RankingCommand(),     "랭킹", "랭크", "ranking", "rank");
         registerPlayerCommand(new SettingCommand(),     "설정", "setting", "set");
         registerPlayerCommand(new StatCommand(),        "스텟", "stat");
         registerPlayerCommand(new UseCommand(),         "사용", "use");
@@ -143,14 +145,14 @@ public class KakaoTalk {
         }
     }
 
-    @NonNull
+    @Nullable
     public static Notification.Action getGroupSession(String room) {
-        return Objects.requireNonNull(groupSessions.get(room));
+        return groupSessions.get(room);
     }
 
-    @NonNull
+    @Nullable
     public static Notification.Action getSoloSession(String room) {
-        return Objects.requireNonNull(soloSessions.get(room));
+        return soloSessions.get(room);
     }
 
     public static void onChat(@NonNull final String sender, @NonNull final String image,
@@ -162,7 +164,7 @@ public class KakaoTalk {
             soloSessions.put(room, session);
         }
 
-        final boolean isCommand = msg.startsWith("n ") || msg.startsWith("ㅜ ");
+        final boolean isCommand = msg.startsWith("N ") || msg.startsWith("n ") || msg.startsWith("ㅜ ");
         final String command = isCommand ? msg.substring(2) : null;
 
         Thread gameThread = new Thread(() -> {
@@ -220,7 +222,7 @@ public class KakaoTalk {
 //                                throw new WeirdCommandException("현재 회원가입이 되어있지 않습니다.\n회원가입을 진행해주세요");
                                 }
                             }
-                        } catch (WeirdCommandException | DoingFilterException | ObjectNotFoundException e) {
+                        } catch (WeirdCommandException | DoingFilterException | EquipUseException e) {
                             KakaoTalk.reply(session,"[오류]\n" + e.getMessage());
                             Logger.w("Common Error", e);
                         } catch (NumberFormatException e) {
@@ -265,11 +267,15 @@ public class KakaoTalk {
         }
     }
 
-    public static void reply(@NonNull Notification.Action session, @Nullable String msg){
+    public static void reply(@Nullable Notification.Action session, @Nullable String msg){
         reply(session, msg == null ? "" : msg, null);
     }
 
-    public static void reply(@NonNull Notification.Action session, @Nullable String msg, @Nullable String innerMsg) {
+    public static void reply(@Nullable Notification.Action session, @Nullable String msg, @Nullable String innerMsg) {
+        if(session == null) {
+            return;
+        }
+
         msg = msg == null ? "" : msg;
 
         Intent intent = new Intent();

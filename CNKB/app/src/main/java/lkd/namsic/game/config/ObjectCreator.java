@@ -9,15 +9,21 @@ import androidx.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 import lkd.namsic.MainActivity;
+import lkd.namsic.game.base.Bool;
 import lkd.namsic.game.base.ChatLimit;
+import lkd.namsic.game.base.EquipUse;
+import lkd.namsic.game.base.Int;
+import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.MonsterType;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.enums.object_list.EquipList;
 import lkd.namsic.game.enums.object_list.ItemList;
@@ -25,19 +31,22 @@ import lkd.namsic.game.enums.object_list.MapList;
 import lkd.namsic.game.enums.object_list.MonsterList;
 import lkd.namsic.game.enums.object_list.NpcList;
 import lkd.namsic.game.enums.object_list.QuestList;
+import lkd.namsic.game.event.DamageEvent;
 import lkd.namsic.game.gameObject.Chat;
-import lkd.namsic.game.gameObject.Item;
+import lkd.namsic.game.gameObject.Entity;
+import lkd.namsic.game.gameObject.Equipment;
 import lkd.namsic.game.gameObject.GameMap;
+import lkd.namsic.game.gameObject.GameObject;
+import lkd.namsic.game.gameObject.Item;
 import lkd.namsic.game.gameObject.Monster;
 import lkd.namsic.game.gameObject.Npc;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.gameObject.Quest;
-import lkd.namsic.game.manager.ItemManager;
 import lkd.namsic.setting.Logger;
 
 public class ObjectCreator {
-
-    private static final ItemManager itemManager = ItemManager.getInstance();
+    
+    //TODO : 생성자에서 name + id를 list 의 enum 으로 대체
 
     public static void start(Button button) {
         Logger.i("ObjectMaker", "Making objects...");
@@ -46,7 +55,6 @@ public class ObjectCreator {
             MainActivity.mainActivity.runOnUiThread(() -> button.setEnabled(false));
 
             try {
-                //Name duplicate check(None duplicate)
                 int totalCount = ItemList.idMap.size() + EquipList.idMap.size() - 1;
 
                 Set<String> list = new HashSet<>(totalCount);
@@ -270,7 +278,12 @@ public class ObjectCreator {
         });
         Config.unloadObject(item);
 
-        createItem("돌", "가장 기본적인 광석이다");
+        item = new Item("돌", "가장 기본적인 광석이다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.COBBLE_STONE.getId(), 10);
+            put(ItemList.COAL.getId(), 5);
+        }}, true);
+        Config.unloadObject(item);
 
         createItem("석탄", "불이 잘 붙는 흔한 광물이다", 2);
 
@@ -409,45 +422,210 @@ public class ObjectCreator {
         createItem("쓰레기", "누가 이런걸 물에 버렸어?");
         createItem("물풀", "누가 이런걸 물에 버렸어?");
 
-        createItem("(일반) 금강모치", "일반 등급의 물고기다", 2);
-        createItem("(일반) 미꾸라지", "일반 등급의 물고기다", 2);
-        createItem("(일반) 붕어", "일반 등급의 물고기다", 2);
-        createItem("(일반) 송사리", "일반 등급의 물고기다", 2);
-        createItem("(일반) 피라미", "일반 등급의 물고기다", 2);
+        item = new Item("(일반) 금강모치", "일반 등급의 물고기다");
+        item.getHandleLv().set(2);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 10);
+        Config.unloadObject(item);
+        
+        item = new Item("(일반) 미꾸라지", "일반 등급의 물고기다");
+        item.getHandleLv().set(2);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 10);
+        Config.unloadObject(item);
 
-        createItem("(희귀) 망둑어", "희귀 등급의 물고기다", 3);
-        createItem("(희귀) 미꾸라지", "희귀 등급의 물고기다", 3);
-        createItem("(희귀) 배스", "희귀 등급의 물고기다", 3);
-        createItem("(희귀) 살치", "희귀 등급의 물고기다", 3);
-        createItem("(희귀) 쏘가리", "희귀 등급의 물고기다", 3);
-        createItem("(희귀) 은어", "희귀 등급의 물고기다", 3);
+        item = new Item("(일반) 붕어", "일반 등급의 물고기다");
+        item.getHandleLv().set(2);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 10);
+        Config.unloadObject(item);
 
-        createItem("(특별) 강준치", "특별 등급의 물고기다", 5);
-        createItem("(특별) 망둑어", "특별 등급의 물고기다", 5);
-        createItem("(특별) 메기", "특별 등급의 물고기다", 5);
-        createItem("(특별) 뱀장어", "특별 등급의 물고기다", 5);
-        createItem("(특별) 산천어", "특별 등급의 물고기다", 5);
-        createItem("(특별) 숭어", "특별 등급의 물고기다", 5);
-        createItem("(특별) 쏘가리", "특별 등급의 물고기다", 5);
-        createItem("(특별) 연어", "특별 등급의 물고기다", 5);
-        createItem("(특별) 은어", "특별 등급의 물고기다", 5);
-        createItem("(특별) 잉어", "특별 등급의 물고기다", 5);
+        item = new Item("(일반) 송사리", "일반 등급의 물고기다");
+        item.getHandleLv().set(2);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 10);
+        Config.unloadObject(item);
 
-        createItem("(유일) 강준치", "유일 등급의 물고기다", 8);
-        createItem("(유일) 메기", "유일 등급의 물고기다", 8);
-        createItem("(유일) 뱀장어", "유일 등급의 물고기다", 8);
-        createItem("(유일) 산천어", "유일 등급의 물고기다", 8);
-        createItem("(유일) 숭어", "유일 등급의 물고기다", 8);
-        createItem("(유일) 연어", "유일 등급의 물고기다", 8);
-        createItem("(유일) 잉어", "유일 등급의 물고기다", 8);
+        item = new Item("(일반) 피라미", "일반 등급의 물고기다");
+        item.getHandleLv().set(2);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 10);
+        Config.unloadObject(item);
 
-        createItem("(전설) 다금바리", "전설 등급의 물고기다", 10);
-        createItem("(전설) 돗돔", "전설 등급의 물고기다", 10);
-        createItem("(전설) 자치", "전설 등급의 물고기다", 10);
-        createItem("(전설) 쿠니마스", "전설 등급의 물고기다", 10);
+        item = new Item("(희귀) 망둑어", "희귀 등급의 물고기다");
+        item.getHandleLv().set(3);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 20);
+        Config.unloadObject(item);
 
-        createItem("(신화) 실러캔스", "신화 등급의 물고기다", 12);
-        createItem("(신화) 폐어", "신화 등급의 물고기다", 12);
+        item = new Item("(희귀) 미꾸라지", "희귀 등급의 물고기다");
+        item.getHandleLv().set(3);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 20);
+        Config.unloadObject(item);
+
+        item = new Item("(희귀) 배스", "희귀 등급의 물고기다");
+        item.getHandleLv().set(3);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 20);
+        Config.unloadObject(item);
+
+        item = new Item("(희귀) 살치", "희귀 등급의 물고기다");
+        item.getHandleLv().set(3);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 20);
+        Config.unloadObject(item);
+
+        item = new Item("(희귀) 쏘가리", "희귀 등급의 물고기다");
+        item.getHandleLv().set(3);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 20);
+        Config.unloadObject(item);
+
+        item = new Item("(희귀) 은어", "희귀 등급의 물고기다");
+        item.getHandleLv().set(3);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 20);
+        Config.unloadObject(item);
+
+        item = new Item("(특별) 강준치", "특별 등급의 물고기다");
+        item.getHandleLv().set(5);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 45);
+        Config.unloadObject(item);
+
+        item = new Item("(특별) 망둑어", "특별 등급의 물고기다");
+        item.getHandleLv().set(5);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 45);
+        Config.unloadObject(item);
+
+        item = new Item("(특별) 메기", "특별 등급의 물고기다");
+        item.getHandleLv().set(5);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 45);
+        Config.unloadObject(item);
+
+        item = new Item("(특별) 뱀장어", "특별 등급의 물고기다");
+        item.getHandleLv().set(5);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 45);
+        Config.unloadObject(item);
+
+        item = new Item("(특별) 산천어", "특별 등급의 물고기다");
+        item.getHandleLv().set(5);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 45);
+        Config.unloadObject(item);
+
+        item = new Item("(특별) 숭어", "특별 등급의 물고기다");
+        item.getHandleLv().set(5);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 45);
+        Config.unloadObject(item);
+
+        item = new Item("(특별) 쏘가리", "특별 등급의 물고기다");
+        item.getHandleLv().set(5);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 45);
+        Config.unloadObject(item);
+
+        item = new Item("(특별) 연어", "특별 등급의 물고기다");
+        item.getHandleLv().set(5);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 45);
+        Config.unloadObject(item);
+
+        item = new Item("(특별) 은어", "특별 등급의 물고기다");
+        item.getHandleLv().set(5);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 45);
+        Config.unloadObject(item);
+
+        item = new Item("(특별) 잉어", "특별 등급의 물고기다");
+        item.getHandleLv().set(5);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 45);
+        Config.unloadObject(item);
+
+        item = new Item("(유일) 강준치", "유일 등급의 물고기다");
+        item.getHandleLv().set(8);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 80);
+        Config.unloadObject(item);
+
+        item = new Item("(유일) 메기", "유일 등급의 물고기다");
+        item.getHandleLv().set(8);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 80);
+        Config.unloadObject(item);
+
+        item = new Item("(유일) 뱀장어", "유일 등급의 물고기다");
+        item.getHandleLv().set(8);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 80);
+        Config.unloadObject(item);
+
+        item = new Item("(유일) 산천어", "유일 등급의 물고기다");
+        item.getHandleLv().set(8);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 80);
+        Config.unloadObject(item);
+
+        item = new Item("(유일) 숭어", "유일 등급의 물고기다");
+        item.getHandleLv().set(8);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 80);
+        Config.unloadObject(item);
+
+        item = new Item("(유일) 연어", "유일 등급의 물고기다");
+        item.getHandleLv().set(8);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 80);
+        Config.unloadObject(item);
+
+        item = new Item("(유일) 잉어", "유일 등급의 물고기다");
+        item.getHandleLv().set(8);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 80);
+        Config.unloadObject(item);
+        
+        item = new Item("(전설) 다금바리", "전설 등급의 물고기다");
+        item.getHandleLv().set(10);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 200);
+        Config.unloadObject(item);
+
+        item = new Item("(전설) 돗돔", "전설 등급의 물고기다");
+        item.getHandleLv().set(10);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 200);
+        Config.unloadObject(item);
+
+        item = new Item("(전설) 자치", "전설 등급의 물고기다");
+        item.getHandleLv().set(10);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 200);
+        Config.unloadObject(item);
+
+        item = new Item("(전설) 쿠니마스", "전설 등급의 물고기다");
+        item.getHandleLv().set(10);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 200);
+        Config.unloadObject(item);
+
+        item = new Item("(신화) 실러캔스", "신화 등급의 물고기다");
+        item.getHandleLv().set(10);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 500);
+        Config.unloadObject(item);
+
+        item = new Item("(신화) 폐어", "신화 등급의 물고기다");
+        item.getHandleLv().set(10);
+        item.setCanEat(true);
+        item.setEatBuff(-1, StatType.HP, 500);
+        Config.unloadObject(item);
+
 
         item = new Item("전투 비활성화권(1일)", "PvP를 1일간 비활성화 하기 위해 필요한 아이템이다(중첩 불가)");
         item.setUse((self, other) -> {
@@ -489,24 +667,61 @@ public class ObjectCreator {
         });
         Config.unloadObject(item);
 
-        item = new Item("하급 제작법", "장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
+        item = new Item("하급 제작법", "하급 아이템 또는 하급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
         item.setUse((self, other) -> {
-            itemManager.giveLowRecipe((Player) self);
-            return null;
+            Random random = new Random();
+            Player player = (Player) self;
+
+            if(random.nextBoolean()) {
+                long itemId = RandomList.lowRecipeItems.get(random.nextInt(RandomList.lowRecipeItems.size()));
+
+                player.getItemRecipe().add(itemId);
+                return ItemList.findById(itemId) + " 의 제작법을 획득했습니다";
+            } else {
+                long equipId = RandomList.lowRecipeEquips.get(random.nextInt(RandomList.lowRecipeEquips.size()));
+
+                player.getEquipRecipe().add(equipId);
+                return ItemList.findById(equipId) + " 의 제작법을 획득했습니다";
+            }
         });
         Config.unloadObject(item);
 
-        item = new Item("중급 제작법", "장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
+        item = new Item("중급 제작법", "중급 아이템 또는 중급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
         item.setUse((self, other) -> {
-            itemManager.giveMiddleRecipe((Player) self);
-            return null;
+            Random random = new Random();
+            Player player = (Player) self;
+
+            if(random.nextBoolean()) {
+                long itemId = RandomList.middleRecipeItems.get(random.nextInt(RandomList.middleRecipeItems.size()));
+
+                player.getItemRecipe().add(itemId);
+                return ItemList.findById(itemId) + " 의 제작법을 획득했습니다";
+            } else {
+                long equipId = RandomList.middleRecipeEquips.get(random.nextInt(RandomList.middleRecipeEquips.size()));
+
+                player.getEquipRecipe().add(equipId);
+                return ItemList.findById(equipId) + " 의 제작법을 획득했습니다";
+            }
         });
         Config.unloadObject(item);
 
-        item = new Item("상급 제작법", "장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
+        item = new Item("상급 제작법", "상급 아이템 또는 상급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
         item.setUse((self, other) -> {
-            itemManager.giveHighRecipe((Player) self);
-            return null;
+            Random random = new Random();
+            Player player = (Player) self;
+
+            //TODO : 고급 장비 생성 시 주석 해제
+//            if(random.nextBoolean()) {
+                long itemId = RandomList.highRecipeItems.get(random.nextInt(RandomList.highRecipeItems.size()));
+
+                player.getItemRecipe().add(itemId);
+                return ItemList.findById(itemId) + " 의 제작법을 획득했습니다";
+//            } else {
+//                long equipId = RandomList.highRecipeEquips.get(random.nextInt(RandomList.highRecipeEquips.size()));
+//
+//                player.getEquipRecipe().add(equipId);
+//                return ItemList.findById(equipId) + " 의 제작법을 획득했습니다";
+//            }
         });
         Config.unloadObject(item);
 
@@ -598,41 +813,279 @@ public class ObjectCreator {
         createItem("상급 증표", "어려운 노동을 완수했다는 증표이다", 10);
 
         item = new Item("하급 부적", "하급 부적 1개를 뽑을 수 있는 아이템이다");
+        item.getHandleLv().set(2);
         item.setUse((self, other) -> {
-            //TODO
-            return "TODO";
+            long equipId = RandomList.lowAmulets.get(new Random().nextInt(RandomList.lowAmulets.size()));
+            self.addEquip(equipId);
+
+            return EquipList.findById(equipId) + " (을/를) 획득하였습니다";
         });
         Config.unloadObject(item);
 
         item = new Item("중급 부적", "중급 부적 1개를 뽑을 수 있는 아이템이다");
+        item.getHandleLv().set(5);
         item.setUse((self, other) -> {
-            //TODO
-            return "TODO";
+            long equipId = RandomList.middleAmulets.get(new Random().nextInt(RandomList.middleAmulets.size()));
+            self.addEquip(equipId);
+
+            return EquipList.findById(equipId) + " (을/를) 획득하였습니다";
         });
         Config.unloadObject(item);
 
         item = new Item("상급 부적", "상급 부적 1개를 뽑을 수 있는 아이템이다");
+        item.getHandleLv().set(8);
         item.setUse((self, other) -> {
-            //TODO
-            return "TODO";
+            long equipId = RandomList.highAmulets.get(new Random().nextInt(RandomList.highAmulets.size()));
+            self.addEquip(equipId);
+
+            return EquipList.findById(equipId) + " (을/를) 획득하였습니다";
         });
         Config.unloadObject(item);
 
-        item = new Item("양고기", "양에게서 나온 고기다");
+        item = new Item("양고기", "양에서 나온 고기다");
         item.setCanEat(true);
         item.setEatBuff(100000, StatType.ATS, 20);
         item.setEatBuff(100000, StatType.ATK, 1);
         Config.unloadObject(item);
         
-        createItem("양가죽", "양을 죽여서 얻은 가죽이다");
-        createItem("양털", "양을 죽여서 얻은 털이다");
+        createItem("양가죽", "양에서 나온 가죽이다");
+        createItem("양털", "양에서 나온 털이다");
 
-        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 147L));
+        item = new Item("돼지고기", "돼지에서 나온 고기다");
+        item.getHandleLv().set(2);
+        item.setCanEat(true);
+        item.setEatBuff(100000, StatType.ACC, 10);
+        item.setEatBuff(100000, StatType.ATS, 10);
+        Config.unloadObject(item);
+        
+        createItem("돼지머리", "행운의 상징으로 자주 쓰이는 아이템이다", 2);
+
+        item = new Item("소고기", "소에게서 나온 고기다");
+        item.getHandleLv().set(2);
+        item.setCanEat(true);
+        item.setEatBuff(50000, StatType.DEF, 3);
+        item.setEatBuff(50000, StatType.AGI, 10);
+        Config.unloadObject(item);
+
+        createItem("가죽", "소에서 나온 가죽이다", 2);
+        
+        createItem("좀비머리", "보기엔 좀 역겨운 좀비 머리다", 3);
+        createItem("좀비영혼파편", "좀비의 영혼을 강제로 해제하여 떨어진 파편이다", 3);
+        createItem("좀비심장", "심장이지만 좀비의 것이라 그런지 피는 나지 않는다", 3);
+
+        item = new Item("하급 합금", "다양한 광물을 합쳐 만든 합금이다");
+        item.getHandleLv().set(3);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.COAL.getId(), 30);
+            put(ItemList.COPPER.getId(), 20);
+            put(ItemList.LEAD.getId(), 15);
+            put(ItemList.TIN.getId(), 15);
+            put(ItemList.NICKEL.getId(), 15);
+        }}, true);
+        Config.unloadObject(item);
+
+        item = new Item("중급 합금", "다양한 광물을 합쳐 만든 괜찮은 합금이다");
+        item.getHandleLv().set(7);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.COAL.getId(), 100);
+            put(ItemList.LITHIUM.getId(), 50);
+            put(ItemList.SILVER.getId(), 20);
+            put(ItemList.GOLD.getId(), 5);
+        }}, true);
+        Config.unloadObject(item);
+
+        item = new Item("상급 합금", "다양한 광물을 합쳐 만든 질 좋은 합금이다");
+        item.getHandleLv().set(13);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.WHITE_GOLD.getId(), 10);
+            put(ItemList.TITANIUM.getId(), 30);
+            put(ItemList.LIQUID_STONE.getId(), 30);
+            put(ItemList.DIAMOND.getId(), 10);
+            put(ItemList.ORICHALCON.getId(), 10);
+            put(ItemList.LANDIUM.getId(), 2);
+            put(ItemList.AITUME.getId(), 2);
+            put(ItemList.EMPTY_SPHERE.getId(), 50);
+        }}, true);
+        Config.unloadObject(item);
+        
+        createItem("슬라임 조각", "슬라임에게서 떨어져나온 파편이다");
+        createItem("거미 다리", "찢어진 거미 다리다. 별로 좋은 형태는 아니다");
+        createItem("거미 눈", "거미 눈이다. 반짝거려서 꽤나 예쁘다");
+
+        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 160L));
         Logger.i("ObjectMaker", "Item making is done!");
     }
 
     private static void createEquips() {
-        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 1L));
+        Equipment equipment = new Equipment(EquipType.WEAPON, "목검", "나무로 만든 기본적인 검이다");
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.BRANCH.getId(), 5);
+            put(ItemList.GRASS.getId(), 5);
+        }}, true);
+        equipment.addBasicStat(StatType.ATK, 1);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.WEAPON, "철검", "철로 만든 날카로운 검이다");
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.STONE.getId(), 20);
+            put(ItemList.LAPIS.getId(), 10);
+            put(ItemList.IRON.getId(), 20);
+        }}, true);
+        equipment.addBasicStat(StatType.ATK, 3);
+        equipment.addBasicStat(StatType.ATS, 5);
+        equipment.addBasicStat(StatType.ACC, 10);
+        equipment.getHandleLv().set(3);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.WEAPON, "합검",
+                "공격 시 33% 확률로 데미지 1.1배, 33% 확률로 +2 데미지를 준다\n" +
+                "사용 시 5 마나를 소모하여 잃은 체력의 30%를 회복한다");
+        equipment.getHandleLv().set(3);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.LOW_ALLOY.getId(), 3);
+            put(ItemList.QUARTZ.getId(), 4);
+        }}, true);
+        equipment.addBasicStat(StatType.ATK, 5);
+        equipment.addBasicStat(StatType.ATS, 5);
+        equipment.getEvents().add(new DamageEvent(-1) {
+            @Override
+            public boolean onDamage(@NonNull Entity self, @NonNull Entity victim, Int totalDmg, Int totalDra, Bool isCrit) {
+                int randomValue = new Random().nextInt(3);
+
+                switch (randomValue) {
+                    case 0:
+                        break;
+
+                    case 1:
+                        totalDmg.multiple(1.1);
+                        break;
+
+                    case 2:
+                        totalDmg.add(2);
+                        break;
+                }
+
+                return false;
+            }
+        });
+        equipment.setEquipUse(new EquipUse(0, 5) {
+            @Override
+            @NonNull
+            public String use(@NonNull Entity self, @NonNull List<GameObject> other) {
+                int lostHp = self.getStat(StatType.MAXHP) - self.getStat(StatType.HP);
+                int heal = (int) (lostHp * 0.3);
+
+                self.addBasicStat(StatType.HP, heal);
+                return "마나 5를 사용하여 체력을 " + lostHp + "만큼 회복했습니다";
+            }
+        });
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.WEAPON, "하트 브레이커1", "공격 시 체력이 10% 미만인 적을 처형시킨다");
+        equipment.getHandleLv().set(4);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.IRON.getId(), 30);
+            put(ItemList.ZOMBIE_HEART.getId(), 10);
+        }}, true);
+        equipment.addBasicStat(StatType.ATK, 15);
+        equipment.addBasicStat(StatType.ATS, 50);
+        equipment.getHandleLv().set(4);
+        equipment.getEvents().add(new DamageEvent(-1) {
+            @Override
+            public boolean onDamage(@NonNull Entity self, @NonNull Entity victim, Int totalDmg, Int totalDra, Bool isCrit) {
+                int hp = victim.getStat(StatType.HP);
+                double remainPercent = (double) hp / victim.getStat(StatType.MAXHP);
+                if(remainPercent < 0.1) {
+                    totalDmg.set(Math.max(hp, totalDmg.get()));
+                }
+
+                return false;
+            }
+        });
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.WEAPON, "헤드 헌터1", "치명타 미 발동시 20% 확률로 1.8배의 치명타를 발동시킨다");
+        equipment.getHandleLv().set(5);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.RED_STONE.getId(), 30);
+            put(ItemList.PIG_HEAD.getId(), 5);
+            put(ItemList.ZOMBIE_HEAD.getId(), 5);
+        }}, true);
+        equipment.addBasicStat(StatType.ATK, 20);
+        equipment.addBasicStat(StatType.ATS, 10);
+        equipment.addBasicStat(StatType.ACC, 10);
+        equipment.addBasicStat(StatType.AGI, 10);
+        equipment.getEvents().add(new DamageEvent(-1) {
+            @Override
+            public boolean onDamage(@NonNull Entity self, @NonNull Entity victim, Int totalDmg, Int totalDra, Bool isCrit) {
+                if(!isCrit.get()) {
+                    if(Math.random() < 0.2) {
+                        isCrit.set(true);
+                        totalDmg.multiple(1.8);
+                    }
+                }
+
+                return false;
+            }
+        });
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.WEAPON, "원혼의 검1",
+                "공격시 적 최대 체력의 6%에 해당하는 추가 데미지를 입힌다\n" +
+                        "사용 시 최대 체력의 6%를 소모하여 다음 공격의 데미지를 66% 증가시킨다");
+        equipment.getHandleLv().set(6);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.ZOMBIE_SOUL.getId(), 3);
+            put(ItemList.SILVER.getId(), 20);
+        }}, true);
+        equipment.addBasicStat(StatType.ATS, 150);
+        equipment.getEvents().add(new DamageEvent(-1) {
+            @Override
+            public boolean onDamage(@NonNull Entity self, @NonNull Entity victim, Int totalDmg, Int totalDra, Bool isCrit) {
+                int maxHp = victim.getStat(StatType.MAXHP);
+                totalDmg.add(maxHp * 0.06);
+
+                if(self.getId().getId().equals(Id.PLAYER)) {
+                    Player player = (Player) self;
+
+                    if(player.getObjectVariable(Variable.GHOST_SWORD_1, false)) {
+                        totalDmg.multiple(1.66);
+                        player.removeVariable(Variable.GHOST_SWORD_1);
+                    }
+                }
+
+                return false;
+            }
+        });
+        equipment.setEquipUse(new EquipUse(0, 0.06, 0, 0, 0, 0) {
+            @Override
+            @NonNull
+            public String use(@NonNull Entity self, @NonNull List<GameObject> other) {
+                ((Player) self).setVariable(Variable.GHOST_SWORD_1, true);
+                return "최대 체력의 6%를 소모하여 다음 공격을 강화했습니다";
+            }
+        });
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.AMULET, "건강의 부적", "착용하고 있으면 건강해지는 기분이 드는 부적이다");
+        equipment.getHandleLv().set(3);
+        equipment.addBasicStat(StatType.MAXHP, 30);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.AMULET, "피의 부적", "누군가의 피가 들어간 섬뜩한 부적이다");
+        equipment.getHandleLv().set(8);
+        equipment.addBasicStat(StatType.MAXHP, 100);
+        equipment.addBasicStat(StatType.ATK, 10);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.AMULET, "용의 부적", "용이 지니고 다녔다는 부적이다");
+        equipment.getHandleLv().set(12);
+        equipment.addBasicStat(StatType.MAXHP, 200);
+        equipment.addBasicStat(StatType.DEF, 30);
+        equipment.addBasicStat(StatType.EVA, 20);
+        Config.unloadObject(equipment);
+
+        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 10L));
         Logger.i("ObjectMaker", "Equipment making is done!");
     }
 
@@ -653,7 +1106,95 @@ public class ObjectCreator {
 
         Config.unloadObject(monster);
 
-        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 2L));
+
+        monster = new Monster("돼지");
+        monster.getLv().set(8);
+        monster.setLocation(null);
+        monster.setType(MonsterType.MIDDLE);
+
+        monster.setBasicStat(StatType.MAXHP, 60);
+        monster.setBasicStat(StatType.HP, 60);
+        monster.setBasicStat(StatType.ATK, 10);
+        monster.setBasicStat(StatType.DEF, 5);
+        monster.setBasicStat(StatType.ATS, 50);
+
+        monster.setItemDrop(ItemList.PORK.getId(), 0.5D, 1, 1);
+        monster.setItemDrop(ItemList.PIG_HEAD.getId(), 0.1D, 1, 1);
+
+        Config.unloadObject(monster);
+
+
+        monster = new Monster("소");
+        monster.getLv().set(20);
+        monster.setLocation(null);
+        monster.setType(MonsterType.MIDDLE);
+
+        monster.setBasicStat(StatType.MAXHP, 100);
+        monster.setBasicStat(StatType.HP, 100);
+        monster.setBasicStat(StatType.ATK, 10);
+        monster.setBasicStat(StatType.DEF, 15);
+        monster.setBasicStat(StatType.ATS, 70);
+        monster.setBasicStat(StatType.EVA, 20);
+
+        monster.setItemDrop(ItemList.BEEF.getId(), 0.5D, 1, 1);
+        monster.setItemDrop(ItemList.LEATHER.getId(), 0.5D, 1, 1);
+
+        Config.unloadObject(monster);
+
+
+        monster = new Monster("좀비");
+        monster.getLv().set(30);
+        monster.setLocation(null);
+
+        monster.setBasicStat(StatType.MAXHP, 300);
+        monster.setBasicStat(StatType.HP, 300);
+        monster.setBasicStat(StatType.ATK, 8);
+        monster.setBasicStat(StatType.ATS, 150);
+        monster.setBasicStat(StatType.EVA, 40);
+
+        monster.setItemDrop(ItemList.ZOMBIE_HEAD.getId(), 0.1D, 1, 1);
+        monster.setItemDrop(ItemList.ZOMBIE_SOUL.getId(), 0.005D, 1, 1);
+        monster.setItemDrop(ItemList.ZOMBIE_HEART.getId(), 0.1D, 1, 1);
+
+        Config.unloadObject(monster);
+
+
+        monster = new Monster("슬라임");
+        monster.getLv().set(45);
+        monster.setLocation(null);
+
+        monster.setBasicStat(StatType.MAXHP, 500);
+        monster.setBasicStat(StatType.HP, 500);
+        monster.setBasicStat(StatType.ATK, 10);
+        monster.setBasicStat(StatType.ATS, 100);
+        monster.setBasicStat(StatType.ACC, 20);
+        monster.setBasicStat(StatType.DRA, 10);
+
+        monster.setItemDrop(ItemList.PIECE_OF_SLIME.getId(), 1D, 1, 3);
+
+        Config.unloadObject(monster);
+
+
+        monster = new Monster("거미");
+        monster.getLv().set(50);
+        monster.setLocation(null);
+
+        monster.setBasicStat(StatType.MAXHP, 75);
+        monster.setBasicStat(StatType.HP, 75);
+        monster.setBasicStat(StatType.ATK, 30);
+        monster.setBasicStat(StatType.DEF, 10);
+        monster.setBasicStat(StatType.ATS, 200);
+        monster.setBasicStat(StatType.ACC, 20);
+        monster.setBasicStat(StatType.EVA, 40);
+        monster.setBasicStat(StatType.AGI, 200);
+
+        monster.setItemDrop(ItemList.SPIDER_LEG.getId(), 0.3D, 1, 1);
+        monster.setItemDrop(ItemList.SPIDER_POISON.getId(), 0.02D, 1, 1);
+
+        Config.unloadObject(monster);
+
+
+        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 7L));
         Logger.i("ObjectMaker", "Monster making is done!");
     }
 
@@ -667,18 +1208,16 @@ public class ObjectCreator {
         map.getLocation().set(0, 1, 1, 1);
         Config.unloadMap(map);
 
-        for(int y = 2; y <= 10; y++) {
-            map = new GameMap(Config.INCOMPLETE);
-            map.getLocation().setMap(0, y);
-            map.setMapType(MapType.FIELD);
-            map.getLocation().set(0, y, 1, 1);
-            Config.unloadMap(map);
-        }
+        map = new GameMap(MapList.findByLocation(0, 2));
+        map.setMapType(MapType.CAVE);
+        map.getLocation().set(0, 2, 1, 1);
+        map.setSpawnMonster(MonsterList.SPIDER.getId(), 1D, 4);
+        Config.unloadMap(map);
 
         map = new GameMap(MapList.findByLocation(1, 0));
         map.setMapType(MapType.FIELD);
         map.getLocation().set(1, 0, 1, 1);
-        map.setSpawnMonster(MonsterList.SHEEP.getId(), 1D, 4);
+        map.setSpawnMonster(MonsterList.SHEEP.getId(), 1D, 8);
         Config.unloadMap(map);
 
         map = new GameMap(MapList.findByLocation(1, 1));
@@ -686,9 +1225,36 @@ public class ObjectCreator {
         map.getLocation().set(1, 1, 1, 1);
         Config.unloadMap(map);
 
-        for(int x = 1; x <= 10; x++) {
+        map = new GameMap(MapList.findByLocation(1, 2));
+        map.setMapType(MapType.SWAMP);
+        map.getLocation().set(1, 2, 1, 1);
+        map.setSpawnMonster(MonsterList.SLIME.getId(), 1, 8);
+        Config.unloadMap(map);
+
+        map = new GameMap(MapList.findByLocation(2, 0));
+        map.setMapType(MapType.FIELD);
+        map.getRequireLv().set(5);
+        map.getLocation().set(2, 0, 1, 1);
+        map.setSpawnMonster(MonsterList.PIG.getId(), 1D, 8);
+        Config.unloadMap(map);
+
+        map = new GameMap(MapList.findByLocation(2, 1));
+        map.setMapType(MapType.FIELD);
+        map.getRequireLv().set(15);
+        map.getLocation().set(2, 1, 1, 1);
+        map.setSpawnMonster(MonsterList.COW.getId(), 1D, 8);
+        Config.unloadMap(map);
+
+        map = new GameMap(MapList.findByLocation(2, 2));
+        map.setMapType(MapType.CEMETERY);
+        map.getRequireLv().set(20);
+        map.getLocation().set(2, 2, 1, 1);
+        map.setSpawnMonster(MonsterList.ZOMBIE.getId(), 1D, 3);
+        Config.unloadMap(map);
+
+        for(int x = 0; x <= 10; x++) {
             for(int y = 0; y <= 10; y++) {
-                if(x == 1 && y <= 1) {
+                if(!MapList.findByLocation(x, y).equals(Config.INCOMPLETE)) {
                     continue;
                 }
 
@@ -698,16 +1264,6 @@ public class ObjectCreator {
                 map.getLocation().set(x, y, 1, 1);
                 Config.unloadMap(map);
             }
-        }
-
-        Player player;
-        for(String[] playerData : Config.PLAYER_LIST.values()) {
-            player = Config.loadPlayer(playerData[0], playerData[1]);
-            Config.unloadObject(player);
-
-            map = Config.loadMap(player.getLocation());
-            map.addEntity(player);
-            Config.unloadMap(map);
         }
 
         Logger.i("ObjectMaker", "Map making is done!");
@@ -723,7 +1279,7 @@ public class ObjectCreator {
     private static void createChats() {
         Chat chat = createChat(null, 1L,
                 "드디어 일어났네 __nickname",
-                "이 소리가 어디서 들려오는지는 아직은 몰라도 되. 결국엔 알게 될테니까",
+                "이 소리가 어디서 들려오는지는 아직은 몰라도 돼. 결국엔 알게 될테니까",
                 "어찌됬든 넌 여기서 성장해야만 해. 그리고 니가 나한테 했던 약속을 지켜야겠지",
                 "음 뭐가됬든 기본적인거부터 가르쳐줄게. " + Emoji.focus("n 도움말") +
                         " 을 입력해서 명령어를 살펴봐"
@@ -744,6 +1300,9 @@ public class ObjectCreator {
         chat.setAnyResponseChat("__정보", 3L, true);
         chat.setAnyResponseChat("__info", 3L, true);
         chat.setAnyResponseChat("__i", 3L, true);
+        chat.setAnyResponseChat("__정보 __nickname", 3L, true);
+        chat.setAnyResponseChat("__info __nickname", 3L, true);
+        chat.setAnyResponseChat("__i __nickname", 3L, true);
         Config.unloadObject(chat);
 
         chat = createChat(null, 3L,
@@ -1014,8 +1573,50 @@ public class ObjectCreator {
                 "말해줄 수 있는건 정말 강하시단거 정도?"
         );
         Config.unloadObject(chat);
+        
+        chat = createChat("후우... 지금은 어떤가요", 52L,
+                "하하하 이제 이정도는 버틴다는 건가?",
+                "그래 좋군, 하지만 아직 부족하네",
+                "자네의 경험을 증명해 보게나",
+                "하급 모험의 증표 3개, 하급 낚시꾼의 증표 10개, 하급 광부의 증표 30개",
+                "받아들이곘는가?"
+        );
+        chat.setResponseChat(WaitResponse.YES, 53L, true);
+        chat.setResponseChat(WaitResponse.NO, 54L, true);
+        Config.unloadObject(chat);
 
-        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 52L));
+        chat = createChat(null, 53L,
+                "좋아 좋아. 그정도 의지는 있어야지",
+                "기다리고 있겠네"
+        );
+        chat.getQuestId().set(5L);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 54L, 
+                "흠... 그정도 의지도 없는겐가?",
+                "약간 실망이군"
+        );
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 55L,
+                "자네의 경험은 증명 됬네",
+                "조금 더 성장해서 오는 그 때를 기대하고 있겠네"
+        );
+        Config.unloadObject(chat);
+        
+        chat = createChat("아무것도 아닙니다", 56L,
+                "그래 빨리 성장해서 오게나"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat("무명은 어떤 분이셔?", 57L,
+                "내 스승님이자...",
+                "과거 국가의 소드마스터이셨던 분",
+                "딱 여기까지 알려줄 수 있겠네.."
+        );
+        Config.unloadObject(chat);
+
+        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 58L));
         Logger.i("ObjectMaker", "Chat making is done!");
    }
 
@@ -1023,26 +1624,37 @@ public class ObjectCreator {
        Quest quest = new Quest("광부의 일", NpcList.NOAH.getId(), 13L);
        quest.setNeedItem(ItemList.STONE.getId(), 30);
        quest.setRewardCloseRate(NpcList.NOAH.getId(), 1, true);
-       quest.getRewardExp().set(20000L);
+       quest.getRewardExp().set(50000L);
        quest.getRewardMoney().set(250L);
        Config.unloadObject(quest);
 
        quest = new Quest("쓰레기 수거", NpcList.NOAH.getId(), 13L);
-       quest.setNeedItem(ItemList.TRASH.getId(), 5);
+       quest.setNeedItem(ItemList.TRASH.getId(), 3);
        quest.setRewardCloseRate(NpcList.NOAH.getId(), 1, true);
-       quest.getRewardExp().set(50000L);
+       quest.getRewardExp().set(100000L);
        Config.unloadObject(quest);
 
        quest = new Quest("불이 필요해!", NpcList.NOAH.getId(), 19L);
        quest.setNeedItem(ItemList.RED_SPHERE.getId(), 1);
        quest.setRewardCloseRate(NpcList.NOAH.getId(), 5, true);
+       quest.getRewardExp().set(300000L);
        quest.getRewardMoney().set(500L);
        Config.unloadObject(quest);
        
        quest = new Quest("불이 너무 강했나?", NpcList.NOAH.getId(), 23L);
        quest.setNeedItem(ItemList.LOW_MP_POTION.getId(), 3);
        quest.setRewardCloseRate(NpcList.NOAH.getId(), 10, true);
-       quest.getRewardItem().put(ItemList.STAT_POINT.getId(), 20);
+       quest.getRewardItem().put(ItemList.STAT_POINT.getId(), 30);
+       Config.unloadObject(quest);
+       
+       quest = new Quest("경험을 증명해라", NpcList.MOO_MYEONG.getId(), 55L);
+       quest.setNeedItem(ItemList.LOW_ADV_TOKEN.getId(), 3);
+       quest.setNeedItem(ItemList.LOW_FISH_TOKEN.getId(), 10);
+       quest.setNeedItem(ItemList.LOW_MINER_TOKEN.getId(), 30);
+       quest.setRewardCloseRate(NpcList.MOO_MYEONG.getId(), 10, true);
+       quest.setRewardCloseRate(NpcList.SELINA.getId(), 10, true);
+       quest.setRewardItem(ItemList.LOW_EXP_POTION.getId(), 5);
+       quest.setRewardItem(ItemList.ADV_STAT.getId(), 10);
        Config.unloadObject(quest);
 
        Config.ID_COUNT.put(Id.QUEST, Math.max(Config.ID_COUNT.get(Id.CHAT), 5L));
@@ -1198,7 +1810,19 @@ public class ObjectCreator {
 
         npc.setBaseChat(new ChatLimit(), 46L);
 
-        npc.setChat(new ChatLimit(), 47L);
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitLv().set(1, 10);
+        npc.setChat(chatLimit, 47L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitLv().set(11, Config.MAX_LV);
+        chatLimit.getNotClearedQuest().add(QuestList.PROVE_EXPERIENCE.getId());
+        chatLimit.getNotRunningQuest().add(QuestList.PROVE_EXPERIENCE.getId());
+        npc.setChat(chatLimit, 52L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitCloseRate().getMin().put(NpcList.MOO_MYEONG.getId(), 10);
+        npc.setChat(chatLimit, 56L);
 
         Config.unloadObject(npc);
 
@@ -1216,7 +1840,12 @@ public class ObjectCreator {
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(21, 23);
         chatLimit.getLimitHour2().set(0, 8);
+        chatLimit.getLimitCloseRate().getMax().put(NpcList.SELINA.getId(), 9);
         npc.setChat(chatLimit, 51L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitCloseRate().getMin().put(NpcList.SELINA.getId(), 10);
+        npc.setChat(chatLimit, 57L);
 
         Config.unloadObject(npc);
 

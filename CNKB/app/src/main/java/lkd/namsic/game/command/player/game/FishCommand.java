@@ -9,6 +9,7 @@ import java.util.List;
 
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.enums.Doing;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.exception.DoingFilterException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Player;
@@ -21,11 +22,18 @@ public class FishCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if(player.getDoing().equals(Doing.NONE)) {
-            if(second != null) {
-                throw new WeirdCommandException();
-            }
+            if(second == null) {
+                FishManager.getInstance().tryFish(player, player.getVariable(Variable.FISH));
+            } else {
+                int fishLv = player.getVariable(Variable.FISH);
+                int inputLv = Integer.parseInt(second);
 
-            FishManager.getInstance().tryFish(player);
+                if(inputLv < 0 || inputLv > fishLv) {
+                    throw new WeirdCommandException("낚시 레벨은 0 이상, " + fishLv + "(현재 레벨) 이하여야 합니다");
+                }
+
+                FishManager.getInstance().tryFish(player, inputLv);
+            }
         } else if(player.getDoing().equals(Doing.FISH)) {
             if(second == null) {
                 throw new WeirdCommandException();

@@ -9,8 +9,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.game.config.Config;
 import lkd.namsic.game.base.LimitInteger;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
@@ -33,14 +33,6 @@ public abstract class AiEntity extends Entity {
 
     public AiEntity(@NonNull String name) {
         super(name);
-    }
-
-    @NonNull
-    public EquipType equip(long equipId, double dropPercent) {
-        EquipType equipType = super.equip(equipId);
-        this.setEquipDropPercent(equipType, dropPercent);
-
-        return equipType;
     }
 
     public void setItemDrop(long itemId, double percent, int minCount, int maxCount) {
@@ -138,6 +130,10 @@ public abstract class AiEntity extends Entity {
             }
         }
 
+        GameMap map = Config.loadMap(this.location);
+        map.removeEntity(this);
+        Config.unloadMap(map);
+
         Config.deleteAiEntity(this);
     }
 
@@ -168,12 +164,6 @@ public abstract class AiEntity extends Entity {
             this.setBasicStat(StatType.HP, this.getStat(StatType.MAXHP));
             this.setBasicStat(StatType.MN, this.getStat(StatType.MAXMN));
         }
-    }
-
-    @NonNull
-    @Override
-    public EquipType equip(long equipId) {
-        return this.equip(equipId, 1);
     }
 
 }

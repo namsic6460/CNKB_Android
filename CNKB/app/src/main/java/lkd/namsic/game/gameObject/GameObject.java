@@ -33,7 +33,7 @@ public abstract class GameObject implements Cloneable {
             return true;
         } else if(obj instanceof GameObject) {
             GameObject gameObject = (GameObject) obj;
-            return this.id.getId().equals(gameObject.id.getId()) && this.id.getObjectId() == gameObject.getId().getObjectId();
+            return this.id.equals(gameObject.id);
         }
 
         return false;

@@ -2,11 +2,13 @@ package lkd.namsic.game.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import lkd.namsic.game.enums.object_list.EquipList;
 import lkd.namsic.game.enums.object_list.ItemList;
 
 public class RandomList {
@@ -199,7 +201,7 @@ public class RandomList {
             Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0D, 0D, 1D)
     );
 
-    public static final Map<Integer, Map<Long, Integer>> EXPLORE_LIST = new HashMap<Integer, Map<Long, Integer>>() {{
+    public static final Map<Integer, Map<Long, Integer>> ADVENTURE_LIST = new HashMap<Integer, Map<Long, Integer>>() {{
         put(1, new HashMap<Long, Integer>() {{
             put(ItemList.STONE.getId(), 150000);
             put(ItemList.BRANCH.getId(), 150000);
@@ -569,5 +571,48 @@ public class RandomList {
     public static long getRandomJewelry() {
         return jewelries.get(new Random().nextInt(jewelries.size()));
     }
+
+    public static final List<Long> lowRecipeItems = Arrays.asList(
+            ItemList.PIECE_OF_MANA.getId(),
+            ItemList.STONE.getId(),
+            ItemList.GOLD.getId(),
+            ItemList.LOW_ALLOY.getId()
+    );
+
+    public static final List<Long> middleRecipeItems = Arrays.asList(
+            ItemList.GLOW_LAPIS.getId(),
+            ItemList.GLOW_RED_STONE.getId(),
+            ItemList.WHITE_GOLD.getId(),
+            ItemList.MIDDLE_ALLOY.getId()
+    );
+
+    public static final List<Long> highRecipeItems = Arrays.asList(
+            ItemList.LIQUID_STONE.getId(),
+            ItemList.DIAMOND.getId(),
+            ItemList.LAPIS_RED_STONE.getId(),
+            ItemList.LANDIUM.getId(),
+            ItemList.AITUME.getId(),
+            ItemList.HIGH_ALLOY.getId()
+    );
+
+    public static final List<Long> lowRecipeEquips = Arrays.asList(
+            EquipList.WOODEN_SWORD.getId(),
+            EquipList.IRON_SWORD.getId(),
+            EquipList.MIX_SWORD.getId()
+    );
+
+    public static final List<Long> middleRecipeEquips = Arrays.asList(
+            EquipList.HEART_BREAKER_1.getId(),
+            EquipList.HEAD_HUNTER_1.getId(),
+            EquipList.GHOST_SWORD_1.getId()
+    );
+
+    public static final List<Long> highRecipeEquips = Collections.emptyList();
+
+    public static final List<Long> lowAmulets = Collections.singletonList(EquipList.HEALTH_AMULET.getId());
+
+    public static final List<Long> middleAmulets = Collections.singletonList(EquipList.BLOOD_AMULET.getId());
+
+    public static final List<Long> highAmulets = Collections.singletonList(EquipList.DRAGON_AMULET.getId());
 
 }

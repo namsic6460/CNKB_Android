@@ -29,9 +29,7 @@ public class UseCommand extends PlayerCommand {
             itemName = command.replace(lastWord, "");
         } catch (NumberFormatException ignore) {}
 
-        if (!ItemManager.getInstance().tryUse(player, itemName.trim(), count)) {
-            player.replyPlayer("아이템 사용에 실패했습니다");
-        }
+        ItemManager.getInstance().tryUse(player, itemName.trim(), count);
     }
 
 }

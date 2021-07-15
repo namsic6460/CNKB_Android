@@ -21,7 +21,14 @@ import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.MonsterType;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.WaitResponse;
+import lkd.namsic.game.event.DamageEvent;
+import lkd.namsic.game.event.DeathEvent;
+import lkd.namsic.game.event.ItemEatEvent;
+import lkd.namsic.game.event.ItemUseEvent;
+import lkd.namsic.game.event.MoneyChangeEvent;
+import lkd.namsic.game.event.MoveEvent;
 import lkd.namsic.game.gameObject.Achieve;
 import lkd.namsic.game.gameObject.AiEntity;
 import lkd.namsic.game.gameObject.Boss;
@@ -39,7 +46,7 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.gameObject.Quest;
 import lkd.namsic.game.gameObject.Research;
 import lkd.namsic.game.gameObject.Skill;
-import lkd.namsic.game.gameObject.Use;
+import lkd.namsic.game.base.Use;
 
 public class Eval {
 
@@ -75,7 +82,15 @@ public class Eval {
             ScriptableObject.putProperty(scope, "MapType", MapType.class);
             ScriptableObject.putProperty(scope, "MonsterType", MonsterType.class);
             ScriptableObject.putProperty(scope, "StatType", StatType.class);
+            ScriptableObject.putProperty(scope, "Variable", Variable.class);
             ScriptableObject.putProperty(scope, "WaitResponse", WaitResponse.class);
+
+            ScriptableObject.putProperty(scope, "DamageEvent", DamageEvent.class);
+            ScriptableObject.putProperty(scope, "DeathEvent", DeathEvent.class);
+            ScriptableObject.putProperty(scope, "ItemEatEvent", ItemEatEvent.class);
+            ScriptableObject.putProperty(scope, "ItemUseEvent", ItemUseEvent.class);
+            ScriptableObject.putProperty(scope, "MoneyChangeEvent", MoneyChangeEvent.class);
+            ScriptableObject.putProperty(scope, "MoveEvent", MoveEvent.class);
 
             ScriptableObject.putProperty(scope, "Achieve", Achieve.class);
             ScriptableObject.putProperty(scope, "AiEntity", AiEntity.class);

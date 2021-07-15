@@ -1,4 +1,4 @@
-package lkd.namsic.game.enums.object_list;
+ package lkd.namsic.game.enums.object_list;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,8 +14,13 @@ public enum MapList {
 
     START_VILLAGE("시작의 마을", 0, 0),
     QUITE_SEASHORE("조용한 바닷가", 0, 1),
+    DARK_CAVE("어두운 동굴", 0, 1),
     ADVENTURE_FIELD("모험의 평원", 1, 0),
-    PEACEFUL_RIVER("평화로운 강", 1, 1);
+    PEACEFUL_RIVER("평화로운 강", 1, 1),
+    SLIME_SWAMP("슬라임 늪지", 1, 2),
+    FERTILE_FARM("비옥한 농장", 2, 0),
+    BLUE_FIELD("푸른 초원", 2, 1),
+    VILLAGE_CEMETERY("마을 공동묘지", 2, 2);
 
     public static final Map<String, MapList> nameMap = new HashMap<>();
     public static final Map<Location, MapList> locationMap = new HashMap<>();

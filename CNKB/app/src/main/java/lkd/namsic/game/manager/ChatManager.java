@@ -43,8 +43,10 @@ public class ChatManager {
 
         if(msg.startsWith("__")) {
             return;
-        } else if(msg.startsWith("n ") || msg.startsWith("ㅜ ")) {
-            response = msg.replaceAll("n ", "__").replaceAll("ㅜ ", "__");
+        } else if(msg.startsWith("N") || msg.startsWith("n ") || msg.startsWith("ㅜ ")) {
+            response = msg.replaceFirst("n ", "__")
+                    .replaceFirst("ㅜ ", "__")
+                    .replaceFirst("N ", "__");
         } else {
             response = msg;
         }
@@ -208,8 +210,12 @@ public class ChatManager {
 
                         self.getResponseChat().clear();
                         self.getResponseChat().putAll(chat.getResponseChat());
+
                         self.getAnyResponseChat().clear();
-                        self.getAnyResponseChat().putAll(chat.getAnyResponseChat());
+                        for(Map.Entry<String, Long> entry : chat.getAnyResponseChat().entrySet()) {
+                            self.getAnyResponseChat().put(entry.getKey()
+                                    .replace("__nickname", self.getNickName()), entry.getValue());
+                        }
 
                         boolean isTutorial = self.getObjectVariable(Variable.IS_TUTORIAL, false);
                         if (!isTutorial) {

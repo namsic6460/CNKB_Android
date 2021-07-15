@@ -37,7 +37,7 @@ public enum ItemList {
     QUARTZ("석영", 22L),
     COPPER("구리", 23L),
     LEAD("납", 24L),
-    TIn("주석", 25L),
+    TIN("주석", 25L),
     NICKEL("니켈", 26L),
     IRON("철", 27L),
     LITHIUM("리튬", 28L),
@@ -173,7 +173,26 @@ public enum ItemList {
 
     LAMB("양고기", 144L),
     SHEEP_LEATHER("양가죽", 145L),
-    WOOL("양털", 146L);
+    WOOL("양털", 146L),
+
+    PORK("돼지고기", 147L),
+    PIG_HEAD("돼지머리", 148L),
+
+    BEEF("소고기", 149L),
+    LEATHER("가죽", 150L),
+
+    ZOMBIE_HEAD("좀비머리", 151L),
+    ZOMBIE_SOUL("좀비영혼파편", 152L),
+    ZOMBIE_HEART("좀비심장", 153L),
+
+    LOW_ALLOY("하급 합금", 154L),
+    MIDDLE_ALLOY("중급 합금", 155L),
+    HIGH_ALLOY("상급 합금", 156L),
+
+    PIECE_OF_SLIME("슬라임 조각", 157L),
+
+    SPIDER_LEG("거미 다리", 158L),
+    SPIDER_POISON("거미 눈", 159L);
 
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();

@@ -6,14 +6,13 @@ import androidx.annotation.Nullable;
 import java.util.HashMap;
 
 import lkd.namsic.game.base.RangeIntegerMap;
+import lkd.namsic.game.base.Use;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class Skill extends NamedObject {
 
     @Setter

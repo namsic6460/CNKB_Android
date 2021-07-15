@@ -3,24 +3,16 @@ package lkd.namsic.game.manager;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
+import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
-import lkd.namsic.game.enums.Variable;
-import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
-import lkd.namsic.game.enums.object_list.EquipList;
-import lkd.namsic.game.enums.object_list.ItemList;
-import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Item;
 import lkd.namsic.game.gameObject.GameMap;
 import lkd.namsic.game.gameObject.Npc;
 import lkd.namsic.game.gameObject.Player;
@@ -34,7 +26,7 @@ public class DisplayManager {
         return instance;
     }
 
-    public void displayItemInfo(@NonNull Player self, @NonNull Player target) {
+    public void displayInfo(@NonNull Player self, @NonNull Player target) {
         StringBuilder innerMsg = new StringBuilder();
 
         if(self.equals(target)) {
@@ -54,7 +46,7 @@ public class DisplayManager {
                 .append("\n연구 완료 개수: ")
                 .append(target.getResearch().size());
 
-        self.replyPlayer("===내 정보===\n" +
+        self.replyPlayer("===" + target.getNickName() + "님의 정보===\n" +
                         Emoji.GOLD + " 골드: " + target.getMoney() + "G\n" +
                         Emoji.HEART + " 체력: " + target.getDisplayHp() + "\n" +
                         Emoji.MANA + " 마나: " + target.getDisplayMn() + "\n" +
@@ -122,12 +114,12 @@ public class DisplayManager {
                     .append("] ")
                     .append(quest.getName());
 
-            Long npcId = quest.getNpcId().get();
+            Long npcId = quest.getClearNpcId().get();
             if(!npcId.equals(0L)) {
                 Npc npc = Config.getData(Id.NPC, npcId);
 
-                builder.append(" (NPC: ")
-                        .append(npc.getName())
+                builder.append("(NPC: ")
+                        .append(npc.getRealName())
                         .append(")");
             }
         }
@@ -149,62 +141,6 @@ public class DisplayManager {
         }
 
         return builder.toString();
-    }
-
-    public void displayInventory(@NonNull Player self, int page) {
-        if(self.getInventory().isEmpty()) {
-            self.replyPlayer("---인벤토리---\n인벤토리가 비어있습니다...");
-            return;
-        }
-
-        int maxPage = (int) Math.ceil(self.getInventory().size() / 30D);
-
-        if(page < 1 || page > maxPage) {
-            throw new WeirdCommandException(page + "페이지 부터 " + maxPage + "페이지 범위 내의 숫자를 입력해주세요");
-        }
-
-        List<Long> highPriorityItems = self.getListVariable(Variable.HIGH_PRIORITY_ITEM);
-
-        StringBuilder msg = new StringBuilder("---인벤토리---\n[")
-                .append(page)
-                .append("페이지 /")
-                .append(maxPage)
-                .append("페이지]");
-
-        if(highPriorityItems.isEmpty()) {
-            msg.append("\n우선 표시 설정된 아이템이 없습니다");
-        } else {
-            for(long itemId : highPriorityItems) {
-                msg.append("\n")
-                        .append(ItemList.findById(itemId))
-                        .append(": ")
-                        .append(self.getItem(itemId))
-                        .append("개");
-            }
-        }
-
-        StringBuilder innerMsg = new StringBuilder();
-
-        int count = 0;
-        List<Long> sortedList = new ArrayList<>(self.getInventory().keySet());
-        Collections.sort(sortedList);
-        for(long itemId : sortedList) {
-            if(highPriorityItems.contains(itemId)) {
-                continue;
-            }
-
-            innerMsg.append(ItemList.findById(itemId))
-                    .append(": ")
-                    .append(self.getItem(itemId))
-                    .append("개\n");
-            count++;
-
-            if(count == 30) {
-                break;
-            }
-        }
-
-        self.replyPlayer(msg.toString(), innerMsg.toString());
     }
 
     public void displayMapList(@NonNull Player self) {
@@ -265,158 +201,6 @@ public class DisplayManager {
         self.replyPlayer(msg.toString(), innerMsg.toString());
     }
 
-    public void displayRecipes(@NonNull Player self, boolean isItem) {
-        StringBuilder msg;
-
-        List<Long> sortedList;
-
-        if(isItem) {
-            sortedList = new ArrayList<>(self.getItemRecipe());
-            Collections.sort(sortedList);
-
-            msg = new StringBuilder("---아이템 목록---");
-        } else {
-            sortedList = new ArrayList<>(self.getEquipRecipe());
-            Collections.sort(sortedList);
-
-            msg = new StringBuilder("---장비 목록---");
-        }
-
-        if(sortedList.isEmpty()) {
-            //아이템의 경우, 기본으로 제공되는 제작법이 존재한다
-            msg.append("\n제작법을 아는 장비가 없습니다");
-            self.replyPlayer(msg.toString());
-            return;
-        }
-
-        StringBuilder innerMsg = new StringBuilder();
-
-        boolean flag = false;
-        if(isItem) {
-            List<Long> highPriorityItems = self.getListVariable(Variable.HIGH_PRIORITY_ITEM);
-
-            if (highPriorityItems.isEmpty()) {
-                msg.append("\n우선 표시 설정된 아이템이 없습니다");
-            } else {
-                for (long itemId : highPriorityItems) {
-                    if (self.getItemRecipe().contains(itemId)) {
-                        flag = true;
-                        msg.append("\n")
-                                .append(ItemList.findById(itemId));
-                    }
-                }
-            }
-
-            if(!flag) {
-                msg.append("\n우선 표시 설정된 제작법을 아는 아이템이 없습니다");
-            }
-
-            for(long itemId : sortedList) {
-                if(highPriorityItems.contains(itemId)) {
-                    continue;
-                }
-
-                innerMsg.append(ItemList.findById(itemId)).append("\n");
-            }
-        } else {
-            for(long equipId : sortedList) {
-                innerMsg.append(EquipList.findById(equipId)).append("\n");
-            }
-        }
-
-        self.replyPlayer(msg.toString(), innerMsg.toString());
-    }
-
-    public void displayRecipe(@NonNull Player self, @NonNull String itemName) {
-        boolean isItem = true;
-        Long itemId = ItemList.findByName(itemName);
-        Set<Long> recipeSet;
-
-        if(itemId == null) {
-            isItem = false;
-            itemId = EquipList.findByName(itemName);
-            recipeSet = self.getEquipRecipe();
-
-            if(itemId == null) {
-                throw new WeirdCommandException("해당 아이템 또는 장비를 찾을 수 없습니다\n" +
-                        "띄어쓰기나 괄호 등 정확한 이름을 입력해주세요");
-            }
-        } else {
-            recipeSet = self.getItemRecipe();
-        }
-
-        if(!recipeSet.contains(itemId)) {
-            if(isItem) {
-                throw new WeirdCommandException("해당 아이템의 제작법을 알고 있지 않습니다");
-            } else {
-                throw new WeirdCommandException("해당 장비의 제작법을 알고 있지 않습니다");
-            }
-        }
-
-        StringBuilder msg = new StringBuilder("---")
-                .append(itemName)
-                .append("의 제작법---");
-
-        int index = 1;
-        Item item = Config.getData(isItem ? Id.ITEM : Id.EQUIPMENT, itemId);
-        for(Map<Long, Integer> recipe : item.getRecipe()) {
-            int size = recipe.size();
-            int count = 0;
-
-            long tempItemId;
-            Item tempItem;
-            int resultCount = 1;
-
-            msg.append("\n")
-                    .append(index++)
-                    .append(". ");
-
-            for(Map.Entry<Long, Integer> entry : recipe.entrySet()) {
-                count++;
-
-                tempItemId = entry.getKey();
-                if(tempItemId == ItemList.NONE.getId()) {
-                    resultCount = entry.getValue();
-                    continue;
-                }
-
-                tempItem = Config.getData(Id.ITEM, tempItemId);
-
-                msg.append(tempItem.getName())
-                        .append(" ")
-                        .append(entry.getValue())
-                        .append("개");
-
-                if(size != count) {
-                    msg.append(" + ");
-                }
-            }
-
-            msg.append(" => ")
-                    .append(resultCount)
-                    .append("개");
-        }
-
-        self.replyPlayer(msg.toString());
-    }
-
-    public void displayItemInfo(@NonNull Player self, @NonNull String itemName) {
-        Id id = Id.ITEM;
-        Long itemId = ItemList.findByName(itemName);
-
-        if(itemId == null) {
-            id = Id.EQUIPMENT;
-            itemId = EquipList.findByName(itemName);
-
-            if(itemId == null) {
-                throw new WeirdCommandException("알 수 없는 아이템 또는 장비입니다");
-            }
-        }
-
-        Item item = Config.getData(id, itemId);
-        self.replyPlayer("[" + item.getName() + "]\n" + item.getDescription());
-    }
-
     public void displayStatInfo(@NonNull Player self) {
         self.replyPlayer("스텟에 관한 정보는 전체보기로 확인해주세요",
                 "---스텟 정보---\n" +
@@ -434,7 +218,7 @@ public class DisplayManager {
                         StatType.AGI.getUseSp() + "SP)\n" +
                         Emoji.LIST + " 공격 속도(Ats) : 전투에서 턴을 가져올 상대적 우선권 나타냅니다 (" +
                         StatType.ATS.getUseSp() + "SP)\n" +
-                        Emoji.LIST + " 방어력(DEF) : 물리 데미지를 방어하는 수치를 나타냅니다 (" +
+                        Emoji.LIST + " 방어력(Def) : 물리 데미지를 방어하는 수치를 나타냅니다 (" +
                         StatType.DEF.getUseSp() + "SP)\n" +
                         Emoji.LIST + " 마법 방어력(MDef) : 마법 데미지를 방어하는 수치를 나타냅니다 (" +
                         StatType.MDEF.getUseSp() + "SP)\n" +
@@ -451,6 +235,25 @@ public class DisplayManager {
                         Emoji.LIST + " 정확도(Acc) : 공격 시 대상의 회피를 상쇄하는 수치를 나타냅니다 (" +
                         StatType.ACC.getUseSp() + "SP)"
         );
+    }
+
+    public void displayLvRanking(@NonNull Player self) {
+        List<String> sortedList = new ArrayList<>(Config.PLAYER_LV_RANK.keySet());
+        sortedList.sort((o1, o2) -> Integer.compare(Config.PLAYER_LV_RANK.get(o2), Config.PLAYER_LV_RANK.get(o1)));
+
+        StringBuilder innerBuilder = new StringBuilder(Config.SPLIT_BAR);
+
+        int rank = 1;
+        for(String name : sortedList) {
+            innerBuilder.append("\n")
+                    .append(rank++)
+                    .append(". ")
+                    .append(name)
+                    .append("\n")
+                    .append(Config.SPLIT_BAR);
+        }
+
+        self.replyPlayer("레벨 랭킹은 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
 }

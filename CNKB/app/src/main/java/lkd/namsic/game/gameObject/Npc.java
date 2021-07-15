@@ -1,5 +1,7 @@
 package lkd.namsic.game.gameObject;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -11,10 +13,13 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.base.ChatLimit;
+import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.object_list.NpcList;
+import lkd.namsic.game.event.Event;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.manager.ChatManager;
 import lombok.Getter;
@@ -75,6 +80,7 @@ public class Npc extends Entity {
     private List<Long> getAvailableBaseChat(@NonNull Player player) {
         List<Long> list = new ArrayList<>();
 
+        Log.i("namsic!", this.baseChat.toString());
         for(Map.Entry<ChatLimit, ConcurrentHashSet<Long>> entry : this.baseChat.entrySet()) {
             if(entry.getKey().isAvailable(player)) {
                 list.addAll(entry.getValue());
@@ -130,6 +136,31 @@ public class Npc extends Entity {
     @Override
     public void onKill(@NonNull Entity entity) {
         throw new RuntimeException("Why onKill in NPC?");
+    }
+
+    @Deprecated
+    @Override
+    public Map<String, ConcurrentArrayList<Event>> getEvents() {
+        throw new RuntimeException("Deprecated");
+    }
+
+    @Deprecated
+    @Override
+    public Map<EquipType, ConcurrentArrayList<Event>> getEquipEvents() {
+        throw new RuntimeException("Deprecated");
+    }
+
+    @Deprecated
+    @NonNull
+    @Override
+    public List<Event> getEvents(@NonNull String eventName) {
+        throw new RuntimeException("Deprecated");
+    }
+
+    @Deprecated
+    @Override
+    public void addEvent(@NonNull Event event) {
+        throw new RuntimeException("Deprecated");
     }
 
     @NonNull

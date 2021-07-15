@@ -13,9 +13,7 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.gameObject.Player;
 import lombok.Getter;
-import lombok.ToString;
 
-@ToString
 @Getter
 public class ChatLimit {
 
@@ -41,7 +39,7 @@ public class ChatLimit {
 
     public boolean isAvailable(@NonNull Player player) {
         boolean flag = this.getLimitLv().isInRange(player.getLv().get()) &&
-                this.getLimitCloseRate().isInRange(player.getCloseRate()) &&
+                this.limitCloseRate.isInRange(player.getCloseRate()) &&
                 player.compareStat(this.limitStat.getMin(), true) &&
                 player.compareStat(this.limitStat.getMax(), false) &&
                 this.limitQuest.isInRange(player.getClearedQuest());
@@ -70,7 +68,7 @@ public class ChatLimit {
 
             LocalDateTime time = LocalDateTime.now();
             flag = (this.limitHour1.isInRange(time.getHour()) || this.limitHour2.isInRange(time.getHour())) &&
-                    Config.compareMap(player.getClearedQuest(), this.clearedQuest,true);
+                    Config.compareMap(player.getClearedQuest(), this.clearedQuest,true, false, 0);
         }
 
         return flag;

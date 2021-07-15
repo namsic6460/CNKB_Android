@@ -36,13 +36,12 @@ public class FileManager {
             for (Id id : Id.values()) {
                 if(!id.equals(Id.PLAYER)) {
                     path = DATA_PATH + "/" + id.toString();
-                    DATA_PATH_MAP.put(id, path + "/");
-                    new File(path).mkdir();
                 } else {
                     path = PATH + "/" + "players";
-                    DATA_PATH_MAP.put(id, path + "/");
-                    new File(path).mkdir();
                 }
+
+                DATA_PATH_MAP.put(id, path + "/");
+                new File(path).mkdir();
             }
 
             new File(MAP_PATH).mkdir();
@@ -107,7 +106,7 @@ public class FileManager {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
             bufferedWriter.write(data.trim());
             bufferedWriter.close();
-            Logger.i("FileManager", "save - " + path + "\n" + data);
+            Logger.i("FileManager", "save - " + path);
         } catch (Exception e) {
             Logger.e("FileManager(path : " + path + ")", e);
         }

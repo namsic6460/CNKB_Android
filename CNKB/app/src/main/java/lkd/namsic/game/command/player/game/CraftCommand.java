@@ -12,7 +12,7 @@ import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Player;
-import lkd.namsic.game.manager.DisplayManager;
+import lkd.namsic.game.manager.ItemDisplayManager;
 import lkd.namsic.game.manager.ItemManager;
 
 public class CraftCommand extends PlayerCommand {
@@ -26,9 +26,9 @@ public class CraftCommand extends PlayerCommand {
         }
 
         if(Arrays.asList("아이템", "item", "장비", "equip").contains(second)) {
-            DisplayManager.getInstance().displayRecipes(player, second.equals("아이템") || second.equals("item"));
+            ItemDisplayManager.getInstance().displayRecipes(player, second.equals("아이템") || second.equals("item"));
         } else if(second.equals("확인") || second.equals("check")) {
-            DisplayManager.getInstance().displayRecipe(player, command.replace(second, "").trim());
+            ItemDisplayManager.getInstance().displayRecipe(player, command.replace(second, "").trim());
         } else {
             KakaoTalk.checkDoing(player);
 

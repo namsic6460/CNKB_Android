@@ -43,7 +43,7 @@ public class MoveManager {
             throw new NumberRangeException(distance, 0);
         }
 
-        boolean isCancelled = MoveEvent.handleEvent(self, self.getEvents().get(MoveEvent.getName()), distance, true);
+        boolean isCancelled = MoveEvent.handleEvent(self, self.getEvents(MoveEvent.class.getName()), distance, true);
 
         if(!isCancelled) {
             if (self.getId().getId().equals(Id.PLAYER)) {
@@ -54,15 +54,23 @@ public class MoveManager {
 
             GameMap map = Config.loadMap(self.getLocation());
 
+            boolean gotGold = false;
+            boolean gotItem = false;
+            boolean gotEquip = false;
+            StringBuilder innerBuilder = new StringBuilder("획득한 골드: ");
+
             long money = map.getMoney(self.getLocation());
             if (money != 0) {
+                gotGold = true;
+
                 self.addMoney(money);
                 map.getMoney().remove(self.getLocation());
             }
 
-            boolean gotItem = false;
-            boolean gotEquip = false;
-            StringBuilder innerBuilder = new StringBuilder("---획득한 아이템---");
+            innerBuilder.append(money)
+                    .append("G");
+
+            innerBuilder.append("\n\n---획득한 아이템---");
 
             Map<Long, Integer> itemMap = map.getItem().get(self.getLocation());
             if (itemMap != null) {
@@ -114,13 +122,13 @@ public class MoveManager {
                 innerBuilder.append("\n획득한 장비가 없습니다");
             }
 
-            if (gotItem || gotEquip) {
+            if (gotGold || gotItem || gotEquip) {
                 if (self.getId().getId().equals(Id.PLAYER)) {
                     ((Player) self).replyPlayer("필드에서 무언가를 주웠습니다", innerBuilder.toString());
                 }
             }
 
-            if (self.getId().getId().equals(Id.PLAYER)) {
+            if (self.getId().getId().equals(Id.PLAYER) && (fieldX != 1 && fieldY != 1)) {
                 Set<Long> attackMonsters = new HashSet<>();
                 Set<Long> attackBosses = new HashSet<>();
 
@@ -147,8 +155,6 @@ public class MoveManager {
                     }
                 }
 
-                Config.unloadMap(map);
-
                 if (!(attackMonsters.isEmpty() && attackBosses.isEmpty())) {
                     Map<Id, Set<Long>> enemies = new HashMap<>();
 
@@ -163,6 +169,8 @@ public class MoveManager {
                     FightManager.getInstance().startFight((Player) self, enemies);
                 }
             }
+
+            Config.unloadMap(map);
         }
 
         return isCancelled;
@@ -198,52 +206,39 @@ public class MoveManager {
             throw new NumberRangeException(distance, 1);
         }
 
-        boolean isCancelled = MoveEvent.handleEvent(self, self.getEvents().get(MoveEvent.getName()), distance, false);
+        boolean isCancelled = MoveEvent.handleEvent(self, self.getEvents(MoveEvent.class.getName()), distance, false);
 
         if(!isCancelled) {
             if(self.getId().getId().equals(Id.PLAYER)) {
                 ((Player) self).addLog(LogData.MAP_MOVE_DISTANCE, distance);
             }
 
-            GameMap prevMap = null;
+            GameMap prevMap = Config.loadMap(self.getLocation());
+            prevMap.removeEntity(self);
+            Config.unloadMap(prevMap);
 
-            try {
-                prevMap = Config.loadMap(self.getLocation());
-                prevMap.removeEntity(self);
-            } finally {
-                if(prevMap != null) {
-                    Config.unloadMap(prevMap);
+            GameMap moveMap = Config.loadMap(x, y);
+
+            if(self.getId().getId().equals(Id.PLAYER) && self.getLv().get() < moveMap.getRequireLv().get()) {
+                throw new NumberRangeException(self.getLv().get(), moveMap.getRequireLv().get(), Config.MAX_LV);
+            }
+
+            self.getLocation().setMap(x, y);
+            if(isToBase) {
+                this.setField(self, moveMap.getLocation().getFieldX().get(), moveMap.getLocation().getFieldY().get());
+            } else {
+                this.setField(self, fieldX, fieldY);
+            }
+
+            moveMap.addEntity(self);
+
+            if(self.getId().getId().equals(Id.PLAYER)) {
+                if(!MapType.cityList().contains(moveMap.getMapType())) {
+                    moveMap.respawn();
                 }
             }
 
-            GameMap moveMap = null;
-
-            try {
-                moveMap = Config.loadMap(x, y);
-
-                if(self.getLv().get() < moveMap.getRequireLv().get()) {
-                    throw new NumberRangeException(self.getLv().get(), moveMap.getRequireLv().get(), Config.MAX_LV);
-                }
-
-                self.getLocation().setMap(x, y);
-                if(isToBase) {
-                    this.setField(self, moveMap.getLocation().getFieldX().get(), moveMap.getLocation().getFieldY().get());
-                } else {
-                    this.setField(self, fieldX, fieldY);
-                }
-
-                moveMap.addEntity(self);
-
-                if(self.getId().getId().equals(Id.PLAYER)) {
-                    if(!MapType.cityList().contains(moveMap.getMapType()) && moveMap.canRespawn()) {
-                        moveMap.respawn();
-                    }
-                }
-            } finally {
-                if(moveMap != null) {
-                    Config.unloadMap(moveMap);
-                }
-            }
+            Config.unloadMap(moveMap);
         }
 
         return isCancelled;
@@ -283,33 +278,27 @@ public class MoveManager {
             throw new WeirdCommandException("이동 가능한 거리보다 먼 거리에 있는 좌표입니다\n" +
                     "이동 가능 거리 : " + movableDis + ", 실제 거리: " + dis);
         } else {
-            GameMap moveMap = null;
+            GameMap moveMap = Config.loadMap(location);
+
+            if(moveMap.getName().equals(Config.INCOMPLETE)) {
+                throw new WeirdCommandException("미완성 맵으로는 이동할 수 없습니다");
+            }
 
             try {
-                moveMap = Config.loadMap(location);
-
-                if(moveMap.getName().equals(Config.INCOMPLETE)) {
-                    throw new WeirdCommandException("미완성 맵으로는 이동할 수 없습니다");
-                }
-
-                try {
-                    this.setMap(self, location, true);
-                } catch (NumberRangeException e) {
-                    if(Objects.requireNonNull(e.getMessage()).endsWith(Integer.toString(Config.MAX_LV))) {
-                        self.replyPlayer("해당 지역으로 이동하기 위한 요구 레벨이 부족합니다\n현재 레벨: " +
-                                self.getLv().get() + ", 요구 레벨: " + moveMap.getRequireLv().get());
-                        return;
-                    } else {
-                        throw e;
-                    }
-                }
-
-                self.replyPlayer("이동을 완료했습니다\n현재 좌표: " + self.getLocation().toString());
-            } finally {
-                if(moveMap != null) {
-                    Config.unloadMap(moveMap);
+                this.setMap(self, location, true);
+            } catch (NumberRangeException e) {
+                if(Objects.requireNonNull(e.getMessage()).endsWith(Integer.toString(Config.MAX_LV))) {
+                    self.replyPlayer("해당 지역으로 이동하기 위한 요구 레벨이 부족합니다\n현재 레벨: " +
+                            self.getLv().get() + "\n요구 레벨: " + moveMap.getRequireLv().get());
+                    return;
+                } else {
+                    throw e;
                 }
             }
+
+            self.replyPlayer("이동을 완료했습니다\n현재 좌표: " + self.getLocation().toString());
+
+            Config.unloadMap(moveMap);
         }
     }
 

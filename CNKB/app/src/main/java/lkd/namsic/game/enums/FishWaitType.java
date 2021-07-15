@@ -11,11 +11,11 @@ import lkd.namsic.game.exception.WeirdCommandException;
 public enum FishWaitType {
 
     NONE,
-    SHAKE("흔들기", "shake"),
-    WAIT("기다리기", "wait"),
-    PULL("당기기", "pull"),
-    RESIST("버티기", "resist"),
-    CATCH("잡기", "catch");
+    SHAKE("흔들기", "shake", "s"),
+    WAIT("기다리기", "wait", "w"),
+    PULL("당기기", "pull", "p"),
+    RESIST("버티기", "resist", "r"),
+    CATCH("잡기", "catch", "c");
 
     private final List<String> texts = new ArrayList<>(2);
 

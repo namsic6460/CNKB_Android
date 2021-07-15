@@ -48,13 +48,12 @@ public class AdventureManager {
         self.addLog(LogData.ADVENTURE, 1);
 
         int adv = self.getAdv().get();
-        long delayTime = Math.max(10 - adv / 20, 5) * 1000;
         int skipPercent = (int) (Math.random() * 10) + Math.min(adv * 4 / 10, 40);
 
-        this.startAdventure(self, adv, delayTime, skipPercent, mapType);
+        this.startAdventure(self, adv, skipPercent, mapType);
     }
 
-    public void startAdventure(@NonNull Player self, int adv, long delayTime, int skipPercent, MapType mapType) {
+    public void startAdventure(@NonNull Player self, int adv, int skipPercent, MapType mapType) {
         self.setVariable(Variable.ADVENTURE_WAIT_TYPE, AdventureWaitType.NONE);
         self.setVariable(Variable.ADVENTURE_FIGHT, false);
         self.replyPlayer("모험을 시작합니다\n모험 중 전투에 주의하세요!");
@@ -69,7 +68,7 @@ public class AdventureManager {
         try {
             for (int i = 0; i < Config.ADVENTURE_COUNT; i++) {
                 try {
-                    Thread.sleep(delayTime);
+                    Thread.sleep(Config.ADVENTURE_DELAY_TIME);
                 } catch (InterruptedException e) {
                     Logger.e("Player.fightThread", e);
                     throw new RuntimeException(e.getMessage());
@@ -104,7 +103,8 @@ public class AdventureManager {
                 }
 
                 adventureMsg.append("\n(예시: ")
-                        .append(Emoji.focus("n 모험 1"));
+                        .append(Emoji.focus("n 모험 1"))
+                        .append(")");
                 self.replyPlayer(adventureMsg.toString());
 
                 self.setVariable(Variable.ADVENTURE_WAIT_TYPE, AdventureWaitType.WAIT);
@@ -150,7 +150,7 @@ public class AdventureManager {
 
                 String msg;
                 if(success) {
-                    Map<Long, Integer> itemList = RandomList.EXPLORE_LIST.get(rewardTier[index]);
+                    Map<Long, Integer> itemList = RandomList.ADVENTURE_LIST.get(rewardTier[index]);
 
                     Long itemId = null;
                     int weight;

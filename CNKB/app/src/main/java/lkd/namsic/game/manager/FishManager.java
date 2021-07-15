@@ -30,7 +30,7 @@ public class FishManager {
         return instance;
     }
 
-    public void tryFish(@NonNull Player self) {
+    public void tryFish(@NonNull Player self, int fishLv) {
         GameMap map = Config.getMapData(self.getLocation());
         if(!MapType.waterList().contains(map.getMapType())) {
             throw new WeirdCommandException("강 또는 바다에서만 낚시가 가능합니다");
@@ -38,8 +38,6 @@ public class FishManager {
 
         self.setDoing(Doing.FISH);
         self.addLog(LogData.FISH, 1);
-
-        int fishLv = self.getVariable(Variable.FISH);
 
         double randomPercent = Math.random() * 100;
 
@@ -164,19 +162,19 @@ public class FishManager {
             String message;
             if (waitType.equals(FishWaitType.SHAKE)) {
                 message = "아직 특별한 느낌이 없습니다\n낚싯대를 흔들어 물고기를 유혹해봅시다\n" +
-                        Emoji.focus("(ㅜ/n) (낚시/fish) (흔들기/shake)");
+                        Emoji.focus("(ㅜ/n) (낚시/fish) (흔들기/shake/s)");
             } else if (waitType.equals(FishWaitType.WAIT)) {
                 message = "미세한 무언가가 느껴집니다...\n확실히 물릴때까지 기다려봅시다\n" +
-                        Emoji.focus("(ㅜ/n) (낚시/fish) (기다리기/wait)");
+                        Emoji.focus("(ㅜ/n) (낚시/fish) (기다리기/wait/w)");
             } else if (waitType.equals(FishWaitType.PULL)) {
                 message = "걸린 것 같습니다!\n힘차게 당겨봅시다\n" +
-                        Emoji.focus("(ㅜ/n) (낚시/fish) (당기기/pull)");
+                        Emoji.focus("(ㅜ/n) (낚시/fish) (당기기/pull/p)");
             } else if (waitType.equals(FishWaitType.RESIST)) {
                 message = "이런! 잘못하면 낚싯대가 망가지겠네요\n최대한 버텨봅시다\n" +
-                        Emoji.focus("(ㅜ/n) (낚시/fish) (버티기/resist)");
+                        Emoji.focus("(ㅜ/n) (낚시/fish) (버티기/resist/r)");
             } else {
                 message = "지금입니다, 당기세요!\n" +
-                        Emoji.focus("(ㅜ/n) (낚시/fish) (잡기/catch)");
+                        Emoji.focus("(ㅜ/n) (낚시/fish) (잡기/catch/c)");
             }
 
             self.replyPlayer(message);

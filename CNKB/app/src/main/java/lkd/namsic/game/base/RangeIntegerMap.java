@@ -27,7 +27,7 @@ public class RangeIntegerMap<T> implements Serializable {
     }
 
     public void set(Map<T, Integer> min, Map<T, Integer> max) {
-        if(Config.compareMap(min, max, false)) {
+        if(Config.compareMap(min, max, false, true, null)) {
             this.checkKeys(min, max);
         } else {
             throw new NumberRangeException(min, max);
@@ -77,13 +77,14 @@ public class RangeIntegerMap<T> implements Serializable {
     }
 
     public boolean isInRange(@NonNull Map<T, Integer> map) {
-        for(Map.Entry<T, Integer> entry : map.entrySet()) {
-            if(!isInRange(entry.getKey(), entry.getValue())) {
-                return false;
-            }
-        }
+        return Config.compareMap(this.min, map, false, false, 0) &&
+                Config.compareMap(this.max, map, true, true, null);
+    }
 
-        return true;
+    @NonNull
+    @Override
+    public String toString() {
+        return this.getMin().toString() + ", " + this.getMax().toString();
     }
 
     @Override

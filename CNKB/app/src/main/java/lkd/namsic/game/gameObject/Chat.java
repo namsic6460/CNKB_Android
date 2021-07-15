@@ -20,10 +20,8 @@ import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class Chat extends GameObject {
 
     @Setter

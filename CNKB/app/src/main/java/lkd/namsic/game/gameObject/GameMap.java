@@ -2,6 +2,7 @@ package lkd.namsic.game.gameObject;
 
 import androidx.annotation.NonNull;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -16,17 +17,14 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
-import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.enums.object_list.NpcList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdDataException;
 import lkd.namsic.game.manager.MoveManager;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class GameMap {
 
     private static final MoveManager moveManager = MoveManager.getInstance();
@@ -130,45 +128,6 @@ public class GameMap {
             }
         }
 
-        builder.append("\n\n---떨어진 아이템---");
-
-        if(this.item.isEmpty()) {
-            builder.append("\n떨어진 아이템 없음");
-        } else {
-            Item item;
-            String locationStr;
-            for (Map.Entry<Location, Map<Long, Integer>> entry : this.item.entrySet()) {
-                locationStr = "\n[" + entry.getKey().toFieldString() + "] ";
-
-                for(Map.Entry<Long, Integer> itemEntry : entry.getValue().entrySet()) {
-                    item = Config.getData(Id.ITEM, itemEntry.getKey());
-                    builder.append(locationStr)
-                            .append(item.getName())
-                            .append(" ")
-                            .append(itemEntry.getValue())
-                            .append("개");
-                }
-            }
-        }
-
-        builder.append("\n\n---떨어진 장비---");
-
-        if(this.equip.isEmpty()) {
-            builder.append("\n떨어진 장비 없음");
-        } else {
-            Equipment equipment;
-            String locationStr;
-            for (Map.Entry<Location, Set<Long>> entry : this.equip.entrySet()) {
-                locationStr = "\n[" + entry.getKey().toFieldString() + "] ";
-
-                for(long equipId : entry.getValue()) {
-                    equipment = Config.getData(Id.EQUIPMENT, equipId);
-                    builder.append(locationStr)
-                            .append(equipment.getName());
-                }
-            }
-        }
-
         builder.append("\n\n---몬스터 목록---");
 
         Set<Long> monsterSet = this.entity.get(Id.MONSTER);
@@ -203,10 +162,49 @@ public class GameMap {
             }
         }
 
+        builder.append("\n\n---떨어진 아이템---");
+
+        if(this.item.isEmpty()) {
+            builder.append("\n떨어진 아이템 없음");
+        } else {
+            Item item;
+            String locationStr;
+            for (Map.Entry<Location, Map<Long, Integer>> entry : new HashMap<>(this.item).entrySet()) {
+                locationStr = "\n[" + entry.getKey().toFieldString() + "] ";
+
+                for(Map.Entry<Long, Integer> itemEntry : entry.getValue().entrySet()) {
+                    item = Config.getData(Id.ITEM, itemEntry.getKey());
+                    builder.append(locationStr)
+                            .append(item.getName())
+                            .append(" ")
+                            .append(itemEntry.getValue())
+                            .append("개");
+                }
+            }
+        }
+
+        builder.append("\n\n---떨어진 장비---");
+
+        if(this.equip.isEmpty()) {
+            builder.append("\n떨어진 장비 없음");
+        } else {
+            Equipment equipment;
+            String locationStr;
+            for (Map.Entry<Location, Set<Long>> entry : this.equip.entrySet()) {
+                locationStr = "\n[" + entry.getKey().toFieldString() + "] ";
+
+                for(long equipId : entry.getValue()) {
+                    equipment = Config.getData(Id.EQUIPMENT, equipId);
+                    builder.append(locationStr)
+                            .append(equipment.getName());
+                }
+            }
+        }
+
         return builder.toString();
     }
 
-    public void setMoney(Location location, long money) {
+    public void setMoney(@NonNull Entity self, @NonNull Location location, long money) {
         if(!location.equalsMap(this.location)) {
             throw new WeirdDataException(this.location, location);
         }
@@ -220,6 +218,9 @@ public class GameMap {
         for(Map.Entry<Id, Set<Long>> entry : this.entity.entrySet()) {
             for(long objectId : entry.getValue()) {
                 entity = Config.getData(entry.getKey(), objectId);
+                if(entity.equals(self)) {
+                    continue;
+                }
 
                 if(entity.getLocation().equalsField(location)) {
                     entitySet.add(entity);
@@ -243,15 +244,16 @@ public class GameMap {
         }
     }
 
-    public long getMoney(Location location) {
+    public long getMoney(@NonNull Location location) {
         return this.money.getOrDefault(location, 0L);
     }
 
-    public void addMoney(Location location, long money) {
-        this.setMoney(location, this.getMoney(location) + money);
+    public void addMoney(@NonNull Entity self, long money) {
+        Location location = self.getLocation();
+        this.setMoney(self, location, this.getMoney(location) + money);
     }
 
-    public void setItem(Location location, long itemId, int count) {
+    public void setItem(@NonNull Entity self, @NonNull Location location, long itemId, int count) {
         if(!location.equalsMap(this.location)) {
             throw new WeirdDataException(this.location, location);
         }
@@ -266,6 +268,10 @@ public class GameMap {
         if(count == 0) {
             if(itemMap != null) {
                 itemMap.remove(itemId);
+
+                if(itemMap.size() == 0) {
+                    this.item.remove(location);
+                }
             }
         } else {
             Entity entity;
@@ -273,6 +279,9 @@ public class GameMap {
             for(Map.Entry<Id, Set<Long>> entry : this.entity.entrySet()) {
                 for(long objectId : entry.getValue()) {
                     entity = Config.getData(entry.getKey(), objectId);
+                    if(entity.equals(self)) {
+                        continue;
+                    }
 
                     if(entity.getLocation().equalsField(location)) {
                         entitySet.add(entity);
@@ -309,11 +318,14 @@ public class GameMap {
         return 0;
     }
 
-    public void addItem(Location location, long itemId, int count) {
-        this.setItem(location, itemId, this.getItem(location, itemId) + count);
+    public void addItem(@NonNull Entity self, long itemId, int count) {
+        Location location = self.getLocation();
+        this.setItem(self, location, itemId, this.getItem(location, itemId) + count);
     }
 
-    public void addEquip(Location location, long equipId) {
+    public void addEquip(@NonNull Entity self, long equipId) {
+        Location location = self.getLocation();
+
         if(!location.equalsMap(this.location)) {
             throw new WeirdDataException(this.location, location);
         }
@@ -325,6 +337,9 @@ public class GameMap {
         for(Map.Entry<Id, Set<Long>> entry : this.entity.entrySet()) {
             for(long objectId : entry.getValue()) {
                 entity = Config.getData(entry.getKey(), objectId);
+                if(entity.equals(self)) {
+                    continue;
+                }
 
                 if(entity.getLocation().equalsField(location)) {
                     entitySet.add(entity);
@@ -373,9 +388,7 @@ public class GameMap {
 
         this.getEntity(id).remove(entity.id.getObjectId());
         if(id.equals(Id.MONSTER) || id.equals(Id.BOSS)) {
-            if(this.canRespawn()) {
-                this.respawn();
-            }
+            this.respawn();
         }
     }
 
@@ -416,7 +429,17 @@ public class GameMap {
         double percent;
         int spawnCount;
 
+        Set<Long> existSet = new HashSet<>();
+        for(long objectId : this.getEntity(Id.MONSTER)) {
+            Monster monster = Config.getData(Id.MONSTER, objectId);
+            existSet.add(monster.getOriginalId());
+        }
+
         for(long monsterId : spawnMonster) {
+            if(existSet.contains(monsterId)) {
+                continue;
+            }
+
             percent = this.spawnPercent.get(Id.MONSTER).get(monsterId);
             spawnCount = random.nextInt(this.spawnMaxCount.get(monsterId)) + 1;
 
@@ -435,7 +458,17 @@ public class GameMap {
             }
         }
 
+        existSet = new HashSet<>();
+        for(long objectId : this.getEntity(Id.BOSS)) {
+            Boss boss = Config.getData(Id.BOSS, objectId);
+            existSet.add(boss.getOriginalId());
+        }
+
         for(long bossId : spawnBoss) {
+            if(existSet.contains(bossId)) {
+                continue;
+            }
+
             percent = this.spawnPercent.get(Id.MONSTER).get(bossId);
 
             if(random.nextDouble() < percent || percent == 1) {

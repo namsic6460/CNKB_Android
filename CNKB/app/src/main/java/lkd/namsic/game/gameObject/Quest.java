@@ -41,31 +41,31 @@ public class Quest extends NamedObject {
     final Map<StatType, Integer> rewardStat = new HashMap<>();
     final Map<Long, Integer> rewardCloseRate = new HashMap<>();
 
-    final LimitId npcId = new LimitId(0, Id.NPC);
-    final LimitId chatId = new LimitId(0, Id.CHAT);
+    final LimitId clearNpcId = new LimitId(0, Id.NPC);
+    final LimitId clearChatId = new LimitId(0, Id.CHAT);
 
-    public Quest(@NonNull String name, long npcId, long chatId) {
+    public Quest(@NonNull String name, long clearNpcId, long clearChatId) {
         super(name);
         this.id.setId(Id.QUEST);
         this.id.setObjectId(Objects.requireNonNull(QuestList.findByName(name)));
 
-        this.setNpcId(npcId);
-        this.setChatId(chatId);
+        this.setClearNpcId(clearNpcId);
+        this.setClearChatId(clearChatId);
     }
 
     //Only use in constructor
-    private void setNpcId(long npcId) {
-        if(npcId < 1) {
-            throw new NumberRangeException(npcId, 0L);
+    private void setClearNpcId(long clearNpcId) {
+        if(clearNpcId < 1) {
+            throw new NumberRangeException(clearNpcId, 0L);
         }
 
         //Since npc creating is after creating quests
-        this.npcId.set(npcId);
+        this.clearNpcId.set(clearNpcId);
     }
 
-    public void setChatId(long chatId) {
+    public void setClearChatId(long chatId) {
         Config.checkId(Id.CHAT, chatId);
-        this.chatId.set(chatId);
+        this.clearChatId.set(chatId);
     }
 
     public void setNeedItem(long itemId, int count) {

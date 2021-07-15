@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     public static Boolean isOn = false;
 
     @SuppressLint("StaticFieldLeak")
+    public static ScrollView scrollView;
+
+    @SuppressLint("StaticFieldLeak")
     public static TextView textView;
 
     @SuppressLint("StaticFieldLeak")
@@ -67,7 +71,10 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        scrollView = findViewById(R.id.scroll);
+
         textView = findViewById(R.id.text);
+        textView.setText(null);
         textView.setMovementMethod(new ScrollingMovementMethod());
 
         startService(new Intent(this, ForcedTerminationService.class));
@@ -108,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 0, 1000);
 
-        Logger.i("Start", "Debug 2 Started");
+        Logger.i("Start", "Debug 3 Started");
         Logger.logCount = 0;
         Logger.logs = "";
     }

@@ -3,6 +3,7 @@ package lkd.namsic.game.config;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.Location;
+import lkd.namsic.game.base.Use;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
@@ -40,29 +42,33 @@ import lkd.namsic.game.gameObject.Boss;
 import lkd.namsic.game.gameObject.Chat;
 import lkd.namsic.game.gameObject.Entity;
 import lkd.namsic.game.gameObject.Equipment;
+import lkd.namsic.game.gameObject.GameMap;
 import lkd.namsic.game.gameObject.GameObject;
 import lkd.namsic.game.gameObject.Item;
-import lkd.namsic.game.gameObject.GameMap;
 import lkd.namsic.game.gameObject.Monster;
 import lkd.namsic.game.gameObject.Npc;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.gameObject.Quest;
 import lkd.namsic.game.gameObject.Research;
 import lkd.namsic.game.gameObject.Skill;
-import lkd.namsic.game.gameObject.Use;
 import lkd.namsic.game.json.ChatLimitAdapter;
-import lkd.namsic.game.json.UseAdapter;
+import lkd.namsic.game.json.EntityAdapter;
+import lkd.namsic.game.json.EquipAdapter;
 import lkd.namsic.game.json.LocationAdapter;
 import lkd.namsic.game.json.NpcAdapter;
+import lkd.namsic.game.json.UseAdapter;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    //TODO : compile test(serializing)
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
             .registerTypeAdapter(Location.class, new LocationAdapter())
+            .registerTypeAdapter(Equipment.class, new EquipAdapter())
+            .registerTypeAdapter(Player.class, new EntityAdapter<>(Player.class))
+            .registerTypeAdapter(Monster.class, new EntityAdapter<>(Monster.class))
+            .registerTypeAdapter(Boss.class, new EntityAdapter<>(Boss.class))
             .registerTypeAdapter(Use.class, new UseAdapter())
             .registerTypeAdapter(ChatLimit.class, new ChatLimitAdapter())
             .setVersion(1.0)
@@ -79,11 +85,12 @@ public class Config {
     public static boolean IGNORE_FILE_LOG = false;
 
     public static final Map<String, GameMap> MAP = new ConcurrentHashMap<>();
-    public static final Map<String, Long> PLAYER_COUNT = new ConcurrentHashMap<>();
+    public static final Map<String, Long> MAP_COUNT = new ConcurrentHashMap<>();
 
     private static final String REGEX = "[^A-Za-z-_0-9ㄱ-ㅎㅏ-ㅣ가-힣\\s]|[\n]|[\r]";
     public static final Map<String, Long> PLAYER_ID = new ConcurrentHashMap<>();
     public static final Map<Long, String[]> PLAYER_LIST = new ConcurrentHashMap<>();
+    public static final Map<String, Integer> PLAYER_LV_RANK = new ConcurrentHashMap<>();
 
     public static final Set<Long> SELECTABLE_CHAT_SET = new ConcurrentHashSet<>();
 
@@ -108,13 +115,12 @@ public class Config {
     public static final int MAX_LV = 999;
     public static final int MIN_AI_INCREASE = 0;
     public static final int MIN_SP = 0;
-    public static final int MAX_SP = 100;
     public static final int MIN_MAGIC_LV = 1;
     public static final int MAX_MAGIC_LV = 10;
     public static final long MIN_DELAY_TIME = 500;
     public static final long MAX_DELAY_TIME = 5000;
-//    public static final long MIN_PAUSE_TIME = 2000;     //REAL TIME
-    public static final long MIN_PAUSE_TIME = 500;      //DEBUG
+    public static final long MIN_PAUSE_TIME = 2000;     //REAL TIME
+//    public static final long MIN_PAUSE_TIME = 500;      //DEBUG
     public static final long MAX_PAUSE_TIME = 5000;
     public static final int MAX_SPAWN_COUNT = 16;
 
@@ -141,10 +147,12 @@ public class Config {
     public static final long FISH_WAIT_TIME = 5000;
     public static final long FIGHT_WAIT_TIME = 30000;
     public static final int ADVENTURE_COUNT = 5;
+    public static final int ADVENTURE_DELAY_TIME = 2000;
     public static final long ADVENTURE_WAIT_TIME = 30000;
     public static final int EXPLORE_HARD_SUCCESS_PERCENT = 20;
     public static final int APPRAISE_LIMIT = 999;
 
+    public static final String SPLIT_BAR = "------------------------------------------";
     public static final String INCOMPLETE = "Incomplete";
     public static final String[] TIERS = new String[] { "하", "중", "상" };
 
@@ -162,7 +170,7 @@ public class Config {
         ID_CLASS.put(Id.SKILL, Skill.class);
 
         for(Id id : Id.values()) {
-            ID_COUNT.put(id, 1L);
+            ID_COUNT.put(id, ID_COUNT.getOrDefault(id, 1L));
 
             OBJECT.put(id, new ConcurrentHashMap<>());
             OBJECT_COUNT.put(id, new ConcurrentHashMap<>());
@@ -176,15 +184,19 @@ public class Config {
 
         String json;
         for(File playerFile : players) {
+            if(playerFile.getName().endsWith(".zip")) {
+                continue;
+            }
+
             try {
                 json = FileManager.read(playerFile);
                 Player player = fromJson(json, Player.class);
 
                 long objectId = player.getId().getObjectId();
-                String nickName = player.getNickName();
 
-                PLAYER_ID.put(nickName, objectId);
+                PLAYER_ID.put(player.getNickName(), objectId);
                 PLAYER_LIST.put(objectId, new String[] {player.getSender(), player.getImage()});
+                PLAYER_LV_RANK.put(player.getName(), player.getLv().get());
             } catch (Exception e) {
                 Logger.e("Config.init", e);
             }
@@ -257,7 +269,6 @@ public class Config {
         t.getId().setObjectId(objectId);
         ID_COUNT.put(id, objectId + 1);
 
-        unloadObject(t);
         Logger.i("newObject", id.toString() + "-" + objectId);
 
         return t;
@@ -424,18 +435,18 @@ public class Config {
 
     public synchronized static void unloadMap(@NonNull GameMap map) {
         String fileName = getMapFileName(map);
-        Long playerCount = PLAYER_COUNT.get(fileName);
-        playerCount = playerCount == null ? 0 : playerCount;
+        Long mapCount = MAP_COUNT.get(fileName);
+        mapCount = mapCount == null ? 0 : mapCount;
 
-        if(playerCount > 1) {
-            PLAYER_COUNT.put(fileName, playerCount - 1);
+        if(mapCount > 1) {
+            MAP_COUNT.put(fileName, mapCount - 1);
         } else {
             String jsonString = toJson(map);
             String path = getMapPath(fileName);
 
-            if(playerCount == 1) {
+            if(mapCount == 1) {
                 MAP.remove(fileName);
-                PLAYER_COUNT.remove(fileName);
+                MAP_COUNT.remove(fileName);
             }
 
             FileManager.save(path, jsonString);
@@ -523,9 +534,9 @@ public class Config {
     @NonNull
     public synchronized static GameMap loadMap(int x, int y) {
         String fileName = getMapFileName(x, y);
-        Long playerCount = PLAYER_COUNT.get(fileName);
+        Long mapCount = MAP_COUNT.get(fileName);
 
-        if(playerCount == null) {
+        if(mapCount == null) {
             String path = getMapPath(fileName);
             String jsonString = FileManager.read(path);
 
@@ -536,10 +547,10 @@ public class Config {
             GameMap map = fromJson(jsonString, GameMap.class);
 
             MAP.put(fileName, map);
-            PLAYER_COUNT.put(fileName, 1L);
+            MAP_COUNT.put(fileName, 1L);
             return map;
         } else {
-            PLAYER_COUNT.put(fileName, playerCount + 1);
+            MAP_COUNT.put(fileName, mapCount + 1);
             return MAP.get(fileName);
         }
     }
@@ -578,14 +589,10 @@ public class Config {
         }
     }
 
-    public static <T> boolean compareMap(@NonNull Map<T, Integer> map1, @NonNull Map<T, Integer> map2, boolean firstIsBig) {
-        return compareMap(map1, map2, firstIsBig, true);
-    }
-
     public static <T> boolean compareMap(@NonNull Map<T, Integer> map1, @NonNull Map<T, Integer> map2,
-                                         boolean firstIsBig, boolean regardZero) {
+                                         boolean firstIsBig, boolean ignoreFirst, @Nullable Integer regardValue) {
         if(!firstIsBig) {
-            return compareMap(map2, map1, true, regardZero);
+            return compareMap(map2, map1, true, ignoreFirst, regardValue);
         }
 
         Integer value;
@@ -593,10 +600,14 @@ public class Config {
         for(Map.Entry<T, Integer> entry : map2.entrySet()) {
             value = map1.get(entry.getKey());
             if(value == null) {
-                if(regardZero) {
-                    value = 0;
+                if(ignoreFirst) {
+                    continue;
                 } else {
-                    return false;
+                    if(regardValue != null) {
+                        value = regardValue;
+                    } else {
+                        return false;
+                    }
                 }
             }
 
@@ -652,6 +663,10 @@ public class Config {
     //AlphaDo 님의 체력바 소스를 참고했음을 알립니다
     @NonNull
     public static String getBar(int value, int maxValue) {
+        if(value < 0) {
+            throw new NumberRangeException(value, 0, null);
+        }
+
         double percent = 10.0 * value / maxValue;
         double dec = percent % 1;
         int filled = (int) percent;

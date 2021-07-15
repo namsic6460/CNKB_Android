@@ -9,7 +9,7 @@ import java.util.List;
 
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.gameObject.Player;
-import lkd.namsic.game.manager.DisplayManager;
+import lkd.namsic.game.manager.ItemDisplayManager;
 
 public class InvenCommand extends PlayerCommand {
 
@@ -18,7 +18,7 @@ public class InvenCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         int page = second == null ? 1 : Integer.parseInt(second);
-        DisplayManager.getInstance().displayInventory(player, page);
+        ItemDisplayManager.getInstance().displayInventory(player, page);
     }
 
 }

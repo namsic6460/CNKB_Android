@@ -12,7 +12,6 @@ import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object_list.ItemList;
-import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Player;
 
@@ -31,9 +30,9 @@ public class SettingCommand extends PlayerCommand {
                 throw new WeirdCommandException();
             }
 
-            Long itemId = ItemList.findByName(fourth);
+            Long itemId = ItemList.findByName(command.split(third)[1].trim());
             if(itemId == null) {
-                throw new ObjectNotFoundException("해당 이름을 가진 아이템을 찾을 수 없습니다");
+                throw new WeirdCommandException("해당 이름을 가진 아이템을 찾을 수 없습니다");
             }
 
             List<Long> highPriorityItems = player.getListVariable(Variable.HIGH_PRIORITY_ITEM);
@@ -50,9 +49,9 @@ public class SettingCommand extends PlayerCommand {
                 player.replyPlayer("아이템이 우선순위에 성공적으로 등록되었습니다");
             } else if(third.equals("제거") || third.equals("remove")) {
                 if(highPriorityItems.isEmpty()) {
-                    throw new ObjectNotFoundException("우선순위 목록이 비어있습니다");
+                    throw new WeirdCommandException("우선순위 목록이 비어있습니다");
                 } else if(!highPriorityItems.contains(itemId)) {
-                    throw new ObjectNotFoundException("우선순위 목록에 해당 아이템이 등록되어있지 않습니다");
+                    throw new WeirdCommandException("우선순위 목록에 해당 아이템이 등록되어있지 않습니다");
                 }
 
                 if(highPriorityItems.size() == 1) {

@@ -16,6 +16,7 @@ public enum FightWaitType {
     DEFENCE("방어", "defence", "d"),
     WAIT("대기", "wait", "w"),
     ITEM("아이템", "item", "i"),
+    EQUIP("장비", "equip", "e"),
     RUN("도주", "도망", "run", "r");
 
     private final List<String> texts = new ArrayList<>(3);
@@ -39,6 +40,12 @@ public enum FightWaitType {
             }
 
             return ITEM;
+        } else if(EQUIP.texts.contains(command)) {
+            if(subCommand == null) {
+                throw new WeirdCommandException("장비 종류도 함께 적어야합니다");
+            }
+
+            return EQUIP;
         } else if(RUN.texts.contains(command)) {
             return RUN;
         }

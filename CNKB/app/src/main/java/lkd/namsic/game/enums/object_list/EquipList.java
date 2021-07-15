@@ -10,7 +10,16 @@ import lombok.Getter;
 
 public enum EquipList {
 
-    NONE("NONE", 0L);
+    NONE("NONE", 0L),
+    WOODEN_SWORD("목검", 1L),
+    IRON_SWORD("철검", 2L),
+    MIX_SWORD("합검", 3L),
+    HEART_BREAKER_1("하트 브레이커1", 4L),
+    HEAD_HUNTER_1("헤드 헌터1", 5L),
+    GHOST_SWORD_1("원혼의 검1", 6L),
+    HEALTH_AMULET("건강의 부적", 7L),
+    BLOOD_AMULET("피의 부적", 8L),
+    DRAGON_AMULET("용의 부적", 9L);
 
     public static final Map<String, EquipList> nameMap = new HashMap<>();
     public static final Map<Long, EquipList> idMap = new HashMap<>();

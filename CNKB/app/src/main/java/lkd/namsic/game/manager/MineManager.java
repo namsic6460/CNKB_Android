@@ -33,11 +33,9 @@ public class MineManager {
         return Config.getMapData(self.getLocation()).getMapType().equals(MapType.COUNTRY);
     }
 
-    public void mine(@NonNull Player self) {
+    public void mine(@NonNull Player self, int mineLv) {
         self.setDoing(Doing.MINE);
         self.addLog(LogData.MINED, 1);
-
-        int mineLv = self.getVariable(Variable.MINE);
 
         double randomPercent = Math.random() * 100;
 
@@ -65,7 +63,7 @@ public class MineManager {
                     switch(itemTier) {
                         case 2:
                             itemList = new long[]{ItemList.COPPER.getId(), ItemList.LEAD.getId(),
-                                    ItemList.TIn.getId(), ItemList.NICKEL.getId()};
+                                    ItemList.TIN.getId(), ItemList.NICKEL.getId()};
                             break;
                         case 3:
                             itemList = new long[]{ItemList.IRON.getId(), ItemList.LITHIUM.getId()};

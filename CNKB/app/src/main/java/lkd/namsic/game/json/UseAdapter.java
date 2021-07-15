@@ -11,7 +11,7 @@ import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 
 import lkd.namsic.game.config.Config;
-import lkd.namsic.game.gameObject.Use;
+import lkd.namsic.game.base.Use;
 
 public class UseAdapter implements JsonSerializer<Use>, JsonDeserializer<Use> {
 

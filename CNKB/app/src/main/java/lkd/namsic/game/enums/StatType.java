@@ -49,7 +49,16 @@ public enum StatType {
 
     @Nullable
     public static StatType findByName(@NonNull String name) {
-        return map.get(name);
-    }
+        StatType statType = map.get(name);
 
+        if(statType == null) {
+            try {
+                statType = StatType.valueOf(name);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+
+        return statType;
+    }
 }

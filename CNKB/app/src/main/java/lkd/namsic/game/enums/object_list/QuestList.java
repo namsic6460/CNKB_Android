@@ -15,7 +15,8 @@ public enum QuestList {
     WORK_OF_MINER("광부의 일", 1L),
     TRASH_COLLECTING("쓰레기 수거", 2L),
     NEED_FIRE("불이 필요해!", 3L),
-    TOO_STRONG_FIRE("불이 너무 강했나?", 4L);
+    TOO_STRONG_FIRE("불이 너무 강했나?", 4L),
+    PROVE_EXPERIENCE("경험을 증명해라", 5L);
 
     public static final Map<String, QuestList> nameMap = new HashMap<>();
     public static final Map<Long, QuestList> idMap = new HashMap<>();

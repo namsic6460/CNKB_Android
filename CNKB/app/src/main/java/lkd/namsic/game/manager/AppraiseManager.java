@@ -52,8 +52,8 @@ public class AppraiseManager {
             try {
                 for (int i = 0; i < count; i++) {
                     synchronized (self) {
-//                        self.wait(5000);
-                        self.wait(10);
+                        self.wait(5000);
+//                        self.wait(10);
                     }
                     
                     isAppraiseStopped = self.getObjectVariable(Variable.IS_APPRAISE_STOP, false);
@@ -107,7 +107,7 @@ public class AppraiseManager {
         if(stopped) {
             self.replyPlayer("감정이 중지되었습니다\n사용한 돌 개수: " + usedStone, builder.toString());
         } else {
-            self.replyPlayer(self.getNickName() + " 감정 완료!\n" +
+            self.replyPlayer("감정 완료!\n" +
                     "돌 " + count + "개를 사용한 감정이 모두 완료되었습니다", builder.toString());
         }
 

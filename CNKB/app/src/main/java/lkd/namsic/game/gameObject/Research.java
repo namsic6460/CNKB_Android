@@ -11,10 +11,8 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class Research extends Achieve {
 
     final RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);

@@ -20,7 +20,7 @@ import lkd.namsic.game.event.ItemUseEvent;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Item;
 import lkd.namsic.game.gameObject.Player;
-import lkd.namsic.game.gameObject.Use;
+import lkd.namsic.game.base.Use;
 
 public class ItemManager {
 
@@ -30,7 +30,7 @@ public class ItemManager {
         return instance;
     }
 
-    public boolean tryUse(@NonNull Player self, @NonNull String itemName, int count) {
+    public long checkUse(@NonNull Player self, @NonNull String itemName, int count) {
         Long itemId = ItemList.findByName(itemName);
 
         if(itemId == null) {
@@ -44,18 +44,25 @@ public class ItemManager {
 
         int currentCount = self.getItem(itemId);
         if(currentCount < count) {
-            throw new WeirdCommandException("아이템이 " + (count - currentCount) + "개 부족합니다\n아이템을 획득한 후 다시 사용해주세요");
+            if(currentCount == 0 && count == 1) {
+                throw new WeirdCommandException("해당 아이템을 보유하고 있지 않습니다");
+            } else {
+                throw new WeirdCommandException("아이템이 " + (count - currentCount) + "개 부족합니다\n아이템을 획득한 후 다시 사용해주세요");
+            }
         }
 
-        return use(self, itemId, count);
+        return itemId;
     }
 
-    public boolean use(@NonNull Player self, long itemId, int count) {
+    public void tryUse(@NonNull Player self, @NonNull String itemName, int count) {
+        long itemId = checkUse(self, itemName, count);
+        this.use(self, itemId, count);
+    }
+
+    public void use(@NonNull Player self, long itemId, int count) {
         Config.checkId(Id.ITEM, itemId);
 
-        boolean isCancelled;
-        isCancelled = ItemUseEvent.handleEvent(self, self.getEvents().get(ItemUseEvent.getName()), itemId, count);
-
+        boolean isCancelled = ItemUseEvent.handleEvent(self, self.getEvents(ItemUseEvent.class.getName()), itemId, count);
         if (!isCancelled) {
             self.addLog(LogData.TOTAL_ITEM_USE, 1);
 
@@ -84,8 +91,6 @@ public class ItemManager {
                 self.replyPlayer(msg, innerBuilder.toString());
             }
         }
-
-        return !isCancelled;
     }
 
     public boolean tryEat(@NonNull Player self, @NonNull String itemName, int count) {
@@ -116,7 +121,7 @@ public class ItemManager {
         Config.checkId(Id.ITEM, itemId);
 
         boolean isCancelled;
-        isCancelled = ItemEatEvent.handleEvent(self, self.getEvents().get(ItemEatEvent.getName()), itemId, count);
+        isCancelled = ItemEatEvent.handleEvent(self, self.getEvents(ItemEatEvent.class.getName()), itemId, count);
 
         if (!isCancelled) {
             self.addLog(LogData.TOTAL_ITEM_EAT, 1);
@@ -137,16 +142,25 @@ public class ItemManager {
                 for(Map.Entry<Long, HashMap<StatType, Integer>> entry : eatBuff.entrySet()) {
                     duration = entry.getKey();
 
-                    innerBuilder.append("\n[")
-                            .append(duration / 1000D)
-                            .append("초]");
+                    if(duration != -1) {
+                        innerBuilder.append("\n[")
+                                .append(duration / 1000D)
+                                .append("초]");
 
-                    duration += currentTime;
+                        duration += currentTime;
+                    } else {
+                        innerBuilder.append("\n[영구 지속]");
+                    }
+
                     for(Map.Entry<StatType, Integer> statEntry : entry.getValue().entrySet()) {
                         statType = statEntry.getKey();
                         stat = statEntry.getValue() * count;
 
-                        self.addBuff(duration, statType, stat);
+                        if(duration != -1) {
+                            self.addBuff(duration, statType, stat);
+                        } else {
+                            self.addBasicStat(statType, stat);
+                        }
 
                         innerBuilder.append("\n")
                                 .append(statType.getDisplayName())
@@ -199,7 +213,8 @@ public class ItemManager {
         }
 
         boolean flag = false;
-        Map<Long, Integer> recipe = null;
+        Map<Long, Integer> recipe;
+        Map<Long, Integer> craftRecipe = null;
         int resultCount = 0;
 
         int index = 1;
@@ -219,13 +234,14 @@ public class ItemManager {
                 recipe.put(entry.getKey(), entry.getValue() * count);
             }
 
-            if(Config.compareMap(self.getInventory(), recipe, true)) {
+            if(Config.compareMap(self.getInventory(), recipe, true, false, 0)) {
                 if(flag) {
                     self.replyPlayer("제작 가능한 레시피가 2개 이상입니다.\n레시피를 선택하여 제작해주세요");
                     return;
                 }
-                
+
                 flag = true;
+                craftRecipe = recipe;
             }
         }
 
@@ -243,9 +259,9 @@ public class ItemManager {
 
         long removeItemId;
         int removeCount;
-        for(Map.Entry<Long, Integer> entry : recipe.entrySet()) {
+        for(Map.Entry<Long, Integer> entry : craftRecipe.entrySet()) {
             removeItemId = entry.getKey();
-            removeCount = entry.getValue() * count;
+            removeCount = entry.getValue();
 
             self.addItem(removeItemId, removeCount * -1);
 
@@ -256,21 +272,15 @@ public class ItemManager {
                     .append("]\n");
         }
 
-        self.addItem(itemId, resultCount, false);
+        if(isItem) {
+            self.addItem(itemId, resultCount, false);
+        } else {
+            for(int i = 0; i < count; i++) {
+                self.addEquip(itemId);
+            }
+        }
+
         self.replyPlayer("제작이 완료되었습니다\n[" + itemName + " +" + resultCount + "]", innerMsg.toString());
-    }
-
-    //TODO
-    public void giveLowRecipe(@NonNull Player self) {
-
-    }
-
-    public void giveMiddleRecipe(@NonNull Player self) {
-
-    }
-
-    public void giveHighRecipe(@NonNull Player self) {
-
     }
 
 }

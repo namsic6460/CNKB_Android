@@ -7,8 +7,8 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
-import lkd.namsic.game.config.Config;
 import lkd.namsic.game.base.ConcurrentHashSet;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MonsterType;
 import lkd.namsic.game.enums.StatType;
@@ -19,6 +19,8 @@ import lombok.Setter;
 
 @Getter
 public class Monster extends AiEntity {
+
+    final long originalId;
 
     @Setter
     @NonNull
@@ -32,7 +34,10 @@ public class Monster extends AiEntity {
     public Monster(@NonNull String name) {
         super(name);
         this.id.setId(Id.MONSTER);
-        this.id.setObjectId(Objects.requireNonNull(MonsterList.findByName(name)));
+
+        long objectId = Objects.requireNonNull(MonsterList.findByName(name));
+        this.id.setObjectId(objectId);
+        this.originalId = objectId;
     }
 
     public void randomLevel() {
@@ -41,10 +46,10 @@ public class Monster extends AiEntity {
         }
 
         int prevLv = this.lv.get();
-        int newLv = prevLv + ((int) Math.round(Math.random() * prevLv) - prevLv / 2);
+        int newLv = Math.max(prevLv + (new Random().nextInt(17) - 8), 1);
         this.lv.set(newLv);
 
-        double statIncrease = 0.2 * (newLv - prevLv);
+        double statIncrease = 0.1 * (newLv - prevLv);
         for(StatType statType : StatType.values()) {
             try {
                 Config.checkStatType(statType);

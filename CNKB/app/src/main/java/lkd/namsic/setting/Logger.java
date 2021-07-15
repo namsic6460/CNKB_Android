@@ -1,6 +1,7 @@
 package lkd.namsic.setting;
 
 import android.util.Log;
+import android.view.View;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -68,7 +69,10 @@ public class Logger {
         final String logText = timeText + "[" + prefix + "] : " + title + " - " + text + "\n";
         logs += logText;
 
-        MainActivity.mainActivity.runOnUiThread(() -> MainActivity.textView.append(logText));
+        MainActivity.mainActivity.runOnUiThread(() -> {
+            MainActivity.textView.append(logText);
+            MainActivity.scrollView.fullScroll(View.FOCUS_DOWN);
+        });
 
         logCount++;
 

@@ -17,12 +17,14 @@ import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Doing;
+import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.FightWaitType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
+import lkd.namsic.game.enums.object_list.EquipList;
 import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
@@ -30,7 +32,6 @@ import lkd.namsic.game.gameObject.Boss;
 import lkd.namsic.game.gameObject.Entity;
 import lkd.namsic.game.gameObject.Equipment;
 import lkd.namsic.game.gameObject.GameMap;
-import lkd.namsic.game.gameObject.Item;
 import lkd.namsic.game.gameObject.Monster;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.setting.Logger;
@@ -81,6 +82,11 @@ public class FightManager {
                     throw new WeirdCommandException("해당 대상은 현재 전투가 불가능합니다\n(도주 성공 후 30초간 PvP 불가)");
                 } else if(preventTime != 0) {
                     preventMap.remove(id);
+                }
+                
+                if(self.getLv().get() > player.getLv().get() / 2) {
+                    throw new WeirdCommandException("본인 레벨의 절반에 미치지 못하는 레벨의 플레이어는 공격할 수 없습니다\n\n" +
+                            "뉴비 학살을 멈춰주세요\n-공익 봇 협의회-");
                 }
 
                 this.startFight(self, player);
@@ -168,6 +174,14 @@ public class FightManager {
         int size = enemies.size();
         if (size == 0) {
             throw new NumberRangeException(size, 1);
+        }
+
+        for(Map.Entry<Id, Set<Long>> entry : enemies.entrySet()) {
+            for(long objectId : entry.getValue()) {
+                if(!self.canFight(Config.getData(entry.getKey(), objectId))) {
+                    throw new WeirdCommandException("전투를 할 수 없는 적이 포함되어 있습니다");
+                }
+            }
         }
 
         if (size == 1 && enemies.containsKey(Id.PLAYER)) {
@@ -396,6 +410,8 @@ public class FightManager {
                             .append(Emoji.LIST)
                             .append(" (전투/fight/f) (아이템/item/i) {아이템 이름} - 아이템을 사용합니다(연속 사용 불가)\n")
                             .append(Emoji.LIST)
+                            .append(" (전투/fight/f) (장비/equip/e) {장비 부위} - 장비를 사용합니다\n")
+                            .append(Emoji.LIST)
                             .append(" (전투/fight/f) (도망/도주/run/r) - 50% 확률로 도주합니다\n(예시: ")
                             .append(Emoji.focus("n 전투 공격 1"))
                             .append("\n\n---대상 목록---");
@@ -478,7 +494,7 @@ public class FightManager {
 
                     if (response.equals(FightWaitType.NONE)) {
                         response = FightWaitType.ATTACK;
-                        targetIndex = random.nextInt(index);
+                        targetIndex = random.nextInt(index - 1) + 1;
                         player.replyPlayer("턴이 종료되어 랜덤한 적을 공격합니다");
                     }
 
@@ -486,7 +502,7 @@ public class FightManager {
                     switch (response) {
                         case WAIT:
                             Player.replyPlayersExcept(playerSet, player.getNickName() +
-                                    "(은/는) 아무 행동도 하지 않고 턴을 넘겼습니다", player);
+                                    " (은/는) 아무 행동도 하지 않고 턴을 넘겼습니다", player);
                             player.replyPlayer("턴을 종료했습니다");
 
                             break;
@@ -507,35 +523,6 @@ public class FightManager {
 
                             if (isDeath) {
                                 msg += "하여 " + targetName + "(을/를) 처치했습니다!";
-
-                                innerBuilder = new StringBuilder("드롭 필드 좌표: ")
-                                        .append(target.getLastDeathLoc().toFieldString())
-                                        .append("떨어진 골드: ")
-                                        .append(target.getLastDropMoney())
-                                        .append("\n\n---떨어진 아이템---");
-
-                                if(target.getLastDropItem().isEmpty()) {
-                                    innerBuilder.append("떨어트린 아이템이 없습니다");
-                                } else {
-                                    for(Map.Entry<Long, Integer> entry : target.getLastDropItem().entrySet()) {
-                                        innerBuilder.append("\n")
-                                                .append(ItemList.findById(entry.getKey()))
-                                                .append(" ")
-                                                .append(entry.getValue())
-                                                .append("개");
-                                    }
-                                }
-
-                                innerBuilder.append("\n\n---떨어진 장비---");
-
-                                if(target.getLastDropEquip().isEmpty()) {
-                                    innerBuilder.append("떨어트린 장비가 없습니다");
-                                } else {
-                                    for(long equipId : target.getLastDropEquip()) {
-                                        innerBuilder.append("\n")
-                                                .append(((Equipment) Config.getData(Id.EQUIPMENT, equipId)).getName());
-                                    }
-                                }
 
                                 this.endFight(target);
                                 Player.replyPlayersExcepts(playerSet, msg, innerBuilder.toString(), excepts);
@@ -575,6 +562,14 @@ public class FightManager {
                                     ItemList.findById(itemId) + "(을/를) 사용했습니다", player);
 
                             break;
+                        case EQUIP:
+                            long equipId = Objects.requireNonNull(player.getObjectVariable(Variable.FIGHT_ITEM_ID));
+
+                            EquipManager.getInstance().use(player, equipId);
+                            Player.replyPlayersExcept(playerSet, player.getNickName() + "(이/가) " +
+                                    EquipList.findById(equipId) + "(을/를) 사용했습니다", player);
+
+                            break;
                         case RUN:
                             if (success) {
                                 preventMap.put(attacker.getId().getObjectId(), System.currentTimeMillis() + Config.PREVENT_FIGHT_TIME);
@@ -582,7 +577,7 @@ public class FightManager {
                                 this.endFight(attacker);
                                 player.replyPlayer("도주에 성공하였습니다");
                                 Player.replyPlayersExcept(playerSet, player.getNickName() +
-                                        "(이/가) 도주에 성공헀습니다", player);
+                                        "(이/가) 도주에 성공했습니다", player);
 
                                 if (attacker.equals(self)) {
                                     for (Entity entity : entitySet) {
@@ -606,7 +601,7 @@ public class FightManager {
                     int pattern = (int) patternData[1];
 
                     if (player == null) {
-                        Player.replyPlayers(playerSet, attacker.getName() + "(은/는) 아무 행동도 하지 않고 턴을 넘겼습니다");
+                        Player.replyPlayers(playerSet, attacker.getName() + " (은/는) 아무 행동도 하지 않고 턴을 넘겼습니다");
                     } else {
                         if (pattern == 0) {
                             boolean isDeath = attacker.attack(player, false);
@@ -617,12 +612,12 @@ public class FightManager {
 
                                 StringBuilder innerBuilder = new StringBuilder("드롭 필드 좌표: ")
                                         .append(player.getLastDeathLoc().toFieldString())
-                                        .append("떨어진 골드: ")
+                                        .append("\n떨어진 골드: ")
                                         .append(player.getLastDropMoney())
                                         .append("\n\n---떨어진 아이템---");
 
                                 if(player.getLastDropItem().isEmpty()) {
-                                    innerBuilder.append("떨어트린 아이템이 없습니다");
+                                    innerBuilder.append("\n떨어트린 아이템이 없습니다");
                                 } else {
                                     for(Map.Entry<Long, Integer> entry : player.getLastDropItem().entrySet()) {
                                         innerBuilder.append("\n")
@@ -636,7 +631,7 @@ public class FightManager {
                                 innerBuilder.append("\n\n---떨어진 장비---");
 
                                 if(player.getLastDropEquip().isEmpty()) {
-                                    innerBuilder.append("떨어트린 장비가 없습니다");
+                                    innerBuilder.append("\n떨어트린 장비가 없습니다");
                                 } else {
                                     for(long equipId : player.getLastDropEquip()) {
                                         innerBuilder.append("\n")
@@ -705,25 +700,16 @@ public class FightManager {
                 return;
             }
         } else if(response.equals(FightWaitType.ITEM)) {
-            Long itemId = ItemList.findByName(subCommand);
-            if(itemId == null) {
-                throw new WeirdCommandException("알 수 없는 아이템 이름입니다");
-            }
-
-            Item item = Config.getData(Id.ITEM, itemId);
-            if(item.getUse() == null) {
-                throw new WeirdCommandException("사용이 불가능한 아이템입니다");
-            }
-
-            if(self.getItem(itemId) == 0) {
-                throw new WeirdCommandException("해당 아이템을 보유하고 있지 않습니다");
-            }
+            long itemId = ItemManager.getInstance().checkUse(self, subCommand, 1);
 
             if(itemId >= ItemList.LOW_EXP_POTION.getId() && itemId <= ItemList.HIGH_EXP_POTION.getId()) {
                 throw new WeirdCommandException("전투중에는 경험치 포션을 사용할 수 없습니다");
             }
 
             self.setVariable(Variable.FIGHT_ITEM_ID, itemId);
+        } else if(response.equals(FightWaitType.EQUIP)) {
+            long equipId = EquipManager.getInstance().checkUse(self, EquipType.findByName(subCommand));
+            self.setVariable(Variable.FIGHT_ITEM_ID, equipId);
         }
 
         self.setVariable(Variable.FIGHT_WAIT_TYPE, response);
