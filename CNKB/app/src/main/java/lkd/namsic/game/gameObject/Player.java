@@ -199,6 +199,8 @@ public class Player extends Entity {
         this.setBasicStat(StatType.MAXMN, 10);
         this.setBasicStat(StatType.MN, 10);
         this.setBasicStat(StatType.ATK, 10);
+
+        this.getEnemies().clear();
     }
 
     @NonNull
@@ -212,6 +214,10 @@ public class Player extends Entity {
 
     public void setCurrentTitle(@NonNull String title) {
         if(this.title.contains(title)) {
+            if(title.equals("관리자")) {
+                Config.PLAYER_LV_RANK.remove(this.getName());
+            }
+
             this.currentTitle = title;
         } else {
             throw new ObjectNotFoundException("Title : " + title);

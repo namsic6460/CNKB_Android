@@ -129,9 +129,6 @@ public class MoveManager {
             }
 
             if (self.getId().getId().equals(Id.PLAYER) && (fieldX != 1 && fieldY != 1)) {
-                Set<Long> attackMonsters = new HashSet<>();
-                Set<Long> attackBosses = new HashSet<>();
-
                 Monster monster;
                 for (long monsterId : map.getEntity(Id.MONSTER)) {
                     monster = Config.getData(Id.MONSTER, monsterId);
@@ -141,32 +138,10 @@ public class MoveManager {
                                 self.getLv().get()) * Config.ATTACKED_PERCENT_INCREASE, Config.MAX_ATTACKED_PERCENT);
 
                         if (Math.random() < attackedPercent) {
-                            attackMonsters.add(monsterId);
+                            FightManager.getInstance().startFight((Player) self, Config.getData(Id.MONSTER, monsterId));
+                            break;
                         }
                     }
-                }
-
-                Boss boss;
-                for (long bossId : map.getEntity(Id.BOSS)) {
-                    boss = Config.getData(Id.BOSS, bossId);
-
-                    if (self.getFieldDistance(boss.getLocation()) <= Config.RECOGNIZE_DISTANCE) {
-                        attackBosses.add(bossId);
-                    }
-                }
-
-                if (!(attackMonsters.isEmpty() && attackBosses.isEmpty())) {
-                    Map<Id, Set<Long>> enemies = new HashMap<>();
-
-                    if (!attackMonsters.isEmpty()) {
-                        enemies.put(Id.MONSTER, attackMonsters);
-                    }
-
-                    if (!attackBosses.isEmpty()) {
-                        enemies.put(Id.BOSS, attackBosses);
-                    }
-
-                    FightManager.getInstance().startFight((Player) self, enemies);
                 }
             }
 

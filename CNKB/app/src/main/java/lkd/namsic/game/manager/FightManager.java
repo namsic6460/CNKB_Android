@@ -3,6 +3,7 @@ package lkd.namsic.game.manager;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -94,117 +95,38 @@ public class FightManager {
                 return false;
             }
         } else {
-            Map<Id, Set<Long>> enemies = new HashMap<>();
-            String[] locationStr = targetStr.split("-");
+            Id id = Id.MONSTER;
+            int index = Integer.parseInt(targetStr);
 
-            int fieldX, fieldY;
-            Location location = null;
+            Set<Long> set = map.getEntity(Id.MONSTER);
+            int size = set.size();
+            if(size < index) {
+                index -= size;
+                set = map.getEntity(Id.BOSS);
 
-            try {
-                fieldX = Integer.parseInt(locationStr[0]);
-                fieldY = Integer.parseInt(locationStr[1]);
-
-                location = new Location(0, 0, fieldX, fieldY);
-            } catch (NumberFormatException | NumberRangeException | IndexOutOfBoundsException ignore) {}
-
-            if(location != null) {
-                Set<Long> bossSet = new HashSet<>();
-                Boss boss;
-                for (long bossId : map.getEntity(Id.BOSS)) {
-                    boss = Config.getData(Id.BOSS, bossId);
-
-                    if (boss.getLocation().equalsField(location)) {
-                        if(self.canFight(boss)) {
-                            bossSet.add(bossId);
-                        } else {
-                            return false;
-                        }
-                    }
+                if(set.size() < index) {
+                    throw new WeirdCommandException("알 수 없는 대상입니다");
+                } else {
+                    id = Id.BOSS;
                 }
-
-                Set<Long> monsterSet = new HashSet<>();
-                Monster monster;
-                for(long monsterId : map.getEntity(Id.MONSTER)) {
-                    monster = Config.getData(Id.MONSTER, monsterId);
-
-                    if (monster.getLocation().equalsField(location)) {
-                        if(self.canFight(monster)) {
-                            monsterSet.add(monsterId);
-                        } else {
-                            return false;
-                        }
-                    }
-                }
-
-                int bossSize = bossSet.size();
-                int monsterSize = monsterSet.size();
-
-                if(bossSize + monsterSize == 0) {
-                    throw new WeirdCommandException("해당 위치에는 몬스터 또는 보스가 존재하지 않습니다");
-                }
-
-                if(bossSize != 0) {
-                    enemies.put(Id.BOSS, bossSet);
-                }
-
-                if(monsterSize != 0) {
-                    enemies.put(Id.MONSTER, monsterSet);
-                }
-
-                this.startFight(self, enemies);
-            } else {
-                throw new WeirdCommandException("알 수 없는 대상입니다");
             }
+
+            List<Long> list = new ArrayList<>(set);
+            Collections.sort(list);
+
+            Entity target = Config.getData(id, list.get(index - 1));
+            this.startFight(self, target);
         }
 
         return true;
     }
 
-    public void startFight(@NonNull Player self, @NonNull Player enemy) {
-        Map<Id, Set<Long>> enemies = new HashMap<>();
-
-        Set<Long> set = new HashSet<>();
-        set.add(enemy.getId().getObjectId());
-        enemies.put(Id.PLAYER, set);
-
-        this.startFight(self, enemies);
-    }
-
-    public void startFight(@NonNull Player self, @NonNull Map<Id, Set<Long>> enemies) {
-        int size = enemies.size();
-        if (size == 0) {
-            throw new NumberRangeException(size, 1);
+    public void startFight(@NonNull Player self, @NonNull Entity enemy) {
+        if(!self.canFight(enemy)) {
+            throw new WeirdCommandException("전투를 할 수 없는 적입니다");
         }
 
-        for(Map.Entry<Id, Set<Long>> entry : enemies.entrySet()) {
-            for(long objectId : entry.getValue()) {
-                if(!self.canFight(Config.getData(entry.getKey(), objectId))) {
-                    throw new WeirdCommandException("전투를 할 수 없는 적이 포함되어 있습니다");
-                }
-            }
-        }
-
-        if (size == 1 && enemies.containsKey(Id.PLAYER)) {
-            Player enemy = Config.getData(Id.PLAYER, (long) enemies.get(Id.PLAYER).toArray()[0]);
-            self.replyPlayer(enemy.getName() + " (와/과)의 전투가 시작되었습니다");
-        } else {
-            StringBuilder innerMsg = new StringBuilder("---적 목록---");
-
-            Id id;
-            Entity enemy;
-            for (Map.Entry<Id, Set<Long>> entry : enemies.entrySet()) {
-                id = entry.getKey();
-
-                for (long objectId : entry.getValue()) {
-                    enemy = Config.getData(id, objectId);
-                    innerMsg.append("\n")
-                            .append(enemy.getName());
-                }
-            }
-
-            self.replyPlayer("적 " + size + "명과의 전투가 시작되었습니다", innerMsg.toString());
-        }
-
+        self.replyPlayer(enemy.getName() + " (와/과)의 전투가 시작되었습니다");
         self.setVariable(Variable.IS_TURN, false);
 
         Doing doing = self.getDoing();
@@ -218,98 +140,85 @@ public class FightManager {
         self.addLog(LogData.FIGHT, 1);
 
         long objectId = self.getId().getObjectId();
-        int enemyCount = 0;
 
-        Id enemyId;
-        for (Map.Entry<Id, Set<Long>> entry : enemies.entrySet()) {
-            enemyCount++;
-            enemyId = entry.getKey();
+        Id enemyId = enemy.getId().getId();
+        long enemyObjectId = enemy.getId().getObjectId();
+        Entity loadedEnemy = Config.loadObject(enemyId, enemyObjectId);
 
-            Entity enemy;
-            for (long enemyObjectId : entry.getValue()) {
-                enemy = Config.loadObject(enemyId, enemyObjectId);
+        if (loadedEnemy.getDoing().equals(Doing.FIGHT)) {
+            int enemyCount = 0;
+            StringBuilder innerMsg = new StringBuilder("---추가된 적 목록---");
 
-                try {
-                    if (enemy.getDoing().equals(Doing.FIGHT)) {
-                        StringBuilder innerMsg = new StringBuilder("---추가된 적 목록---");
+            Set<Player> playerSet = new HashSet<>();
+            if (enemyId.equals(Id.PLAYER)) {
+                playerSet.add((Player) loadedEnemy);
+            }
 
-                        Set<Player> playerSet = new HashSet<>();
-                        if (enemyId.equals(Id.PLAYER)) {
-                            playerSet.add((Player) enemy);
+            boolean hasInner = true;
+            if(loadedEnemy.getEnemies().isEmpty()) {
+                hasInner = false;
+            } else {
+                for (Map.Entry<Id, ConcurrentHashSet<Long>> newEntry : loadedEnemy.getEnemies().entrySet()) {
+                    Id newEnemyId = newEntry.getKey();
+
+                    for (long newEnemyObjectId : newEntry.getValue()) {
+                        enemyCount++;
+                        Entity newEnemy = Config.loadObject(newEnemyId, newEnemyObjectId);
+
+                        self.addEnemy(newEnemyId, newEnemyObjectId);
+                        newEnemy.addEnemy(Id.PLAYER, objectId);
+
+                        if (newEnemyId.equals(Id.PLAYER)) {
+                            playerSet.add((Player) newEnemy);
+                            ((Player) newEnemy).addLog(LogData.FIGHT_ENEMY, 1);
                         }
 
-                        boolean hasInner = true;
-                        if(enemy.getEnemies().isEmpty()) {
-                            hasInner = false;
-                        } else {
-                            for (Map.Entry<Id, ConcurrentHashSet<Long>> newEntry : enemy.getEnemies().entrySet()) {
-                                Id newEnemyId = newEntry.getKey();
-
-                                for (long newEnemyObjectId : newEntry.getValue()) {
-                                    enemyCount++;
-                                    Entity newEnemy = Config.loadObject(newEnemyId, newEnemyObjectId);
-
-                                    try {
-                                        self.addEnemy(newEnemyId, newEnemyObjectId);
-                                        newEnemy.addEnemy(Id.PLAYER, objectId);
-
-                                        if (newEnemyId.equals(Id.PLAYER)) {
-                                            playerSet.add((Player) newEnemy);
-                                        }
-
-                                        innerMsg.append("\n")
-                                                .append(Emoji.LIST)
-                                                .append(newEnemy.getName());
-                                    } finally {
-                                        Config.unloadObject(newEnemy);
-                                    }
-                                }
-                            }
-                        }
-
-                        self.addEnemy(enemyId, enemyObjectId);
-                        enemy.addEnemy(Id.PLAYER, objectId);
-
-                        Player.replyPlayers(playerSet, self.getName() + "(이/가) 전투에 난입했습니다!");
-
-                        self.addLog(LogData.FIGHT_ENEMY, enemyCount);
-
-                        if(hasInner) {
-                            self.replyPlayer(enemy.getRealName() + "(와/과) 전투중인 다른 적들이 본인을 경계하기 시작했습니다",
-                                    innerMsg.toString());
-                        }
-
-                        return;
-                    } else {
-                        self.addEnemy(enemy.getId().getId(), enemy.getId().getObjectId());
-                        enemy.addEnemy(Id.PLAYER, objectId);
-
-                        if (enemy.getId().getId().equals(Id.PLAYER)) {
-                            Player player = (Player) enemy;
-
-                            if (player.getDoing().equals(Doing.ADVENTURE)) {
-                                player.setVariable(Variable.ADVENTURE_FIGHT, true);
-                                player.setPrevDoing(Doing.NONE);
-                            } else {
-                                player.setPrevDoing(player.getDoing());
-                            }
-
-                            player.setVariable(Variable.IS_TURN, false);
-                            player.addLog(LogData.FIGHT, 1);
-                            player.addLog(LogData.FIGHT_ENEMY, enemyCount);
-
-                            player.replyPlayer(self.getName() + " (와/과) 의 전투가 시작되었습니다");
-                        }
-
-                        enemy.setDoing(Doing.FIGHT);
+                        innerMsg.append("\n")
+                                .append(Emoji.LIST)
+                                .append(newEnemy.getName());
+                        Config.unloadObject(newEnemy);
                     }
-                } finally {
-                    Config.unloadObject(enemy);
                 }
             }
+
+            self.addEnemy(enemyId, enemyObjectId);
+            loadedEnemy.addEnemy(Id.PLAYER, objectId);
+
+            Player.replyPlayers(playerSet, self.getName() + "(이/가) 전투에 난입했습니다!");
+
+            self.addLog(LogData.FIGHT_ENEMY, enemyCount);
+
+            if(hasInner) {
+                self.replyPlayer(loadedEnemy.getName() + " (와/과) 전투중인 다른 적들이 본인을 경계하기 시작했습니다",
+                        innerMsg.toString());
+            }
+
+            return;
+        } else {
+            self.addEnemy(loadedEnemy.getId().getId(), loadedEnemy.getId().getObjectId());
+            loadedEnemy.addEnemy(Id.PLAYER, objectId);
+
+            if (loadedEnemy.getId().getId().equals(Id.PLAYER)) {
+                Player player = (Player) loadedEnemy;
+
+                if (player.getDoing().equals(Doing.ADVENTURE)) {
+                    player.setVariable(Variable.ADVENTURE_FIGHT, true);
+                    player.setPrevDoing(Doing.NONE);
+                } else {
+                    player.setPrevDoing(player.getDoing());
+                }
+
+                player.setVariable(Variable.IS_TURN, false);
+                player.addLog(LogData.FIGHT, 1);
+                player.addLog(LogData.FIGHT_ENEMY, 1);
+
+                player.replyPlayer(self.getName() + " (와/과) 의 전투가 시작되었습니다");
+            }
+
+            loadedEnemy.setDoing(Doing.FIGHT);
         }
 
-        self.addLog(LogData.FIGHT_ENEMY, enemyCount);
+        Config.unloadObject(loadedEnemy);
 
         Random random = new Random();
         while (true) {
@@ -428,18 +337,18 @@ public class FightManager {
                         return isPlayer1 ? -1 : 1;
                     });
 
-                    for (Entity enemy : list) {
-                        if (enemy.equals(attacker)) {
+                    for (Entity entity : list) {
+                        if (entity.equals(attacker)) {
                             continue;
                         }
 
-                        targets.put(index, enemy);
+                        targets.put(index, entity);
                         innerBuilder.append("\n")
                                 .append(index++)
                                 .append(". ")
-                                .append(enemy.getName())
+                                .append(entity.getName())
                                 .append(" - 남은 체력 : [ ")
-                                .append(enemy.getDisplayHp())
+                                .append(entity.getDisplayHp())
                                 .append(" ]");
                     }
 

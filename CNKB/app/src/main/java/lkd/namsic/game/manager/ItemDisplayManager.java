@@ -224,23 +224,28 @@ public class ItemDisplayManager {
     }
 
     public void displayItemInfo(@NonNull Player self, @NonNull String itemName) {
-        Id id = Id.ITEM;
         Long itemId = ItemList.findByName(itemName);
 
         if(itemId == null) {
-            id = Id.EQUIPMENT;
-            itemId = EquipList.findByName(itemName);
-
-            if(itemId == null) {
-                throw new WeirdCommandException("알 수 없는 아이템 또는 장비입니다");
-            }
+            throw new WeirdCommandException("알 수 없는 아이템입니다");
         }
 
-        Item item = Config.getData(id, itemId);
+        Item item = Config.getData(Id.ITEM, itemId);
         self.replyPlayer("[" + item.getName() + "]\n" + item.getDescription());
     }
 
-    public void displayEquipInfo(@NonNull Player self) {
+    public void displayEquipInfo(@NonNull Player self, @NonNull String equipName) {
+        Long equipId = EquipList.findByName(equipName);
+
+        if(equipId == null) {
+            throw new WeirdCommandException("알 수 없는 장비입니다");
+        }
+
+        Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+        self.replyPlayer("[" + equipment.getName() + "]\n" + equipment.getDescription());
+    }
+
+    public void displayEquippedInfo(@NonNull Player self) {
         StringBuilder innerBuilder = new StringBuilder("---착용하고 있는 장비---");
 
         Equipment equipment;

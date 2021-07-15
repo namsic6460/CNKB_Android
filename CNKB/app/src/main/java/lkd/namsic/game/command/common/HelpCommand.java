@@ -24,7 +24,8 @@ public class HelpCommand extends CommonCommand {
                         Emoji.LIST + " *(개발자/dev) : 개발자 정보를 표시합니다\n\n" +
                         "\n---유저 명령어---\n" +
                         Emoji.LIST + " *(정보/info/i) [{플레이어 닉네임}] : 플레이어의 정보를 표시합니다\n\n" +
-                        Emoji.LIST + " *(정보/info/i) (아이템/item) ({아이템 이름}) : 아이템 또는 장비의 정보를 표시합니다\n\n" +
+                        Emoji.LIST + " *(정보/info/i) (아이템/item) ({아이템 이름}) : 아이템의 정보를 표시합니다\n\n" +
+                        Emoji.LIST + " *(정보/info/i) (장비/equip) ({장비 이름}) : 장비의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(가방/인벤토리/인벤/inventory/inven) [{페이지}] : 현재 인벤토리를 표시합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) : 장비 착용 현황을 표시합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) (인벤토리/인벤/inventory/inven) [{페이지}] : 현재 장비 인벤토리를 표시합니다\n\n" +
@@ -46,7 +47,7 @@ public class HelpCommand extends CommonCommand {
                         Emoji.LIST + " (감정/appraise/apr) [{아이템 개수}] : 돌을 감정하여 보석을 선별해냅니다(개당 5초 소요)\n\n" +
                         Emoji.LIST + " (감정/appraise/apr) (중지/정지/stop) : 감정을 중지합니다(보상의 50%만 적용됩니다)\n\n" +
                         Emoji.LIST + " (낚시/fish) [{낚시 레벨}] : 낚시를 합니다(추가 명령 필요)(강 또는 바다에서만 가능)\n\n" +
-                        Emoji.LIST + " (전투/fight/f) ({닉네임}/{좌표}) : 대상과의 전투를 시작합니다" +
+                        Emoji.LIST + " (전투/fight/f) ({닉네임}/{번호}) : 대상과의 전투를 시작합니다" +
                         "(좌표로 지정할 경우 몬스터 또는 보스만 대상이 됩니다)\n\n" +
                         Emoji.LIST + " (모험/adventure/adv) : 현재 지역을 탐색합니다(마을 이외 지역에서만 가능)(모험 중 공격받을 수 있음)\n\n" +
                         Emoji.LIST + " (스텟/stat) : 각 스텟들의 정보를 보여줍니다\n\n" +

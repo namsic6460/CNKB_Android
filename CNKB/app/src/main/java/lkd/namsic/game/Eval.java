@@ -100,7 +100,7 @@ public class Eval {
             ScriptableObject.putProperty(scope, "Equipment", Equipment.class);
             ScriptableObject.putProperty(scope, "GameObject", GameObject.class);
             ScriptableObject.putProperty(scope, "Item", Item.class);
-            ScriptableObject.putProperty(scope, "MapClass", GameMap.class);
+            ScriptableObject.putProperty(scope, "GameMap", GameMap.class);
             ScriptableObject.putProperty(scope, "Monster", Monster.class);
             ScriptableObject.putProperty(scope, "NamedObject", NamedObject.class);
             ScriptableObject.putProperty(scope, "Npc", Npc.class);

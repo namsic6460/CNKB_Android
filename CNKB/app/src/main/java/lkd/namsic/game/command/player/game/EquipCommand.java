@@ -22,7 +22,7 @@ public class EquipCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if(second == null) {
-            ItemDisplayManager.getInstance().displayEquipInfo(player);
+            ItemDisplayManager.getInstance().displayEquippedInfo(player);
         } else if(Arrays.asList("인벤토리", "인벤", "inventory", "inven").contains(second)) {
             int page = third == null ? 1 : Integer.parseInt(third);
             ItemDisplayManager.getInstance().displayEquipInventory(player, page);

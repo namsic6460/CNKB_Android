@@ -18,6 +18,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -88,6 +89,9 @@ public class Config {
     public static final Map<String, Long> MAP_COUNT = new ConcurrentHashMap<>();
 
     private static final String REGEX = "[^A-Za-z-_0-9ㄱ-ㅎㅏ-ㅣ가-힣\\s]|[\n]|[\r]";
+    public static final List<String> FORBIDDEN_WORD = Arrays.asList("아이템", "item", "장비", "equip", "시발", "애미", "애비",
+            "느금", "느금마", "지랄", "염병", "옘병", "tlqkf", "ㄴㄱㅁ", "앰이", "보지", "자지", "섹스", "발기", "왕고추", "느금",
+            "유미없음", "창년", "창녀", "창남", "몸팔이", "니애미", "니애비");
     public static final Map<String, Long> PLAYER_ID = new ConcurrentHashMap<>();
     public static final Map<Long, String[]> PLAYER_LIST = new ConcurrentHashMap<>();
     public static final Map<String, Integer> PLAYER_LV_RANK = new ConcurrentHashMap<>();
@@ -134,7 +138,7 @@ public class Config {
 
     public static final long PREVENT_FIGHT_TIME = 30000L;
     public static final int RECOGNIZE_DISTANCE = 16;
-    public static final double ATTACKED_PERCENT = 0.5;
+    public static final double ATTACKED_PERCENT = 0.3;
     public static final double ATTACKED_PERCENT_INCREASE = 0.025;
     public static final double MAX_ATTACKED_PERCENT = 0.9;
 

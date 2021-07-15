@@ -2,8 +2,11 @@ package lkd.namsic.game.gameObject;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -26,8 +29,6 @@ import lombok.Setter;
 
 @Getter
 public class GameMap {
-
-    private static final MoveManager moveManager = MoveManager.getInstance();
 
     @Setter
     @NonNull
@@ -128,17 +129,22 @@ public class GameMap {
             }
         }
 
+        int index = 1;
+
         builder.append("\n\n---몬스터 목록---");
 
-        Set<Long> monsterSet = this.entity.get(Id.MONSTER);
-        if(monsterSet.isEmpty()) {
+        List<Long> monsterList = new ArrayList<>(this.entity.get(Id.MONSTER));
+        Collections.sort(monsterList);
+
+        if(monsterList.isEmpty()) {
             builder.append("\n몬스터 없음");
         } else {
             Monster monster;
-
-            for(long monsterId : monsterSet) {
+            for(long monsterId : monsterList) {
                 monster = Config.getData(Id.MONSTER, monsterId);
-                builder.append("\n[")
+                builder.append("\n")
+                        .append(index++)
+                        .append(". [")
                         .append(monster.getLocation().toFieldString())
                         .append("] ")
                         .append(monster.getName());
@@ -155,7 +161,9 @@ public class GameMap {
 
             for(long bossId : bossSet) {
                 boss = Config.getData(Id.BOSS, bossId);
-                builder.append("\n[")
+                builder.append("\n")
+                        .append(index++)
+                        .append(". [")
                         .append(boss.getLocation().toFieldString())
                         .append("] ")
                         .append(boss.getName());
@@ -419,10 +427,6 @@ public class GameMap {
         this.spawnPercent.get(Id.BOSS).put(bossId, percent);
     }
 
-    public boolean canRespawn() {
-        return this.getEntity(Id.MONSTER).isEmpty() && this.getEntity(Id.BOSS).isEmpty();
-    }
-
     public void respawn() {
         Random random = new Random();
 
@@ -451,7 +455,7 @@ public class GameMap {
                     Monster monster = Config.newObject(Config.getData(Id.MONSTER, monsterId));
                     monster.randomLevel();
                     monster.location = new Location();
-                    moveManager.setMap(monster, this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
+                    MoveManager.getInstance().setMap(monster, this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
                     this.addEntity(monster);
                     Config.unloadObject(monster);
                 }
@@ -478,7 +482,7 @@ public class GameMap {
                 Boss boss = Config.newObject(Config.getData(Id.BOSS, bossId));
                 boss.randomLevel();
                 boss.location = new Location();
-                moveManager.setMap(boss, this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
+                MoveManager.getInstance().setMap(boss, this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
                 this.addEntity(boss);
                 Config.unloadObject(boss);
 
