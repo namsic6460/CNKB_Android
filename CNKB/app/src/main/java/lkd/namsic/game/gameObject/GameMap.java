@@ -224,6 +224,10 @@ public class GameMap {
         Entity entity;
         Set<Entity> entitySet = new HashSet<>();
         for(Map.Entry<Id, Set<Long>> entry : this.entity.entrySet()) {
+            if(entry.getKey().equals(Id.NPC)) {
+                continue;
+            }
+
             for(long objectId : entry.getValue()) {
                 entity = Config.getData(entry.getKey(), objectId);
                 if(entity.equals(self)) {
@@ -285,6 +289,10 @@ public class GameMap {
             Entity entity;
             Set<Entity> entitySet = new HashSet<>();
             for(Map.Entry<Id, Set<Long>> entry : this.entity.entrySet()) {
+                if(entry.getKey().equals(Id.NPC)) {
+                    continue;
+                }
+
                 for(long objectId : entry.getValue()) {
                     entity = Config.getData(entry.getKey(), objectId);
                     if(entity.equals(self)) {
@@ -343,6 +351,10 @@ public class GameMap {
         Entity entity;
         Set<Entity> entitySet = new HashSet<>();
         for(Map.Entry<Id, Set<Long>> entry : this.entity.entrySet()) {
+            if(entry.getKey().equals(Id.NPC)) {
+                continue;
+            }
+
             for(long objectId : entry.getValue()) {
                 entity = Config.getData(entry.getKey(), objectId);
                 if(entity.equals(self)) {

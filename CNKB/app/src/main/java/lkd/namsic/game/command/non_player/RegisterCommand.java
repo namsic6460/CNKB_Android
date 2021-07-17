@@ -41,7 +41,7 @@ public class RegisterCommand extends NonPlayerCommand {
                             Emoji.LIST + " 숫자\n" +
                             Emoji.LIST + " 하이픈(-)\n" +
                             Emoji.LIST + " 언더바(_)\n" +
-                            Emoji.LIST + " 연속 공백은 최대 1칸" +
+                            Emoji.LIST + " 연속 공백은 최대 1칸\n" +
                             Emoji.LIST + " 길이는 2~16자");
             return;
         }

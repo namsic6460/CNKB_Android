@@ -1157,7 +1157,7 @@ public class ObjectCreator {
 
         monster.setBasicStat(StatType.MAXHP, 300);
         monster.setBasicStat(StatType.HP, 300);
-        monster.setBasicStat(StatType.ATK, 8);
+        monster.setBasicStat(StatType.ATK, 20);
         monster.setBasicStat(StatType.ATS, 150);
         monster.setBasicStat(StatType.EVA, 40);
 
@@ -1174,10 +1174,11 @@ public class ObjectCreator {
 
         monster.setBasicStat(StatType.MAXHP, 500);
         monster.setBasicStat(StatType.HP, 500);
-        monster.setBasicStat(StatType.ATK, 10);
+        monster.setBasicStat(StatType.ATK, 40);
         monster.setBasicStat(StatType.ATS, 100);
         monster.setBasicStat(StatType.ACC, 20);
         monster.setBasicStat(StatType.DRA, 10);
+        monster.setBasicStat(StatType.BRE, 20);
 
         monster.setItemDrop(ItemList.PIECE_OF_SLIME.getId(), 1D, 1, 3);
 
@@ -1236,6 +1237,7 @@ public class ObjectCreator {
 
         map = new GameMap(MapList.findByLocation(1, 2));
         map.setMapType(MapType.SWAMP);
+        map.getRequireLv().set(40);
         map.getLocation().set(1, 2, 1, 1);
         map.setSpawnMonster(MonsterList.SLIME.getId(), 1, 8);
         Config.unloadMap(map);
