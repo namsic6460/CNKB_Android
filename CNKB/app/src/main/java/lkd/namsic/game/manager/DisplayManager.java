@@ -3,7 +3,9 @@ package lkd.namsic.game.manager;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
@@ -13,6 +15,9 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
+import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object_list.NpcList;
+import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.GameMap;
 import lkd.namsic.game.gameObject.Npc;
 import lkd.namsic.game.gameObject.Player;
@@ -106,7 +111,9 @@ public class DisplayManager {
             return builder.toString() + "\n현재 진행중인 퀘스트 없음";
         }
 
-        for(long questId : self.getQuest().keySet()) {
+        List<Long> list = new ArrayList<>(self.getQuest().keySet());
+        Collections.sort(list);
+        for(long questId : list) {
             Quest quest = Config.getData(Id.QUEST, questId);
 
             builder.append("\n[")
@@ -118,7 +125,7 @@ public class DisplayManager {
             if(!npcId.equals(0L)) {
                 Npc npc = Config.getData(Id.NPC, npcId);
 
-                builder.append("(NPC: ")
+                builder.append(" (NPC: ")
                         .append(npc.getRealName())
                         .append(")");
             }
@@ -178,7 +185,7 @@ public class DisplayManager {
                 } else {
                     distance = self.getMapDistance(new Location(x, y));
 
-                    if (movableDistance <= distance) {
+                    if (movableDistance >= distance) {
                         builder = innerMsg;
                         flag = true;
                     }
@@ -254,6 +261,109 @@ public class DisplayManager {
         }
 
         self.replyPlayer("레벨 랭킹은 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+
+    public void displayQuestInfo(@NonNull Player self, long questId) {
+        if(!(self.getQuest().containsKey(questId) || self.getClearedQuest().containsKey(questId))) {
+            throw new WeirdCommandException("받아본 적 없는 퀘스트의 정보는 확인할 수 없습니다");
+        }
+        
+        StringBuilder innerBuilder = new StringBuilder("퀘스트 이름: ");
+        Quest quest = Config.getData(Id.QUEST, questId);
+        
+        innerBuilder.append(quest.getName())
+                .append("\n\n")
+                .append(Config.HARD_SPLIT_BAR)
+                .append("\n\n요구 금액: ")
+                .append(quest.getNeedMoney().get())
+                .append("\n\n---요구 아이템---");
+        
+        if(quest.getNeedItem().isEmpty()) {
+            innerBuilder.append("\n요구 아이템이 없습니다");
+        } else {
+            for (Map.Entry<Long, Integer> entry : quest.getNeedItem().entrySet()) {
+                innerBuilder.append("\n")
+                        .append(ItemList.findById(entry.getKey()))
+                        .append(": ")
+                        .append(entry.getValue())
+                        .append("개");
+            }
+        }
+        
+        innerBuilder.append("\n\n---요구 스텟---");
+        if(quest.getNeedStat().isEmpty()) {
+            innerBuilder.append("\n요구 스텟이 없습니다");
+        } else {
+            for (Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
+                innerBuilder.append("\n")
+                        .append(entry.getKey().getDisplayName())
+                        .append(": ")
+                        .append(entry.getValue());
+            }
+        }
+        
+        innerBuilder.append("\n\n---요구 친밀도---");
+        if(quest.getNeedCloseRate().isEmpty()) {
+            innerBuilder.append("\n요구 친밀도가 없습니다");
+        } else {
+            for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
+                innerBuilder.append("\n")
+                        .append(NpcList.findById(entry.getKey()))
+                        .append(": ")
+                        .append(entry.getValue());
+            }
+        }
+        
+        innerBuilder.append("\n\n")
+                .append(Config.HARD_SPLIT_BAR)
+                .append("\n\n보상 골드: ")
+                .append(quest.getRewardMoney().get())
+                .append("\n보상 경험치: ")
+                .append(quest.getRewardExp().get())
+                .append("\n보상 모험 스텟: ")
+                .append(quest.getRewardAdv().get())
+                .append("\n\n---보상 아이템---");
+        
+        if(quest.getRewardItem().isEmpty()) {
+            innerBuilder.append("\n보상 아이템이 없습니다");
+        } else {
+            for(Map.Entry<Long, Integer> entry : quest.getRewardItem().entrySet()) {
+                innerBuilder.append("\n")
+                        .append(ItemList.findById(entry.getKey()))
+                        .append(": ")
+                        .append(entry.getValue())
+                        .append("개");
+            }
+        }
+
+        innerBuilder.append("\n\n---보상 스텟---");
+        if(quest.getRewardStat().isEmpty()) {
+            innerBuilder.append("\n보상 스텟이 없습니다");
+        } else {
+            for (Map.Entry<StatType, Integer> entry : quest.getRewardStat().entrySet()) {
+                innerBuilder.append("\n")
+                        .append(entry.getKey().getDisplayName())
+                        .append(": ")
+                        .append(entry.getValue());
+            }
+        }
+
+        innerBuilder.append("\n\n---보상 친밀도---");
+        if(quest.getRewardCloseRate().isEmpty()) {
+            innerBuilder.append("\n요구 친밀도가 없습니다");
+        } else {
+            for(Map.Entry<Long, Integer> entry : quest.getRewardCloseRate().entrySet()) {
+                innerBuilder.append("\n")
+                        .append(NpcList.findById(entry.getKey()))
+                        .append(": ")
+                        .append(entry.getValue());
+            }
+        }
+
+        innerBuilder.append("\n\n")
+                .append(Config.HARD_SPLIT_BAR);
+        
+        self.replyPlayer("퀘스트 정보는 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
 }

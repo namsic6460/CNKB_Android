@@ -681,7 +681,7 @@ public class ObjectCreator {
                 long equipId = RandomList.lowRecipeEquips.get(random.nextInt(RandomList.lowRecipeEquips.size()));
 
                 player.getEquipRecipe().add(equipId);
-                return ItemList.findById(equipId) + " 의 제작법을 획득했습니다";
+                return EquipList.findById(equipId) + " 의 제작법을 획득했습니다";
             }
         });
         Config.unloadObject(item);
@@ -700,7 +700,7 @@ public class ObjectCreator {
                 long equipId = RandomList.middleRecipeEquips.get(random.nextInt(RandomList.middleRecipeEquips.size()));
 
                 player.getEquipRecipe().add(equipId);
-                return ItemList.findById(equipId) + " 의 제작법을 획득했습니다";
+                return EquipList.findById(equipId) + " 의 제작법을 획득했습니다";
             }
         });
         Config.unloadObject(item);
@@ -814,6 +814,9 @@ public class ObjectCreator {
 
         item = new Item("하급 부적", "하급 부적 1개를 뽑을 수 있는 아이템이다");
         item.getHandleLv().set(2);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.PIECE_OF_LOW_AMULET.getId(), 10);
+        }}, true);
         item.setUse((self, other) -> {
             long equipId = RandomList.lowAmulets.get(new Random().nextInt(RandomList.lowAmulets.size()));
             self.addEquip(equipId);
@@ -824,6 +827,9 @@ public class ObjectCreator {
 
         item = new Item("중급 부적", "중급 부적 1개를 뽑을 수 있는 아이템이다");
         item.getHandleLv().set(5);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.PIECE_OF_AMULET.getId(), 10);
+        }}, true);
         item.setUse((self, other) -> {
             long equipId = RandomList.middleAmulets.get(new Random().nextInt(RandomList.middleAmulets.size()));
             self.addEquip(equipId);
@@ -834,6 +840,9 @@ public class ObjectCreator {
 
         item = new Item("상급 부적", "상급 부적 1개를 뽑을 수 있는 아이템이다");
         item.getHandleLv().set(8);
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.PIECE_OF_HIGH_AMULET.getId(), 10);
+        }}, true);
         item.setUse((self, other) -> {
             long equipId = RandomList.highAmulets.get(new Random().nextInt(RandomList.highAmulets.size()));
             self.addEquip(equipId);
@@ -1061,7 +1070,7 @@ public class ObjectCreator {
             @Override
             @NonNull
             public String use(@NonNull Entity self, @NonNull List<GameObject> other) {
-                ((Player) self).setVariable(Variable.GHOST_SWORD_1, true);
+                self.setVariable(Variable.GHOST_SWORD_1, true);
                 return "최대 체력의 6%를 소모하여 다음 공격을 강화했습니다";
             }
         });
@@ -1616,7 +1625,73 @@ public class ObjectCreator {
         );
         Config.unloadObject(chat);
 
-        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 58L));
+        chat = createChat("낚시는 할만 한가요?", 58L, 
+                "하, 내가 누군데 당연히 잘 낚이지",
+                "가끔 낚싯대가 부서지는게 문제지만...",
+                "어? 이건 내 문제가 아니야. 낚싯대 문제라고...",
+                "그래.. 낚싯대라... 낚싯대 재료 좀 구해와 봐",
+                "실은 있으니 가죽 20개에 나뭇가지 10개면 적당할 것 같다"
+        );
+        chat.setResponseChat(WaitResponse.YES, 59L, true);
+        chat.setResponseChat(WaitResponse.NO, 60L, true);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 59L, "최대한 빨리 구해와라");
+        chat.getQuestId().set(QuestList.NEED_FISHING_ROD_ITEM.getId());
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 60L, "...... 꺼져");
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 61L,"그렇게 굼뱅이는 아니었군. 여기 보수다");
+        Config.unloadObject(chat);
+        
+        chat = createChat("근데 어떤 수련을 하고 있는거야?", 62L,
+                "음... 나는 마검사쪽을 공부하고 있어",
+                "검술은 무명님께 배우면 되지만 아무래도 마법쪽은 어렵긴 하네",
+                "아 말 나온 김에 혹시 하급 사냥꾼의 증표 5개랑 중급 사냥꾼의 증표 5개만 구해줄 수 있을까?",
+                "사냥꾼의 증표에 있는 기운을 좀 쓰고 싶거든"
+        );
+        chat.setResponseChat(WaitResponse.YES, 63L, true);
+        chat.setResponseChat(WaitResponse.NO, 64L, true);
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 63L, "고마워! 다 구하면 다시 말 걸어줘");
+        chat.getQuestId().set(QuestList.HUNTER_TALENT.getId());
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 64L, "그래? 아쉽네...");
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 65L,
+                "고마워! 이제.....",
+                "하.. 다시 수련하러 가야겠네..."
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat("뭔가 급해 보이시는데...", 66L,
+                "아 __nickname 마침 잘왔군",
+                "아내를 위한 선물을 해주려고 하는데 마땅한 아이템이 없어서 말이지",
+                "혹시 금 5개와 1만 골드를 구해줄 수 있겠나?"
+        );
+        chat.setResponseChat(WaitResponse.YES, 67L, true);
+        chat.setResponseChat(WaitResponse.NO, 68L, true);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 67L, "오 고맙군! 덕분에 선물을 만들어 줄 수 있곘군");
+        chat.getQuestId().set(QuestList.GOLD_RING.getId());
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 68L, "아쉽지만 별 수 없군! 다음에 또 들르게!");
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 69L,
+                "음... 보답을 해주고 싶은데 마땅한 광물이 없군",
+                "아 이거라도 가져가게나! 꽤나 유용할거야"
+        );
+        Config.unloadObject(chat);
+
+        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 70L));
         Logger.i("ObjectMaker", "Chat making is done!");
    }
 
@@ -1653,8 +1728,31 @@ public class ObjectCreator {
        quest.setNeedItem(ItemList.LOW_MINER_TOKEN.getId(), 30);
        quest.setRewardCloseRate(NpcList.MOO_MYEONG.getId(), 10, true);
        quest.setRewardCloseRate(NpcList.SELINA.getId(), 10, true);
-       quest.setRewardItem(ItemList.LOW_EXP_POTION.getId(), 5);
-       quest.setRewardItem(ItemList.ADV_STAT.getId(), 10);
+       quest.setRewardItem(ItemList.LOW_EXP_POTION.getId(), 30);
+       quest.setRewardItem(ItemList.ADV_STAT.getId(), 20);
+       Config.unloadObject(quest);
+
+       quest = new Quest("낚싯대 재료 구해오기", NpcList.KANG_TAE_GONG.getId(), 61L);
+       quest.setNeedItem(ItemList.LEATHER.getId(), 20);
+       quest.setNeedItem(ItemList.BRANCH.getId(), 10);
+       quest.setRewardCloseRate(NpcList.KANG_TAE_GONG.getId(), 10, true);
+       quest.setRewardItem(ItemList.SMALL_GOLD_BAG.getId(), 2);
+       quest.getRewardExp().set(100000L);
+       Config.unloadObject(quest);
+
+       quest = new Quest("증표의 힘?", NpcList.SELINA.getId(), 65L);
+       quest.setNeedItem(ItemList.LOW_HUNTER_TOKEN.getId(), 5);
+       quest.setNeedItem(ItemList.HUNTER_TOKEN.getId(), 5);
+       quest.setRewardCloseRate(NpcList.SELINA.getId(), 1, true);
+       quest.setRewardItem(ItemList.EXP_POTION.getId(), 1);
+       Config.unloadObject(quest);
+
+       quest = new Quest("금반지 선물", NpcList.HYEONG_SEOK.getId(), 69L);
+       quest.setNeedItem(ItemList.GOLD.getId(), 5);
+       quest.getNeedMoney().set(10000L);
+       quest.setRewardCloseRate(NpcList.HYEONG_SEOK.getId(), 10, true);
+       quest.setRewardCloseRate(NpcList.EL.getId(), 10, true);
+       quest.setRewardItem(ItemList.LOW_AMULET.getId(), 1);
        Config.unloadObject(quest);
 
        Config.ID_COUNT.put(Id.QUEST, Math.max(Config.ID_COUNT.get(Id.CHAT), 5L));
@@ -1728,6 +1826,12 @@ public class ObjectCreator {
 
         npc.setChat(new ChatLimit(), 28L);
 
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(QuestList.GOLD_RING.getId());
+        chatLimit.getNotClearedQuest().add(QuestList.GOLD_RING.getId());
+        chatLimit.getLimitQuest().addMin(QuestList.WORK_OF_MINER.getId(), 10);
+        npc.setChat(chatLimit, 66L);
+
         Config.unloadObject(npc);
 
 
@@ -1790,6 +1894,12 @@ public class ObjectCreator {
 
         npc.setChat(new ChatLimit(), 41L);
 
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(QuestList.NEED_FISHING_ROD_ITEM.getId());
+        chatLimit.getNotClearedQuest().add(QuestList.NEED_FISHING_ROD_ITEM.getId());
+        chatLimit.getLimitQuest().addMin(QuestList.NEED_FISHING_ROD_ITEM.getId(), 5);
+        npc.setChat(chatLimit, 58L);
+
         Config.unloadObject(npc);
 
 
@@ -1840,12 +1950,17 @@ public class ObjectCreator {
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(21, 23);
         chatLimit.getLimitHour2().set(0, 8);
-        chatLimit.getLimitCloseRate().getMax().put(NpcList.SELINA.getId(), 9);
+        chatLimit.getLimitCloseRate().addMax(NpcList.SELINA.getId(), 9);
         npc.setChat(chatLimit, 51L);
 
         chatLimit = new ChatLimit();
-        chatLimit.getLimitCloseRate().getMin().put(NpcList.SELINA.getId(), 10);
+        chatLimit.getLimitCloseRate().addMin(NpcList.SELINA.getId(), 10);
         npc.setChat(chatLimit, 57L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitCloseRate().addMin(NpcList.SELINA.getId(), 10);
+        chatLimit.getNotRunningQuest().add(QuestList.HUNTER_TALENT.getId());
+        npc.setChat(chatLimit, 62L);
 
         Config.unloadObject(npc);
 

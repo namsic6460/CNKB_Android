@@ -2,14 +2,12 @@ package lkd.namsic.game.base;
 
 import androidx.annotation.Nullable;
 
-import java.io.Serializable;
-
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class RangeInteger implements Serializable {
+public class RangeInteger {
 
     int min;
     int max;

@@ -27,6 +27,8 @@ public class InfoCommand extends PlayerCommand {
             ItemDisplayManager.getInstance().displayItemInfo(player, command.replace(second, "").trim());
         } else if(second.equals("장비") || second.equals("equip")) {
             ItemDisplayManager.getInstance().displayEquipInfo(player, command.replace(second, "").trim());
+        } else if(second.equals("퀘스트") || second.equals("quest")) {
+            DisplayManager.getInstance().displayQuestInfo(player, Long.parseLong(third));
         } else {
             Long playerId = Config.PLAYER_ID.get(command);
 

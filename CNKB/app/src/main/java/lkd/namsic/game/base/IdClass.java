@@ -2,7 +2,6 @@ package lkd.namsic.game.base;
 
 import androidx.annotation.Nullable;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import lkd.namsic.game.enums.Id;
@@ -11,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class IdClass implements Serializable {
+public class IdClass {
 
     Id id = null;
     long objectId = 0;

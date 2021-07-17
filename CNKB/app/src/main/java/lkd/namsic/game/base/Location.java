@@ -3,13 +3,11 @@ package lkd.namsic.game.base;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.io.Serializable;
-
 import lkd.namsic.game.config.Config;
 import lombok.Getter;
 
 @Getter
-public class Location implements Serializable {
+public class Location {
 
     private final LimitInteger x = new LimitInteger(Config.MIN_MAP_X, Config.MIN_MAP_X, Config.MAX_MAP_X);
     private final LimitInteger y = new LimitInteger(Config.MIN_MAP_Y, Config.MIN_MAP_Y, Config.MAX_MAP_Y);

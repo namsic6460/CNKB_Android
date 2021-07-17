@@ -576,14 +576,16 @@ public class RandomList {
             ItemList.PIECE_OF_MANA.getId(),
             ItemList.STONE.getId(),
             ItemList.GOLD.getId(),
-            ItemList.LOW_ALLOY.getId()
+            ItemList.LOW_ALLOY.getId(),
+            ItemList.LOW_AMULET.getId()
     );
 
     public static final List<Long> middleRecipeItems = Arrays.asList(
             ItemList.GLOW_LAPIS.getId(),
             ItemList.GLOW_RED_STONE.getId(),
             ItemList.WHITE_GOLD.getId(),
-            ItemList.MIDDLE_ALLOY.getId()
+            ItemList.MIDDLE_ALLOY.getId(),
+            ItemList.AMULET.getId()
     );
 
     public static final List<Long> highRecipeItems = Arrays.asList(
@@ -592,7 +594,8 @@ public class RandomList {
             ItemList.LAPIS_RED_STONE.getId(),
             ItemList.LANDIUM.getId(),
             ItemList.AITUME.getId(),
-            ItemList.HIGH_ALLOY.getId()
+            ItemList.HIGH_ALLOY.getId(),
+            ItemList.HIGH_AMULET.getId()
     );
 
     public static final List<Long> lowRecipeEquips = Arrays.asList(

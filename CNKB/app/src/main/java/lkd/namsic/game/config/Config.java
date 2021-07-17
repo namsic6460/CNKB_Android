@@ -157,6 +157,7 @@ public class Config {
     public static final int APPRAISE_LIMIT = 999;
 
     public static final String SPLIT_BAR = "------------------------------------------";
+    public static final String HARD_SPLIT_BAR = "==========================================";
     public static final String INCOMPLETE = "Incomplete";
     public static final String[] TIERS = new String[] { "하", "중", "상" };
 

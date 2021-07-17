@@ -20,4 +20,9 @@ public class Bool {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return this.value.toString();
+    }
+
 }

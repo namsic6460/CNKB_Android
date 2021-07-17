@@ -85,7 +85,7 @@ public class FightManager {
                     preventMap.remove(id);
                 }
                 
-                if(self.getLv().get() > player.getLv().get() / 2) {
+                if(self.getLv().get() / 2 > player.getLv().get()) {
                     throw new WeirdCommandException("본인 레벨의 절반에 미치지 못하는 레벨의 플레이어는 공격할 수 없습니다\n\n" +
                             "뉴비 학살을 멈춰주세요\n-공익 봇 협의회-");
                 }

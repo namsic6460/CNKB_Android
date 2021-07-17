@@ -3,7 +3,6 @@ package lkd.namsic.game.base;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -17,7 +16,7 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-public class ConcurrentArrayList<T> implements List<T>, Serializable {
+public class ConcurrentArrayList<T> implements List<T> {
 
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final List<T> list;

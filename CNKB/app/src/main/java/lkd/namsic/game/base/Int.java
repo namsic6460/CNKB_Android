@@ -2,6 +2,8 @@ package lkd.namsic.game.base;
 
 public class Int {
 
+    private Integer value;
+
     public Int() {
         this.set(0);
     }
@@ -9,8 +11,6 @@ public class Int {
     public Int(Integer value) {
         this.set(value);
     }
-
-    private Integer value;
 
     public Integer get() {
         return this.value;
@@ -42,6 +42,11 @@ public class Int {
 
     public void divide(double value) {
         this.set((int) (this.get() / value));
+    }
+
+    @Override
+    public String toString() {
+        return this.value.toString();
     }
 
 }

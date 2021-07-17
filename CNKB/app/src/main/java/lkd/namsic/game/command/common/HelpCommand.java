@@ -26,6 +26,7 @@ public class HelpCommand extends CommonCommand {
                         Emoji.LIST + " *(정보/info/i) [{플레이어 닉네임}] : 플레이어의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(정보/info/i) (아이템/item) ({아이템 이름}) : 아이템의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(정보/info/i) (장비/equip) ({장비 이름}) : 장비의 정보를 표시합니다\n\n" +
+                        Emoji.LIST + " *(정보/info/i) (퀘스트/quest) ({퀘스트 번호}) : 퀘스트의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(가방/인벤토리/인벤/inventory/inven) [{페이지}] : 현재 인벤토리를 표시합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) : 장비 착용 현황을 표시합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) (인벤토리/인벤/inventory/inven) [{페이지}] : 현재 장비 인벤토리를 표시합니다\n\n" +

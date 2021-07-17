@@ -13,6 +13,8 @@ import lkd.namsic.game.gameObject.GameObject;
 
 public abstract class EquipUse implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     public EquipUse(int useHp, int useMn) {
         this(useHp, 0, 0, useMn, 0, 0);
     }

@@ -11,6 +11,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import lkd.namsic.MainActivity;
+import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.FightWaitType;
@@ -60,6 +61,7 @@ public class Eval {
             Scriptable scope = context.initStandardObjects();
 
             ScriptableObject.putProperty(scope, "Config", Config.class);
+            ScriptableObject.putProperty(scope, "RandomList", RandomList.class);
             ScriptableObject.putProperty(scope, "System", System.class);
 
             ScriptableObject.putProperty(scope, "int", int.class);

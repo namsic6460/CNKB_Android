@@ -372,7 +372,9 @@ public class Player extends Entity {
         this.sp.add(5);
         this.exp.add(-1 * needExp);
 
-        Config.PLAYER_LV_RANK.put(this.getName(), this.lv.get());
+        if(this.id.getObjectId() != 1) {
+            Config.PLAYER_LV_RANK.put(this.getName(), this.lv.get());
+        }
     }
 
     public void setPvp(boolean enable, @Nullable Integer day) {

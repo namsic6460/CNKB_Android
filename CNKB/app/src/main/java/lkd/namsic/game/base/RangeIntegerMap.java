@@ -3,7 +3,6 @@ package lkd.namsic.game.base;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.io.Serializable;
 import java.util.Map;
 
 import lkd.namsic.game.config.Config;
@@ -11,7 +10,7 @@ import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
 
-public class RangeIntegerMap<T> implements Serializable {
+public class RangeIntegerMap<T> {
 
     final private String className;
 
