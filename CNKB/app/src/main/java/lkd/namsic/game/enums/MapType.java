@@ -12,6 +12,7 @@ public enum MapType {
     COUNTRY("도시"),
     FIELD("평원"),
     MOUNTAIN("산"),
+    FOREST("숲"),
     RIVER("강"),
     CEMETERY("공동묘지"),
     CAVE("동굴"),

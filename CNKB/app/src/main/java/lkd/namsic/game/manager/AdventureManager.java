@@ -431,7 +431,7 @@ public class AdventureManager {
         int percentIncrease = Math.min((int) (adv / 1.1), 190);
         for(int i = 0; i < 4; i++) {
             tier = rewardTier[i];
-            percents[i] = Math.max(0, percentIncrease + (110 - tier * 10) - (tier < 9 ? 0 : tier == 9 ? 5 : 10));
+            percents[i] = Math.min(100, Math.max(0, percentIncrease + (110 - tier * 10) - (tier < 9 ? 0 : tier == 9 ? 5 : 10)));
         }
 
         output[0] = adventureType;

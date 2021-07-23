@@ -12,27 +12,27 @@ import lkd.namsic.game.base.Int;
 import lkd.namsic.game.exception.EventSkipException;
 import lkd.namsic.game.gameObject.Entity;
 
-public abstract class DamageEvent extends Event {
+public abstract class DamagedEvent extends Event {
 
     private static final long serialVersionUID = 1L;
 
     @NonNull
     public static String getName() {
-        return "DamageEvent";
+        return "DamagedEvent";
     }
 
-    public static void handleEvent(@NonNull Entity self, @Nullable List<Event> events, @NonNull Entity victim,
+    public static void handleEvent(@NonNull Entity self, @Nullable List<Event> events, @NonNull Entity attacker,
                                       @NonNull Int totalDmg, @NonNull Int totalDra, Bool isCrit) {
         if (events != null) {
             List<Event> removeList = new ArrayList<>();
 
-            for (Event damageEvent : events) {
+            for (Event damagedEvent : events) {
                 try {
-                    ((DamageEvent) damageEvent).onDamage(self, victim, totalDmg, totalDra, isCrit);
+                    ((DamagedEvent) damagedEvent).onDamaged(self, attacker, totalDmg, totalDra, isCrit);
 
-                    if (damageEvent.activeCount != -1) {
-                        if (--damageEvent.activeCount == 0) {
-                            removeList.add(damageEvent);
+                    if (damagedEvent.activeCount != -1) {
+                        if (--damagedEvent.activeCount == 0) {
+                            removeList.add(damagedEvent);
                         }
                     }
                 } catch (EventSkipException ignore) {}
@@ -42,15 +42,15 @@ public abstract class DamageEvent extends Event {
         }
     }
 
-    public DamageEvent(int activeCount) {
+    public DamagedEvent(int activeCount) {
         this(activeCount, null);
     }
 
-    public DamageEvent(int activeCount, @Nullable Map<String, Object> variable) {
+    public DamagedEvent(int activeCount, @Nullable Map<String, Object> variable) {
         super(activeCount, variable);
     }
 
-    public abstract void onDamage(@NonNull Entity self, @NonNull Entity victim, Int totalDmg, Int totalDra, Bool isCrit);
+    public abstract void onDamaged(@NonNull Entity self, @NonNull Entity attacker, Int totalDmg, Int totalDra, Bool isCrit);
 
     @NonNull
     @Override

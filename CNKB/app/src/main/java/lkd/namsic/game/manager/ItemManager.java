@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.StatType;
@@ -62,38 +63,37 @@ public class ItemManager {
     public void use(@NonNull Player self, long itemId, int count) {
         Config.checkId(Id.ITEM, itemId);
 
-        boolean isCancelled = ItemUseEvent.handleEvent(self, self.getEvents(ItemUseEvent.class.getName()), itemId, count);
-        if (!isCancelled) {
-            self.addLog(LogData.TOTAL_ITEM_USE, 1);
+        ItemUseEvent.handleEvent(self, self.getEvents(ItemUseEvent.class.getName()), itemId, count);
 
-            Item item = Config.getData(Id.ITEM, itemId);
+        self.addLog(LogData.TOTAL_ITEM_USE, 1);
 
-            String msg = item.getName() + " " + count + "개를 사용했습니다";
-            StringBuilder innerBuilder = new StringBuilder();
+        Item item = Config.getData(Id.ITEM, itemId);
 
-            String result = null;
+        String msg = item.getName() + " " + count + "개를 사용했습니다";
+        StringBuilder innerBuilder = new StringBuilder();
 
-            Use use = Objects.requireNonNull(item.getUse());
-            for(int i = 1; i <= count; i++) {
-                result = use.use(self, new ArrayList<>());
+        String result = null;
 
-                if(result != null) {
-                    innerBuilder.append(result)
-                            .append("\n");
-                }
+        Use use = Objects.requireNonNull(item.getUse());
+        for(int i = 1; i <= count; i++) {
+            result = use.use(self, new ArrayList<>());
+
+            if(result != null) {
+                innerBuilder.append(result)
+                        .append("\n");
             }
-            
-            self.addItem(itemId, count * -1);
+        }
 
-            if(result == null) {
-                self.replyPlayer(msg);
-            } else {
-                self.replyPlayer(msg, innerBuilder.toString());
-            }
+        self.addItem(itemId, count * -1);
+
+        if(result == null) {
+            self.replyPlayer(msg);
+        } else {
+            self.replyPlayer(msg, innerBuilder.toString());
         }
     }
 
-    public boolean tryEat(@NonNull Player self, @NonNull String itemName, int count) {
+    public void tryEat(@NonNull Player self, @NonNull String itemName, int count) {
         Long itemId = ItemList.findByName(itemName);
 
         if(itemId == null) {
@@ -114,69 +114,64 @@ public class ItemManager {
             throw new WeirdCommandException("아이템이 " + (count - currentCount) + "개 부족합니다\n아이템을 획득한 후 다시 사용해주세요");
         }
 
-        return eat(self, itemId, count);
+        eat(self, itemId, count);
     }
 
-    public boolean eat(@NonNull Player self, long itemId, int count) {
+    public void eat(@NonNull Player self, long itemId, int count) {
         Config.checkId(Id.ITEM, itemId);
 
-        boolean isCancelled;
-        isCancelled = ItemEatEvent.handleEvent(self, self.getEvents(ItemEatEvent.class.getName()), itemId, count);
+        ItemEatEvent.handleEvent(self, self.getEvents(ItemEatEvent.class.getName()), itemId, count);
 
-        if (!isCancelled) {
-            self.addLog(LogData.TOTAL_ITEM_EAT, 1);
+        self.addLog(LogData.TOTAL_ITEM_EAT, 1);
 
-            Item item = Config.getData(Id.ITEM, itemId);
+        Item item = Config.getData(Id.ITEM, itemId);
 
-            StringBuilder innerBuilder = new StringBuilder("---획득한 버프---");
+        StringBuilder innerBuilder = new StringBuilder("---획득한 버프---");
 
-            Map<Long, HashMap<StatType, Integer>> eatBuff = item.getEatBuff();
-            if(eatBuff.isEmpty()) {
-                innerBuilder.append("\n획득한 버프가 없습니다");
-            } else {
-                long duration;
-                StatType statType;
-                int stat;
+        Map<Long, HashMap<StatType, Integer>> eatBuff = item.getEatBuff();
+        if(eatBuff.isEmpty()) {
+            innerBuilder.append("\n획득한 버프가 없습니다");
+        } else {
+            long duration;
+            StatType statType;
+            int stat;
 
-                long currentTime = System.currentTimeMillis();
-                for(Map.Entry<Long, HashMap<StatType, Integer>> entry : eatBuff.entrySet()) {
-                    duration = entry.getKey();
+            long currentTime = System.currentTimeMillis();
+            for(Map.Entry<Long, HashMap<StatType, Integer>> entry : eatBuff.entrySet()) {
+                duration = entry.getKey();
+
+                if(duration != -1) {
+                    innerBuilder.append("\n[")
+                            .append(duration / 1000D)
+                            .append("초]");
+
+                    duration += currentTime;
+                } else {
+                    innerBuilder.append("\n[영구 지속]");
+                }
+
+                for(Map.Entry<StatType, Integer> statEntry : entry.getValue().entrySet()) {
+                    statType = statEntry.getKey();
+                    stat = statEntry.getValue() * count;
 
                     if(duration != -1) {
-                        innerBuilder.append("\n[")
-                                .append(duration / 1000D)
-                                .append("초]");
-
-                        duration += currentTime;
+                        self.addBuff(duration, statType, stat);
                     } else {
-                        innerBuilder.append("\n[영구 지속]");
+                        self.addBasicStat(statType, stat);
                     }
 
-                    for(Map.Entry<StatType, Integer> statEntry : entry.getValue().entrySet()) {
-                        statType = statEntry.getKey();
-                        stat = statEntry.getValue() * count;
-
-                        if(duration != -1) {
-                            self.addBuff(duration, statType, stat);
-                        } else {
-                            self.addBasicStat(statType, stat);
-                        }
-
-                        innerBuilder.append("\n")
-                                .append(statType.getDisplayName())
-                                .append(": ")
-                                .append(Config.getIncrease(stat));
-                    }
-
-                    innerBuilder.append("\n");
+                    innerBuilder.append("\n")
+                            .append(statType.getDisplayName())
+                            .append(": ")
+                            .append(Config.getIncrease(stat));
                 }
-            }
 
-            self.addItem(itemId, count * -1);
-            self.replyPlayer(item.getName() + " " + count + "개를 먹었습니다", innerBuilder.toString());
+                innerBuilder.append("\n");
+            }
         }
 
-        return !isCancelled;
+        self.addItem(itemId, count * -1);
+        self.replyPlayer(item.getName() + " " + count + "개를 먹었습니다", innerBuilder.toString());
     }
 
     public void craft(@NonNull Player self, @NonNull String itemName, int count, @Nullable Integer recipeIdx) {
@@ -191,7 +186,7 @@ public class ItemManager {
 
             if(itemId == null) {
                 throw new WeirdCommandException("해당 아이템 또는 장비를 찾을 수 없습니다\n" +
-                        "띄어쓰기나 괄호 등 정확한 이름을 입력해주세요");
+                        "띄어쓰기나 괄호 등 정확한 이름을 입력해주세요\n입력값: " + Emoji.focus(itemName));
             }
         } else {
             recipeSet = self.getItemRecipe();

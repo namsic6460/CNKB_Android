@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import lkd.namsic.game.base.Int;
+import lkd.namsic.game.base.LoNg;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.Variable;
@@ -15,6 +17,7 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.event.MineEvent;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.gameObject.Item;
@@ -47,7 +50,7 @@ public class MineManager {
         List<Long> output = Arrays.asList(ItemList.STONE.getId(), ItemList.COAL.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.SILVER.getId(), ItemList.GLOW_STONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.ORICHALCON.getId(), ItemList.NONE.getId());
 
         double percent;
-        long itemId = 0;
+        LoNg itemId = new LoNg();
 
         //0 ~ 11
         int itemTier = 0;
@@ -55,9 +58,9 @@ public class MineManager {
             percent = percents.get(itemTier);
 
             if(randomPercent < percent) {
-                itemId = output.get(itemTier);
+                itemId.set(output.get(itemTier));
 
-                if(itemId == 0) {
+                if(itemId.get() == 0) {
                     long[] itemList;
 
                     switch(itemTier) {
@@ -88,7 +91,7 @@ public class MineManager {
                             throw new InvalidNumberException(itemTier);
                     }
 
-                    itemId = itemList[new Random().nextInt(itemList.length)];
+                    itemId.set(itemList[new Random().nextInt(itemList.length)]);
                 }
 
                 break;
@@ -104,19 +107,23 @@ public class MineManager {
             throw new RuntimeException(e.getMessage());
         }
 
-        int count = self.getItem(itemId);
-        self.addItem(itemId, 1, false);
+        Int mineCount = new Int(1);
+
+        MineEvent.handleEvent(self, self.getEvents(MineEvent.getName()), itemId, mineCount);
+
+        int count = self.getItem(itemId.get());
+        self.addItem(itemId.get(), mineCount.get(), false);
 
         StringBuilder builder = new StringBuilder();
 
-        Item item = Config.getData(Id.ITEM, itemId);
+        Item item = Config.getData(Id.ITEM, itemId.get());
         builder.append(item.getName())
                 .append("을 캤습니다!\n아이템 개수 : ")
                 .append(count).append(" -> ")
-                .append(count + 1)
+                .append(count + mineCount.get())
                 .append("\n");
 
-        int token = Config.giveToken(ItemList.LOW_MINER_TOKEN.getId(), RandomList.MINE_TOKEN, itemTier, self);
+        int token = Config.randomToken(ItemList.LOW_MINER_TOKEN.getId(), RandomList.MINE_TOKEN, itemTier, self);
         if(token >= 0) {
             builder.append(Config.TIERS[token])
                     .append("급 광부의 증표 1개를 획득하였습니다\n");

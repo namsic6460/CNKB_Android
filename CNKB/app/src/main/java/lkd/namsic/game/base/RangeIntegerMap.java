@@ -60,21 +60,6 @@ public class RangeIntegerMap<T> {
         }
     }
 
-    public boolean isInRange(@NonNull T key, int value) {
-        Integer minValue = this.min.get(key);
-        Integer maxValue = this.max.get(key);
-
-        if(minValue != null && maxValue != null) {
-            return minValue <= value && maxValue >= value;
-        } else if(minValue == null && maxValue == null) {
-            return true;
-        } else if(minValue == null) {
-            return value <= maxValue;
-        } else {
-            return value >= minValue;
-        }
-    }
-
     public boolean isInRange(@NonNull Map<T, Integer> map) {
         return Config.compareMap(this.min, map, false, false, 0) &&
                 Config.compareMap(this.max, map, true, true, null);

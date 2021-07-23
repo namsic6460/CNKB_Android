@@ -27,6 +27,7 @@ import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object_list.EquipList;
 import lkd.namsic.game.event.DamageEvent;
+import lkd.namsic.game.event.DamagedEvent;
 import lkd.namsic.game.event.DeathEvent;
 import lkd.namsic.game.event.Event;
 import lkd.namsic.game.event.MoneyChangeEvent;
@@ -102,23 +103,18 @@ public abstract class Entity extends NamedObject {
         return Config.getBar(this.getStat(StatType.MN), this.getStat(StatType.MAXMN));
     }
 
-    public boolean setMoney(long money) {
-        boolean isCancelled = MoneyChangeEvent.handleEvent(this,
-                this.getEvents(MoneyChangeEvent.class.getName()), money);
-        if (!isCancelled) {
-            this.money.set(money);
-        }
-
-        return isCancelled;
+    public void setMoney(long money) {
+        MoneyChangeEvent.handleEvent(this, this.getEvents(MoneyChangeEvent.class.getName()), money);
+        this.money.set(money);
     }
 
     public long getMoney() {
         return this.money.get();
     }
 
-    public boolean addMoney(long money) {
+    public void addMoney(long money) {
         money *= Config.MONEY_BOOST;
-        return this.setMoney(this.getMoney() + money);
+        this.setMoney(this.getMoney() + money);
     }
 
     public void dropMoney(long money) {
@@ -150,7 +146,6 @@ public abstract class Entity extends NamedObject {
     public boolean setBasicStat(@NonNull StatType statType, int stat) {
         this.revalidateBuff();
 
-        boolean isCancelled = false;
         boolean isDeath = false;
         if(statType.equals(StatType.HP)) {
             int maxHp = this.getStat(StatType.MAXHP);
@@ -159,8 +154,7 @@ public abstract class Entity extends NamedObject {
                 stat = maxHp;
             } else if(stat <= 0) {
                 isDeath = true;
-                isCancelled = DeathEvent.handleEvent(this,
-                        this.getEvents(DeathEvent.class.getName()), this.getStat(StatType.HP), stat);
+                DeathEvent.handleEvent(this, this.getEvents(DeathEvent.class.getName()), this.getStat(StatType.HP), stat);
             }
         } else if(statType.equals(StatType.MN)) {
             int maxMn = this.getStat(StatType.MAXMN);
@@ -178,13 +172,11 @@ public abstract class Entity extends NamedObject {
             }
         }
 
-        if(!isCancelled) {
-            this.basicStat.put(statType, stat);
+        this.basicStat.put(statType, stat);
 
-            if(isDeath) {
-                this.onDeath();
-                return true;
-            }
+        if(isDeath) {
+            this.onDeath();
+            return true;
         }
 
         return false;
@@ -435,6 +427,11 @@ public abstract class Entity extends NamedObject {
         Config.unloadMap(map);
     }
 
+    public void addBasicEquip(long equipId) {
+        Config.checkId(Id.EQUIPMENT, equipId);
+        this.equipInventory.add(equipId);
+    }
+
     public void addEquip(long equipId) {
         Config.checkId(Id.EQUIPMENT, equipId);
 
@@ -586,52 +583,50 @@ public abstract class Entity extends NamedObject {
                 totalDmg.multiple(2);
             }
 
-            boolean isCancelled = DamageEvent.handleEvent(this,
-                    this.getEvents(DamageEvent.getName()), entity, totalDmg, totalDra, isCrit);
+            DamageEvent.handleEvent(this, this.getEvents(DamageEvent.getName()), entity, totalDmg, totalDra, isCrit);
+            DamagedEvent.handleEvent(entity, entity.getEvents(DamagedEvent.getName()), this, totalDmg, totalDra, isCrit);
 
-            if(!isCancelled) {
-                boolean isDeath = entity.addBasicStat(StatType.HP, -1 * totalDmg.get());
-                this.addBasicStat(StatType.HP, totalDra.get());
+            boolean isDeath = entity.addBasicStat(StatType.HP, -1 * totalDmg.get());
+            this.addBasicStat(StatType.HP, totalDra.get());
 
-                String hp;
-                if (isDeath) {
-                    hp = entity.getDisplayHp(0);
-                } else {
-                    hp = entity.getDisplayHp();
-                }
+            String hp;
+            if (isDeath) {
+                hp = entity.getDisplayHp(0);
+            } else {
+                hp = entity.getDisplayHp();
+            }
 
-                if (!isDeath || printOnDeath) {
-                    String selfHp = this.getDisplayHp();
-                    String innerMsg = "총 데미지: " + totalDmg + "\n총 흡수량: " + totalDra + "\n";
+            if (!isDeath || printOnDeath) {
+                String selfHp = this.getDisplayHp();
+                String innerMsg = "총 데미지: " + totalDmg + "\n총 흡수량: " + totalDra + "\n";
 
-                    if (this.id.getId().equals(Id.PLAYER)) {
-                        String msg = "공격에 성공했습니다\n적 체력: " + hp;
-                        if (isCrit.get()) {
-                            msg = "[치명타!] " + msg;
-                        }
-
-                        ((Player) this).replyPlayer(msg, innerMsg + "남은 체력: " + selfHp);
+                if (this.id.getId().equals(Id.PLAYER)) {
+                    String msg = "공격에 성공했습니다\n적 체력: " + hp;
+                    if (isCrit.get()) {
+                        msg = "[치명타!] " + msg;
                     }
 
-                    //Used instanceof because of warning
-                    if (entity instanceof Player) {
-                        String msg = this.getName() + " 에게 공격당했습니다!\n남은 체력: " + hp;
-                        if (isCrit.get()) {
-                            msg = "[치명타!] " + msg;
-                        }
+                    ((Player) this).replyPlayer(msg, innerMsg + "남은 체력: " + selfHp);
+                }
 
-                        if (isDefencing) {
-                            msg += "\n방어로 인해 회복한 체력: " + heal;
-                        }
-
-                        ((Player) entity).replyPlayer(msg, innerMsg + "적 체력: " + selfHp);
+                //Used instanceof because of warning
+                if (entity instanceof Player) {
+                    String msg = this.getName() + " 에게 공격당했습니다!\n남은 체력: " + hp;
+                    if (isCrit.get()) {
+                        msg = "[치명타!] " + msg;
                     }
-                }
 
-                if (isDeath) {
-                    this.onKill(entity);
-                    return true;
+                    if (isDefencing) {
+                        msg += "\n방어로 인해 회복한 체력: " + heal;
+                    }
+
+                    ((Player) entity).replyPlayer(msg, innerMsg + "적 체력: " + selfHp);
                 }
+            }
+
+            if (isDeath) {
+                this.onKill(entity);
+                return true;
             }
         } else {
             if (this.getId().getId().equals(Id.PLAYER)) {

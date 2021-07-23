@@ -27,7 +27,7 @@ public class EquipCommand extends PlayerCommand {
             int page = third == null ? 1 : Integer.parseInt(third);
             ItemDisplayManager.getInstance().displayEquipInventory(player, page);
         } else if(second.equals("사용") || second.equals("use")) {
-            EquipManager.getInstance().tryUse(player, EquipType.findByName(command.replace(second, "").trim()));
+            EquipManager.getInstance().tryUse(player, EquipType.findByName(command.replace(second, "").trim().toLowerCase()));
         } else {
             KakaoTalk.checkDoing(player);
             EquipManager.getInstance().equip(player, Integer.parseInt(second));

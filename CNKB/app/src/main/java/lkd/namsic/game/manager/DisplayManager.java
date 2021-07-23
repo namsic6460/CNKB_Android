@@ -15,6 +15,7 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
+import lkd.namsic.game.enums.object_list.EquipList;
 import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.enums.object_list.NpcList;
 import lkd.namsic.game.exception.WeirdCommandException;
@@ -316,6 +317,10 @@ public class DisplayManager {
         
         innerBuilder.append("\n\n")
                 .append(Config.HARD_SPLIT_BAR)
+                .append("\n\n클리어 제한 레벨: ")
+                .append(quest.getClearLimitLv().get())
+                .append("\n\n")
+                .append(Config.HARD_SPLIT_BAR)
                 .append("\n\n보상 골드: ")
                 .append(quest.getRewardMoney().get())
                 .append("\n보상 경험치: ")
@@ -350,13 +355,37 @@ public class DisplayManager {
 
         innerBuilder.append("\n\n---보상 친밀도---");
         if(quest.getRewardCloseRate().isEmpty()) {
-            innerBuilder.append("\n요구 친밀도가 없습니다");
+            innerBuilder.append("\n보상 친밀도가 없습니다");
         } else {
             for(Map.Entry<Long, Integer> entry : quest.getRewardCloseRate().entrySet()) {
                 innerBuilder.append("\n")
                         .append(NpcList.findById(entry.getKey()))
                         .append(": ")
                         .append(entry.getValue());
+            }
+        }
+
+        innerBuilder.append("\n\n---보상 아이템 제작법---");
+        if(quest.getRewardItemRecipe().isEmpty()) {
+            innerBuilder.append("\n보상 아이템 제작법이 없습니다");
+        } else {
+            for(long itemId : quest.getRewardItemRecipe()) {
+                innerBuilder.append("\n")
+                        .append(Emoji.LIST)
+                        .append(" ")
+                        .append(ItemList.findById(itemId));
+            }
+        }
+
+        innerBuilder.append("\n\n---보상 장비 제작법---");
+        if(quest.getRewardEquipRecipe().isEmpty()) {
+            innerBuilder.append("\n보상 장비 제작법이 없습니다");
+        } else {
+            for(long equipId : quest.getRewardEquipRecipe()) {
+                innerBuilder.append("\n")
+                        .append(Emoji.LIST)
+                        .append(" ")
+                        .append(EquipList.findById(equipId));
             }
         }
 

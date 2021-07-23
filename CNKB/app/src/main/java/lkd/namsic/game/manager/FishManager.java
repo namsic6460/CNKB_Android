@@ -41,8 +41,8 @@ public class FishManager {
 
         double randomPercent = Math.random() * 100;
 
-        List<Double> percents = new ArrayList<>();
-        for(List<Double> fishPercent : RandomList.FISH_PERCENT) {
+        List<Integer> percents = new ArrayList<>();
+        for(List<Integer> fishPercent : RandomList.FISH_PERCENT) {
             percents.add(fishPercent.get(fishLv));
         }
 
@@ -199,7 +199,7 @@ public class FishManager {
                     StringBuilder innerBuilder = new StringBuilder();
 
                     if (itemTier != 0) {
-                        int token = Config.giveToken(ItemList.LOW_FISH_TOKEN.getId(), RandomList.FISH_TOKEN, itemTier, self);
+                        int token = Config.randomToken(ItemList.LOW_FISH_TOKEN.getId(), RandomList.FISH_TOKEN, itemTier, self);
                         if(token >= 0) {
                             innerBuilder.append(Config.TIERS[token])
                                     .append("급 낚시꾼의 증표 1개를 획득하였습니다\n");

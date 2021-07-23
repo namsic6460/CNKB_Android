@@ -25,6 +25,7 @@ import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.command.common.DevCommand;
 import lkd.namsic.game.command.common.HelpCommand;
 import lkd.namsic.game.command.non_player.RegisterCommand;
+import lkd.namsic.game.command.player.debug.CleanCommand;
 import lkd.namsic.game.command.player.debug.DoingCommand;
 import lkd.namsic.game.command.player.debug.EvalCommand;
 import lkd.namsic.game.command.player.debug.GiveCommand;
@@ -95,6 +96,7 @@ public class KakaoTalk {
         registerPlayerCommand(new DoingCommand(), "doing");
         registerPlayerCommand(new SaveCommand(), "save");
         registerPlayerCommand(new EvalCommand(), "eval");
+        registerPlayerCommand(new CleanCommand(), "clean");
 
         //Register
         registerPlayerCommand(new PlayerRegisterCommand(), "회원가입", "가입", "register");
@@ -224,7 +226,6 @@ public class KakaoTalk {
                             }
                         } catch (WeirdCommandException | DoingFilterException | EquipUseException e) {
                             KakaoTalk.reply(session,"[오류]\n" + e.getMessage());
-                            Logger.w("Common Error", e);
                         } catch (NumberFormatException e) {
                             String message = e.getMessage();
                             message = message == null ? "" : "\n" + message;
@@ -232,8 +233,6 @@ public class KakaoTalk {
                             if(player != null) {
                                 player.replyPlayer("숫자를 입력해야합니다", message);
                             }
-
-                            Logger.w("Number Error", e);
                         }
                     }
                 }

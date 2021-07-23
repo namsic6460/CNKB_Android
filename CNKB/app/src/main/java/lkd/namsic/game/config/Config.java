@@ -34,6 +34,7 @@ import lkd.namsic.game.base.Location;
 import lkd.namsic.game.base.Use;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.UnhandledEnumException;
@@ -160,6 +161,9 @@ public class Config {
     public static final String HARD_SPLIT_BAR = "==========================================";
     public static final String INCOMPLETE = "Incomplete";
     public static final String[] TIERS = new String[] { "하", "중", "상" };
+    public static final ItemList[] GEMS = { ItemList.QUARTZ, ItemList.GOLD, ItemList.WHITE_GOLD, ItemList.GARNET,
+            ItemList.AMETHYST, ItemList.AQUAMARINE, ItemList.DIAMOND, ItemList.EMERALD, ItemList.PEARL, ItemList.RUBY,
+            ItemList.PERIDOT, ItemList.SAPPHIRE, ItemList.OPAL, ItemList.TOPAZ, ItemList.TURQUOISE };
 
     public static void init() {
         ID_CLASS.put(Id.ACHIEVE, Achieve.class);
@@ -188,22 +192,25 @@ public class Config {
         File[] players = Objects.requireNonNull(folder.listFiles());
 
         String json;
-        for(File playerFile : players) {
-            if(playerFile.getName().endsWith(".zip")) {
+        for(File file : players) {
+            if(file.getName().endsWith(".zip")) {
                 continue;
             }
 
             try {
-                json = FileManager.read(playerFile);
+                json = FileManager.read(file);
                 Player player = fromJson(json, Player.class);
 
                 long objectId = player.getId().getObjectId();
 
                 PLAYER_ID.put(player.getNickName(), objectId);
                 PLAYER_LIST.put(objectId, new String[] {player.getSender(), player.getImage()});
-                PLAYER_LV_RANK.put(player.getName(), player.getLv().get());
+
+                if(objectId != 1) {
+                    PLAYER_LV_RANK.put(player.getName(), player.getLv().get());
+                }
             } catch (Exception e) {
-                Logger.e("Config.init", e);
+                Logger.e("Config.init(" + file.getName() + ")", e);
             }
         }
 
@@ -274,6 +281,15 @@ public class Config {
         t.getId().setObjectId(objectId);
         ID_COUNT.put(id, objectId + 1);
 
+        if(t instanceof Entity) {
+            Entity entity = (Entity) t;
+
+            for(long equipId : new HashSet<>(entity.getEquipInventory())) {
+                entity.addEquip(equipId);
+                entity.removeEquip(equipId);
+            }
+        }
+
         Logger.i("newObject", id.toString() + "-" + objectId);
 
         return t;
@@ -292,7 +308,9 @@ public class Config {
             DELETE_LIST.get(entity.getId().getId()).add(entity.getId().getObjectId());
 
             for(long equipId : entity.getEquipInventory()) {
-                DELETE_LIST.get(Id.EQUIPMENT).add(equipId);
+                if(!entity.getLastDropEquip().contains(equipId)) {
+                    DELETE_LIST.get(Id.EQUIPMENT).add(equipId);
+                }
             }
         }
     }
@@ -713,13 +731,12 @@ public class Config {
         }
     }
 
-    public static int giveToken(long startItemId, double[][] tokenList, int index, @NonNull Player self) {
+    public static int randomToken(long startItemId, double[][] tokenList, int index, @NonNull Player self) {
         double random = Math.random();
 
         double weight = 0D;
         double percent;
         double[] percents = tokenList[index];
-
         for(int i = 0; i < 3; i++) {
             percent = percents[i];
 
@@ -733,7 +750,7 @@ public class Config {
 
                 return i;
             } else {
-                weight += random;
+                weight += percent;
             }
         }
 
@@ -758,6 +775,13 @@ public class Config {
         return string.replaceAll(REGEX, replacement)
                 .replaceAll("[ ]{2,}", " ")
                 .trim();
+    }
+
+    //TODO : change many replace methods to replaceLast
+
+    @NonNull
+    public static String replaceLast(@NonNull String text, @NonNull String regex, @NonNull String replacement) {
+        return text.replaceFirst("(?s)" + regex + "(?!.*?" + regex + ")", replacement).trim();
     }
 
 }

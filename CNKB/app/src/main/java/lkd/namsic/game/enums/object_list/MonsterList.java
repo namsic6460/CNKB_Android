@@ -17,7 +17,9 @@ public enum MonsterList {
     COW("소", 3L),
     ZOMBIE("좀비", 4L),
     SLIME("슬라임", 5L),
-    SPIDER("거미", 6L);
+    SPIDER("거미", 6L),
+    TROLL("트롤", 7L),
+    ENT("엔트", 8L);
 
     public static final Map<String, MonsterList> nameMap = new HashMap<>();
     public static final Map<Long, MonsterList> idMap = new HashMap<>();

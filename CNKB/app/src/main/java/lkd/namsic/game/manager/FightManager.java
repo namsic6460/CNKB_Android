@@ -14,7 +14,6 @@ import java.util.Random;
 import java.util.Set;
 
 import lkd.namsic.game.base.ConcurrentHashSet;
-import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Doing;
@@ -27,9 +26,7 @@ import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object_list.EquipList;
 import lkd.namsic.game.enums.object_list.ItemList;
-import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Boss;
 import lkd.namsic.game.gameObject.Entity;
 import lkd.namsic.game.gameObject.Equipment;
 import lkd.namsic.game.gameObject.GameMap;

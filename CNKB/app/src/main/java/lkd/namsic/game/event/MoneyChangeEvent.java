@@ -12,20 +12,20 @@ import lkd.namsic.game.gameObject.Entity;
 
 public abstract class MoneyChangeEvent extends Event {
 
+    private static final long serialVersionUID = 1L;
+
     @NonNull
     public static String getName() {
         return "MoneyChangeEvent";
     }
 
-    public static boolean handleEvent(@NonNull Entity self, @Nullable List<Event> events, long money) {
-        boolean isCancelled = false;
-
+    public static void handleEvent(@NonNull Entity self, @Nullable List<Event> events, long money) {
         if (events != null) {
             List<Event> removeList = new ArrayList<>();
 
             for (Event earnEvent : events) {
                 try {
-                    isCancelled = ((MoneyChangeEvent) earnEvent).onMoneyChange(self, money);
+                    ((MoneyChangeEvent) earnEvent).onMoneyChange(self, money);
 
                     if (earnEvent.activeCount != -1) {
                         if (--earnEvent.activeCount == 0) {
@@ -37,8 +37,6 @@ public abstract class MoneyChangeEvent extends Event {
 
             events.removeAll(removeList);
         }
-
-        return isCancelled;
     }
 
     public MoneyChangeEvent(int activeCount) {
@@ -49,7 +47,7 @@ public abstract class MoneyChangeEvent extends Event {
         super(activeCount, variable);
     }
 
-    public abstract boolean onMoneyChange(@NonNull Entity self, long money);
+    public abstract void onMoneyChange(@NonNull Entity self, long money);
 
     @NonNull
     @Override

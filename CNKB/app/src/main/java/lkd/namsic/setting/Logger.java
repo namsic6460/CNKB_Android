@@ -14,7 +14,7 @@ public class Logger {
 
     private Logger() {}
 
-    private static final int SAVE_COUNT = 1000;
+    private static final int SAVE_COUNT = 10000;
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH.mm.ss.SSS", Locale.KOREA);
     public static volatile int logCount = 0;
     public static volatile String logs = "";

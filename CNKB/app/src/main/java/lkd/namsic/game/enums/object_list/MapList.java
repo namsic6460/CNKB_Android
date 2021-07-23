@@ -20,7 +20,9 @@ public enum MapList {
     SLIME_SWAMP("슬라임 늪지", 1, 2),
     FERTILE_FARM("비옥한 농장", 2, 0),
     BLUE_FIELD("푸른 초원", 2, 1),
-    VILLAGE_CEMETERY("마을 공동묘지", 2, 2);
+    VILLAGE_CEMETERY("마을 공동묘지", 2, 2),
+    GLOOMY_FIELD("스산한 평야", 3, 0),
+    OVERGROWN_FOREST("우거진 숲", 3, 1);
 
     public static final Map<String, MapList> nameMap = new HashMap<>();
     public static final Map<Location, MapList> locationMap = new HashMap<>();

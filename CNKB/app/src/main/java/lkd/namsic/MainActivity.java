@@ -18,13 +18,18 @@ import androidx.core.app.ActivityCompat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.ObjectCreator;
 import lkd.namsic.game.base.ConcurrentArrayList;
+import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.gameObject.GameMap;
+import lkd.namsic.game.gameObject.GameObject;
 import lkd.namsic.service.ForcedTerminationService;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.setting.Logger;
@@ -135,6 +140,26 @@ public class MainActivity extends AppCompatActivity {
         Config.IGNORE_FILE_LOG = true;
         Config.save();
         Config.IGNORE_FILE_LOG = false;
+
+        GameObject object;
+        for(Map.Entry<Id, ConcurrentHashMap<Long, Long>> entry : Config.OBJECT_COUNT.entrySet()) {
+            for(Map.Entry<Long, Long> entry_ : entry.getValue().entrySet()) {
+                object = Config.getData(entry.getKey(), entry_.getKey());
+
+                for(long i = 0; i < entry_.getValue(); i++) {
+                    Config.unloadObject(object);
+                }
+            }
+        }
+
+        GameMap map;
+        for(Map.Entry<String, Long> entry : Config.MAP_COUNT.entrySet()) {
+            map = Config.MAP.get(entry.getKey());
+
+            for(long i = 0; i < entry.getValue(); i++) {
+                Config.unloadMap(map);
+            }
+        }
 
         for(Thread thread : MainActivity.threads) {
             if (thread.isAlive()) {

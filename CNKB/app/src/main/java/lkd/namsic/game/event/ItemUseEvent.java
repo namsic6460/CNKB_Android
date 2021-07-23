@@ -15,14 +15,14 @@ import lkd.namsic.game.gameObject.Item;
 
 public abstract class ItemUseEvent extends Event {
 
+    private static final long serialVersionUID = 1L;
+
     @NonNull
     public static String getName() {
         return "ItemUseEvent";
     }
 
-    public static boolean handleEvent(@NonNull Entity self, @Nullable List<Event> events, long itemId, int count) {
-        boolean isCancelled = false;
-
+    public static void handleEvent(@NonNull Entity self, @Nullable List<Event> events, long itemId, int count) {
         Item item = Config.getData(Id.ITEM, itemId);
 
         if (events != null) {
@@ -30,7 +30,7 @@ public abstract class ItemUseEvent extends Event {
 
             for (Event itemUseEvent : events) {
                 try {
-                    isCancelled = ((ItemUseEvent) itemUseEvent).onUse(self, item, count);
+                    ((ItemUseEvent) itemUseEvent).onUse(self, item, count);
 
                     if (itemUseEvent.activeCount != -1) {
                         if (--itemUseEvent.activeCount == 0) {
@@ -42,8 +42,6 @@ public abstract class ItemUseEvent extends Event {
 
             events.removeAll(removeList);
         }
-
-        return isCancelled;
     }
 
     public ItemUseEvent(int activeCount) {
@@ -54,7 +52,7 @@ public abstract class ItemUseEvent extends Event {
         super(activeCount, variable);
     }
 
-    public abstract boolean onUse(@NonNull Entity self, Item item, int count);
+    public abstract void onUse(@NonNull Entity self, Item item, int count);
 
     @NonNull
     @Override

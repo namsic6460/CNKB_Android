@@ -11,6 +11,7 @@ import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object_list.EquipList;
 import lkd.namsic.game.enums.object_list.ItemList;
 import lkd.namsic.game.enums.object_list.NpcList;
 import lkd.namsic.game.exception.ObjectNotFoundException;
@@ -38,7 +39,8 @@ public class QuestManager {
         return self.getMoney() >= quest.getNeedMoney().get() &&
                 Config.compareMap(self.getInventory(), quest.getNeedItem(), true, false, 0) &&
                 self.compareStat(quest.getNeedStat()) &&
-                Config.compareMap(self.getCloseRate(), quest.getNeedCloseRate(), true, false, 0);
+                Config.compareMap(self.getCloseRate(), quest.getNeedCloseRate(), true, false, 0) &&
+                self.getLv().get() >= quest.getClearLimitLv().get();
     }
 
     public void clearQuest(@NonNull Player self, long questId, long npcId) {
@@ -158,6 +160,32 @@ public class QuestManager {
                         .append(NpcList.findById(entry.getKey()))
                         .append(": ")
                         .append(Config.getIncrease(entry.getValue()));
+            }
+        }
+
+        innerMsg.append("\n\n---획득한 아이템 제작법---");
+        if(quest.getRewardItemRecipe().isEmpty()) {
+            innerMsg.append("\n획득한 아이템 제작법이 없습니다");
+        } else {
+            for(long itemId : quest.getRewardItemRecipe()) {
+                self.getItemRecipe().add(itemId);
+                innerMsg.append("\n")
+                        .append(Emoji.LIST)
+                        .append(" ")
+                        .append(ItemList.findById(itemId));
+            }
+        }
+
+        innerMsg.append("\n\n---획득한 장비 제작법---");
+        if(quest.getRewardEquipRecipe().isEmpty()) {
+            innerMsg.append("\n획득한 장비 제작법이 없습니다");
+        } else {
+            for(long equipId : quest.getRewardEquipRecipe()) {
+                self.getEquipRecipe().add(equipId);
+                innerMsg.append("\n")
+                        .append(Emoji.LIST)
+                        .append(" ")
+                        .append(EquipList.findById(equipId));
             }
         }
 

@@ -242,7 +242,16 @@ public class ItemDisplayManager {
         }
 
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
-        self.replyPlayer("[" + equipment.getName() + "]\n" + equipment.getDescription());
+
+        StringBuilder innerBuilder = new StringBuilder("---장비 기본 스텟---");
+        for(Map.Entry<StatType, Integer> entry : equipment.getBasicStat().entrySet()) {
+            innerBuilder.append("\n")
+                    .append(entry.getKey().getDisplayName())
+                    .append(": ")
+                    .append(entry.getValue());
+        }
+
+        self.replyPlayer("[" + equipment.getName() + "]\n" + equipment.getDescription(), innerBuilder.toString());
     }
 
     public void displayEquippedInfo(@NonNull Player self) {

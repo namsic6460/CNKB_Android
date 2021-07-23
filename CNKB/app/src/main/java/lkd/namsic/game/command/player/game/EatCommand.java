@@ -29,9 +29,7 @@ public class EatCommand extends PlayerCommand {
             itemName = itemName.replace(lastWord, "");
         } catch (NumberFormatException ignore) {}
 
-        if(!ItemManager.getInstance().tryEat(player, itemName.trim(), count)) {
-            player.replyPlayer("아이템을 먹는것을 실패했습니다");
-        }
+        ItemManager.getInstance().tryEat(player, itemName.trim(), count);
     }
 
 }

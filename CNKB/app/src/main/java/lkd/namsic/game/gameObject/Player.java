@@ -815,27 +815,23 @@ public class Player extends Entity {
     }
 
     @Override
-    public boolean setMoney(long money) {
+    public void setMoney(long money) {
         long gap = money - this.getMoney();
-        boolean isCancelled = super.setMoney(money);
+        super.setMoney(money);
 
-        if(!isCancelled) {
-            this.addLog(LogData.TOTAL_MONEY, gap);
+        this.addLog(LogData.TOTAL_MONEY, gap);
 
-            if(gap > 0) {
-                if (this.getLog(LogData.MAX_MONEY) < money) {
-                    this.setLog(LogData.MAX_MONEY, money);
-                }
-            } else if(gap < 0) {
-                gap *= -1;
+        if(gap > 0) {
+            if (this.getLog(LogData.MAX_MONEY) < money) {
+                this.setLog(LogData.MAX_MONEY, money);
+            }
+        } else if(gap < 0) {
+            gap *= -1;
 
-                if(this.getLog(LogData.MAX_PAYMENT) < gap) {
-                    this.setLog(LogData.MAX_PAYMENT, gap);
-                }
+            if(this.getLog(LogData.MAX_PAYMENT) < gap) {
+                this.setLog(LogData.MAX_PAYMENT, gap);
             }
         }
-
-        return isCancelled;
     }
 
     @Override
@@ -943,7 +939,7 @@ public class Player extends Entity {
                 Emoji.LV + " 레벨: " + this.getDisplayLv();
         
         if(!entity.id.getId().equals(Id.PLAYER)) {
-            int token = Config.giveToken(ItemList.LOW_HUNTER_TOKEN.getId(), RandomList.HUNTER_TOKEN, this.getLv().get() / 100, this);
+            int token = Config.randomToken(ItemList.LOW_HUNTER_TOKEN.getId(), RandomList.HUNTER_TOKEN, entity.getLv().get() / 50, this);
             
             if(token >= 0) {
                 msg += "\n\n" + Config.TIERS[token] + "급 사냥꾼의 증표 1개를 획득하였습니다";

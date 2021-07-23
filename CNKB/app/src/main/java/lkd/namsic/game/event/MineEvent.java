@@ -7,29 +7,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lkd.namsic.game.base.Int;
+import lkd.namsic.game.base.LoNg;
 import lkd.namsic.game.exception.EventSkipException;
 import lkd.namsic.game.gameObject.Entity;
 
-public abstract class DeathEvent extends Event {
+public abstract class MineEvent extends Event {
 
     private static final long serialVersionUID = 1L;
 
     @NonNull
     public static String getName() {
-        return "DeathEvent";
+        return "MineEvent";
     }
 
-    public static void handleEvent(@NonNull Entity self, @Nullable List<Event> events, int beforeDeathHp, int afterDeathHp) {
+    public static void handleEvent(@NonNull Entity self, @Nullable List<Event> events, @NonNull LoNg itemId, @NonNull Int mineCount) {
         if (events != null) {
             List<Event> removeList = new ArrayList<>();
 
-            for (Event deathEvent : events) {
+            for (Event mineEvents : events) {
                 try {
-                    ((DeathEvent) deathEvent).onDeath(self, beforeDeathHp, afterDeathHp);
+                    ((MineEvent) mineEvents).onMine(self, itemId, mineCount);
 
-                    if (deathEvent.activeCount != -1) {
-                        if (--deathEvent.activeCount == 0) {
-                            removeList.add(deathEvent);
+                    if (mineEvents.activeCount != -1) {
+                        if (--mineEvents.activeCount == 0) {
+                            removeList.add(mineEvents);
                         }
                     }
                 } catch (EventSkipException ignore) {}
@@ -39,15 +41,15 @@ public abstract class DeathEvent extends Event {
         }
     }
 
-    public DeathEvent(int activeCount) {
+    public MineEvent(int activeCount) {
         this(activeCount, null);
     }
 
-    public DeathEvent(int activeCount, @Nullable Map<String, Object> variable) {
+    public MineEvent(int activeCount, @Nullable Map<String, Object> variable) {
         super(activeCount, variable);
     }
 
-    public abstract void onDeath(@NonNull Entity self, int beforeDeathHp, int afterDeathHp);
+    public abstract void onMine(@NonNull Entity self, @NonNull LoNg itemId, @NonNull Int mineCount);
 
     @NonNull
     @Override

@@ -22,6 +22,7 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.object_list.NpcList;
 import lkd.namsic.game.exception.NumberRangeException;
+import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdDataException;
 import lkd.namsic.game.manager.MoveManager;
 import lombok.Getter;
@@ -104,9 +105,9 @@ public class GameMap {
         if(npcSet.isEmpty()) {
             builder.append("\nNPC 없음");
         } else {
-            for(long npcId : npcSet) {
-                Npc npc;
+            Npc npc;
 
+            for(long npcId : npcSet) {
                 npc = Config.getData(Id.NPC, npcId);
                 builder.append("\n[")
                         .append(npc.getLocation().toFieldString())
@@ -140,8 +141,16 @@ public class GameMap {
             builder.append("\n몬스터 없음");
         } else {
             Monster monster;
+            Set<Long> removeSet = new HashSet<>();
+
             for(long monsterId : monsterList) {
-                monster = Config.getData(Id.MONSTER, monsterId);
+                try {
+                    monster = Config.getData(Id.MONSTER, monsterId);
+                } catch (ObjectNotFoundException e) {
+                    removeSet.add(monsterId);
+                    continue;
+                }
+
                 builder.append("\n")
                         .append(index++)
                         .append(". [")
@@ -149,6 +158,8 @@ public class GameMap {
                         .append("] ")
                         .append(monster.getName());
             }
+
+            this.entity.get(Id.MONSTER).removeAll(removeSet);
         }
 
         builder.append("\n\n---보스 목록---");

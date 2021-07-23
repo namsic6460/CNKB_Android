@@ -23,7 +23,9 @@ public enum NpcList {
     KANG_TAE_GONG("강태공", 8L),
     PEDRO("페드로", 9L),
     MOO_MYEONG("무명", 10L),
-    SELINA("셀리나", 11L);
+    SELINA("셀리나", 11L),
+    SYLVIA("실비아", 12L),
+    HANA("하나", 13L);
 
     public static final Map<String, NpcList> nameMap = new HashMap<>();
     public static final Map<Long, NpcList> idMap = new HashMap<>();

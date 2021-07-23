@@ -15,14 +15,14 @@ import lkd.namsic.game.gameObject.Item;
 
 public abstract class ItemEatEvent extends Event {
 
+    private static final long serialVersionUID = 1L;
+
     @NonNull
     public static String getName() {
         return "ItemEatEvent";
     }
 
-    public static boolean handleEvent(@NonNull Entity self, @Nullable List<Event> events, long itemId, int count) {
-        boolean isCancelled = false;
-
+    public static void handleEvent(@NonNull Entity self, @Nullable List<Event> events, long itemId, int count) {
         Item item = Config.getData(Id.ITEM, itemId);
 
         if (events != null) {
@@ -30,7 +30,7 @@ public abstract class ItemEatEvent extends Event {
 
             for (Event itemUseEvent : events) {
                 try {
-                    isCancelled = ((ItemEatEvent) itemUseEvent).onEat(self, item, count);
+                    ((ItemEatEvent) itemUseEvent).onEat(self, item, count);
 
                     if (itemUseEvent.activeCount != -1) {
                         if (--itemUseEvent.activeCount == 0) {
@@ -42,8 +42,6 @@ public abstract class ItemEatEvent extends Event {
 
             events.removeAll(removeList);
         }
-
-        return isCancelled;
     }
 
     public ItemEatEvent(int activeCount) {
@@ -54,7 +52,7 @@ public abstract class ItemEatEvent extends Event {
         super(activeCount, variable);
     }
 
-    public abstract boolean onEat(@NonNull Entity self, Item item, int count);
+    public abstract void onEat(@NonNull Entity self, Item item, int count);
 
     @NonNull
     @Override

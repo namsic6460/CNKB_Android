@@ -10,6 +10,7 @@ import java.util.List;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.gameObject.Player;
 import lkd.namsic.game.manager.ItemDisplayManager;
@@ -32,30 +33,33 @@ public class CraftCommand extends PlayerCommand {
         } else {
             KakaoTalk.checkDoing(player);
 
-            String countStr = "";
-            int count = 1;
+            String lastStr = "";
+            int lastNumber = 1;
 
             if(third != null) {
-                countStr = commands.get(commands.size() - 1);
+                lastStr = commands.get(commands.size() - 1);
 
                 try {
-                    count = Integer.parseInt(countStr);
+                    lastNumber = Integer.parseInt(lastStr);
 
                     if(fourth != null) {
-                        int recipeIdx = Integer.parseInt(commands.get(commands.size() - 2));
+                        String frontStr = commands.get(commands.size() - 2);
+                        int frontNumber = Integer.parseInt(frontStr);
 
-                        if(recipeIdx < 1) {
+                        if(lastNumber < 1) {
                             throw new WeirdCommandException("레시피 번호는 1 이상이어야 합니다");
                         }
 
-                        ItemManager.getInstance().craft(player, command.replace(countStr, "").trim(), count, recipeIdx);
+                        ItemManager.getInstance().craft(player, Config.replaceLast(Config.replaceLast(
+                                command, lastStr, ""), frontStr, ""), frontNumber, lastNumber);
+                        return;
                     }
                 } catch (NumberFormatException e) {
-                    countStr = "";
+                    lastStr = "";
                 }
             }
 
-            ItemManager.getInstance().craft(player, command.replace(countStr, "").trim(), count, null);
+            ItemManager.getInstance().craft(player, Config.replaceLast(command, lastStr, ""), lastNumber, null);
         }
     }
 

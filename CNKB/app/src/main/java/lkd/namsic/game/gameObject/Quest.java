@@ -3,8 +3,10 @@ package lkd.namsic.game.gameObject;
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import lkd.namsic.game.base.LimitId;
 import lkd.namsic.game.base.LimitInteger;
@@ -17,6 +19,7 @@ import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object_list.QuestList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class Quest extends NamedObject {
@@ -29,6 +32,8 @@ public class Quest extends NamedObject {
             new HashMap<>(), new HashMap<>(), StatType.class
     );
 
+    final LimitInteger clearLimitLv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
+
     final LimitLong needMoney = new LimitLong(0, 0L, null);
     final Map<Long, Integer> needItem = new HashMap<>();
     final Map<StatType, Integer> needStat = new HashMap<>();
@@ -40,6 +45,8 @@ public class Quest extends NamedObject {
     final Map<Long, Integer> rewardItem = new HashMap<>();
     final Map<StatType, Integer> rewardStat = new HashMap<>();
     final Map<Long, Integer> rewardCloseRate = new HashMap<>();
+    final Set<Long> rewardItemRecipe = new HashSet<>();
+    final Set<Long> rewardEquipRecipe = new HashSet<>();
 
     final LimitId clearNpcId = new LimitId(0, Id.NPC);
     final LimitId clearChatId = new LimitId(0, Id.CHAT);

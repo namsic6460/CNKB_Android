@@ -19,7 +19,26 @@ public enum EquipList {
     GHOST_SWORD_1("원혼의 검1", 6L),
     HEALTH_AMULET("건강의 부적", 7L),
     BLOOD_AMULET("피의 부적", 8L),
-    DRAGON_AMULET("용의 부적", 9L);
+    DRAGON_AMULET("용의 부적", 9L),
+    LEATHER_HELMET("가죽 투구", 10L),
+    LEATHER_CHESTPLATE("가죽 갑옷", 11L),
+    LEATHER_LEGGINGS("가죽 바지", 12L),
+    LEATHER_SHOES("가죽 신발", 13L),
+    LOW_ALLOY_HELMET("하급 합금 투구", 14L),
+    LOW_ALLOY_CHESTPLATE("하급 합금 갑옷", 15L),
+    LOW_ALLOY_LEGGINGS("하급 합금 바지", 16L),
+    LOW_ALLOY_SHOES("하급 합금 신발", 17L),
+    LOW_MANA_SWORD("하급 마나소드", 18L),
+    QUARTZ_SWORD("석영 검", 19L),
+    SLIME_HELMET("슬라임 투구", 20L),
+    SLIME_CHESTPLATE("슬라임 갑옷", 21L),
+    SLIME_LEGGINGS("슬라임 바지", 22L),
+    SLIME_SHOES("슬라임 신발", 23L),
+    WOOL_HELMET("양털 모자", 24L),
+    HARD_IRON_CHESTPLATE("강철 갑옷", 25L),
+    WEIRD_LEGGINGS("기괴한 바지", 26L),
+    MINER_SHOES("광부의 신발", 27L),
+    TROLL_CLUB("트롤의 몽둥이", 28L);
 
     public static final Map<String, EquipList> nameMap = new HashMap<>();
     public static final Map<Long, EquipList> idMap = new HashMap<>();

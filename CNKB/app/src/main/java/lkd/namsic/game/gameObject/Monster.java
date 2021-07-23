@@ -94,4 +94,10 @@ public class Monster extends AiEntity {
         return output;
     }
 
+    @NonNull
+    @Override
+    public String getName() {
+        return " [" + this.type.getDisplayName() + "] " + super.getName();
+    }
+
 }

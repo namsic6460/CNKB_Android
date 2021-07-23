@@ -12,20 +12,20 @@ import lkd.namsic.game.gameObject.Entity;
 
 public abstract class MoveEvent extends Event {
 
+    private static final long serialVersionUID = 1L;
+
     @NonNull
     public static String getName() {
         return "MoveEvent";
     }
 
-    public static boolean handleEvent(@NonNull Entity self, @Nullable List<Event> events, int distance, boolean isField) {
-        boolean isCancelled = false;
-
+    public static void handleEvent(@NonNull Entity self, @Nullable List<Event> events, int distance, boolean isField) {
         if (events != null) {
             List<Event> removeList = new ArrayList<>();
 
             for (Event moveEvent : events) {
                 try {
-                    isCancelled = ((MoveEvent) moveEvent).onMove(self, distance, isField);
+                    ((MoveEvent) moveEvent).onMove(self, distance, isField);
 
                     if (moveEvent.activeCount != -1) {
                         if (--moveEvent.activeCount == 0) {
@@ -37,8 +37,6 @@ public abstract class MoveEvent extends Event {
 
             events.removeAll(removeList);
         }
-
-        return isCancelled;
     }
 
     public MoveEvent(int activeCount) {
@@ -49,7 +47,7 @@ public abstract class MoveEvent extends Event {
         super(activeCount, variable);
     }
 
-    public abstract boolean onMove(@NonNull Entity self, int distance, boolean isField);
+    public abstract void onMove(@NonNull Entity self, int distance, boolean isField);
 
     @NonNull
     @Override

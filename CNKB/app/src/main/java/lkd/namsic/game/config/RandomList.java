@@ -192,13 +192,14 @@ public class RandomList {
             Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0D, 0.0001D, 0.0003D)
     );
 
-    public static final List<List<Double>> FISH_PERCENT = Arrays.asList(
-            Arrays.asList(35D, 25D, 15D, 5D, 1D, 0D, 0D, 0D, 0D),
-            Arrays.asList(55D, 50D, 35D, 25D, 15D, 10D, 9D, 7D, 4D),
-            Arrays.asList(10D, 25D, 40D, 40D, 30D, 25D, 20D, 10D, 5D),
-            Arrays.asList(0D, 0D, 10D, 30D, 50D, 45D, 30D, 30D, 25D),
-            Arrays.asList(0D, 0D, 0D, 0D, 4D, 20D, 40D, 5D, 60D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0D, 0D, 1D)
+    public static final List<List<Integer>> FISH_PERCENT = Arrays.asList(
+            Arrays.asList(45, 30, 10, 0, 0, 0, 0, 0, 0),
+            Arrays.asList(55, 60, 50, 30, 10, 0, 0, 0, 0),
+            Arrays.asList(0, 10, 35, 50, 45, 20, 10, 5, 0),
+            Arrays.asList(0, 0, 5, 20, 40, 50, 40, 20, 15),
+            Arrays.asList(0, 0, 0, 0, 5, 30, 45, 65, 65),
+            Arrays.asList(0, 0, 0, 0, 0, 0, 5, 10, 15),
+            Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 5)
     );
 
     public static final Map<Integer, Map<Long, Integer>> ADVENTURE_LIST = new HashMap<Integer, Map<Long, Integer>>() {{
@@ -512,25 +513,35 @@ public class RandomList {
 
     public static final double[][] HUNTER_TOKEN = new double[][] {
             { 0.1, 0, 0 },
-            { 0.1, 0.05, 0 },
-            { 0, 0.1, 0 },
+            { 0.15, 0.05, 0 },
+            { 0.1, 0.1, 0 },
+            { 0.05, 0.1, 0 },
             { 0, 0.15, 0 },
             { 0, 0.2, 0 },
-            { 0, 0.25, 0 },
-            { 0, 0.3, 0 },
-            { 0, 0.25, 0.05 },
-            { 0, 0.2, 0.1 },
-            { 0, 0.1, 0.2 }
+            { 0, 0.2, 0.05 },
+            { 0, 0.15, 0.05 },
+            { 0, 0.1, 0.05 },
+            { 0, 0.05, 0.1 },
+            { 0, 0.05, 0.1 },
+            { 0, 0, 0.1 },
+            { 0, 0, 0.1 },
+            { 0, 0, 0.1 },
+            { 0, 0, 0.1 },
+            { 0, 0, 0.1 },
+            { 0, 0, 0.1 },
+            { 0, 0, 0.1 },
+            { 0, 0, 0.1 },
+            { 0, 0, 0.1 },
     };
 
     public static final double[][] FISH_TOKEN = new double[][] {
             {}, //Empty
             { 0.1, 0, 0 },
-            { 0.05, 0.05, 0 },
-            { 0.05, 0.1, 0 },
-            { 0, 0.15, 0.02 },
-            { 0, 0.2, 0.05 },
-            { 0, 0.15, 0.1 }
+            { 0.15, 0.05, 0 },
+            { 0.1, 0.05, 0 },
+            { 0.05, 0.1, 0.02 },
+            { 0, 0.15, 0.05 },
+            { 0, 0.1, 0.1 }
     };
 
     public static final double[][] MINE_TOKEN = new double[][] {
@@ -577,15 +588,19 @@ public class RandomList {
             ItemList.STONE.getId(),
             ItemList.GOLD.getId(),
             ItemList.LOW_ALLOY.getId(),
-            ItemList.LOW_AMULET.getId()
+            ItemList.LOW_AMULET.getId(),
+            ItemList.HARD_IRON.getId(),
+            ItemList.CRAFT_GUIDE.getId(),
+            ItemList.LOW_ELIXIR.getId()
     );
 
     public static final List<Long> middleRecipeItems = Arrays.asList(
             ItemList.GLOW_LAPIS.getId(),
             ItemList.GLOW_RED_STONE.getId(),
             ItemList.WHITE_GOLD.getId(),
-            ItemList.MIDDLE_ALLOY.getId(),
-            ItemList.AMULET.getId()
+            ItemList.ALLOY.getId(),
+            ItemList.AMULET.getId(),
+            ItemList.ELIXIR.getId()
     );
 
     public static final List<Long> highRecipeItems = Arrays.asList(
@@ -595,19 +610,38 @@ public class RandomList {
             ItemList.LANDIUM.getId(),
             ItemList.AITUME.getId(),
             ItemList.HIGH_ALLOY.getId(),
-            ItemList.HIGH_AMULET.getId()
+            ItemList.HIGH_AMULET.getId(),
+            ItemList.HIGH_ELIXIR.getId()
     );
 
     public static final List<Long> lowRecipeEquips = Arrays.asList(
             EquipList.WOODEN_SWORD.getId(),
             EquipList.IRON_SWORD.getId(),
-            EquipList.MIX_SWORD.getId()
+            EquipList.MIX_SWORD.getId(),
+            EquipList.LEATHER_HELMET.getId(),
+            EquipList.LEATHER_CHESTPLATE.getId(),
+            EquipList.LEATHER_LEGGINGS.getId(),
+            EquipList.LEATHER_SHOES.getId(),
+            EquipList.LOW_ALLOY_HELMET.getId(),
+            EquipList.LOW_ALLOY_CHESTPLATE.getId(),
+            EquipList.LOW_ALLOY_LEGGINGS.getId(),
+            EquipList.LOW_ALLOY_SHOES.getId(),
+            EquipList.LOW_MANA_SWORD.getId(),
+            EquipList.WOOL_HELMET.getId(),
+            EquipList.HARD_IRON_CHESTPLATE.getId(),
+            EquipList.MINER_SHOES.getId()
     );
 
     public static final List<Long> middleRecipeEquips = Arrays.asList(
             EquipList.HEART_BREAKER_1.getId(),
             EquipList.HEAD_HUNTER_1.getId(),
-            EquipList.GHOST_SWORD_1.getId()
+            EquipList.GHOST_SWORD_1.getId(),
+            EquipList.QUARTZ_SWORD.getId(),
+            EquipList.SLIME_HELMET.getId(),
+            EquipList.SLIME_CHESTPLATE.getId(),
+            EquipList.SLIME_LEGGINGS.getId(),
+            EquipList.SLIME_SHOES.getId(),
+            EquipList.WEIRD_LEGGINGS.getId()
     );
 
     public static final List<Long> highRecipeEquips = Collections.emptyList();

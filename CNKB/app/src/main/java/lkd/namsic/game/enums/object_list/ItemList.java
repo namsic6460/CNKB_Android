@@ -186,13 +186,37 @@ public enum ItemList {
     ZOMBIE_HEART("좀비심장", 153L),
 
     LOW_ALLOY("하급 합금", 154L),
-    MIDDLE_ALLOY("중급 합금", 155L),
+    ALLOY("중급 합금", 155L),
     HIGH_ALLOY("상급 합금", 156L),
 
     PIECE_OF_SLIME("슬라임 조각", 157L),
 
     SPIDER_LEG("거미 다리", 158L),
-    SPIDER_POISON("거미 눈", 159L);
+    SPIDER_EYE("거미 눈", 159L),
+
+    HARD_IRON("강철", 160L),
+
+    ELIXIR_HERB("엘릭서 허브", 161L),
+
+    LOW_ELIXIR("하급 엘릭서", 162L),
+    ELIXIR("중급 엘릭서", 163L),
+    HIGH_ELIXIR("상급 엘릭서", 164L),
+
+    COMMON_GRILLED_FISH("(일반) 생선구이", 165L),
+    RARE_GRILLED_FISH("(희귀) 생선구이", 166L),
+    SPECIAL_GRILLED_FISH("(특별) 생선구이", 167L),
+    UNIQUE_GRILLED_FISH("(유일) 생선구이", 168L),
+    LEGENDARY_GRILLED_FISH("(전설) 생선구이", 169L),
+    MYSTIC_GRILLED_FISH("(신화) 생선구이", 170L),
+
+    COOKED_LAMB("익힌 양고기", 171L),
+    COOKED_PORT("익힌 돼지고기", 172L),
+    COOKED_BEEF("익힌 소고기", 173L),
+
+    GOD_WATER("신의 물", 174L),
+    PURIFIED_ZOMBIE_SOUL("하얘진 좀비 영혼", 175L),
+    HARDENED_SLIME("굳은 슬라임", 176L),
+    MAGIC_STONE("마정석", 177L);
 
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();
