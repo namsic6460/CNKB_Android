@@ -2559,7 +2559,7 @@ public class ObjectCreator {
 
             chat = createChat("보석 수집 - " + gemName, chatId,
                     "모험가님... 혹시 " + gemName + " 하나 구해줄 수 있어요?",
-                    "보석을 모으고 있는데 석영이 필요해서요..."
+                    "보석을 모으고 있는데 " + gemName + "이 필요해서요..."
             );
             chat.setResponseChat(WaitResponse.YES, chatId + 1, true);
             chat.setResponseChat(WaitResponse.NO, 97L, true);
@@ -2701,6 +2701,7 @@ public class ObjectCreator {
        quest.getRewardItemRecipe().add(ItemList.COOKED_PORT.getId());
        quest.getRewardItemRecipe().add(ItemList.COOKED_BEEF.getId());
        quest.setRewardCloseRate(NpcList.JOON_SIK.getId(), 10, true);
+       Config.unloadObject(quest);
 
        quest = new Quest("거미 눈의 마법", NpcList.SELINA.getId(), 88L);
        quest.setNeedItem(ItemList.SPIDER_EYE.getId(), 5);
@@ -2922,7 +2923,7 @@ public class ObjectCreator {
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.NEED_FISHING_ROD_ITEM.getId());
         chatLimit.getNotClearedQuest().add(QuestList.NEED_FISHING_ROD_ITEM.getId());
-        chatLimit.getLimitQuest().addMin(QuestList.NEED_FISHING_ROD_ITEM.getId(), 5);
+        chatLimit.getLimitQuest().addMin(QuestList.TRASH_COLLECTING.getId(), 5);
         npc.setChat(chatLimit, 58L);
 
         Config.unloadObject(npc);
