@@ -31,7 +31,7 @@ public class ItemDisplayManager {
 
     public void displayInventory(@NonNull Player self, int page) {
         if(self.getInventory().isEmpty()) {
-            self.replyPlayer("---인벤토리---\n인벤토리가 비어있습니다...");
+            self.replyPlayer("\n---인벤토리---\n인벤토리가 비어있습니다...");
             return;
         }
 
@@ -43,7 +43,7 @@ public class ItemDisplayManager {
 
         List<Long> highPriorityItems = self.getListVariable(Variable.HIGH_PRIORITY_ITEM);
 
-        StringBuilder msg = new StringBuilder("---인벤토리---\n[")
+        StringBuilder msg = new StringBuilder("\n---인벤토리---\n[")
                 .append(page)
                 .append("페이지 / ")
                 .append(maxPage)
@@ -293,7 +293,7 @@ public class ItemDisplayManager {
     public void displayEquipInventory(@NonNull Player self, int page) {
         List<Long> list = new ArrayList<>(self.getEquipInventory());
         if(list.isEmpty()) {
-            self.replyPlayer("---장비 인벤토리---\n인벤토리가 비어있습니다...");
+            self.replyPlayer("\n---장비 인벤토리---\n인벤토리가 비어있습니다...");
             return;
         }
 
@@ -333,7 +333,7 @@ public class ItemDisplayManager {
                     .append(Config.SPLIT_BAR);
         }
 
-        self.replyPlayer("---장비 인벤토리---\n[" + page + "페이지 / " + maxPage + "페이지]", innerBuilder.toString());
+        self.replyPlayer("\n---장비 인벤토리---\n[" + page + "페이지 / " + maxPage + "페이지]", innerBuilder.toString());
     }
 
 }

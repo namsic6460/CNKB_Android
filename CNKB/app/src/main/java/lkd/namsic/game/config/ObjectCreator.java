@@ -52,6 +52,8 @@ import lkd.namsic.setting.Logger;
 public class ObjectCreator {
     
     //TODO : 생성자에서 name + id를 list 의 enum 으로 대체
+    //TODO : Use, EquipUse, Event 등등은 직렬화 대신 코드 내에 저장해두고 직접 호출하는 방식으로 변경
+    //TODO : 장비를 가진 몬스터는 생성 떄 장비를 복사하지 말고 드롭할 때 원래 엔티티에서 장비를 가져와서 드롭  
 
     public static void start(Button button) {
         Logger.i("ObjectMaker", "Making objects...");
@@ -107,7 +109,7 @@ public class ObjectCreator {
 
         item = new Item("골드 주머니", "골드가 소량 들어간 주머니다");
         item.setUse((self, other) -> {
-            int money = new Random().nextInt(100 * self.getLv().get()) + 500;
+            int money = new Random().nextInt(10 * self.getLv().get()) + 500;
 
             self.addMoney(money);
             return "골드 주머니를 사용하여 " + money + "G 를 획득했습니다\n" + Emoji.GOLD + " 골드: " + self.getMoney() + "\n";
@@ -117,7 +119,7 @@ public class ObjectCreator {
         item = new Item("골드 보따리", "골드가 들어간 주머니다");
         item.getHandleLv().set(5);
         item.setUse((self, other) -> {
-            int money = new Random().nextInt(500 * self.getLv().get()) + 3000;
+            int money = new Random().nextInt(50 * self.getLv().get()) + 3000;
 
             self.addMoney(money);
             return "골드 보따리를 사용하여 " + money + "G 를 획득했습니다\n" + Emoji.GOLD + " 골드: " + self.getMoney() + "\n";
@@ -744,7 +746,7 @@ public class ObjectCreator {
 
         item = new Item("하급 경험치 포션", "경험치를 소량 제공해주는 포션이다");
         item.setUse((self, other) -> {
-            long exp = new Random().nextInt(2000 * self.getLv().get()) + 20000;
+            long exp = new Random().nextInt(500 * self.getLv().get()) + 20000;
 
             Player player = (Player) self;
             player.addExp(exp);
@@ -755,7 +757,7 @@ public class ObjectCreator {
         item = new Item("중급 경험치 포션", "경험치를 제공해주는 포션이다");
         item.getHandleLv().set(5);
         item.setUse((self, other) -> {
-            long exp = new Random().nextInt(10000 * self.getLv().get()) + 150_000;
+            long exp = new Random().nextInt(8000 * self.getLv().get()) + 150_000;
 
             Player player = (Player) self;
             player.addExp(exp);
@@ -1426,6 +1428,8 @@ public class ObjectCreator {
             put(ItemList.RED_STONE.getId(), 20);
         }}, true);
         equipment.getEvents().add(new DamageEvent(-1) {
+            //TODO : 마나 회복 안됨(어째써?)
+
             @Override
             public void onDamage(@NonNull Entity self, @NonNull Entity victim, Int totalDmg, Int totalDra, Bool isCrit) {
                 self.addBasicStat(StatType.MN, 1);
@@ -1591,7 +1595,7 @@ public class ObjectCreator {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.LEGGINGS, "기괴한 바지", "거미 다리로 만든 기괴하게 생긴 바지다\n" +
-                "피격 시 20% 확률로 데미지를 50% 감소시키고 다음 자신의 공격을 치명타로 만든다");
+                "피격 시 10% 확률로 데미지를 50% 감소시키고 다음 자신의 공격을 치명타로 만든다");
         equipment.getHandleLv().set(6);
         equipment.addBasicStat(StatType.MAXHP, 30);
         equipment.addBasicStat(StatType.ATS, 50);
@@ -1603,12 +1607,12 @@ public class ObjectCreator {
         equipment.getEvents().add(new DamagedEvent(-1) {
             @Override
             public void onDamaged(@NonNull Entity self, @NonNull Entity attacker, Int totalDmg, Int totalDra, Bool isCrit) {
-                if(Math.random() < 0.2) {
+                if(Math.random() < 0.1) {
                     totalDmg.set(0);
                     self.setVariable(Variable.WEIRD_LEGGINGS, true);
                     
                     if(attacker.getId().getId().equals(Id.PLAYER)) {
-                        ((Player) attacker).replyPlayer("기괴한 바지의 효과로 공격이 상쇄되었습니다");
+                        ((Player) attacker).replyPlayer("상대방의 기괴한 바지의 효과로 공격이 상쇄되었습니다");
                     }
                     
                     if(self.getId().getId().equals(Id.PLAYER)) {
@@ -1747,7 +1751,7 @@ public class ObjectCreator {
         monster.setBasicStat(StatType.EVA, 40);
 
         monster.setItemDrop(ItemList.ZOMBIE_HEAD.getId(), 0.1D, 1, 1);
-        monster.setItemDrop(ItemList.ZOMBIE_SOUL.getId(), 0.005D, 1, 1);
+        monster.setItemDrop(ItemList.ZOMBIE_SOUL.getId(), 0.01D, 1, 1);
         monster.setItemDrop(ItemList.ZOMBIE_HEART.getId(), 0.1D, 1, 1);
 
         Config.unloadObject(monster);
@@ -2028,7 +2032,7 @@ public class ObjectCreator {
 
         chat = createChat("낚시를 하면서 할만한 퀘스트가 있을까요?", 9L,
                 "요즘 바다나 강이 너무 더러워저셔 말일세",
-                "쓰레기가 낚이는게 있으면 5개만 구해다 줄 수 있겠나?"
+                "쓰레기가 낚이는게 있으면 3개만 구해다 줄 수 있겠나?"
         );
         chat.setResponseChat(WaitResponse.YES, 12L, true);
         chat.setResponseChat(WaitResponse.NO, 11L, true);
@@ -2251,7 +2255,7 @@ public class ObjectCreator {
                 "하하하 이제 이정도는 버틴다는 건가?",
                 "그래 좋군, 하지만 아직 부족하네",
                 "자네의 경험을 증명해 보게나",
-                "하급 모험의 증표 3개, 하급 낚시꾼의 증표 10개, 하급 광부의 증표 30개",
+                "하급 모험의 증표 3개, 하급 낚시꾼의 증표 7개, 하급 광부의 증표 30개",
                 "받아들이곘는가?"
         );
         chat.setResponseChat(WaitResponse.YES, 53L, true);
@@ -2602,7 +2606,7 @@ public class ObjectCreator {
        Quest quest = new Quest("광부의 일", NpcList.NOAH.getId(), 13L);
        quest.setNeedItem(ItemList.STONE.getId(), 30);
        quest.setRewardCloseRate(NpcList.NOAH.getId(), 1, true);
-       quest.getRewardExp().set(50000L);
+       quest.getRewardExp().set(35000L);
        quest.getRewardMoney().set(250L);
        Config.unloadObject(quest);
 
@@ -2627,7 +2631,7 @@ public class ObjectCreator {
        
        quest = new Quest("경험을 증명해라", NpcList.MOO_MYEONG.getId(), 55L);
        quest.setNeedItem(ItemList.LOW_ADV_TOKEN.getId(), 3);
-       quest.setNeedItem(ItemList.LOW_FISH_TOKEN.getId(), 10);
+       quest.setNeedItem(ItemList.LOW_FISH_TOKEN.getId(), 7);
        quest.setNeedItem(ItemList.LOW_MINER_TOKEN.getId(), 30);
        quest.setRewardCloseRate(NpcList.MOO_MYEONG.getId(), 10, true);
        quest.setRewardCloseRate(NpcList.SELINA.getId(), 10, true);

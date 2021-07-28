@@ -300,7 +300,7 @@ public class GameMap {
             Entity entity;
             Set<Entity> entitySet = new HashSet<>();
             for(Map.Entry<Id, Set<Long>> entry : this.entity.entrySet()) {
-                if(entry.getKey().equals(Id.NPC)) {
+                if(!entry.getKey().equals(Id.PLAYER)) {
                     continue;
                 }
 

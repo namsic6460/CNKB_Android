@@ -33,7 +33,7 @@ public class AdventureCommand extends PlayerCommand {
 
             AdventureManager.getInstance().exploreCommand(player, second);
         } else {
-            throw new DoingFilterException();
+            throw new DoingFilterException(player.getDoing());
         }
     }
 

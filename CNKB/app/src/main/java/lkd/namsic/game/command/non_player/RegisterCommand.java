@@ -26,7 +26,7 @@ public class RegisterCommand extends NonPlayerCommand {
                                @NonNull String room, boolean isGroupChat, @NonNull Notification.Action session) {
         if (command.equals("")) {
             throw new WeirdCommandException("닉네임을 입력해주세요\n" +
-                    "(예시: " + Emoji.focus("n 회원가입 남식") + ")");
+                    "(예시: " + Emoji.focus("n 회원가입 홍길동") + ")");
         }
 
         String checkedNickName = Config.getRegex(command, "");

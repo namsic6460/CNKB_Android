@@ -40,7 +40,7 @@ public class FightCommand extends PlayerCommand {
 
             FightManager.getInstance().fightCommand(player, second, command.replace(second, "").trim());
         } else {
-            throw new DoingFilterException();
+            throw new DoingFilterException(player.getDoing());
         }
     }
 

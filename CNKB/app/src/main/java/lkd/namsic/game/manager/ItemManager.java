@@ -210,7 +210,7 @@ public class ItemManager {
         boolean flag = false;
         Map<Long, Integer> recipe;
         Map<Long, Integer> craftRecipe = null;
-        int resultCount = 0;
+        int tempCount, resultCount = 0;
 
         int index = 1;
         for(Map<Long, Integer> recipeMap : item.getRecipe()) {
@@ -220,7 +220,7 @@ public class ItemManager {
                 }
             }
 
-            resultCount = recipeMap.getOrDefault(ItemList.NONE.getId(), 1);
+            tempCount = recipeMap.getOrDefault(ItemList.NONE.getId(), 1);
 
             recipe = new HashMap<>(recipeMap);
             recipe.remove(ItemList.NONE.getId());
@@ -237,6 +237,7 @@ public class ItemManager {
 
                 flag = true;
                 craftRecipe = recipe;
+                resultCount = tempCount;
             }
         }
 

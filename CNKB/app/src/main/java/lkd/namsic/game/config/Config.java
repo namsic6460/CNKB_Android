@@ -148,7 +148,7 @@ public class Config {
     public static final int MAX_EVADE = 80;
     
     public static final int FISH_DELAY_TIME = 3000;
-    public static final long FISH_DELAY_TIME_OFFSET = 5000;
+    public static final long FISH_DELAY_TIME_OFFSET = 3000;
     public static final long FISH_WAIT_TIME = 5000;
     public static final long FIGHT_WAIT_TIME = 30000;
     public static final int ADVENTURE_COUNT = 5;

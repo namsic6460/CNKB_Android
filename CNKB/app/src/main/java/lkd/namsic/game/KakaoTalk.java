@@ -262,7 +262,7 @@ public class KakaoTalk {
 
     public static void checkDoing(@NonNull Player player) throws DoingFilterException {
         if(!player.getDoing().equals(Doing.NONE)) {
-            throw new DoingFilterException();
+            throw new DoingFilterException(player.getDoing());
         }
     }
 

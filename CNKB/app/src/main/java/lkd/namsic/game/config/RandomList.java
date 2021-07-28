@@ -193,8 +193,8 @@ public class RandomList {
     );
 
     public static final List<List<Integer>> FISH_PERCENT = Arrays.asList(
-            Arrays.asList(45, 30, 10, 0, 0, 0, 0, 0, 0),
-            Arrays.asList(55, 60, 50, 30, 10, 0, 0, 0, 0),
+            Arrays.asList(70, 50, 10, 0, 0, 0, 0, 0, 0),
+            Arrays.asList(30, 40, 50, 30, 10, 0, 0, 0, 0),
             Arrays.asList(0, 10, 35, 50, 45, 20, 10, 5, 0),
             Arrays.asList(0, 0, 5, 20, 40, 50, 40, 20, 15),
             Arrays.asList(0, 0, 0, 0, 5, 30, 45, 65, 65),

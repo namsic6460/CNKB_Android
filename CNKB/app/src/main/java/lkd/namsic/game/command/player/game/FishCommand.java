@@ -41,7 +41,7 @@ public class FishCommand extends PlayerCommand {
 
             FishManager.getInstance().fishCommand(player, second);
         } else {
-            throw new DoingFilterException();
+            throw new DoingFilterException(player.getDoing());
         }
     }
 
