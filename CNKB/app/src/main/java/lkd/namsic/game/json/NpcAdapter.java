@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.ConcurrentHashSet;
-import lkd.namsic.game.gameObject.Npc;
+import lkd.namsic.game.object.Npc;
 
 public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
 

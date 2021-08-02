@@ -11,7 +11,7 @@ import java.util.Objects;
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.enums.Doing;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 
 public class DoingCommand extends PlayerCommand {
 

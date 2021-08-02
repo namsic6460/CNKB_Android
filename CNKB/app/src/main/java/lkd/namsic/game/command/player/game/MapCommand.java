@@ -10,8 +10,8 @@ import java.util.List;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.GameMap;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.DisplayManager;
 
 public class MapCommand extends PlayerCommand {

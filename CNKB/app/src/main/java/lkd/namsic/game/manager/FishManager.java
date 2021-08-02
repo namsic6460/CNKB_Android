@@ -15,11 +15,11 @@ import lkd.namsic.game.enums.FishWaitType;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.Variable;
-import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.GameMap;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
 
 public class FishManager {
@@ -308,28 +308,28 @@ public class FishManager {
 
         switch (fishLv) {
             case 0:
-                requireSkill = 20;
+                requireSkill = 10;
                 break;
             case 1:
-                requireSkill = 50;
+                requireSkill = 30;
                 break;
             case 2:
-                requireSkill = 100;
+                requireSkill = 80;
                 break;
             case 3:
-                requireSkill = 500;
+                requireSkill = 250;
                 break;
             case 4:
-                requireSkill = 1000;
+                requireSkill = 1_000;
                 break;
             case 5:
-                requireSkill = 5000;
+                requireSkill = 3_000;
                 break;
             case 6:
-                requireSkill = 10000;
+                requireSkill = 8_000;
                 break;
             case 7:
-                requireSkill = 20000;
+                requireSkill = 20_000;
                 break;
             default:
                 throw new NumberRangeException(fishLv, 0, 7);

@@ -11,9 +11,9 @@ import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Variable;
-import lkd.namsic.game.enums.object_list.NpcList;
+import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.MineManager;
 
 public class MineCommand extends PlayerCommand {

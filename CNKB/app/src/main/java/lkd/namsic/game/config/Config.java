@@ -10,16 +10,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,34 +25,30 @@ import java.util.concurrent.ConcurrentHashMap;
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.Location;
-import lkd.namsic.game.base.Use;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
-import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.UnhandledEnumException;
-import lkd.namsic.game.gameObject.Achieve;
-import lkd.namsic.game.gameObject.AiEntity;
-import lkd.namsic.game.gameObject.Boss;
-import lkd.namsic.game.gameObject.Chat;
-import lkd.namsic.game.gameObject.Entity;
-import lkd.namsic.game.gameObject.Equipment;
-import lkd.namsic.game.gameObject.GameMap;
-import lkd.namsic.game.gameObject.GameObject;
-import lkd.namsic.game.gameObject.Item;
-import lkd.namsic.game.gameObject.Monster;
-import lkd.namsic.game.gameObject.Npc;
-import lkd.namsic.game.gameObject.Player;
-import lkd.namsic.game.gameObject.Quest;
-import lkd.namsic.game.gameObject.Research;
-import lkd.namsic.game.gameObject.Skill;
+import lkd.namsic.game.object.Achieve;
+import lkd.namsic.game.object.AiEntity;
+import lkd.namsic.game.object.Boss;
+import lkd.namsic.game.object.Chat;
+import lkd.namsic.game.object.Entity;
+import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.GameObject;
+import lkd.namsic.game.object.Item;
+import lkd.namsic.game.object.Monster;
+import lkd.namsic.game.object.Npc;
+import lkd.namsic.game.object.Player;
+import lkd.namsic.game.object.Quest;
+import lkd.namsic.game.object.Research;
+import lkd.namsic.game.object.Skill;
 import lkd.namsic.game.json.ChatLimitAdapter;
-import lkd.namsic.game.json.EntityAdapter;
-import lkd.namsic.game.json.EquipAdapter;
 import lkd.namsic.game.json.LocationAdapter;
 import lkd.namsic.game.json.NpcAdapter;
-import lkd.namsic.game.json.UseAdapter;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.setting.Logger;
 
@@ -67,11 +57,6 @@ public class Config {
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
             .registerTypeAdapter(Location.class, new LocationAdapter())
-            .registerTypeAdapter(Equipment.class, new EquipAdapter())
-            .registerTypeAdapter(Player.class, new EntityAdapter<>(Player.class))
-            .registerTypeAdapter(Monster.class, new EntityAdapter<>(Monster.class))
-            .registerTypeAdapter(Boss.class, new EntityAdapter<>(Boss.class))
-            .registerTypeAdapter(Use.class, new UseAdapter())
             .registerTypeAdapter(ChatLimit.class, new ChatLimitAdapter())
             .setVersion(1.0)
             .create();
@@ -90,14 +75,14 @@ public class Config {
     public static final Map<String, Long> MAP_COUNT = new ConcurrentHashMap<>();
 
     private static final String REGEX = "[^A-Za-z-_0-9ㄱ-ㅎㅏ-ㅣ가-힣\\s]|[\n]|[\r]";
-    public static final List<String> FORBIDDEN_WORD = Arrays.asList("아이템", "item", "장비", "equip", "시발", "애미", "애비",
+    public static final List<String> FORBIDDEN_NICKNAME = Arrays.asList("아이템", "item", "장비", "equip", "시발", "애미", "애비",
             "느금", "느금마", "지랄", "염병", "옘병", "tlqkf", "ㄴㄱㅁ", "앰이", "보지", "자지", "섹스", "발기", "왕고추", "느금",
             "유미없음", "창년", "창녀", "창남", "몸팔이", "니애미", "니애비");
     public static final Map<String, Long> PLAYER_ID = new ConcurrentHashMap<>();
     public static final Map<Long, String[]> PLAYER_LIST = new ConcurrentHashMap<>();
     public static final Map<String, Integer> PLAYER_LV_RANK = new ConcurrentHashMap<>();
 
-    public static final Set<Long> SELECTABLE_CHAT_SET = new ConcurrentHashSet<>();
+    public static final Set<Long> SELECTABLE_CHAT_SET = new HashSet<>();
 
     public static final double MONEY_BOOST = 1;
     public static final double EXP_BOOST = 1;
@@ -227,7 +212,7 @@ public class Config {
         }
 
         jsonObject.add("id", idJson);
-        jsonObject.add("selectableChat", gson.toJsonTree(SELECTABLE_CHAT_SET, HashSet.class));
+        jsonObject.add("selectableChat", gson.toJsonTree(SELECTABLE_CHAT_SET));
 
         return jsonObject;
     }
@@ -243,11 +228,10 @@ public class Config {
             ID_COUNT.put(id, idObject.getAsJsonPrimitive(idName).getAsLong());
         }
 
-        JsonArray selectableArray = jsonObject.getAsJsonArray("selectableChat");
-        Set<Double> selectableChat = gson.fromJson(selectableArray, HashSet.class);
-
-        for(double d : selectableChat) {
-            SELECTABLE_CHAT_SET.add((long) d);
+        JsonArray selectableChatArray = jsonObject.getAsJsonArray("selectableChat");
+        Set<Double> selectableChatSet = gson.fromJson(selectableChatArray, HashSet.class);
+        for(double selectableChatId : selectableChatSet) {
+            SELECTABLE_CHAT_SET.add((long) selectableChatId);
         }
     }
 
@@ -280,15 +264,6 @@ public class Config {
 
         t.getId().setObjectId(objectId);
         ID_COUNT.put(id, objectId + 1);
-
-        if(t instanceof Entity) {
-            Entity entity = (Entity) t;
-
-            for(long equipId : new HashSet<>(entity.getEquipInventory())) {
-                entity.addEquip(equipId);
-                entity.removeEquip(equipId);
-            }
-        }
 
         Logger.i("newObject", id.toString() + "-" + objectId);
 
@@ -343,35 +318,6 @@ public class Config {
         } catch (Exception e) {
             Log.e("namsic!", jsonString);
             throw e;
-        }
-    }
-
-    @NonNull
-    public static <T extends Serializable> String serialize(T t) {
-        byte[] serialized;
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
-                oos.writeObject(t);
-                serialized = baos.toByteArray();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return Base64.getEncoder().encodeToString(serialized);
-    }
-
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public static <T extends Serializable> T deserialize(String byteStr) {
-        byte[] serialized = Base64.getDecoder().decode(byteStr);
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(serialized)) {
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            Object object = ois.readObject();
-
-            return (T) object;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 

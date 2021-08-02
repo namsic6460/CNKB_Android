@@ -12,7 +12,7 @@ import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.AppraiseManager;
 
 public class AppraiseCommand extends PlayerCommand {

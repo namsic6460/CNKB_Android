@@ -15,14 +15,14 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
-import lkd.namsic.game.enums.object_list.EquipList;
-import lkd.namsic.game.enums.object_list.ItemList;
-import lkd.namsic.game.enums.object_list.NpcList;
+import lkd.namsic.game.enums.object.EquipList;
+import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.GameMap;
-import lkd.namsic.game.gameObject.Npc;
-import lkd.namsic.game.gameObject.Player;
-import lkd.namsic.game.gameObject.Quest;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Npc;
+import lkd.namsic.game.object.Player;
+import lkd.namsic.game.object.Quest;
 
 public class DisplayManager {
 

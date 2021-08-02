@@ -25,11 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.config.Config;
-import lkd.namsic.game.config.ObjectCreator;
+import lkd.namsic.game.initializer.Initializer;
 import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.enums.Id;
-import lkd.namsic.game.gameObject.GameMap;
-import lkd.namsic.game.gameObject.GameObject;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.GameObject;
 import lkd.namsic.service.ForcedTerminationService;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.setting.Logger;
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onInitClick(View view) {
-        ObjectCreator.start((Button) view);
+        Initializer.start((Button) view);
     }
 
     public static void toast(final String msg) {

@@ -11,9 +11,9 @@ import java.util.List;
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.enums.Variable;
-import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 
 public class SettingCommand extends PlayerCommand {
 

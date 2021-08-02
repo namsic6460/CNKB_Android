@@ -14,12 +14,12 @@ import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
-import lkd.namsic.game.enums.object_list.EquipList;
-import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object.EquipList;
+import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Equipment;
-import lkd.namsic.game.gameObject.Item;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.Item;
+import lkd.namsic.game.object.Player;
 
 public class ItemDisplayManager {
 

@@ -7,20 +7,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import lkd.namsic.game.base.ConcurrentArrayList;
+import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.EquipUse;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.StatType;
-import lkd.namsic.game.enums.object_list.EquipList;
-import lkd.namsic.game.event.Event;
+import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Entity;
-import lkd.namsic.game.gameObject.Equipment;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Entity;
+import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.Player;
 
 public class EquipManager {
 
@@ -83,15 +82,8 @@ public class EquipManager {
             }
         }
 
-        if(equipment.getEvents().isEmpty()) {
-            self.getEquipEvents().remove(equipType);
-        } else {
-            ConcurrentArrayList<Event> events = new ConcurrentArrayList<>();
-            events.addAll(equipment.getEvents());
-            self.getEquipEvents().put(equipType, events);
-        }
-
         self.getEquipped().put(equipType, equipId);
+        self.getRemovedEquipEvent().put(equipType, new ConcurrentHashSet<>());
 
         if(self.getId().getId().equals(Id.PLAYER)) {
             ((Player) self).replyPlayer(equipment.getName() + "(을/를) 착용했습니다", innerBuilder.toString());
@@ -128,7 +120,7 @@ public class EquipManager {
         }
 
         self.getEquipped().remove(equipType);
-        self.getEquipEvents().remove(equipType);
+        self.getRemovedEquipEvent().remove(equipType);
 
         if(self.getId().getId().equals(Id.PLAYER)) {
             ((Player) self).replyPlayer(equipment.getName() + "(을/를) 착용 해제했습니다", innerBuilder.toString());

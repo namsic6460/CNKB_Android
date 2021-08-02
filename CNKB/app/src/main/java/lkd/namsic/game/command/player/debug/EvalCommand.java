@@ -10,7 +10,7 @@ import java.util.List;
 import lkd.namsic.game.Eval;
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 
 public class EvalCommand extends PlayerCommand {
 

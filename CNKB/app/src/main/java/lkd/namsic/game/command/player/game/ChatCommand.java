@@ -10,7 +10,7 @@ import java.util.List;
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.ChatManager;
 
 public class ChatCommand extends PlayerCommand {

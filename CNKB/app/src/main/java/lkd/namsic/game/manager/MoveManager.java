@@ -12,16 +12,16 @@ import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
-import lkd.namsic.game.enums.object_list.MapList;
+import lkd.namsic.game.enums.object.MapList;
 import lkd.namsic.game.event.MoveEvent;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Entity;
-import lkd.namsic.game.gameObject.Equipment;
-import lkd.namsic.game.gameObject.Item;
-import lkd.namsic.game.gameObject.GameMap;
-import lkd.namsic.game.gameObject.Monster;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Entity;
+import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.Item;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Monster;
+import lkd.namsic.game.object.Player;
 
 public class MoveManager {
 
@@ -40,7 +40,8 @@ public class MoveManager {
             throw new NumberRangeException(distance, 0);
         }
 
-        MoveEvent.handleEvent(self, self.getEvents(MoveEvent.class.getName()), distance, true);
+        String eventName = MoveEvent.getName();
+        MoveEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), distance, true);
 
         if (self.getId().getId().equals(Id.PLAYER)) {
             ((Player) self).addLog(LogData.FIELD_MOVE_DISTANCE, distance);
@@ -170,7 +171,8 @@ public class MoveManager {
             throw new NumberRangeException(distance, 1);
         }
 
-        MoveEvent.handleEvent(self, self.getEvents(MoveEvent.class.getName()), distance, false);
+        String eventName = MoveEvent.getName();
+        MoveEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), distance, false);
 
         if(self.getId().getId().equals(Id.PLAYER)) {
             ((Player) self).addLog(LogData.MAP_MOVE_DISTANCE, distance);

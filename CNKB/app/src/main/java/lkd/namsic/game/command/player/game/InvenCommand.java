@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import java.util.List;
 
 import lkd.namsic.game.command.PlayerCommand;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.ItemDisplayManager;
 
 public class InvenCommand extends PlayerCommand {

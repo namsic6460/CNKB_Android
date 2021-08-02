@@ -17,14 +17,14 @@ import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.WaitResponse;
-import lkd.namsic.game.enums.object_list.NpcList;
-import lkd.namsic.game.enums.object_list.QuestList;
+import lkd.namsic.game.enums.object.NpcList;
+import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Chat;
-import lkd.namsic.game.gameObject.GameMap;
-import lkd.namsic.game.gameObject.Npc;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Chat;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Npc;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
 
 public class ChatManager {

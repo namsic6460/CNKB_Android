@@ -11,7 +11,7 @@ import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.DisplayManager;
 import lkd.namsic.game.manager.ItemDisplayManager;
 

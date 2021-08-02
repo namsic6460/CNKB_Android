@@ -5,46 +5,52 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.exception.EventRemoveException;
 import lkd.namsic.game.exception.EventSkipException;
-import lkd.namsic.game.gameObject.Entity;
+import lkd.namsic.game.object.Entity;
+import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.interfaces.EntityEvents;
+import lkd.namsic.game.object.interfaces.EquipEvents;
 
-public abstract class MoveEvent extends Event {
-
-    private static final long serialVersionUID = 1L;
+public abstract class MoveEvent implements Event {
 
     @NonNull
     public static String getName() {
         return "MoveEvent";
     }
 
-    public static void handleEvent(@NonNull Entity self, @Nullable List<Event> events, int distance, boolean isField) {
+    public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events,
+                                   @NonNull Set<Long> eventEquipSet, int distance, boolean isField) {
         if (events != null) {
-            List<Event> removeList = new ArrayList<>();
+            List<Long> removeList = new ArrayList<>();
 
-            for (Event moveEvent : events) {
+            for (long eventId : events) {
+                MoveEvent moveEvent = EntityEvents.getEvent(eventId);
+
                 try {
-                    ((MoveEvent) moveEvent).onMove(self, distance, isField);
-
-                    if (moveEvent.activeCount != -1) {
-                        if (--moveEvent.activeCount == 0) {
-                            removeList.add(moveEvent);
-                        }
-                    }
+                    moveEvent.onMove(self, distance, isField);
+                } catch (EventRemoveException e) {
+                    removeList.add(eventId);
                 } catch (EventSkipException ignore) {}
             }
 
             events.removeAll(removeList);
         }
-    }
 
-    public MoveEvent(int activeCount) {
-        this(activeCount, null);
-    }
+        for(long equipId : eventEquipSet) {
+            MoveEvent moveEvent = EquipEvents.getEvent(equipId, getName());
 
-    public MoveEvent(int activeCount, @Nullable Map<String, Object> variable) {
-        super(activeCount, variable);
+            try {
+                moveEvent.onMove(self, distance, isField);
+            } catch (EventRemoveException e) {
+                Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+                self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
+            } catch (EventSkipException ignore) {}
+        }
     }
 
     public abstract void onMove(@NonNull Entity self, int distance, boolean isField);

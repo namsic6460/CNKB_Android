@@ -5,49 +5,57 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.exception.EventRemoveException;
 import lkd.namsic.game.exception.EventSkipException;
-import lkd.namsic.game.gameObject.Entity;
+import lkd.namsic.game.object.Entity;
+import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.interfaces.EntityEvents;
+import lkd.namsic.game.object.interfaces.EquipEvents;
 
-public abstract class DeathEvent extends Event {
+public abstract class DeathEvent implements Event {
 
-    private static final long serialVersionUID = 1L;
+    public static String name = "Hi";
 
     @NonNull
     public static String getName() {
         return "DeathEvent";
     }
 
-    public static void handleEvent(@NonNull Entity self, @Nullable List<Event> events, int beforeDeathHp, int afterDeathHp) {
+    public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events, @NonNull Set<Long> eventEquipSet,
+                                   final int beforeDeathHp, final int afterDeathHp) {
         if (events != null) {
-            List<Event> removeList = new ArrayList<>();
+            List<Long> removeList = new ArrayList<>();
 
-            for (Event deathEvent : events) {
+            for (long eventId : events) {
+                DeathEvent deathEvent = EntityEvents.getEvent(eventId);
+
                 try {
-                    ((DeathEvent) deathEvent).onDeath(self, beforeDeathHp, afterDeathHp);
-
-                    if (deathEvent.activeCount != -1) {
-                        if (--deathEvent.activeCount == 0) {
-                            removeList.add(deathEvent);
-                        }
-                    }
+                    deathEvent.onDeath(self, beforeDeathHp, afterDeathHp);
+                } catch (EventRemoveException e) {
+                    removeList.add(eventId);
                 } catch (EventSkipException ignore) {}
             }
 
             events.removeAll(removeList);
         }
+
+        for(long equipId : eventEquipSet) {
+            DeathEvent deathEvent = EquipEvents.getEvent(equipId, getName());
+
+            try {
+                deathEvent.onDeath(self, beforeDeathHp, afterDeathHp);
+            } catch (EventRemoveException e) {
+                Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+                self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
+            } catch (EventSkipException ignore) {}
+        }
     }
 
-    public DeathEvent(int activeCount) {
-        this(activeCount, null);
-    }
-
-    public DeathEvent(int activeCount, @Nullable Map<String, Object> variable) {
-        super(activeCount, variable);
-    }
-
-    public abstract void onDeath(@NonNull Entity self, int beforeDeathHp, int afterDeathHp);
+    public abstract void onDeath(@NonNull Entity self, final int beforeDeathHp, final int afterDeathHp);
 
     @NonNull
     @Override

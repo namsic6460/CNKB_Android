@@ -2,18 +2,15 @@ package lkd.namsic.game.base;
 
 import androidx.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.List;
 
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.EquipUseException;
 import lkd.namsic.game.exception.NumberRangeException;
-import lkd.namsic.game.gameObject.Entity;
-import lkd.namsic.game.gameObject.GameObject;
+import lkd.namsic.game.object.Entity;
+import lkd.namsic.game.object.GameObject;
 
-public abstract class EquipUse implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public abstract class EquipUse {
 
     public EquipUse(int useHp, int useMn) {
         this(useHp, 0, 0, useMn, 0, 0);

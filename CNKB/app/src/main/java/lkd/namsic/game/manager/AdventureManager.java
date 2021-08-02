@@ -21,9 +21,9 @@ import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Item;
-import lkd.namsic.game.gameObject.GameMap;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Item;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
 
 public class AdventureManager {

@@ -54,7 +54,7 @@ import lkd.namsic.game.exception.DoingFilterException;
 import lkd.namsic.game.exception.EquipUseException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.ChatManager;
 import lkd.namsic.service.NotificationListener;
 import lkd.namsic.setting.Logger;
@@ -166,7 +166,7 @@ public class KakaoTalk {
             soloSessions.put(room, session);
         }
 
-        final boolean isCommand = msg.startsWith("N ") || msg.startsWith("n ") || msg.startsWith("ㅜ ");
+        boolean isCommand = msg.startsWith("N ") || msg.startsWith("n ") || msg.startsWith("ㅜ ");
         final String command = isCommand ? msg.substring(2) : null;
 
         Thread gameThread = new Thread(() -> {

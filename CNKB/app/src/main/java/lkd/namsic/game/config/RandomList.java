@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import lkd.namsic.game.enums.object_list.EquipList;
-import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object.EquipList;
+import lkd.namsic.game.enums.object.ItemList;
 
 public class RandomList {
 
@@ -280,7 +280,7 @@ public class RandomList {
             put(ItemList.SMALL_GOLD_BAG.getId(), 100000);
             put(ItemList.ADV_STAT.getId(), 50000);
             put(ItemList.LOW_EXP_POTION.getId(), 50000);
-            put(ItemList.LOW_CRAFT_GUIDE.getId(), 50000);
+            put(ItemList.LOW_RECIPE.getId(), 50000);
         }});
         put(7, new HashMap<Long, Integer>() {{
             put(ItemList.STONE.getId(), 40000);
@@ -299,7 +299,7 @@ public class RandomList {
             put(ItemList.SMALL_GOLD_BAG.getId(), 100000);
             put(ItemList.ADV_STAT.getId(), 75000);
             put(ItemList.LOW_EXP_POTION.getId(), 50000);
-            put(ItemList.LOW_CRAFT_GUIDE.getId(), 75000);
+            put(ItemList.LOW_RECIPE.getId(), 75000);
         }});
         put(8, new HashMap<Long, Integer>() {{
             put(ItemList.STONE.getId(), 30000);
@@ -316,7 +316,7 @@ public class RandomList {
             put(ItemList.SMALL_GOLD_BAG.getId(), 100000);
             put(ItemList.ADV_STAT.getId(), 100000);
             put(ItemList.LOW_EXP_POTION.getId(), 120000);
-            put(ItemList.LOW_CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.LOW_RECIPE.getId(), 100000);
         }});
         put(9, new HashMap<Long, Integer>() {{
             put(ItemList.STONE.getId(), 20000);
@@ -335,7 +335,7 @@ public class RandomList {
             put(ItemList.LOW_EXP_POTION.getId(), 150000);
             put(ItemList.LOW_REINFORCE_STONE.getId(), 50000);
             put(ItemList.PIECE_OF_LOW_AMULET.getId(), 50000);
-            put(ItemList.LOW_CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.LOW_RECIPE.getId(), 100000);
         }});
         put(10, new HashMap<Long, Integer>() {{
             put(ItemList.STONE.getId(), 30000);
@@ -354,7 +354,7 @@ public class RandomList {
             put(ItemList.LOW_EXP_POTION.getId(), 100000);
             put(ItemList.LOW_REINFORCE_STONE.getId(), 50000);
             put(ItemList.PIECE_OF_LOW_AMULET.getId(), 50000);
-            put(ItemList.LOW_CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.LOW_RECIPE.getId(), 100000);
         }});
         put(11, new HashMap<Long, Integer>() {{
             put(ItemList.STONE.getId(), 10000);
@@ -376,8 +376,8 @@ public class RandomList {
             put(ItemList.EXP_POTION.getId(), 100000);
             put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
             put(ItemList.PIECE_OF_LOW_AMULET.getId(), 100000);
-            put(ItemList.LOW_CRAFT_GUIDE.getId(), 80000);
-            put(ItemList.CRAFT_GUIDE.getId(), 60000);
+            put(ItemList.LOW_RECIPE.getId(), 80000);
+            put(ItemList.RECIPE.getId(), 60000);
         }});
         put(12, new HashMap<Long, Integer>() {{
             put(ItemList.EMPTY_SPHERE.getId(), 10000);
@@ -391,8 +391,8 @@ public class RandomList {
             put(ItemList.EXP_POTION.getId(), 100000);
             put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
             put(ItemList.PIECE_OF_LOW_AMULET.getId(), 100000);
-            put(ItemList.LOW_CRAFT_GUIDE.getId(), 80000);
-            put(ItemList.CRAFT_GUIDE.getId(), 60000);
+            put(ItemList.LOW_RECIPE.getId(), 80000);
+            put(ItemList.RECIPE.getId(), 60000);
         }});
         put(13, new HashMap<Long, Integer>() {{
             put(ItemList.HIGH_ADV_TOKEN.getId(), 100000);
@@ -405,7 +405,7 @@ public class RandomList {
             put(ItemList.EXP_POTION.getId(), 100000);
             put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
             put(ItemList.PIECE_OF_LOW_AMULET.getId(), 100000);
-            put(ItemList.CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.RECIPE.getId(), 100000);
         }});
         put(14, new HashMap<Long, Integer>() {{
             put(ItemList.HIGH_ADV_TOKEN.getId(), 100000);
@@ -419,7 +419,7 @@ public class RandomList {
             put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
             put(ItemList.PIECE_OF_LOW_AMULET.getId(), 100000);
             put(ItemList.PIECE_OF_AMULET.getId(), 50000);
-            put(ItemList.CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.RECIPE.getId(), 100000);
         }});
         put(15, new HashMap<Long, Integer>() {{
             put(ItemList.HIGH_ADV_TOKEN.getId(), 100000);
@@ -430,7 +430,7 @@ public class RandomList {
             put(ItemList.EXP_POTION.getId(), 100000);
             put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
             put(ItemList.PIECE_OF_AMULET.getId(), 100000);
-            put(ItemList.CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.RECIPE.getId(), 100000);
             put(ItemList.PIECE_OF_GEM.getId(), 50000);
             put(ItemList.GEM_ABRASIVE_MATERIAL.getId(), 50000);
         }});
@@ -445,7 +445,7 @@ public class RandomList {
             put(ItemList.LOW_REINFORCE_STONE.getId(), 100000);
             put(ItemList.REINFORCE_STONE.getId(), 50000);
             put(ItemList.PIECE_OF_AMULET.getId(), 50000);
-            put(ItemList.CRAFT_GUIDE.getId(), 50000);
+            put(ItemList.RECIPE.getId(), 50000);
             put(ItemList.PIECE_OF_GEM.getId(), 50000);
             put(ItemList.GEM_ABRASIVE_MATERIAL.getId(), 50000);
             put(ItemList.WEAPON_SAFENER.getId(), 50000);
@@ -461,8 +461,8 @@ public class RandomList {
             put(ItemList.REINFORCE_STONE.getId(), 100000);
             put(ItemList.PIECE_OF_AMULET.getId(), 50000);
             put(ItemList.PIECE_OF_HIGH_AMULET.getId(), 50000);
-            put(ItemList.CRAFT_GUIDE.getId(), 50000);
-            put(ItemList.HIGH_CRAFT_GUIDE.getId(), 50000);
+            put(ItemList.RECIPE.getId(), 50000);
+            put(ItemList.HIGH_RECIPE.getId(), 50000);
             put(ItemList.PIECE_OF_GEM.getId(), 50000);
             put(ItemList.GEM_ABRASIVE_MATERIAL.getId(), 50000);
             put(ItemList.WEAPON_SAFENER.getId(), 50000);
@@ -476,7 +476,7 @@ public class RandomList {
             put(ItemList.HIGH_EXP_POTION.getId(), 100000);
             put(ItemList.REINFORCE_STONE.getId(), 100000);
             put(ItemList.PIECE_OF_HIGH_AMULET.getId(), 100000);
-            put(ItemList.HIGH_CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.HIGH_RECIPE.getId(), 100000);
             put(ItemList.PIECE_OF_GEM.getId(), 50000);
             put(ItemList.GEM_ABRASIVE_MATERIAL.getId(), 50000);
             put(ItemList.WEAPON_SAFENER.getId(), 50000);
@@ -490,7 +490,7 @@ public class RandomList {
             put(ItemList.REINFORCE_STONE.getId(), 100000);
             put(ItemList.HIGH_REINFORCE_STONE.getId(), 100000);
             put(ItemList.PIECE_OF_HIGH_AMULET.getId(), 100000);
-            put(ItemList.HIGH_CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.HIGH_RECIPE.getId(), 100000);
             put(ItemList.PIECE_OF_GEM.getId(), 50000);
             put(ItemList.GEM_ABRASIVE_MATERIAL.getId(), 50000);
             put(ItemList.WEAPON_SAFENER.getId(), 50000);
@@ -504,7 +504,7 @@ public class RandomList {
             put(ItemList.REINFORCE_STONE.getId(), 100000);
             put(ItemList.HIGH_REINFORCE_STONE.getId(), 100000);
             put(ItemList.PIECE_OF_HIGH_AMULET.getId(), 100000);
-            put(ItemList.HIGH_CRAFT_GUIDE.getId(), 100000);
+            put(ItemList.HIGH_RECIPE.getId(), 100000);
             put(ItemList.PIECE_OF_GEM.getId(), 50000);
             put(ItemList.GLOW_GEM_ABRASIVE_MATERIAL.getId(), 50000);
             put(ItemList.WEAPON_SAFENER.getId(), 50000);
@@ -590,7 +590,7 @@ public class RandomList {
             ItemList.LOW_ALLOY.getId(),
             ItemList.LOW_AMULET.getId(),
             ItemList.HARD_IRON.getId(),
-            ItemList.CRAFT_GUIDE.getId(),
+            ItemList.RECIPE.getId(),
             ItemList.LOW_ELIXIR.getId()
     );
 

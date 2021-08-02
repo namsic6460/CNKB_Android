@@ -10,13 +10,13 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.Variable;
-import lkd.namsic.game.enums.object_list.BossList;
-import lkd.namsic.game.enums.object_list.ItemList;
-import lkd.namsic.game.enums.object_list.MonsterList;
-import lkd.namsic.game.enums.object_list.NpcList;
+import lkd.namsic.game.enums.object.BossList;
+import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.enums.object.MonsterList;
+import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.GameMap;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.ChatManager;
 
 public class RegisterCommand extends NonPlayerCommand {
@@ -67,7 +67,7 @@ public class RegisterCommand extends NonPlayerCommand {
                     "닉네임을 변경한 후 다시 시도해주세요");
         }
 
-        for(String forbiddenWord : Config.FORBIDDEN_WORD) {
+        for(String forbiddenWord : Config.FORBIDDEN_NICKNAME) {
             if(command.contains(forbiddenWord)) {
                 throw new WeirdCommandException("닉네임에 금지된 단어가 포함되어 있습니다.\n" +
                         "닉네임을 변경한 후 다시 시도해주세요\n(금지된 단어 : " + forbiddenWord + ")");

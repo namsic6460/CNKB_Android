@@ -1,0 +1,124 @@
+package lkd.namsic.game.object;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
+import lkd.namsic.game.base.Use;
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.exception.NumberRangeException;
+import lkd.namsic.game.object.interfaces.ItemUses;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+public class Item extends NamedObject {
+
+    @Setter
+    @NonNull
+    String description;
+
+    @Nullable
+    Use use = null;
+
+    @Setter
+    private boolean canEat = false;
+
+    private final Map<Long, HashMap<StatType, Integer>> eatBuff = new HashMap<>();
+
+    final Set<Map<Long, Integer>> recipe = new LinkedHashSet<>();
+
+    protected Item(@NonNull String name) {
+        super(name);
+    }
+
+    public Item(@NonNull ItemList itemData, @NonNull String description) {
+        super(itemData.getDisplayName());
+        this.id.setId(Id.ITEM);
+        this.id.setObjectId(itemData.getId());
+
+        this.description = description;
+    }
+
+    @Nullable
+    public Use getUse() {
+        return ItemUses.USE_MAP.get(this.id.getObjectId());
+    }
+
+    public void setEatBuff(long time, @NonNull StatType statType, int stat) {
+        if(time != -1) {
+            Config.checkStatType(statType);
+
+            if(time < 1) {
+                throw new NumberRangeException(time, 1, Long.MAX_VALUE);
+            }
+        }
+
+        HashMap<StatType, Integer> buff = this.eatBuff.get(time);
+
+        if(buff == null) {
+            if(stat == 0) {
+                return;
+            }
+
+            buff = new HashMap<>();
+            buff.put(statType, stat);
+            this.eatBuff.put(time, buff);
+        } else {
+            if(stat == 0) {
+                if(buff.size() == 1) {
+                    this.eatBuff.remove(time);
+                } else {
+                    buff.remove(statType);
+                }
+            } else {
+                buff.put(statType, stat);
+            }
+        }
+    }
+
+    public int getEatBuff(long time, @NonNull StatType statType) {
+        Map<StatType, Integer> buff = this.eatBuff.get(time);
+
+        if(buff == null) {
+            return 0;
+        } else {
+            return buff.getOrDefault(statType, 0);
+        }
+    }
+
+    public void addRecipe(@NonNull Map<Long, Integer> recipe) {
+        this.addRecipe(recipe, false);
+    }
+
+    public void addRecipe(@NonNull Map<Long, Integer> recipe, boolean skip) {
+        long key;
+        int value;
+        for(Map.Entry<Long, Integer> entry : recipe.entrySet()) {
+            key = entry.getKey();
+            value = entry.getValue();
+
+            if(!skip && key != ItemList.NONE.getId()) {
+                try {
+                    Config.checkId(Id.ITEM, key);
+                } catch (NumberRangeException e) {
+                    Config.checkId(Id.EQUIPMENT, key);
+                }
+            }
+
+            if(value < 1) {
+                throw new NumberRangeException(value, 1, Integer.MAX_VALUE);
+            }
+        }
+
+        this.recipe.add(recipe);
+    }
+
+}

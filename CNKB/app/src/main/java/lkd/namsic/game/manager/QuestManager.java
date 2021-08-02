@@ -11,12 +11,12 @@ import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.StatType;
-import lkd.namsic.game.enums.object_list.EquipList;
-import lkd.namsic.game.enums.object_list.ItemList;
-import lkd.namsic.game.enums.object_list.NpcList;
+import lkd.namsic.game.enums.object.EquipList;
+import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.exception.ObjectNotFoundException;
-import lkd.namsic.game.gameObject.Player;
-import lkd.namsic.game.gameObject.Quest;
+import lkd.namsic.game.object.Player;
+import lkd.namsic.game.object.Quest;
 
 public class QuestManager {
 

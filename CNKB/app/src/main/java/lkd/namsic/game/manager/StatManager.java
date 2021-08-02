@@ -6,7 +6,7 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 
 public class StatManager {
 

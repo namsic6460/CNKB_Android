@@ -9,19 +9,19 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import lkd.namsic.game.base.Use;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.StatType;
-import lkd.namsic.game.enums.object_list.EquipList;
-import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object.EquipList;
+import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.event.ItemEatEvent;
 import lkd.namsic.game.event.ItemUseEvent;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Item;
-import lkd.namsic.game.gameObject.Player;
-import lkd.namsic.game.base.Use;
+import lkd.namsic.game.object.Item;
+import lkd.namsic.game.object.Player;
 
 public class ItemManager {
 
@@ -63,7 +63,8 @@ public class ItemManager {
     public void use(@NonNull Player self, long itemId, int count) {
         Config.checkId(Id.ITEM, itemId);
 
-        ItemUseEvent.handleEvent(self, self.getEvents(ItemUseEvent.class.getName()), itemId, count);
+        String eventName = ItemUseEvent.getName();
+        ItemUseEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), itemId, count);
 
         self.addLog(LogData.TOTAL_ITEM_USE, 1);
 
@@ -72,25 +73,14 @@ public class ItemManager {
         String msg = item.getName() + " " + count + "개를 사용했습니다";
         StringBuilder innerBuilder = new StringBuilder();
 
-        String result = null;
-
         Use use = Objects.requireNonNull(item.getUse());
         for(int i = 1; i <= count; i++) {
-            result = use.use(self, new ArrayList<>());
-
-            if(result != null) {
-                innerBuilder.append(result)
-                        .append("\n");
-            }
+            innerBuilder.append(use.use(self, new ArrayList<>()))
+                    .append("\n");
         }
 
         self.addItem(itemId, count * -1);
-
-        if(result == null) {
-            self.replyPlayer(msg);
-        } else {
-            self.replyPlayer(msg, innerBuilder.toString());
-        }
+        self.replyPlayer(msg, innerBuilder.toString());
     }
 
     public void tryEat(@NonNull Player self, @NonNull String itemName, int count) {
@@ -120,7 +110,8 @@ public class ItemManager {
     public void eat(@NonNull Player self, long itemId, int count) {
         Config.checkId(Id.ITEM, itemId);
 
-        ItemEatEvent.handleEvent(self, self.getEvents(ItemEatEvent.class.getName()), itemId, count);
+        String eventName = ItemEatEvent.getName();
+        ItemEatEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), itemId, count);
 
         self.addLog(LogData.TOTAL_ITEM_EAT, 1);
 

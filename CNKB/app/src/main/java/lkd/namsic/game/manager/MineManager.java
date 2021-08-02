@@ -8,20 +8,19 @@ import java.util.List;
 import java.util.Random;
 
 import lkd.namsic.game.base.Int;
-import lkd.namsic.game.base.LoNg;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.RandomList;
-import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
-import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.Variable;
+import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.event.MineEvent;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
-import lkd.namsic.game.gameObject.Item;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Item;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
 
 public class MineManager {
@@ -50,7 +49,7 @@ public class MineManager {
         List<Long> output = Arrays.asList(ItemList.STONE.getId(), ItemList.COAL.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.SILVER.getId(), ItemList.GLOW_STONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.ORICHALCON.getId(), ItemList.NONE.getId());
 
         double percent;
-        LoNg itemId = new LoNg();
+        long itemId = 0;
 
         //0 ~ 11
         int itemTier = 0;
@@ -58,9 +57,9 @@ public class MineManager {
             percent = percents.get(itemTier);
 
             if(randomPercent < percent) {
-                itemId.set(output.get(itemTier));
+                itemId = output.get(itemTier);
 
-                if(itemId.get() == 0) {
+                if(itemId == 0) {
                     long[] itemList;
 
                     switch(itemTier) {
@@ -91,7 +90,7 @@ public class MineManager {
                             throw new InvalidNumberException(itemTier);
                     }
 
-                    itemId.set(itemList[new Random().nextInt(itemList.length)]);
+                    itemId = itemList[new Random().nextInt(itemList.length)];
                 }
 
                 break;
@@ -109,14 +108,15 @@ public class MineManager {
 
         Int mineCount = new Int(1);
 
-        MineEvent.handleEvent(self, self.getEvents(MineEvent.getName()), itemId, mineCount);
+        String eventName = MineEvent.getName();
+        MineEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), itemId, mineCount);
 
-        int count = self.getItem(itemId.get());
-        self.addItem(itemId.get(), mineCount.get(), false);
+        int count = self.getItem(itemId);
+        self.addItem(itemId, mineCount.get(), false);
 
         StringBuilder builder = new StringBuilder();
 
-        Item item = Config.getData(Id.ITEM, itemId.get());
+        Item item = Config.getData(Id.ITEM, itemId);
         builder.append(item.getName())
                 .append("을 캤습니다!\n아이템 개수 : ")
                 .append(count).append(" -> ")
@@ -153,25 +153,25 @@ public class MineManager {
                 requireCount = 30;
                 break;
             case 1:
-                requireCount = 200;
+                requireCount = 100;
                 break;
             case 2:
-                requireCount = 1000;
+                requireCount = 300;
                 break;
             case 3:
-                requireCount = 5000;
+                requireCount = 800;
                 break;
             case 4:
-                requireCount = 20_000;
+                requireCount = 2_000;
                 break;
             case 5:
-                requireCount = 100_000;
+                requireCount = 5_000;
                 break;
             case 6:
-                requireCount = 1_000_000;
+                requireCount = 15_000;
                 break;
             case 7:
-                requireCount = 10_000_000;
+                requireCount = 50_000;
                 break;
             default:
                 throw new NumberRangeException(mineLv, 0, 7);

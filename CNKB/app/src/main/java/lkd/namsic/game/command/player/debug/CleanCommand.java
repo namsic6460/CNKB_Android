@@ -16,8 +16,8 @@ import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
-import lkd.namsic.game.gameObject.Entity;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Entity;
+import lkd.namsic.game.object.Player;
 
 public class CleanCommand extends PlayerCommand {
 
@@ -34,7 +34,7 @@ public class CleanCommand extends PlayerCommand {
 
             Id id;
             Entity entity;
-            for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : new HashMap<>(target.getEnemies()).entrySet()) {
+            for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : new HashMap<>(target.getEnemy()).entrySet()) {
                 id = entry.getKey();
 
                 for(long enemyId : entry.getValue()) {

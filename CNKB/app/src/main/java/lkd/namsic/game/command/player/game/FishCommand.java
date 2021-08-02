@@ -12,7 +12,7 @@ import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.exception.DoingFilterException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.FishManager;
 
 public class FishCommand extends PlayerCommand {

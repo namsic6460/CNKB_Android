@@ -11,10 +11,10 @@ import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.Variable;
-import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Item;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Item;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
 
 public class AppraiseManager {

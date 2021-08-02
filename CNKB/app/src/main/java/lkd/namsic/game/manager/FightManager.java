@@ -24,14 +24,14 @@ import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
-import lkd.namsic.game.enums.object_list.EquipList;
-import lkd.namsic.game.enums.object_list.ItemList;
+import lkd.namsic.game.enums.object.EquipList;
+import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.gameObject.Entity;
-import lkd.namsic.game.gameObject.Equipment;
-import lkd.namsic.game.gameObject.GameMap;
-import lkd.namsic.game.gameObject.Monster;
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Entity;
+import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Monster;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
 
 public class FightManager {
@@ -152,10 +152,10 @@ public class FightManager {
             }
 
             boolean hasInner = true;
-            if(loadedEnemy.getEnemies().isEmpty()) {
+            if(loadedEnemy.getEnemy().isEmpty()) {
                 hasInner = false;
             } else {
-                for (Map.Entry<Id, ConcurrentHashSet<Long>> newEntry : loadedEnemy.getEnemies().entrySet()) {
+                for (Map.Entry<Id, ConcurrentHashSet<Long>> newEntry : loadedEnemy.getEnemy().entrySet()) {
                     Id newEnemyId = newEntry.getKey();
 
                     for (long newEnemyObjectId : newEntry.getValue()) {
@@ -229,7 +229,7 @@ public class FightManager {
             int sum = 0;
 
             try {
-                for (Map.Entry<Id, ConcurrentHashSet<Long>> entry : self.getEnemies().entrySet()) {
+                for (Map.Entry<Id, ConcurrentHashSet<Long>> entry : self.getEnemy().entrySet()) {
                     Entity entity;
                     Id entityId = entry.getKey();
 
@@ -638,12 +638,12 @@ public class FightManager {
             self.setDoing(Doing.NONE);
         }
 
-        if(self.getEnemies().isEmpty()) {
+        if(self.getEnemy().isEmpty()) {
             return;
         }
 
         Id enemyId;
-        Map<Id, Set<Long>> copyMap = new HashMap<>(self.getEnemies());
+        Map<Id, Set<Long>> copyMap = new HashMap<>(self.getEnemy());
         for(Map.Entry<Id, Set<Long>> entry : copyMap.entrySet()) {
             enemyId = entry.getKey();
 

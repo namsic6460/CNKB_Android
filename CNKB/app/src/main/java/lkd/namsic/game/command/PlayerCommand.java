@@ -7,7 +7,7 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
-import lkd.namsic.game.gameObject.Player;
+import lkd.namsic.game.object.Player;
 
 public abstract class PlayerCommand implements CommandListener {
 

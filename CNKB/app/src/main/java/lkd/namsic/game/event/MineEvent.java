@@ -5,51 +5,59 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import lkd.namsic.game.base.Int;
-import lkd.namsic.game.base.LoNg;
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.exception.EventRemoveException;
 import lkd.namsic.game.exception.EventSkipException;
-import lkd.namsic.game.gameObject.Entity;
+import lkd.namsic.game.object.Entity;
+import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.Item;
+import lkd.namsic.game.object.interfaces.EntityEvents;
+import lkd.namsic.game.object.interfaces.EquipEvents;
 
-public abstract class MineEvent extends Event {
-
-    private static final long serialVersionUID = 1L;
+public abstract class MineEvent implements Event {
 
     @NonNull
     public static String getName() {
         return "MineEvent";
     }
 
-    public static void handleEvent(@NonNull Entity self, @Nullable List<Event> events, @NonNull LoNg itemId, @NonNull Int mineCount) {
+    public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events,
+                                   @NonNull Set<Long> eventEquipSet, long itemId, @NonNull Int mineCount) {
+        Item item = Config.getData(Id.ITEM, itemId);
+
         if (events != null) {
-            List<Event> removeList = new ArrayList<>();
+            List<Long> removeList = new ArrayList<>();
 
-            for (Event mineEvents : events) {
+            for (long eventId : events) {
+                MineEvent mineEvent = EntityEvents.getEvent(eventId);
+
                 try {
-                    ((MineEvent) mineEvents).onMine(self, itemId, mineCount);
-
-                    if (mineEvents.activeCount != -1) {
-                        if (--mineEvents.activeCount == 0) {
-                            removeList.add(mineEvents);
-                        }
-                    }
+                    mineEvent.onMine(self, item, mineCount);
+                } catch (EventRemoveException e) {
+                    removeList.add(eventId);
                 } catch (EventSkipException ignore) {}
             }
 
             events.removeAll(removeList);
         }
+
+        for(long equipId : eventEquipSet) {
+            MineEvent mineEvent = EquipEvents.getEvent(equipId, getName());
+
+            try {
+                mineEvent.onMine(self, item, mineCount);
+            } catch (EventRemoveException e) {
+                Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+                self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
+            } catch (EventSkipException ignore) {}
+        }
     }
 
-    public MineEvent(int activeCount) {
-        this(activeCount, null);
-    }
-
-    public MineEvent(int activeCount, @Nullable Map<String, Object> variable) {
-        super(activeCount, variable);
-    }
-
-    public abstract void onMine(@NonNull Entity self, @NonNull LoNg itemId, @NonNull Int mineCount);
+    public abstract void onMine(@NonNull Entity self, @NonNull Item item, @NonNull Int mineCount);
 
     @NonNull
     @Override
