@@ -281,8 +281,6 @@ public class GameMap {
             throw new WeirdDataException(this.location, location);
         }
 
-        Config.checkId(Id.ITEM, itemId);
-
         if(count < 0) {
             throw new NumberRangeException(count, 0);
         }
@@ -357,8 +355,6 @@ public class GameMap {
             throw new WeirdDataException(this.location, location);
         }
 
-        Config.checkId(Id.EQUIPMENT, equipId);
-
         Entity entity;
         Set<Entity> entitySet = new HashSet<>();
         for(Map.Entry<Id, Set<Long>> entry : this.entity.entrySet()) {
@@ -432,8 +428,6 @@ public class GameMap {
             throw new NumberRangeException(maxCount, 1, Config.MAX_SPAWN_COUNT);
         }
 
-        Config.checkId(Id.MONSTER, monsterId);
-
         this.spawnMonster.add(monsterId);
         this.spawnPercent.get(Id.MONSTER).put(monsterId, percent);
         this.spawnMaxCount.put(monsterId, maxCount);
@@ -443,8 +437,6 @@ public class GameMap {
         if(percent < 0 || percent > 1) {
             throw new NumberRangeException(percent, 0, 1);
         }
-
-        Config.checkId(Id.BOSS, bossId);
 
         this.spawnBoss.add(bossId);
         this.spawnPercent.get(Id.BOSS).put(bossId, percent);

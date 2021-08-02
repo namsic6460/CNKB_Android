@@ -1,7 +1,6 @@
 package lkd.namsic.game.manager;
 
 import android.app.Notification;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -99,7 +98,6 @@ public class ChatManager {
     }
 
     public void startChat(@NonNull Player self, long chatId, long npcId) {
-        Config.checkId(Id.CHAT, chatId);
         self.setDoing(Doing.CHAT);
 
         Chat chat = Config.getData(Id.CHAT, chatId);
@@ -111,7 +109,7 @@ public class ChatManager {
                 try {
                     Thread.sleep(chat.getDelayTime().get());
                 } catch (InterruptedException e) {
-                    Log.e("Player.startChat - chat Thread", Config.errorString(e));
+                    Logger.e("ChatManager", e);
                     return;
                 }
 
@@ -130,7 +128,7 @@ public class ChatManager {
                             Thread.sleep(pauseTime);
                         }
                     } catch (InterruptedException e) {
-                        Log.e("Player.startChat - chat Thread", Config.errorString(e));
+                        Logger.e("ChatManager", e);
                         return;
                     }
                 }
@@ -253,7 +251,6 @@ public class ChatManager {
                     }
                 }
             } catch (Exception e) {
-                Log.e("ChatManager", Config.errorString(e));
                 Logger.e("ChatManager", e);
             }
         });

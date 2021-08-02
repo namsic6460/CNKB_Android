@@ -407,8 +407,6 @@ public class Player extends Entity {
 
     @NonNull
     public Player addAchieve(long achieveId) {
-        Config.checkId(Id.ACHIEVE, achieveId);
-
         if(this.achieve.add(achieveId)) {
             Achieve achieve = Config.getData(Id.ACHIEVE, achieveId);
 
@@ -491,8 +489,6 @@ public class Player extends Entity {
     }
 
     public boolean canAddResearch(long researchId) {
-        Config.checkId(Id.RESEARCH, researchId);
-
         Research research = Config.getData(Id.RESEARCH, researchId);
         return research.getLimitLv().isInRange(this.lv.get()) && research.getNeedMoney().get() <= this.getMoney()
                     && Config.compareMap(this.inventory, research.needItem, true, false, 0);
@@ -580,8 +576,6 @@ public class Player extends Entity {
     }
 
     public boolean canAddQuest(long questId) {
-        Config.checkId(Id.QUEST, questId);
-
         Quest quest = Config.getData(Id.QUEST, questId);
         return quest.limitLv.isInRange(this.lv.get()) && quest.limitCloseRate.isInRange(this.closeRate)
                 && this.checkStatRange(quest.limitStat.getMin(), quest.limitStat.getMax());
@@ -606,8 +600,6 @@ public class Player extends Entity {
     }
 
     public boolean canEquip(long equipId) {
-        Config.checkId(Id.EQUIPMENT, equipId);
-
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
         return equipment.getTotalLimitLv().isInRange(this.lv.get()) &&
                 this.checkStatRange(equipment.getLimitStat().getMin(), equipment.getLimitStat().getMax());
@@ -696,8 +688,6 @@ public class Player extends Entity {
     }
 
     public void setChatCount(long npcId, long count) {
-        Config.checkId(Id.NPC, npcId);
-
         if(count < 0) {
             throw new NumberRangeException(count, 0);
         }
@@ -725,7 +715,6 @@ public class Player extends Entity {
         if(chatId == 0) {
             this.anyResponseChat.remove(response);
         } else {
-            Config.checkId(Id.CHAT, chatId);
             this.anyResponseChat.put(response, chatId);
         }
     }
@@ -775,8 +764,6 @@ public class Player extends Entity {
     }
 
     public void setCloseRate(long npcId, int closeRate) {
-        Config.checkId(Id.NPC, npcId);
-
         this.addLog(LogData.TOTAL_CLOSERATE, closeRate - this.getCloseRate(npcId));
 
         if(closeRate == 0) {

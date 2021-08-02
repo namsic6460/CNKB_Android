@@ -32,8 +32,6 @@ public class Research extends Achieve {
     }
 
     public void setNeedItem(long itemId, int count) {
-        Config.checkId(Id.ITEM, itemId);
-
         if(count < 0) {
             throw new NumberRangeException(count, 0);
         }
@@ -46,7 +44,6 @@ public class Research extends Achieve {
     }
 
     public int getNeedItem(long itemId) {
-        Config.checkId(Id.ITEM, itemId);
         return this.needItem.getOrDefault(itemId, 0);
     }
 

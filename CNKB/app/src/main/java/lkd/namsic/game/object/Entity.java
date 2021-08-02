@@ -140,12 +140,10 @@ public abstract class Entity extends NamedObject {
     }
 
     public void addSkill(long skillId) {
-        Config.checkId(Id.SKILL, skillId);
         this.skill.add(skillId);
     }
 
     public boolean canAddSkill(long skillId) {
-        Config.checkId(Id.SKILL, skillId);
         Skill skill = Config.getData(Id.SKILL, skillId);
         return this.checkStatRange(skill.getLimitStat().getMin(), skill.getLimitStat().getMax());
     }
@@ -389,7 +387,6 @@ public abstract class Entity extends NamedObject {
     }
 
     public void setItem(long itemId, int count) {
-        Config.checkId(Id.ITEM, itemId);
 
         if(count < 0) {
             throw new NumberRangeException(count, 0);
@@ -403,7 +400,6 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getItem(long itemId) {
-        Config.checkId(Id.ITEM, itemId);
         return this.inventory.getOrDefault(itemId, 0);
     }
 
@@ -438,13 +434,10 @@ public abstract class Entity extends NamedObject {
     }
 
     public void addBasicEquip(long equipId) {
-        Config.checkId(Id.EQUIPMENT, equipId);
         this.equipInventory.add(equipId);
     }
 
     public void addEquip(long equipId) {
-        Config.checkId(Id.EQUIPMENT, equipId);
-
         Equipment newEquip = Config.newObject(Config.getData(Id.EQUIPMENT, equipId));
         long newEquipId = newEquip.getId().getObjectId();
         this.equipInventory.add(newEquipId);
@@ -477,7 +470,6 @@ public abstract class Entity extends NamedObject {
 
     public void addEnemy(@NonNull Id id, long objectId) {
         Id.checkEntityId(id);
-        Config.checkId(id, objectId);
 
         ConcurrentHashSet<Long> enemySet = this.enemy.get(id);
         if(enemySet == null) {
@@ -491,7 +483,6 @@ public abstract class Entity extends NamedObject {
 
     public void removeEnemy(@NonNull Id id, long objectId) {
         Id.checkEntityId(id);
-        Config.checkId(id, objectId);
 
         Set<Long> enemySet = this.enemy.get(id);
         if(enemySet == null) {
@@ -548,11 +539,11 @@ public abstract class Entity extends NamedObject {
     }
 
     public boolean attack(@NonNull Entity entity, boolean printOnDeath) {
-        return this.damage(entity, new Int(this.getStat(StatType.ATK)), new Int(), new Int(), true, printOnDeath);
+        return this.damage(entity, new Int(this.getStat(StatType.ATK)), new Int(), new Int(), true, true, printOnDeath);
     }
 
     public boolean damage(@NonNull Entity entity, @NonNull Int physicDmg, @NonNull Int magicDmg, @NonNull Int staticDmg,
-                          boolean canEvade, boolean printOnDeath) {
+                          boolean canEvade, boolean canCrit, boolean printOnDeath) {
         Random random = new Random();
 
         this.revalidateBuff();
@@ -590,10 +581,12 @@ public abstract class Entity extends NamedObject {
             Int totalDra = new Int(dra.get() + mdra.get());
 
             Bool isCrit = new Bool();
-            int agi = this.getStat(StatType.AGI);
-            if(random.nextDouble() < agi * Config.CRIT_PER_AGI) {
-                isCrit.set(true);
-                totalDmg.multiple(2);
+            if(canCrit) {
+                int agi = this.getStat(StatType.AGI);
+                if (random.nextDouble() < agi * Config.CRIT_PER_AGI) {
+                    isCrit.set(true);
+                    totalDmg.multiple(3);
+                }
             }
 
             String eventName = DamageEvent.getName();

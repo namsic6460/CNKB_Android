@@ -1,7 +1,5 @@
 package lkd.namsic.game;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.faendir.rhino_android.RhinoAndroidHelper;
@@ -126,7 +124,6 @@ public class Eval {
 
             return Context.toString(result);
         } catch (Exception e) {
-            Log.e("namsic!", Config.errorString(e));
             return "[Error]\n" + Config.errorString(e);
         }
     }

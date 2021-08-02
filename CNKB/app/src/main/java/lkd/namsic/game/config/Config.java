@@ -1,7 +1,5 @@
 package lkd.namsic.game.config;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -290,15 +288,6 @@ public class Config {
         }
     }
 
-    public static void checkId(@NonNull Id id, long objectId) throws NumberRangeException {
-        String path = Config.getPath(id, objectId);
-
-        File file = new File(path);
-        if(!file.exists()) {
-            throw new ObjectNotFoundException(id, objectId);
-        }
-    }
-
     public static void checkStatType(@NonNull StatType statType) throws UnhandledEnumException {
         if(statType.equals(StatType.HP) || statType.equals(StatType.MN)) {
             throw new UnhandledEnumException(statType);
@@ -316,7 +305,7 @@ public class Config {
         try {
             return (T) gson.fromJson(jsonString, c);
         } catch (Exception e) {
-            Log.e("namsic!", jsonString);
+            Logger.e("fromJson", e);
             throw e;
         }
     }
@@ -435,13 +424,21 @@ public class Config {
             }
         }
 
-        checkId(id, objectId);
+        String path = getPath(id, objectId);
+        File file = new File(path);
+        if(!file.exists()) {
+            throw new ObjectNotFoundException(id, objectId);
+        }
 
         Long objectCount = OBJECT_COUNT.get(id).get(objectId);
 
         if(objectCount == null) {
-            String path = getPath(id, objectId);
-            String jsonString = FileManager.read(path);
+            String jsonString = null;
+            try {
+                jsonString = FileManager.read(file);
+            } catch (Exception e) {
+                Logger.e("loadObject", e);
+            }
 
             if(jsonString.equals("")) {
                 throw new ObjectNotFoundException(id, objectId);

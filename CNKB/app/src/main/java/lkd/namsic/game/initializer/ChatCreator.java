@@ -35,11 +35,11 @@ public class ChatCreator implements ObjectCreator {
                 "음 뭐가됬든 기본적인거부터 가르쳐줄게. " + Emoji.focus("n 도움말") +
                         " 을 입력해서 명령어를 살펴봐"
         );
-        chat.setAnyResponseChat("__도움말", 2L, true);
-        chat.setAnyResponseChat("__명령어", 2L, true);
-        chat.setAnyResponseChat("__?", 2L, true);
-        chat.setAnyResponseChat("__h", 2L, true);
-        chat.setAnyResponseChat("__help", 2L, true);
+        chat.setAnyResponseChat("__도움말", 2L);
+        chat.setAnyResponseChat("__명령어", 2L);
+        chat.setAnyResponseChat("__?", 2L);
+        chat.setAnyResponseChat("__h", 2L);
+        chat.setAnyResponseChat("__help", 2L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 2L,
@@ -48,12 +48,12 @@ public class ChatCreator implements ObjectCreator {
                 "아 물론 거기 적혀있기도 하지만 네가 명령어 창을 연 것 처럼, " +
                         "모든 명령어에는 " + Emoji.focus("n") + "이나 " +
                         Emoji.focus("ㅜ") + "라는 글자가 붙으니까 기억해");
-        chat.setAnyResponseChat("__정보", 3L, true);
-        chat.setAnyResponseChat("__info", 3L, true);
-        chat.setAnyResponseChat("__i", 3L, true);
-        chat.setAnyResponseChat("__정보 __nickname", 3L, true);
-        chat.setAnyResponseChat("__info __nickname", 3L, true);
-        chat.setAnyResponseChat("__i __nickname", 3L, true);
+        chat.setAnyResponseChat("__정보", 3L);
+        chat.setAnyResponseChat("__info", 3L);
+        chat.setAnyResponseChat("__i", 3L);
+        chat.setAnyResponseChat("__정보 __nickname", 3L);
+        chat.setAnyResponseChat("__info __nickname", 3L);
+        chat.setAnyResponseChat("__i __nickname", 3L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 3L,
@@ -63,8 +63,8 @@ public class ChatCreator implements ObjectCreator {
                 "마지막으로 간단한거 하나만 소개하고 가봐야겠네. 마을에서는 광질을 할 수 있으니까" +
                         " 광질 명령어를 입력해봐"
         );
-        chat.setAnyResponseChat("__광질", 4L, true);
-        chat.setAnyResponseChat("__mine", 4L, true);
+        chat.setAnyResponseChat("__광질", 4L);
+        chat.setAnyResponseChat("__mine", 4L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 4L,
@@ -97,16 +97,16 @@ public class ChatCreator implements ObjectCreator {
                 "음, 아무래도 돌은 항상 부족해서 말이지",
                 "돌 30개만 구해다 줄 수 있겠나?"
         );
-        chat.setResponseChat(WaitResponse.YES, 10L, true);
-        chat.setResponseChat(WaitResponse.NO, 11L, true);
+        chat.setResponseChat(WaitResponse.YES, 10L);
+        chat.setResponseChat(WaitResponse.NO, 11L);
         Config.unloadObject(chat);
 
         chat = createChat("낚시를 하면서 할만한 퀘스트가 있을까요?", 9L,
                 "요즘 바다나 강이 너무 더러워저셔 말일세",
                 "쓰레기가 낚이는게 있으면 3개만 구해다 줄 수 있겠나?"
         );
-        chat.setResponseChat(WaitResponse.YES, 12L, true);
-        chat.setResponseChat(WaitResponse.NO, 11L, true);
+        chat.setResponseChat(WaitResponse.YES, 12L);
+        chat.setResponseChat(WaitResponse.NO, 11L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 10L, "고맙네! 돌을 다 구하고 다시 말을 걸어주게나");
@@ -140,8 +140,8 @@ public class ChatCreator implements ObjectCreator {
                 "아무래도 불의 기운을 좀 쥐고 있으면 괜찮아질 것 같은데...",
                 "붉은색 구체 하나만 구해줄 수 있겠나?"
         );
-        chat.setResponseChat(WaitResponse.YES, 24L, true);
-        chat.setResponseChat(WaitResponse.NO, 18L, true);
+        chat.setResponseChat(WaitResponse.YES, 24L);
+        chat.setResponseChat(WaitResponse.NO, 18L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 18L, "그래 뭐... 바쁘다면 어쩔 수 없는 일이지");
@@ -158,8 +158,8 @@ public class ChatCreator implements ObjectCreator {
                 "자네가 준 붉은색 구체가 너무 강해서 오히려 역효과가 나는 모양이야..",
                 "마지막으로 하급 마나 포션 3개만 만들어와줄 수 있겠나?"
         );
-        chat.setResponseChat(WaitResponse.YES, 21L, true);
-        chat.setResponseChat(WaitResponse.NO, 22L, true);
+        chat.setResponseChat(WaitResponse.YES, 21L);
+        chat.setResponseChat(WaitResponse.NO, 22L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 21L, "자꾸 번거롭게 해서 미안하네\n최대한 빨리 구해와주게나");
@@ -329,8 +329,8 @@ public class ChatCreator implements ObjectCreator {
                 "하급 모험의 증표 3개, 하급 낚시꾼의 증표 7개, 하급 광부의 증표 30개",
                 "받아들이곘는가?"
         );
-        chat.setResponseChat(WaitResponse.YES, 53L, true);
-        chat.setResponseChat(WaitResponse.NO, 54L, true);
+        chat.setResponseChat(WaitResponse.YES, 53L);
+        chat.setResponseChat(WaitResponse.NO, 54L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 53L,
@@ -371,8 +371,8 @@ public class ChatCreator implements ObjectCreator {
                 "그래.. 낚싯대라... 낚싯대 재료 좀 구해와 봐",
                 "실은 있으니 가죽 20개에 나뭇가지 10개면 적당할 것 같다"
         );
-        chat.setResponseChat(WaitResponse.YES, 59L, true);
-        chat.setResponseChat(WaitResponse.NO, 60L, true);
+        chat.setResponseChat(WaitResponse.YES, 59L);
+        chat.setResponseChat(WaitResponse.NO, 60L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 59L, "최대한 빨리 구해와라");
@@ -391,8 +391,8 @@ public class ChatCreator implements ObjectCreator {
                 "아 말 나온 김에 혹시 하급 사냥꾼의 증표 5개랑 중급 사냥꾼의 증표 5개만 구해줄 수 있을까?",
                 "사냥꾼의 증표에 있는 기운을 좀 쓰고 싶거든"
         );
-        chat.setResponseChat(WaitResponse.YES, 63L, true);
-        chat.setResponseChat(WaitResponse.NO, 64L, true);
+        chat.setResponseChat(WaitResponse.YES, 63L);
+        chat.setResponseChat(WaitResponse.NO, 64L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 63L, "고마워! 다 구하면 다시 말 걸어줘");
@@ -413,8 +413,8 @@ public class ChatCreator implements ObjectCreator {
                 "아내를 위한 선물을 해주려고 하는데 마땅한 아이템이 없어서 말이지",
                 "혹시 금 5개와 1만 골드를 구해줄 수 있겠나?"
         );
-        chat.setResponseChat(WaitResponse.YES, 67L, true);
-        chat.setResponseChat(WaitResponse.NO, 68L, true);
+        chat.setResponseChat(WaitResponse.YES, 67L);
+        chat.setResponseChat(WaitResponse.NO, 68L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 67L, "오 고맙군! 덕분에 선물을 만들어 줄 수 있곘군");
@@ -435,8 +435,8 @@ public class ChatCreator implements ObjectCreator {
                 "근데 누가 석탄을 다 캐가고 있는건지 잘 안보여서 막막하네요",
                 "혹시 석탄 남으시는거 있으시면 하급 강화석과 바꿀 수 있을까요?"
         );
-        chat.setResponseChat(WaitResponse.YES, 71L, true);
-        chat.setResponseChat(WaitResponse.NO, 72L, true);
+        chat.setResponseChat(WaitResponse.YES, 71L);
+        chat.setResponseChat(WaitResponse.NO, 72L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 71L,
@@ -467,8 +467,8 @@ public class ChatCreator implements ObjectCreator {
                 "저도 보답으로 선물을 주고 싶어서요",
                 "발광석이랑 물고기 몇마리정도면 될 것 같은데 구해와주실 수 있을까요?"
         );
-        chat.setResponseChat(WaitResponse.YES, 75L, true);
-        chat.setResponseChat(WaitResponse.NO, 76L, true);
+        chat.setResponseChat(WaitResponse.YES, 75L);
+        chat.setResponseChat(WaitResponse.NO, 76L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 75L,
@@ -502,7 +502,7 @@ public class ChatCreator implements ObjectCreator {
                 "역시 자네라면 금방 받아갈 줄 알았지 허허",
                 "자 여기 유용하게 쓰게나"
         );
-        chat.setResponseChat(WaitResponse.NONE, 80L, true);
+        chat.setResponseChat(WaitResponse.NONE, 80L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 80L,
@@ -519,8 +519,8 @@ public class ChatCreator implements ObjectCreator {
                 "생선은 넉넉한데 평소에 돼지를 좋아하셔서 돼지 머리를 놓고 싶은데 어떻게 구해야할지 생각하고 있었어",
                 "그래서 말인데 혹시 돼지머리 3개만 구해줄 수 있을까?"
         );
-        chat.setResponseChat(WaitResponse.YES, 82L, true);
-        chat.setResponseChat(WaitResponse.NO, 83L, true);
+        chat.setResponseChat(WaitResponse.YES, 82L);
+        chat.setResponseChat(WaitResponse.NO, 83L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 82L, "고마워. 대신 구해오면 괜찮은거 알려줄게");
@@ -544,8 +544,8 @@ public class ChatCreator implements ObjectCreator {
                 "아 맞다, 수련하는데에 필요한 아이템이 있는데 좀 구해줄 수 있을까?",
                 "거미의 눈에 마법의 힘이 담겨있다고 해서 일단 5개 정도만 구해주면 될 것 같은데"
         );
-        chat.setResponseChat(WaitResponse.YES, 86L, true);
-        chat.setResponseChat(WaitResponse.NO, 87L, true);
+        chat.setResponseChat(WaitResponse.YES, 86L);
+        chat.setResponseChat(WaitResponse.NO, 87L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 86L,
@@ -571,8 +571,8 @@ public class ChatCreator implements ObjectCreator {
                 "아 혹시 슬라임 20마리만 잡아주실 수 있을까요?",
                 "슬라임 처리 증거로 슬라임 조각 20개면 충분할것 같은데..."
         );
-        chat.setResponseChat(WaitResponse.YES, 90L, true);
-        chat.setResponseChat(WaitResponse.NO, 91L, true);
+        chat.setResponseChat(WaitResponse.YES, 90L);
+        chat.setResponseChat(WaitResponse.NO, 91L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 90L,
@@ -600,8 +600,8 @@ public class ChatCreator implements ObjectCreator {
                 "혹시 약초를 좀 캐와주실 수 있을까요?",
                 "약초 10개정도를 구해와주시면 제가 엘릭서 허브를 만들어서 하나 나눠드릴게요"
         );
-        chat.setResponseChat(WaitResponse.YES, 94L, true);
-        chat.setResponseChat(WaitResponse.NO, 95L, true);
+        chat.setResponseChat(WaitResponse.YES, 94L);
+        chat.setResponseChat(WaitResponse.NO, 95L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 94L,
@@ -632,8 +632,8 @@ public class ChatCreator implements ObjectCreator {
                     "모험가님... 혹시 " + gemName + " 하나 구해줄 수 있어요?",
                     "보석을 모으고 있는데 " + gemName + "이 필요해서요..."
             );
-            chat.setResponseChat(WaitResponse.YES, chatId + 1, true);
-            chat.setResponseChat(WaitResponse.NO, 97L, true);
+            chat.setResponseChat(WaitResponse.YES, chatId + 1);
+            chat.setResponseChat(WaitResponse.NO, 97L);
             Config.unloadObject(chat);
 
             chat = createChat(null, chatId + 1, "감사합니다");

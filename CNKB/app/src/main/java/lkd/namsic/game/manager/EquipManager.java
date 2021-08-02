@@ -148,8 +148,6 @@ public class EquipManager {
     }
 
     public void use(@NonNull Player self, long equipId) {
-        Config.checkId(Id.EQUIPMENT, equipId);
-
         self.addLog(LogData.TOTAL_EQUIP_USE, 1);
 
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);

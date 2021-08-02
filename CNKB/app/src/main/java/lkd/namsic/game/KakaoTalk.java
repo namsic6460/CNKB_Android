@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.app.RemoteInput;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -139,7 +138,6 @@ public class KakaoTalk {
 
             if(prevListener != null) {
                 String errorString = "<" + command + "> already exists\n" + map.toString();
-                Log.e("CommandRegister", errorString);
                 Logger.e("CommandRegister", errorString);
 
                 throw new WeirdCommandException();

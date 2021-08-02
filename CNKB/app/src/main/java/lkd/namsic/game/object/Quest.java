@@ -70,13 +70,10 @@ public class Quest extends NamedObject {
     }
 
     public void setClearChatId(long chatId) {
-        Config.checkId(Id.CHAT, chatId);
         this.clearChatId.set(chatId);
     }
 
     public void setNeedItem(long itemId, int count) {
-        Config.checkId(Id.ITEM, itemId);
-
         if(count < 0) {
             throw new NumberRangeException(count, 0);
         }
@@ -120,8 +117,6 @@ public class Quest extends NamedObject {
     }
 
     public void setNeedCloseRate(long npcId, int closeRate) {
-        Config.checkId(Id.NPC, npcId);
-
         if(closeRate < 0) {
             throw new NumberRangeException(closeRate, 0);
         }
@@ -134,7 +129,6 @@ public class Quest extends NamedObject {
     }
 
     public int getNeedCloseRate(long npcId) {
-        Config.checkId(Id.NPC, npcId);
         return this.needCloseRate.getOrDefault(npcId, 0);
     }
 
@@ -143,8 +137,6 @@ public class Quest extends NamedObject {
     }
 
     public void setRewardItem(long itemId, int count) {
-        Config.checkId(Id.ITEM, itemId);
-
         if(count < 0) {
             throw new NumberRangeException(count, 0);
         }
@@ -188,14 +180,6 @@ public class Quest extends NamedObject {
     }
 
     public void setRewardCloseRate(long npcId, int closeRate) {
-        this.setRewardCloseRate(npcId, closeRate, false);
-    }
-
-    public void setRewardCloseRate(long npcId, int closeRate, boolean skip) {
-        if(!skip) {
-            Config.checkId(Id.NPC, npcId);
-        }
-
         if(closeRate < 0) {
             throw new NumberRangeException(closeRate, 0);
         }

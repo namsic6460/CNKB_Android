@@ -61,8 +61,6 @@ public class ItemManager {
     }
 
     public void use(@NonNull Player self, long itemId, int count) {
-        Config.checkId(Id.ITEM, itemId);
-
         String eventName = ItemUseEvent.getName();
         ItemUseEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), itemId, count);
 
@@ -108,8 +106,6 @@ public class ItemManager {
     }
 
     public void eat(@NonNull Player self, long itemId, int count) {
-        Config.checkId(Id.ITEM, itemId);
-
         String eventName = ItemEatEvent.getName();
         ItemEatEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), itemId, count);
 

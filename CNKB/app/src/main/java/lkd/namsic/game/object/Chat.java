@@ -54,14 +54,6 @@ public class Chat extends GameObject {
     }
 
     public void setResponseChat(@NonNull WaitResponse waitResponse, long chatId) {
-        this.setResponseChat(waitResponse, chatId, false);
-    }
-
-    public void setResponseChat(@NonNull WaitResponse waitResponse, long chatId, boolean skip) {
-        if(!skip) {
-            Config.checkId(Id.CHAT, chatId);
-        }
-
         if(chatId == 0) {
             this.responseChat.remove(waitResponse);
         } else {
@@ -74,14 +66,6 @@ public class Chat extends GameObject {
     }
 
     public void setAnyResponseChat(@NonNull String response, long chatId) {
-        this.setAnyResponseChat(response, chatId, false);
-    }
-
-    public void setAnyResponseChat(@NonNull String response, long chatId, boolean skip) {
-        if(!skip) {
-            Config.checkId(Id.CHAT, chatId);
-        }
-
         if(chatId == 0) {
             this.anyResponseChat.remove(response);
         } else {
@@ -94,8 +78,6 @@ public class Chat extends GameObject {
     }
 
     public void setItem(long itemId, int count) {
-        Config.checkId(Id.ITEM, itemId);
-
         if(count < 0) {
             throw new NumberRangeException(count, 0);
         }

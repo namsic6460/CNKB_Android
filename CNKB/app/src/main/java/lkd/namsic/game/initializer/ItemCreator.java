@@ -43,7 +43,7 @@ public class ItemCreator implements ObjectCreator {
                 put(ItemList.NONE.getId(), 3);
 
                 put(itemId_, 1);
-            }}, true);
+            }});
         }
         Config.unloadObject(item);
 
@@ -54,14 +54,14 @@ public class ItemCreator implements ObjectCreator {
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.SAND.getId(), 3);
             put(ItemList.COAL.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.GLASS_BOTTLE, "유리를 가공하여 만든 병이다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.GLASS.getId(), 2);
             put(ItemList.COAL.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.LOW_HP_POTION, "최대 체력의 15%를 회복시켜주는 포션이다");
@@ -70,12 +70,12 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.HERB.getId(), 3);
             put(ItemList.GLASS_BOTTLE.getId(), 1);
             put(ItemList.COAL.getId(), 1);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 3);
 
             put(ItemList.HP_POTION.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HP_POTION, "최대 체력의 50%를 회복시켜주는 포션이다");
@@ -85,12 +85,12 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.RED_STONE.getId(), 3);
             put(ItemList.GLOW_STONE.getId(), 1);
             put(ItemList.FIRE_QUARTZ.getId(), 3);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 2);
 
             put(ItemList.HIGH_HP_POTION.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_HP_POTION, "체력을 모두 회복시켜주는 포션이다");
@@ -101,11 +101,11 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.GLOW_STONE.getId(), 10);
             put(ItemList.HARD_COAL.getId(), 1);
             put(ItemList.LIQUID_STONE.getId(), 3);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.HIGH_MP_POTION.getId(), 1);
             put(ItemList.LAPIS_RED_STONE.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.LOW_MP_POTION, "최대 마나의 15%를 회복시켜주는 포션이다");
@@ -114,12 +114,12 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.PIECE_OF_MANA.getId(), 3);
             put(ItemList.GLASS_BOTTLE.getId(), 1);
             put(ItemList.COAL.getId(), 1);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 3);
 
             put(ItemList.MP_POTION.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.MP_POTION, "최대 마나의 50%를 회복시켜주는 포션이다");
@@ -129,12 +129,12 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.LAPIS.getId(), 3);
             put(ItemList.GLOW_STONE.getId(), 1);
             put(ItemList.FIRE_QUARTZ.getId(), 3);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 2);
 
             put(ItemList.HIGH_MP_POTION.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_MP_POTION, "마나를 모두 회복시켜주는 포션이다");
@@ -145,22 +145,22 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.GLOW_STONE.getId(), 10);
             put(ItemList.HARD_COAL.getId(), 1);
             put(ItemList.LIQUID_STONE.getId(), 3);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.HIGH_HP_POTION.getId(), 1);
             put(ItemList.LAPIS_RED_STONE.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.STONE, "가장 기본적인 광석이다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.COBBLE_STONE.getId(), 10);
             put(ItemList.COAL.getId(), 5);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.MAGIC_STONE.getId(), 1);
             put(ItemList.GOD_WATER.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         createItem(ItemList.COAL, "불이 잘 붙는 흔한 광물이다");
@@ -185,7 +185,7 @@ public class ItemCreator implements ObjectCreator {
 
             put(ItemList.DARK_QUARTZ.getId(), 3);
             put(ItemList.WHITE_GOLD.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         createItem(ItemList.GLOW_STONE, "스스로 빛을 내는 광물이다");
@@ -197,38 +197,38 @@ public class ItemCreator implements ObjectCreator {
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LAPIS.getId(), 3);
             put(ItemList.GLOW_STONE.getId(), 5);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 10);
 
             put(ItemList.GLOW_STONE.getId(), 10);
             put(ItemList.LAPIS_RED_STONE.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.GLOW_RED_STONE, "스스로 빛을 내는 힘의 기운이 담긴 붉은 광물이다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.RED_STONE.getId(), 3);
             put(ItemList.GLOW_STONE.getId(), 5);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 10);
 
             put(ItemList.GLOW_STONE.getId(), 10);
             put(ItemList.LAPIS_RED_STONE.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.WHITE_GOLD, "주변의 어둠을 흡수하는 보석이다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.GOLD.getId(), 5);
             put(ItemList.LIQUID_STONE.getId(), 1);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 5);
 
             put(ItemList.AITUME.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         createItem(ItemList.HARD_COAL, "일반 석탄보다 훨씬 질이 좋은 광물이다");
@@ -241,14 +241,14 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.FIRE_QUARTZ.getId(), 10);
             put(ItemList.DARK_QUARTZ.getId(), 1);
             put(ItemList.WHITE_GOLD.getId(), 5);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.DIAMOND, "매우 단단하고 아름다운 보석이다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.TITANIUM.getId(), 10);
             put(ItemList.LIQUID_STONE.getId(), 3);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         createItem(ItemList.ORICHALCON, "일반적으로 가장 단단하다고 여겨지는 광물이다");
@@ -259,21 +259,21 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.GLOW_RED_STONE.getId(), 50);
             put(ItemList.WHITE_GOLD.getId(), 20);
             put(ItemList.DIAMOND.getId(), 10);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.LANDIUM, "부서질수록 단단해자고, 스스로 복구되는 광물이다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.WHITE_GOLD.getId(), 10);
             put(ItemList.AITUME.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.AITUME, "공기처럼 가벼우나 오리하르콘만큼 단단한 광물이다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.WHITE_GOLD.getId(), 10);
             put(ItemList.LANDIUM.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         createItem(ItemList.GARNET, "검붉은색을 띄는 보석이다");
@@ -480,7 +480,7 @@ public class ItemCreator implements ObjectCreator {
         item = new Item(ItemList.RECIPE, "중급 아이템 또는 중급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_RECIPE.getId(), 6);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_RECIPE, "상급 아이템 또는 상급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
@@ -546,19 +546,19 @@ public class ItemCreator implements ObjectCreator {
         item = new Item(ItemList.LOW_AMULET, "하급 부적 1개를 뽑을 수 있는 아이템이다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_LOW_AMULET.getId(), 10);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.AMULET, "중급 부적 1개를 뽑을 수 있는 아이템이다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_AMULET.getId(), 10);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_AMULET, "상급 부적 1개를 뽑을 수 있는 아이템이다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_HIGH_AMULET.getId(), 10);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.LAMB, "양에서 나온 고기다");
@@ -597,7 +597,7 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.LEAD.getId(), 15);
             put(ItemList.TIN.getId(), 15);
             put(ItemList.NICKEL.getId(), 15);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.ALLOY, "다양한 광물을 합쳐 만든 괜찮은 합금이다");
@@ -606,7 +606,7 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.LITHIUM.getId(), 50);
             put(ItemList.SILVER.getId(), 20);
             put(ItemList.GOLD.getId(), 5);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_ALLOY, "다양한 광물을 합쳐 만든 질 좋은 합금이다");
@@ -619,7 +619,7 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.LANDIUM.getId(), 2);
             put(ItemList.AITUME.getId(), 2);
             put(ItemList.EMPTY_SPHERE.getId(), 50);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         createItem(ItemList.PIECE_OF_SLIME, "슬라임에게서 떨어져나온 파편이다");
@@ -631,7 +631,7 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.IRON.getId(), 100);
             put(ItemList.LOW_ALLOY.getId(), 3);
             put(ItemList.COAL.getId(), 100);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         createItem(ItemList.ELIXIR_HERB, "엘프의 기운이 들어간 약초다");
@@ -640,12 +640,12 @@ public class ItemCreator implements ObjectCreator {
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.ELIXIR_HERB.getId(), 3);
             put(ItemList.GLASS_BOTTLE.getId(), 1);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 2);
 
             put(ItemList.ELIXIR.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.ELIXIR, "최대 체력과 마나의 50%를 회복시켜주는 포션이다");
@@ -653,12 +653,12 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.LOW_ELIXIR.getId(), 3);
             put(ItemList.HP_POTION.getId(), 1);
             put(ItemList.MP_POTION.getId(), 1);
-        }}, true);
+        }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 2);
 
             put(ItemList.HIGH_ELIXIR.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_ELIXIR, "최대 체력과 마나를 모두 회복시켜주는 포션이다");
@@ -666,7 +666,7 @@ public class ItemCreator implements ObjectCreator {
             put(ItemList.ELIXIR.getId(), 5);
             put(ItemList.HIGH_HP_POTION.getId(), 1);
             put(ItemList.HIGH_MP_POTION.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.COMMON_GRILLED_FISH, "일반 등급의 생선을 구운 음식이다");
@@ -676,7 +676,7 @@ public class ItemCreator implements ObjectCreator {
             item.addRecipe(new HashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
-            }}, true);
+            }});
         }
         item.setCanEat(true);
         item.setEatBuff(-1, StatType.HP, 15);
@@ -689,7 +689,7 @@ public class ItemCreator implements ObjectCreator {
             item.addRecipe(new HashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
-            }}, true);
+            }});
         }
         item.setCanEat(true);
         item.setEatBuff(-1, StatType.HP, 30);
@@ -702,7 +702,7 @@ public class ItemCreator implements ObjectCreator {
             item.addRecipe(new HashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
-            }}, true);
+            }});
         }
         item.setCanEat(true);
         item.setEatBuff(-1, StatType.HP, 67);
@@ -715,7 +715,7 @@ public class ItemCreator implements ObjectCreator {
             item.addRecipe(new HashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
-            }}, true);
+            }});
         }
         item.setCanEat(true);
         item.setEatBuff(-1, StatType.HP, 120);
@@ -728,7 +728,7 @@ public class ItemCreator implements ObjectCreator {
             item.addRecipe(new HashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
-            }}, true);
+            }});
         }
         item.setCanEat(true);
         item.setEatBuff(-1, StatType.HP, 300);
@@ -741,7 +741,7 @@ public class ItemCreator implements ObjectCreator {
             item.addRecipe(new HashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
-            }}, true);
+            }});
         }
         item.setCanEat(true);
         item.setEatBuff(-1, StatType.HP, 750);
@@ -751,7 +751,7 @@ public class ItemCreator implements ObjectCreator {
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LAMB.getId(), 1);
             put(ItemList.COAL.getId(), 5);
-        }}, true);
+        }});
         item.setEatBuff(100000, StatType.ATS, 30);
         item.setEatBuff(100000, StatType.ATK, 1);
         item.setCanEat(true);
@@ -761,7 +761,7 @@ public class ItemCreator implements ObjectCreator {
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.PORK.getId(), 1);
             put(ItemList.COAL.getId(), 5);
-        }}, true);
+        }});
         item.setEatBuff(100000, StatType.ACC, 15);
         item.setEatBuff(100000, StatType.ATS, 15);
         item.setCanEat(true);
@@ -771,7 +771,7 @@ public class ItemCreator implements ObjectCreator {
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.BEEF.getId(), 1);
             put(ItemList.COAL.getId(), 5);
-        }}, true);
+        }});
         item.setEatBuff(50000, StatType.DEF, 4);
         item.setEatBuff(50000, StatType.AGI, 15);
         item.setCanEat(true);
@@ -783,14 +783,14 @@ public class ItemCreator implements ObjectCreator {
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.ZOMBIE_SOUL.getId(), 3);
             put(ItemList.GOD_WATER.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HARDENED_SLIME, "신의 힘으로 어둠이 사라져 굳어버린 슬라임이다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_SLIME.getId(), 30);
             put(ItemList.GOD_WATER.getId(), 1);
-        }}, true);
+        }});
         Config.unloadObject(item);
 
         createItem(ItemList.MAGIC_STONE, "어둠의 힘이 담긴 돌이다");

@@ -1,6 +1,5 @@
 package lkd.namsic.game.initializer;
 
-import android.util.Log;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -37,7 +36,6 @@ public class Initializer {
                 Config.save();
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.e("namsic!", Config.errorString(e));
                 Logger.e("ObjectMaker", e);
             } finally {
                 MainActivity.mainActivity.runOnUiThread(() -> button.setEnabled(true));

@@ -41,8 +41,6 @@ public class Npc extends Entity {
     }
 
     public void setBaseChat(@NonNull ChatLimit chatLimit, long chatId) {
-        Config.checkId(Id.CHAT, chatId);
-
         Chat chat = Config.getData(Id.CHAT, chatId);
         if(chat.getQuestId().get() != 0) {
             throw new InvalidNumberException(0);
@@ -61,8 +59,6 @@ public class Npc extends Entity {
     }
 
     public void setChat(@NonNull ChatLimit chatLimit, long chatId) {
-        Config.checkId(Id.CHAT, chatId);
-
         ConcurrentHashSet<Long> chatSet = this.chat.get(chatLimit);
         if(chatSet == null) {
             chatSet = new ConcurrentHashSet<>();

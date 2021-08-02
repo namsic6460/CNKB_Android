@@ -27,7 +27,6 @@ public class QuestManager {
     }
 
     public boolean canClearQuest(@NonNull Player self,  long questId) {
-        Config.checkId(Id.QUEST, questId);
         Long chatId = self.getQuest().get(questId);
 
         if(chatId == null) {
@@ -44,8 +43,6 @@ public class QuestManager {
     }
 
     public void clearQuest(@NonNull Player self, long questId, long npcId) {
-        Config.checkId(Id.QUEST, questId);
-        Config.checkId(Id.NPC, npcId);
         Long chatId = self.getQuest().get(questId);
 
         if(chatId == null) {
