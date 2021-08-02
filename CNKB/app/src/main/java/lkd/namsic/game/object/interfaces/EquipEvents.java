@@ -46,6 +46,9 @@ public class EquipEvents {
                         case 2:
                             totalDmg.add(2);
                             break;
+
+                        default:
+                            throw new RuntimeException();
                     }
                 }
             });

@@ -500,6 +500,8 @@ public class FightManager {
                             }
 
                             break;
+                        default:
+                            throw new RuntimeException();
                     }
                 } else {
                     Object[] patternData = ((Monster) attacker).onTurn(playerSet);

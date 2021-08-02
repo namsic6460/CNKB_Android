@@ -45,16 +45,12 @@ public class Player extends Entity {
         replyPlayers(players, msg, null);
     }
 
-    public static void replyPlayersExcept(@NonNull Set<Player> players, @Nullable String msg, @Nullable Player except) {
-        replyPlayersExcept(players, msg, null, except);
-    }
-
-    public static void replyPlayersExcepts(@NonNull Set<Player> players, @Nullable String msg, @NonNull Set<Player> excepts) {
-        replyPlayersExcepts(players, msg, null, excepts);
-    }
-
     public static void replyPlayers(@NonNull Set<Player> players, @Nullable String msg, @Nullable String innerMsg) {
         replyPlayersExcept(players, msg, innerMsg, null);
+    }
+
+    public static void replyPlayersExcept(@NonNull Set<Player> players, @Nullable String msg, @Nullable Player except) {
+        replyPlayersExcept(players, msg, null, except);
     }
 
     public static void replyPlayersExcept(@NonNull Set<Player> players, @Nullable String msg,
@@ -62,6 +58,10 @@ public class Player extends Entity {
         Set<Player> excepts = new HashSet<>();
         excepts.add(except);
         replyPlayersExcepts(players, msg, innerMsg, excepts);
+    }
+
+    public static void replyPlayersExcepts(@NonNull Set<Player> players, @Nullable String msg, @NonNull Set<Player> excepts) {
+        replyPlayersExcepts(players, msg, null, excepts);
     }
 
     public static void replyPlayersExcepts(@NonNull Set<Player> players, @Nullable String msg,
