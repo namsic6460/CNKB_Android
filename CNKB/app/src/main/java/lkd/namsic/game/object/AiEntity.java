@@ -56,10 +56,6 @@ public abstract class AiEntity extends Entity {
         return this.itemDropPercent.getOrDefault(itemId, 0D);
     }
 
-    public void addItemDropPercent(long itemId, double percent) {
-        this.setItemDropPercent(itemId, this.getItemDropPercent(itemId) + percent);
-    }
-
     public void setItemDropMinCount(long itemId, int minCount) {
         if(minCount < 1) {
             throw new NumberRangeException(minCount, 1);
@@ -72,10 +68,6 @@ public abstract class AiEntity extends Entity {
         return this.itemDropMinCount.getOrDefault(itemId, 1);
     }
 
-    public void addItemDropMinCount(long itemId, int minCount) {
-        this.setItemDropMinCount(itemId, this.getItemDropMinCount(itemId) + minCount);
-    }
-
     public void setEquipDropPercent(@NonNull EquipType equipType, double percent) {
         if(percent < 0 || percent > 1) {
             throw new NumberRangeException(percent, 0D, 1D);
@@ -86,10 +78,6 @@ public abstract class AiEntity extends Entity {
 
     public double getEquipDropPercent(@NonNull EquipType equipType) {
         return this.equipDropPercent.getOrDefault(equipType, 0D);
-    }
-
-    public void addEquipDropPercent(@NonNull EquipType equipType, double percent) {
-        this.setEquipDropPercent(equipType, this.getEquipDropPercent(equipType) + percent);
     }
 
     @Override

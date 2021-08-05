@@ -31,7 +31,7 @@ public class ItemDisplayManager {
 
     public void displayInventory(@NonNull Player self, int page) {
         if(self.getInventory().isEmpty()) {
-            self.replyPlayer("\n---인벤토리---\n인벤토리가 비어있습니다...");
+            self.replyPlayer("\n인벤토리 (1페이지 / 1페이지)\n인벤토리가 비어있습니다");
             return;
         }
 
@@ -43,11 +43,11 @@ public class ItemDisplayManager {
 
         List<Long> highPriorityItems = self.getListVariable(Variable.HIGH_PRIORITY_ITEM);
 
-        StringBuilder msg = new StringBuilder("\n---인벤토리---\n[")
+        StringBuilder msg = new StringBuilder("\n인벤토리 (")
                 .append(page)
                 .append("페이지 / ")
                 .append(maxPage)
-                .append("페이지]");
+                .append("페이지)");
 
         if(highPriorityItems.isEmpty()) {
             msg.append("\n우선 표시 설정된 아이템이 없습니다");
@@ -236,22 +236,75 @@ public class ItemDisplayManager {
 
     public void displayEquipInfo(@NonNull Player self, @NonNull String equipName) {
         Long equipId = EquipList.findByName(equipName);
-
         if(equipId == null) {
             throw new WeirdCommandException("알 수 없는 장비입니다");
         }
 
+        displayEquipInfo(self, equipId);
+    }
+
+    public void displayEquipInfo(@NonNull Player self, int index) {
+        long equipId = self.getEquipIdByIndex(index);
+        displayEquipInfo(self, equipId);
+    }
+
+    public void displayEquipInfo(@NonNull Player self, long equipId) {
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
 
-        StringBuilder innerBuilder = new StringBuilder("---장비 기본 스텟---");
-        for(Map.Entry<StatType, Integer> entry : equipment.getBasicStat().entrySet()) {
-            innerBuilder.append("\n")
-                    .append(entry.getKey().getDisplayName())
-                    .append(": ")
-                    .append(entry.getValue());
+        StringBuilder innerBuilder = new StringBuilder(equipment.getName() + " 의 정보\n\n장착 제한 레벨: ")
+                .append(equipment.getTotalLimitLv())
+                .append("\n강화 성공 확률: ")
+                .append(Config.getDisplayPercent(equipment.getReinforcePercent(self.getReinforceMultiplier())))
+                .append("(x")
+                .append(self.getReinforceMultiplier())
+                .append(")\n강화 필요 아이템: ")
+                .append(ItemList.findById(equipment.getReinforceItem()))
+                .append("\n강화 비용: ")
+                .append(equipment.getReinforceCost())
+                .append("G\n\n---스텟 현황---");
+
+        if(equipment.getBasicStat().isEmpty()) {
+            innerBuilder.append("\n장착 스텟이 없습니다");
+        } else {
+            StatType statType;
+            int stat;
+            for (Map.Entry<StatType, Integer> entry : equipment.getBasicStat().entrySet()) {
+                statType = entry.getKey();
+
+                innerBuilder.append("\n")
+                        .append(statType.getDisplayName())
+                        .append(": ")
+                        .append(equipment.getStat(statType))
+                        .append("(")
+                        .append(entry.getValue());
+
+                stat = equipment.getReinforceStat(statType);
+                if (stat >= 0) {
+                    innerBuilder.append(" + ")
+                            .append(stat);
+                } else {
+                    innerBuilder.append(" - ")
+                            .append(stat);
+                }
+
+                innerBuilder.append(")");
+            }
         }
 
-        self.replyPlayer("[" + equipment.getName() + "]\n" + equipment.getDescription(), innerBuilder.toString());
+        innerBuilder.append("\n\n---장착 제한 스텟---");
+
+        if(equipment.getLimitStat().isEmpty()) {
+            innerBuilder.append("\n장착 제한 스텟이 없습니다");
+        } else {
+            for(Map.Entry<StatType, Integer> entry : equipment.getLimitStat().entrySet()) {
+                innerBuilder.append("\n")
+                        .append(entry.getKey().getDisplayName())
+                        .append(": ")
+                        .append(entry.getValue());
+            }
+        }
+
+        self.replyPlayer("장비 정보는 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
     public void displayEquippedInfo(@NonNull Player self) {
@@ -334,6 +387,46 @@ public class ItemDisplayManager {
         }
 
         self.replyPlayer("\n---장비 인벤토리---\n[" + page + "페이지 / " + maxPage + "페이지]", innerBuilder.toString());
+    }
+
+    public void displayReinforceInfo(@NonNull Player self) {
+        StringBuilder innerBuilder = new StringBuilder();
+
+        double multiplier = self.getReinforceMultiplier();
+
+        long equipId;
+        Equipment equipment;
+        for(EquipType equipType : EquipType.values()) {
+            innerBuilder.append(equipType.getDisplayNames().get(0))
+                    .append(": ");
+
+            equipId = self.getEquipped(equipType);
+
+            if(equipId == EquipList.NONE.getId()) {
+                innerBuilder.append("미장착");
+            } else {
+                equipment = Config.getData(Id.EQUIPMENT, equipId);
+
+                innerBuilder.append(equipment.getName());
+
+                if(equipment.getReinforceCount().get() != Config.MAX_REINFORCE_COUNT) {
+                    innerBuilder.append("\n강화 성공 확률: ")
+                            .append(Config.getDisplayPercent(equipment.getReinforcePercent(multiplier)))
+                            .append("(x")
+                            .append(multiplier)
+                            .append(")\n현재 강화 실패 횟수: ")
+                            .append(equipment.getReinforceFloor2().get())
+                            .append("회\n강화 재료: ")
+                            .append(ItemList.findById(equipment.getReinforceItem()))
+                            .append("\n강화 비용: ")
+                            .append(equipment.getReinforceCost());
+                }
+            }
+
+            innerBuilder.append("\n\n");
+        }
+
+        self.replyPlayer("장비 강화 현황은 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
 }

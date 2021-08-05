@@ -262,7 +262,7 @@ public class ChatManager {
         try {
             thread.join();
         } catch (InterruptedException e) {
-            Logger.e("player.chatThread", e);
+            Logger.e("ChatManager", e);
             throw new RuntimeException(e);
         }
     }

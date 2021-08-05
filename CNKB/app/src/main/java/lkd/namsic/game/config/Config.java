@@ -29,6 +29,9 @@ import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.UnhandledEnumException;
+import lkd.namsic.game.json.ChatLimitAdapter;
+import lkd.namsic.game.json.LocationAdapter;
+import lkd.namsic.game.json.NpcAdapter;
 import lkd.namsic.game.object.Achieve;
 import lkd.namsic.game.object.AiEntity;
 import lkd.namsic.game.object.Boss;
@@ -44,19 +47,18 @@ import lkd.namsic.game.object.Player;
 import lkd.namsic.game.object.Quest;
 import lkd.namsic.game.object.Research;
 import lkd.namsic.game.object.Skill;
-import lkd.namsic.game.json.ChatLimitAdapter;
-import lkd.namsic.game.json.LocationAdapter;
-import lkd.namsic.game.json.NpcAdapter;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.setting.Logger;
 
 public class Config {
 
+    public static final double VERSION = 1.0;
+
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
             .registerTypeAdapter(Location.class, new LocationAdapter())
             .registerTypeAdapter(ChatLimit.class, new ChatLimitAdapter())
-            .setVersion(1.0)
+            .setVersion(VERSION)
             .create();
 
     public static final Map<Id, Long> ID_COUNT = new ConcurrentHashMap<>();
@@ -75,7 +77,7 @@ public class Config {
     private static final String REGEX = "[^A-Za-z-_0-9ㄱ-ㅎㅏ-ㅣ가-힣\\s]|[\n]|[\r]";
     public static final List<String> FORBIDDEN_NICKNAME = Arrays.asList("아이템", "item", "장비", "equip", "시발", "애미", "애비",
             "느금", "느금마", "지랄", "염병", "옘병", "tlqkf", "ㄴㄱㅁ", "앰이", "보지", "자지", "섹스", "발기", "왕고추", "느금",
-            "유미없음", "창년", "창녀", "창남", "몸팔이", "니애미", "니애비");
+            "유미없음", "창년", "창녀", "창남", "몸팔이", "니애미", "니애비", "씨발", "fuck", "씨빨", "좆", "개새");
     public static final Map<String, Long> PLAYER_ID = new ConcurrentHashMap<>();
     public static final Map<Long, String[]> PLAYER_LIST = new ConcurrentHashMap<>();
     public static final Map<String, Integer> PLAYER_LV_RANK = new ConcurrentHashMap<>();
@@ -96,21 +98,26 @@ public class Config {
 
     public static final int MIN_HANDLE_LV = 1;
     public static final int MAX_HANDLE_LV = 13;
-    public static final int MIN_REINFORCE_COUNT = 0;
     public static final int MAX_REINFORCE_COUNT = 15;
-    public static final double REINFORCE_FLOOR_MULTIPLE = 0.025;
     public static final int MIN_LV = 1;
     public static final int MAX_LV = 999;
+    public static final int MIN_RANK_LV = 10;
     public static final int MIN_AI_INCREASE = 0;
     public static final int MIN_SP = 0;
     public static final int MIN_MAGIC_LV = 1;
     public static final int MAX_MAGIC_LV = 10;
     public static final long MIN_DELAY_TIME = 500;
     public static final long MAX_DELAY_TIME = 5000;
-    public static final long MIN_PAUSE_TIME = 2000;     //REAL TIME
-//    public static final long MIN_PAUSE_TIME = 500;      //DEBUG
+    public static final long MIN_PAUSE_TIME = 2000;
     public static final long MAX_PAUSE_TIME = 5000;
     public static final int MAX_SPAWN_COUNT = 16;
+
+    public static final double REINFORCE_EFFICIENCY = 0.2;
+    public static final double REINFORCE_EFFICIENCY_PER_HANDLE_LV = 0.035;
+    public static final long REINFORCE_BASE_COST = 3000;
+    public static final long REINFORCE_COST_PER_HANDLE_LV = 1000;
+    public static final double REINFORCE_COST_MULTIPLIER = 0.1;
+    public static final long REINFORCE_DELAY_TIME = 2000;
 
     public static final double TOTAL_MONEY_LOSE_RANDOM = 0.1;
     public static final double TOTAL_MONEY_LOSE_MIN = 0.05;
@@ -135,7 +142,7 @@ public class Config {
     public static final long FISH_WAIT_TIME = 5000;
     public static final long FIGHT_WAIT_TIME = 30000;
     public static final int ADVENTURE_COUNT = 5;
-    public static final int ADVENTURE_DELAY_TIME = 2000;
+    public static final int ADVENTURE_DELAY_TIME = 5000;
     public static final long ADVENTURE_WAIT_TIME = 30000;
     public static final int EXPLORE_HARD_SUCCESS_PERCENT = 20;
     public static final int APPRAISE_LIMIT = 999;
@@ -189,7 +196,7 @@ public class Config {
                 PLAYER_ID.put(player.getNickName(), objectId);
                 PLAYER_LIST.put(objectId, new String[] {player.getSender(), player.getImage()});
 
-                if(objectId != 1) {
+                if(objectId != 1 && player.getLv().get() >= MIN_RANK_LV) {
                     PLAYER_LV_RANK.put(player.getName(), player.getLv().get());
                 }
             } catch (Exception e) {
@@ -369,7 +376,7 @@ public class Config {
                         }
                     }
 
-                    Logger.i("FileManager", "New object unloaded");
+                    Logger.i("FileManager", "New object unloaded - [" + id + ", " + objectId + "]");
                 }
 
                 FileManager.save(path, jsonString);
@@ -414,63 +421,77 @@ public class Config {
     @SuppressWarnings("unchecked")
     @NonNull
     public synchronized static <T extends GameObject> T loadObject(@NonNull Id id, long objectId) {
+        T t = null;
+
         if(id.equals(Id.PLAYER)) {
             String[] playerData = PLAYER_LIST.get(objectId);
 
             try {
-                return (T) Objects.requireNonNull(loadPlayer(playerData[0], playerData[1]));
+                t = (T) Objects.requireNonNull(loadPlayer(playerData[0], playerData[1]));
             } catch (NullPointerException e) {
                 throw new NullPointerException(e.getMessage() + "\n" + objectId + " " + PLAYER_LIST.toString());
             }
         }
 
-        String path = getPath(id, objectId);
-        File file = new File(path);
+        File file = new File(getPath(id, objectId));
         if(!file.exists()) {
             throw new ObjectNotFoundException(id, objectId);
         }
 
         Long objectCount = OBJECT_COUNT.get(id).get(objectId);
-
         if(objectCount == null) {
-            String jsonString = null;
-            try {
-                jsonString = FileManager.read(file);
-            } catch (Exception e) {
-                Logger.e("loadObject", e);
+            if(t == null) {
+                String jsonString;
+
+                try {
+                    jsonString = FileManager.read(file);
+                } catch (Exception e) {
+                    Logger.e("loadObject", e);
+                    throw new RuntimeException(e);
+                }
+
+                if (jsonString.equals("")) {
+                    throw new ObjectNotFoundException(id, objectId);
+                }
+
+                t = fromJson(jsonString, ID_CLASS.get(id));
             }
-
-            if(jsonString.equals("")) {
-                throw new ObjectNotFoundException(id, objectId);
-            }
-
-            T t = fromJson(jsonString, ID_CLASS.get(id));
-
-            try {
-                Id.checkEntityId(id);
-                ((Entity) t).revalidateBuff();
-            } catch (UnhandledEnumException ignore) {}
 
             OBJECT.get(id).put(objectId, t);
             OBJECT_COUNT.get(id).put(objectId, 1L);
-            return t;
+
+            try {
+                Id.checkEntityId(id);
+
+                if(!id.equals(Id.PLAYER)) {
+                    check((Entity) t);
+                }
+            } catch (UnhandledEnumException ignore) {}
         } else {
             OBJECT_COUNT.get(id).put(objectId, objectCount + 1);
-            Logger.i("loadObject(" + objectCount + ")", objectId + " - " + objectId);
 
-            T t = (T) Objects.requireNonNull(OBJECT.get(id).get(objectId));
+            if(t == null) {
+                t = (T) Objects.requireNonNull(OBJECT.get(id).get(objectId));
+                Logger.i("loadObject(" + objectCount + ")", objectId + " - " + objectId);
+            }
 
             try {
                 Id.checkEntityId(id);
                 ((Entity) t).revalidateBuff();
             } catch (UnhandledEnumException ignore) {}
-
-            return t;
         }
+
+        return t;
     }
 
     @NonNull
     public synchronized static Player loadPlayer(@NonNull String sender, @NonNull String image) {
+        return loadPlayer(sender, image, null, false, false);
+    }
+
+    @NonNull
+    public synchronized static Player loadPlayer(@NonNull String sender, @NonNull String image,
+                                                 @Nullable String room, boolean isGroupChat, boolean count) {
         String path = getPlayerPath(sender, image);
         String jsonString = FileManager.read(path);
 
@@ -479,21 +500,25 @@ public class Config {
         }
 
         Player player = fromJson(jsonString, Player.class);
-        player.checkTime();
-
         long objectId = player.getId().getObjectId();
         Long objectCount = OBJECT_COUNT.get(Id.PLAYER).get(objectId);
 
-        if(objectCount == null) {
+        if(count) {
             OBJECT.get(Id.PLAYER).put(objectId, player);
             OBJECT_COUNT.get(Id.PLAYER).put(objectId, 1L);
-        } else {
-            Logger.i("loadPlayer(" + objectCount + ")", sender);
-            player = (Player) Objects.requireNonNull(OBJECT.get(Id.PLAYER).get(objectId));
-            OBJECT_COUNT.get(Id.PLAYER).put(objectId, objectCount + 1);
         }
 
-        player.revalidateBuff();
+        if(objectCount != null) {
+            Logger.i("loadPlayer(" + objectCount + ")", sender);
+        }
+
+        if(room != null) {
+            player.setRecentRoom(room);
+            player.setGroup(isGroupChat);
+        }
+
+        check(player);
+
         return player;
     }
 
@@ -646,7 +671,7 @@ public class Config {
         output.append(Emoji.HALF_BAR[(int) Math.round(dec * 8)]);
 
         for(int i = 9; i > filled; i--) {
-            output.append("  ");
+            output.append("   ");
         }
 
         return output.toString() + "] (" + value + "/" + maxValue + ")";
@@ -720,11 +745,64 @@ public class Config {
                 .trim();
     }
 
-    //TODO : change many replace methods to replaceLast
-
     @NonNull
     public static String replaceLast(@NonNull String text, @NonNull String regex, @NonNull String replacement) {
         return text.replaceFirst("(?s)" + regex + "(?!.*?" + regex + ")", replacement).trim();
+    }
+
+    private static void check(@NonNull Entity entity) {
+        entity.revalidateBuff();
+
+        if(entity.getVersion() != Config.VERSION) {
+            if (entity.getId().getId().equals(Id.PLAYER)) {
+                ((Player) entity).replyPlayer("데이터를 업데이트하는 중입니다\n잠시만 기다려주세요");
+            }
+
+            Logger.i("Version Update", entity.getName());
+            update(entity);
+        }
+    }
+
+    public static void update(@NonNull Entity entity) {
+        Equipment equipment;
+
+        boolean unavailable = false;
+        List<String> unavailableEquipList = new ArrayList<>();
+        for(long equipId : entity.getEquipInventory()) {
+            equipment = Config.loadObject(Id.EQUIPMENT, equipId);
+
+            if(!equipment.revalidateStat(true, entity)) {
+                unavailable = true;
+                unavailableEquipList.add(equipment.getName());
+            }
+
+            Config.unloadObject(equipment);
+        }
+
+        entity.revalidateEquipStat();
+
+        if(entity.getId().getId().equals(Id.PLAYER)) {
+            Player player = (Player) entity;
+
+            if (unavailable) {
+                StringBuilder innerBuilder = new StringBuilder("---장비 업데이트 경고---\n(장착 해제할 경우 재장착이 불가능한 장비 목록)");
+                for (String string : unavailableEquipList) {
+                    innerBuilder.append(Emoji.LIST)
+                            .append(" ")
+                            .append(string);
+                }
+
+                player.replyPlayer("업데이트가 완료되었습니다\nv" + player.getVersion() + " -> v" + Config.VERSION,
+                        innerBuilder.toString());
+            } else {
+                player.replyPlayer("업데이트가 완료되었습니다\nv" + player.getVersion() + " -> v" + Config.VERSION);
+            }
+        } else if(unavailable) {
+            Logger.w("Update", "Non-Player Entity equip limit stat warning - " + entity.getId().getObjectId() + "\n" +
+                    unavailableEquipList.toString());
+        }
+
+        entity.setVersion(Config.VERSION);
     }
 
 }

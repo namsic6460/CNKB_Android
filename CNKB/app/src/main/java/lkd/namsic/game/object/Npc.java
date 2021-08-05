@@ -25,8 +25,6 @@ import lombok.Setter;
 @Setter
 public class Npc extends Entity {
 
-    private static final ChatManager chatManager = ChatManager.getInstance();
-
     @Nullable
     Long firstChat = null;
 
@@ -118,7 +116,7 @@ public class Npc extends Entity {
         }
         
         long chatId = (long) availableBaseSet.toArray()[new Random().nextInt(availableBaseSet.size())];
-        chatManager.startChat(player, chatId, this.getId().getObjectId());
+        ChatManager.getInstance().startChat(player, chatId, this.getId().getObjectId());
     }
 
     @Deprecated

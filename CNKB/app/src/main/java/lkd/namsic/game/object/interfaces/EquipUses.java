@@ -47,7 +47,7 @@ public class EquipUses {
             @NonNull
             @Override
             public String use(@NonNull Entity self, @NonNull List<GameObject> other) {
-                if(Math.random() < 0.75) {
+                if(Math.random() < 0.85) {
                     self.setVariable(Variable.IS_DEFENCING, true);
                     return "방어 태세로 전환했습니다";
                 } else {

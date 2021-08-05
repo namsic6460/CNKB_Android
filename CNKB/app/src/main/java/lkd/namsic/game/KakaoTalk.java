@@ -43,18 +43,20 @@ import lkd.namsic.game.command.player.game.MapCommand;
 import lkd.namsic.game.command.player.game.MineCommand;
 import lkd.namsic.game.command.player.game.MoveCommand;
 import lkd.namsic.game.command.player.game.RankingCommand;
+import lkd.namsic.game.command.player.game.ReinforceCommand;
 import lkd.namsic.game.command.player.game.SettingCommand;
 import lkd.namsic.game.command.player.game.StatCommand;
 import lkd.namsic.game.command.player.game.UseCommand;
 import lkd.namsic.game.command.player.register.PlayerRegisterCommand;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.exception.DoingFilterException;
 import lkd.namsic.game.exception.EquipUseException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.ChatManager;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.service.NotificationListener;
 import lkd.namsic.setting.Logger;
 
@@ -62,6 +64,7 @@ public class KakaoTalk {
 
     public final static Map<String, Notification.Action> groupSessions = new ConcurrentHashMap<>();
     public final static Map<String, Notification.Action> soloSessions = new ConcurrentHashMap<>();
+    public final static Map<String, Notification.Action> replyAllSessions = new ConcurrentHashMap<>();
 
     private static String lastSender = "";
     private static String lastMsg = "";
@@ -115,6 +118,7 @@ public class KakaoTalk {
         registerPlayerCommand(new MineCommand(),        "광질", "mine");
         registerPlayerCommand(new MoveCommand(),        "이동", "move");
         registerPlayerCommand(new RankingCommand(),     "랭킹", "랭크", "ranking", "rank");
+        registerPlayerCommand(new ReinforceCommand(),   "강화", "reinforce", "r");
         registerPlayerCommand(new SettingCommand(),     "설정", "setting", "set");
         registerPlayerCommand(new StatCommand(),        "스텟", "stat");
         registerPlayerCommand(new UseCommand(),         "사용", "use");
@@ -167,6 +171,10 @@ public class KakaoTalk {
         boolean isCommand = msg.startsWith("N ") || msg.startsWith("n ") || msg.startsWith("ㅜ ");
         final String command = isCommand ? msg.substring(2) : null;
 
+        if(isCommand && isGroupChat) {
+            replyAllSessions.put(room, session);
+        }
+
         Thread gameThread = new Thread(() -> {
             CommandListener listener;
             Player player = null;
@@ -183,7 +191,7 @@ public class KakaoTalk {
                 lastMsg = msg;
 
                 try {
-                    player = Config.loadPlayer(sender, image);
+                    player = Config.loadPlayer(sender, image, room, isGroupChat, true);
                 } catch (ObjectNotFoundException ignore) {}
 
                 if(isCommand) {
@@ -207,8 +215,6 @@ public class KakaoTalk {
                     } else {
                         try {
                             if (player != null && (listener = KakaoTalk.playerCommands.get(first)) != null) {
-                                player.setRecentRoom(room);
-                                player.setGroup(isGroupChat);
                                 player.checkNewDay();
 
                                 listener.execute(player, cmd, commands, second, third, fourth, session);
@@ -218,8 +224,8 @@ public class KakaoTalk {
                                 if (listener != null) {
                                     listener.execute(sender, image, cmd, room, isGroupChat, session);
                                 } else {
-                                    //TODO: 공기계로 진행할 때 주석 해제
-//                                throw new WeirdCommandException("현재 회원가입이 되어있지 않습니다.\n회원가입을 진행해주세요");
+                                    throw new WeirdCommandException("현재 회원가입이 되어있지 않습니다.\n회원가입을 진행해주세요\n" +
+                                            "회원가입 명령어 : " + Emoji.focus("n 회원가입 {닉네임}"));
                                 }
                             }
                         } catch (WeirdCommandException | DoingFilterException | EquipUseException e) {
@@ -245,9 +251,12 @@ public class KakaoTalk {
             } catch (Exception e) {
                 Logger.e("onChat", e);
 
-                //TODO: 추후 봇 전용 휴대폰으로 돌릴 시, 에러 발생을 reply 가 아닌 replyAll 으로 알려야한다.
-                reply(session, "[ERROR]\n" + Config.errorString(e));
-//                replyAll("[ERROR]\n" + Config.errorString(e));
+                String errorStr = "[ERROR]\n" + Config.errorString(e);
+
+                replyAll(errorStr);
+                if(isCommand && !isGroupChat) {
+                    reply(session, errorStr);
+                }
 
                 if(player != null) {
                     Config.discardPlayer(player);
@@ -304,17 +313,8 @@ public class KakaoTalk {
         }
     }
 
-    public static void replyGroup(@NonNull String msg) {
-        for(Notification.Action session : groupSessions.values()) {
-            reply(session, msg);
-        }
-    }
-
-    @Deprecated
     public static void replyAll(@NonNull String msg) {
-        replyGroup(msg);
-
-        for(Notification.Action session : soloSessions.values()) {
+        for(Notification.Action session : replyAllSessions.values()) {
             reply(session, msg);
         }
     }

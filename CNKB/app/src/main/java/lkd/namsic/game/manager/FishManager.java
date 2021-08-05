@@ -153,7 +153,7 @@ public class FishManager {
             try {
                 Thread.sleep(random.nextInt(Config.FISH_DELAY_TIME) + Config.FISH_DELAY_TIME_OFFSET);
             } catch (InterruptedException e) {
-                Logger.e("Player.fishThread", e);
+                Logger.e("FishManager", e);
                 throw new RuntimeException(e.getMessage());
             }
 
@@ -183,7 +183,7 @@ public class FishManager {
                 try {
                     self.wait(Config.FISH_WAIT_TIME);
                 } catch (InterruptedException e) {
-                    Logger.e("Player.fishThread", e);
+                    Logger.e("FishManager", e);
                     throw new RuntimeException(e.getMessage());
                 }
 

@@ -109,7 +109,7 @@ public class EquipEvents {
                 public void onDamaged(@NonNull Entity self, @NonNull Entity attacker,
                                       @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
                     if(isCrit.get()) {
-                        totalDmg.multiple(0.95);
+                        totalDmg.multiple(0.8);
                     }
                 }
             });
@@ -209,15 +209,11 @@ public class EquipEvents {
                 public void onDamaged(@NonNull Entity self, @NonNull Entity attacker,
                                       @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
                     if(Math.random() < 0.1) {
-                        totalDmg.set(0);
+                        totalDmg.divide(2);
                         self.setVariable(Variable.WEIRD_LEGGINGS, true);
 
-                        if(attacker.getId().getId().equals(Id.PLAYER)) {
-                            ((Player) attacker).replyPlayer("상대방의 기괴한 바지의 효과로 공격이 상쇄되었습니다");
-                        }
-
                         if(self.getId().getId().equals(Id.PLAYER)) {
-                            ((Player) self).replyPlayer("기괴한 바지의 효과로 공격이 상쇄되며, 다음 공격이 치명타가 됩니다");
+                            ((Player) self).replyPlayer("기괴한 바지의 효과로 데미지가 줄어들며, 다음 공격이 강화됩니다");
                         }
                     }
                 }
@@ -230,7 +226,7 @@ public class EquipEvents {
 
                     if(weirdLeggings) {
                         isCrit.set(true);
-                        totalDmg.multiple(2);
+                        totalDmg.multiple(1.5);
 
                         self.removeVariable(Variable.WEIRD_LEGGINGS);
                     }
@@ -257,7 +253,7 @@ public class EquipEvents {
                     boolean trollClub = self.getObjectVariable(Variable.TROLL_CLUB, false);
 
                     if(trollClub) {
-                        if(victim.getId().getId().equals(Id.MONSTER)) {
+                        if(victim.getId().getId().equals(Id.MONSTER) && self.getLv().get() > victim.getLv().get()) {
                             totalDmg.multiple(3);
                         }
 

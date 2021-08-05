@@ -1,4 +1,4 @@
-package lkd.namsic.game.initializer;
+package lkd.namsic.game.creator;
 
 import java.util.HashMap;
 
@@ -11,7 +11,7 @@ import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.object.Equipment;
 import lkd.namsic.setting.Logger;
 
-public class EquipCreator implements ObjectCreator {
+public class EquipCreator implements Creatable {
 
     @Override
     public void start() {
@@ -110,7 +110,6 @@ public class EquipCreator implements ObjectCreator {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.LEATHER_CHESTPLATE, "가죽으로 만든 간단한 보호구다");
-        equipment.getHandleLv().set(2);
         equipment.addBasicStat(StatType.MAXHP, 10);
         equipment.addBasicStat(StatType.DEF, 2);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
@@ -120,7 +119,6 @@ public class EquipCreator implements ObjectCreator {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.LEATHER_LEGGINGS, "가죽으로 만든 간단한 보호구다");
-        equipment.getHandleLv().set(2);
         equipment.addBasicStat(StatType.MAXHP, 10);
         equipment.addBasicStat(StatType.MDEF, 2);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
@@ -130,7 +128,6 @@ public class EquipCreator implements ObjectCreator {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.LEATHER_SHOES, "가죽으로 만든 간단한 보호구다");
-        equipment.getHandleLv().set(2);
         equipment.addBasicStat(StatType.MAXHP, 8);
         equipment.addBasicStat(StatType.AGI, 8);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
@@ -141,7 +138,7 @@ public class EquipCreator implements ObjectCreator {
 
         equipment = new Equipment(EquipType.HELMET, EquipList.LOW_ALLOY_HELMET, "하급 합금으로 만든 간단한 보호구다\n" +
                 "치명타 데미지를 20% 확률로 50% 방어한다");
-        equipment.getHandleLv().set(3);
+        equipment.getHandleLv().set(2);
         equipment.addBasicStat(StatType.MAXHP, 25);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_ALLOY.getId(), 5);
@@ -151,7 +148,7 @@ public class EquipCreator implements ObjectCreator {
 
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.LOW_ALLOY_CHESTPLATE, "하급 합금으로 만든 간단한 보호구다\n" +
                 "사용 시 4 마나를 사용하여 75% 확률로 방어를 한다");
-        equipment.getHandleLv().set(3);
+        equipment.getHandleLv().set(2);
         equipment.addBasicStat(StatType.MAXHP, 25);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_ALLOY.getId(), 5);
@@ -161,7 +158,7 @@ public class EquipCreator implements ObjectCreator {
 
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.LOW_ALLOY_LEGGINGS, "하급 합금으로 만든 간단한 보호구다\n" +
                 "사용 시 5 마나를 사용하여 20초간 회피 15의 버프를 얻는다");
-        equipment.getHandleLv().set(3);
+        equipment.getHandleLv().set(2);
         equipment.addBasicStat(StatType.MAXHP, 25);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_ALLOY.getId(), 5);
@@ -171,7 +168,7 @@ public class EquipCreator implements ObjectCreator {
 
         equipment = new Equipment(EquipType.SHOES, EquipList.LOW_ALLOY_SHOES, "하급 합금으로 만든 간단한 보호구다\n" +
                 "타격 시 합검을 장착하고 있다면 5의 추가 데미지를 준다");
-        equipment.getHandleLv().set(3);
+        equipment.getHandleLv().set(2);
         equipment.addBasicStat(StatType.MAXHP, 25);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_ALLOY.getId(), 5);
@@ -181,7 +178,7 @@ public class EquipCreator implements ObjectCreator {
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.LOW_MANA_SWORD, "마나의 기운을 담고 있는 검이다\n" +
                 "공격 시 마나 1을 회복한다");
-        equipment.getHandleLv().set(3);
+        equipment.getHandleLv().set(2);
         equipment.addBasicStat(StatType.ATS, 15);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_MANA.getId(), 5);
@@ -191,7 +188,7 @@ public class EquipCreator implements ObjectCreator {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.QUARTZ_SWORD, "다양한 석영으로 만들어진 빛나는 검이다");
-        equipment.getHandleLv().set(5);
+        equipment.getHandleLv().set(2);
         equipment.addBasicStat(StatType.ATK, 5);
         equipment.addBasicStat(StatType.MAXMN, 5);
         equipment.addBasicStat(StatType.ATS, 10);
@@ -205,7 +202,7 @@ public class EquipCreator implements ObjectCreator {
 
         equipment = new Equipment(EquipType.HELMET, EquipList.SLIME_HELMET, "끈적끈적한 투구다\n" +
                 "피격 시 데미지의 8% 를 회복한다\n해당 공격이 치명타일 경우 15% 를 회복한다");
-        equipment.getHandleLv().set(5);
+        equipment.getHandleLv().set(3);
         equipment.addBasicStat(StatType.ATS, -10);
         equipment.addBasicStat(StatType.MAXHP, 20);
         equipment.addBasicStat(StatType.ATK, 3);
@@ -219,7 +216,7 @@ public class EquipCreator implements ObjectCreator {
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.SLIME_CHESTPLATE, "끈적끈적한 갑옷이다\n" +
                 "피격 시 데미지의 20% 를 저장한다\n해당 공격이 치명타일 경우 40% 를 저장한다\n" +
                 "사용 시 마나 5를 소모하여 다음 공격이 저장한 데미지를 사용하여 추가 데미지를 입힌다");
-        equipment.getHandleLv().set(5);
+        equipment.getHandleLv().set(3);
         equipment.addBasicStat(StatType.ATS, -10);
         equipment.addBasicStat(StatType.MAXHP, 20);
         equipment.addBasicStat(StatType.ATK, 3);
@@ -232,7 +229,7 @@ public class EquipCreator implements ObjectCreator {
 
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.SLIME_LEGGINGS, "끈적끈적한 바지다\n" +
                 "사용 시 마나를 10 사용하여 30초간 모든 적의 공격 속도를 25 감소시킨다");
-        equipment.getHandleLv().set(5);
+        equipment.getHandleLv().set(3);
         equipment.addBasicStat(StatType.ATS, -10);
         equipment.addBasicStat(StatType.MAXHP, 20);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
@@ -241,7 +238,7 @@ public class EquipCreator implements ObjectCreator {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.SHOES, EquipList.SLIME_SHOES, "끈적끈적한 신발이다");
-        equipment.getHandleLv().set(5);
+        equipment.getHandleLv().set(2);
         equipment.addBasicStat(StatType.ATS, -10);
         equipment.addBasicStat(StatType.MAXHP, 30);
         equipment.addBasicStat(StatType.BRE, 5);
@@ -251,7 +248,6 @@ public class EquipCreator implements ObjectCreator {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.HELMET, EquipList.WOOL_HELMET, "양털로 만든 따뜻한 모자다");
-        equipment.getHandleLv().set(2);
         equipment.addBasicStat(StatType.MAXHP, 15);
         equipment.addBasicStat(StatType.MDEF, 5);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
@@ -261,8 +257,7 @@ public class EquipCreator implements ObjectCreator {
 
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.HARD_IRON_CHESTPLATE, "강철로 만든 단단한 갑옷이다");
         equipment.getHandleLv().set(3);
-        equipment.addBasicStat(StatType.MAXHP, 50);
-        equipment.addBasicStat(StatType.ATS, -20);
+        equipment.addBasicStat(StatType.MAXHP, 75);
         equipment.addBasicStat(StatType.DEF, 10);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.HARD_IRON.getId(), 5);
@@ -271,8 +266,8 @@ public class EquipCreator implements ObjectCreator {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.WEIRD_LEGGINGS, "거미 다리로 만든 기괴하게 생긴 바지다\n" +
-                "피격 시 10% 확률로 데미지를 50% 감소시키고 다음 자신의 공격을 치명타로 만든다");
-        equipment.getHandleLv().set(6);
+                "피격 시 10% 확률로 데미지를 50% 감소시키고 다음 자신의 공격의 데미지를 1.5배로 준다");
+        equipment.getHandleLv().set(3);
         equipment.addBasicStat(StatType.MAXHP, 30);
         equipment.addBasicStat(StatType.ATS, 50);
         equipment.addBasicStat(StatType.DEF, 5);
@@ -294,9 +289,9 @@ public class EquipCreator implements ObjectCreator {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.TROLL_CLUB, "트롤이 가지고 다니는 무식하게 생긴 몽둥이다\n" +
-                "사용 시 마나 1을 사용하여 다음 공격이 자신보다 낮은 레벨의 몬스터를 공격하는 것이라면 3배의 데미지를 준다");
-        equipment.getHandleLv().set(5);
-        equipment.addBasicStat(StatType.ATK, 20);
+                "사용 시 마나 1을 소모하여 다음 공격이 자신보다 낮은 레벨의 몬스터를 공격하는 것이라면 데미지를 3배로 준다");
+        equipment.getHandleLv().set(4);
+        equipment.addBasicStat(StatType.ATK, 35);
         equipment.addBasicStat(StatType.ATS, -20);
         Config.unloadObject(equipment);
 

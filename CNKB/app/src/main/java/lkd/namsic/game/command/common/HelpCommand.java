@@ -31,6 +31,7 @@ public class HelpCommand extends CommonCommand {
                         Emoji.LIST + " *(장비/equip) : 장비 착용 현황을 표시합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) (인벤토리/인벤/inventory/inven) [{페이지}] : 현재 장비 인벤토리를 표시합니다\n\n" +
                         Emoji.LIST + " (장비/equip) ({장비 번호}) : 장비를 착용 또는 착용 해제합니다\n\n" +
+                        Emoji.LIST + " *(장비/equip) (정보/info) ({장비 번호}) : 보유중인 장비의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " (대화/chat) ({NPC 이름}) : 해당 NPC 와 대화를 합니다\n\n" +
                         Emoji.LIST + " *(맵/map) : 현재 위치 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(맵/map) (목록/list) : 이동 가능한 주변 맵의 정보를 표시합니다\n\n" +
@@ -53,20 +54,19 @@ public class HelpCommand extends CommonCommand {
                         Emoji.LIST + " (모험/adventure/adv) : 현재 지역을 탐색합니다(마을 이외 지역에서만 가능)(모험 중 공격받을 수 있음)\n\n" +
                         Emoji.LIST + " (스텟/stat) : 각 스텟들의 정보를 보여줍니다\n\n" +
                         Emoji.LIST + " (스텟/stat) ({스텟 이름}) ({숫자}) : SP를 소모하여 스텟을 증가시킵니다(영구 적용)\n\n" +
-                        Emoji.LIST + " *(제작/craft) (아이템/item/장비/equip) : 제작 가능한 아이템 또는 장비 목록을 확인합니다\n\n" +
-                        Emoji.LIST + " *(제작/craft) (확인/check) ({아이템 또는 장비 이름}) : 해당 아이템 또는 장비의 제작법을 확인합니다\n\n" +
+                        Emoji.LIST + " *(제작/craft) (아이템/item/장비/equip) : 제작 가능한 아이템 또는 장비 목록을 표시합니다\n\n" +
+                        Emoji.LIST + " *(제작/craft) (확인/check) ({아이템 또는 장비 이름}) : 해당 아이템 또는 장비의 제작법을 표시합니다\n\n" +
                         Emoji.LIST + " (제작/craft) ({아이템 또는 장비 이름}) [{아이템 개수}] : 해당 아이템 또는 장비를 제작합니다\n\n" +
                         Emoji.LIST + " (제작/craft) ({아이템 또는 장비 이름}) ({아이템 개수}) [{레시피 번호}] : " +
                         "해당 아이템 또는 장비를 특정 레시피로 제작합니다\n\n" +
-                        Emoji.LIST + " (랭킹/랭크/ranking/rank) [레벨] : 레벨 랭킹을 표시합니다\n\n" +
+                        Emoji.LIST + " (강화/reinforce/r) : 강화에 대한 설명을 표시합니다\n\n" +
+                        Emoji.LIST + " (강화/reinforce/r) (정보/info) : 현재 장착중인 장비들의 강화 상태를 표시합니다\n\n" +
+                        Emoji.LIST + " (강화/reinforce/r) ({장비 번호}) : 장비를 강화합니다\n\n" +
+                        Emoji.LIST + " *(랭킹/랭크/ranking/rank) [레벨] : 레벨 랭킹을 표시합니다\n\n" +
                         Emoji.LIST + " *(설정/setting/set) (가방/인벤토리/inventory/inven) (추가/add) ({아이템 이름}) : " +
                         "해당 아이템을 인벤토리 표시 우선순위 목록에 추가합니다\n\n" +
                         Emoji.LIST + " *(설정/setting/set) (가방/인벤토리/inventory/inven) (제거/remove) ({아이템 이름}) : " +
-                        "해당 아이템을 인벤토리 표시 우선순위 목록에서 제거합니다\n\n" +
-                        Emoji.LIST + " *(설정/setting/set) (pvp) : PvP 설정을 확인합니다\n\n" +
-                        Emoji.LIST + " *(설정/setting/set) (pvp) (켜기/on) : PvP 설정을 활성화합니다\n\n" +
-                        Emoji.LIST + " *(설정/setting/set) (pvp) (끄기/off) (1/7) : PvP 설정을 1일 또는 7일간 비활성화합니다" +
-                        "(아이템 필요)(시간은 반올림 적용)"
+                        "해당 아이템을 인벤토리 표시 우선순위 목록에서 제거합니다\n\n"
         );
     }
 

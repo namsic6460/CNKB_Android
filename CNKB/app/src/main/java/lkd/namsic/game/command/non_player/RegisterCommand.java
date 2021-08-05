@@ -67,8 +67,9 @@ public class RegisterCommand extends NonPlayerCommand {
                     "닉네임을 변경한 후 다시 시도해주세요");
         }
 
+        String lowerNickname = command.toLowerCase();
         for(String forbiddenWord : Config.FORBIDDEN_NICKNAME) {
-            if(command.contains(forbiddenWord)) {
+            if(lowerNickname.contains(forbiddenWord)) {
                 throw new WeirdCommandException("닉네임에 금지된 단어가 포함되어 있습니다.\n" +
                         "닉네임을 변경한 후 다시 시도해주세요\n(금지된 단어 : " + forbiddenWord + ")");
             }
@@ -94,10 +95,8 @@ public class RegisterCommand extends NonPlayerCommand {
         map.addEntity(player);
         Config.unloadMap(map);
 
-
         player.replyPlayer("회원가입에 성공하였습니다!");
         Config.unloadObject(player);
-        Config.PLAYER_LV_RANK.put(player.getName(), 1);
 
         Config.loadPlayer(sender, image);
         ChatManager.getInstance().startChat(player, 1L, 1L);

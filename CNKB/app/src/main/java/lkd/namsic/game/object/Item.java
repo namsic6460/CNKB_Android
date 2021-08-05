@@ -25,9 +25,6 @@ public class Item extends NamedObject {
     @NonNull
     String description;
 
-    @Nullable
-    Use use = null;
-
     @Setter
     private boolean canEat = false;
 
@@ -81,16 +78,6 @@ public class Item extends NamedObject {
             } else {
                 buff.put(statType, stat);
             }
-        }
-    }
-
-    public int getEatBuff(long time, @NonNull StatType statType) {
-        Map<StatType, Integer> buff = this.eatBuff.get(time);
-
-        if(buff == null) {
-            return 0;
-        } else {
-            return buff.getOrDefault(statType, 0);
         }
     }
 

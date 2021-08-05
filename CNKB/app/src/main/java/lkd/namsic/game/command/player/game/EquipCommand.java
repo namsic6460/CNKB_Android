@@ -11,6 +11,7 @@ import java.util.List;
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.enums.EquipType;
+import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.EquipManager;
 import lkd.namsic.game.manager.ItemDisplayManager;
@@ -28,6 +29,12 @@ public class EquipCommand extends PlayerCommand {
             ItemDisplayManager.getInstance().displayEquipInventory(player, page);
         } else if(second.equals("사용") || second.equals("use")) {
             EquipManager.getInstance().tryUse(player, EquipType.findByName(command.replace(second, "").trim().toLowerCase()));
+        } else if(second.equals("정보") || second.equals("info")) {
+            if(third == null) {
+                throw new WeirdCommandException();
+            }
+
+            ItemDisplayManager.getInstance().displayEquipInfo(player, Integer.parseInt(third));
         } else {
             KakaoTalk.checkDoing(player);
             EquipManager.getInstance().equip(player, Integer.parseInt(second));

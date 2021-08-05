@@ -39,6 +39,8 @@ public class Logger {
     public static synchronized void w(String title, String text) {
         log(title, text, "WARN");
         Log.w(title, text);
+
+        FileManager.save(FileManager.LOG_PATH + "/WARN_" + getTimeFileName(), title + "\n" + text);
     }
 
     public static synchronized void e(String title, Throwable t) {
@@ -59,7 +61,7 @@ public class Logger {
             return;
         }
 
-        FileManager.save(FileManager.LOG_PATH + "/ERROR_" + getTimeFileName(), errorString);
+        FileManager.save(FileManager.LOG_PATH + "/ERROR_" + getTimeFileName(), title + "\n" + errorString);
     }
 
     private static synchronized void log(String title, String text, String prefix) {

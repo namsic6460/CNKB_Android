@@ -1,4 +1,4 @@
-package lkd.namsic.game.initializer;
+package lkd.namsic.game.creator;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.MapType;
@@ -8,7 +8,7 @@ import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
 
-public class MapCreator implements ObjectCreator {
+public class MapCreator implements Creatable {
 
     public void start() {
         GameMap map;

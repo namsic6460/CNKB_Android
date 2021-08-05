@@ -6,8 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,9 +31,9 @@ import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.enums.object.ItemList;
-import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
+import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -111,6 +111,8 @@ public class Player extends Entity {
     @NonNull
     final LocalDateTime created = LocalDateTime.now();
 
+    private int newDayCount = 0;
+
     @NonNull
     final String sender;
 
@@ -134,11 +136,6 @@ public class Player extends Entity {
     String recentRoom;
 
     boolean pvp = true;
-
-    int pvpEnableYear = 0;
-    int pvpEnableDay = 0;
-    boolean pvpEnabled = false;
-    boolean checkPvp = false;
 
     @Setter
     boolean isGroup = true;
@@ -182,6 +179,9 @@ public class Player extends Entity {
         put(LogData.PLAYED_DAY, 1L);
     }};
 
+    @Setter
+    double reinforceMultiplier = 1;
+
     public Player(@NonNull String sender, @NonNull String nickName, @NonNull String image, @NonNull String recentRoom) {
         super(sender);
         this.id.setId(Id.PLAYER);
@@ -199,8 +199,6 @@ public class Player extends Entity {
         this.setBasicStat(StatType.MAXMN, 10);
         this.setBasicStat(StatType.MN, 10);
         this.setBasicStat(StatType.ATK, 10);
-
-        this.getEnemy().clear();
     }
 
     @NonNull
@@ -233,19 +231,6 @@ public class Player extends Entity {
         KakaoTalk.reply(this.getSession(), this.getName() + "\n" + msg, innerMsg);
     }
 
-    public void checkTime() {
-        if(this.checkPvp) {
-            LocalDateTime now = LocalDateTime.now();
-            int year = now.getYear();
-            int day = now.getDayOfYear();
-
-            if(year >= this.pvpEnableDay || day >= this.pvpEnableDay) {
-                this.setPvp(true, null);
-                this.pvpEnabled = true;
-            }
-        }
-    }
-
     public void checkNewDay() {
         LocalDateTime now = LocalDateTime.now();
         int day = now.getDayOfYear();
@@ -256,18 +241,60 @@ public class Player extends Entity {
             this.lastYear = year;
             this.newDay();
         }
-
-        if(this.pvpEnabled) {
-            LocalDateTime pvpEnabledTime = LocalDateTime.of(this.pvpEnableYear, 1, 1, 0, 0)
-                    .plusDays(this.pvpEnableDay);
-            replyPlayer("PvP가 " + pvpEnabledTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "에 활성화되었습니다");
-            this.pvpEnabled = false;
-        }
     }
 
     public void newDay() {
-        //출석 보상
-        this.replyPlayer("New Day!");
+        int count = ++this.newDayCount;
+
+        List<Object[]> rewardList = new ArrayList<>();
+        rewardList.add(new Object[] {ItemList.SMALL_GOLD_BAG, 1});
+        rewardList.add(new Object[] {ItemList.LOW_HP_POTION, 5});
+        rewardList.add(new Object[] {ItemList.LOW_MP_POTION, 5});
+        rewardList.add(new Object[] {ItemList.LOW_ELIXIR, 5});
+
+        if(count == 7) {
+            rewardList.add(new Object[] {ItemList.STAT_POINT, 7});
+            rewardList.add(new Object[] {ItemList.LOW_RECIPE, 3});
+            rewardList.add(new Object[] {ItemList.EMPTY_SPHERE, 5});
+            rewardList.add(new Object[] {ItemList.LOW_EXP_POTION, 3});
+            rewardList.add(new Object[] {ItemList.LOW_REINFORCE_STONE, 3});
+        }
+
+        if(count % 30 == 0) {
+            rewardList.add(new Object[] {ItemList.PIECE_OF_GEM, 5});
+            rewardList.add(new Object[] {ItemList.EQUIP_SAFENER, 5});
+            rewardList.add(new Object[] {ItemList.HP_POTION, 30});
+            rewardList.add(new Object[] {ItemList.MP_POTION, 30});
+            rewardList.add(new Object[] {ItemList.ELIXIR, 5});
+            rewardList.add(new Object[] {ItemList.STAT_POINT, 30});
+            rewardList.add(new Object[] {ItemList.MAGIC_STONE, 10});
+        }
+
+        if(count % 100 == 0) {
+            rewardList.add(new Object[] {ItemList.GOLD_BAG, 3});
+            rewardList.add(new Object[] {ItemList.STAT_POINT, 50});
+            rewardList.add(new Object[] {ItemList.HIGH_HP_POTION, 50});
+            rewardList.add(new Object[] {ItemList.HIGH_MP_POTION, 50});
+            rewardList.add(new Object[] {ItemList.HIGH_ELIXIR, 50});
+        }
+
+        StringBuilder innerBuilder = new StringBuilder("---출석 보상---");
+
+        long itemId;
+        int itemCount;
+        for(Object[] entry : rewardList) {
+            itemId = ((ItemList) entry[0]).getId();
+            itemCount = (int) entry[1];
+
+            innerBuilder.append(ItemList.findById(itemId))
+                    .append(" ")
+                    .append(itemCount)
+                    .append("개");
+
+            this.addItem(itemId, itemCount, false);
+        }
+        
+        this.replyPlayer("출석 " + count + "일차", innerBuilder.toString());
     }
 
     @Nullable
@@ -372,36 +399,8 @@ public class Player extends Entity {
         this.sp.add(5);
         this.exp.add(-1 * needExp);
 
-        if(this.id.getObjectId() != 1) {
+        if(this.id.getObjectId() != 1 && this.lv.get() >= Config.MIN_RANK_LV) {
             Config.PLAYER_LV_RANK.put(this.getName(), this.lv.get());
-        }
-    }
-
-    public void setPvp(boolean enable, @Nullable Integer day) {
-        if(enable) {
-            this.pvp = true;
-            this.checkPvp = false;
-            this.pvpEnableYear = 0;
-            this.pvpEnableDay = 0;
-            
-            this.replyPlayer("PvP를 활성화했습니다");
-        } else {
-            if(day == null) {
-                throw new NullPointerException();
-            }
-
-            if(day != 1 && day != 7) {
-                throw new InvalidNumberException(day);
-            }
-
-            LocalDateTime enableTime = LocalDateTime.now().plusDays(day + 1);
-
-            this.pvp = false;
-            this.checkPvp = true;
-            this.pvpEnableYear = enableTime.getYear();
-            this.pvpEnableDay = enableTime.getDayOfYear();
-
-            this.replyPlayer("PvP를 " + day + "일간 비활성화 했습니다");
         }
     }
 
@@ -479,10 +478,9 @@ public class Player extends Entity {
             }
 
             String msg = achieve.name + " 업적을 획득하였습니다!";
-            this.replyPlayer(msg, innerMsg.toString());
 
-            //TODO: 서비스 시 주석 해제
-//          KakaoTalk.replyGroup(this.getName() + "님이 " + msg);
+            this.replyPlayer(msg, innerMsg.toString());
+            KakaoTalk.replyAll(this.getName() + "님이 " + msg);
         }
 
         return this;
@@ -490,7 +488,7 @@ public class Player extends Entity {
 
     public boolean canAddResearch(long researchId) {
         Research research = Config.getData(Id.RESEARCH, researchId);
-        return research.getLimitLv().isInRange(this.lv.get()) && research.getNeedMoney().get() <= this.getMoney()
+        return research.getLimitLv().get() <= this.lv.get() && research.getNeedMoney().get() <= this.getMoney()
                     && Config.compareMap(this.inventory, research.needItem, true, false, 0);
     }
 
@@ -568,10 +566,9 @@ public class Player extends Entity {
             }
 
             String msg = research.name + " 연구를 해금하였습니다!";
-            this.replyPlayer(msg, innerMsg.toString());
 
-            //TODO: 서비스 시 주석 해제
-//          KakaoTalk.replyGroup(this.getName() + "님이 " + msg);
+            this.replyPlayer(msg, innerMsg.toString());
+            KakaoTalk.replyAll(this.getName() + "님이 " + msg);
         }
     }
 
@@ -596,90 +593,6 @@ public class Player extends Entity {
             this.questNpc.put(questNpcId, questNpcSet);
         } else {
             questNpcSet.add(questId);
-        }
-    }
-
-    public boolean canEquip(long equipId) {
-        Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
-        return equipment.getTotalLimitLv().isInRange(this.lv.get()) &&
-                this.checkStatRange(equipment.getLimitStat().getMin(), equipment.getLimitStat().getMax());
-    }
-
-    public boolean canReinforce(long equipId, Map<StatType, Integer> increaseLimitStat) {
-        if(this.getEquipInventory().contains(equipId)) {
-            Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
-
-            boolean flag = equipment.getReinforceCount().get() < Config.MAX_REINFORCE_COUNT;
-
-            if(flag && this.getEquipped(equipment.getEquipType()) == equipId) {
-                Map<StatType, Integer> minStat = new HashMap<>(equipment.getLimitStat().getMin());
-                Map<StatType, Integer> maxStat = new HashMap<>(equipment.getLimitStat().getMax());
-
-                StatType statType;
-                Integer value;
-                int stat;
-
-                for(Map.Entry<StatType, Integer> entry : increaseLimitStat.entrySet()) {
-                    statType = entry.getKey();
-                    stat = entry.getValue();
-
-                    value = minStat.get(statType);
-                    value = value == null ? 0 : value;
-                    minStat.put(statType, value + stat);
-
-                    value = maxStat.get(statType);
-                    value = value == null ? 0 : value;
-                    maxStat.put(statType, value + stat);
-                }
-
-                return equipment.getTotalLimitLv().isInRange(this.lv.get()) && this.checkStatRange(minStat, maxStat);
-            }
-
-            return flag;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean reinforce(long equipId, Map<StatType, Integer> increaseReinforceStat,
-                             Map<StatType, Integer> increaseMinLimitStat, Map<StatType, Integer> increaseMaxLimitStat) {
-        this.setDoing(Doing.REINFORCE);
-        this.addLog(LogData.REINFORCE_TRY, 1);
-
-        Random random = new Random();
-        double percent = random.nextDouble();
-
-        try {
-            Thread.sleep(random.nextInt(5000));
-        } catch (InterruptedException e) {
-            Logger.e("Player.reinforce", e);
-            throw new RuntimeException(e.getMessage());
-        } finally {
-            this.setDoing(Doing.NONE);
-        }
-
-        Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
-        double reinforcePercent = equipment.getReinforcePercent();
-
-        try {
-            if (percent < reinforcePercent) {
-                equipment.successReinforce(increaseReinforceStat, increaseMinLimitStat, increaseMaxLimitStat);
-
-                this.addLog(LogData.REINFORCE_SUCCESS, 1);
-
-                int reinforceCount = equipment.reinforceCount.get();
-                this.replyPlayer("강화에 성공헀습니다!\n" + reinforceCount + "강 -> " + (reinforceCount + 1) + "강");
-
-                return true;
-            } else {
-                equipment.failReinforce();
-                this.replyPlayer("강화에 실패하였습니다...",
-                        "현재 강화 천장 : " + equipment.reinforceFloor.get() + "\n" +
-                                "다음 강화 확률 : " + Config.getDisplayPercent(equipment.getReinforcePercent()) + "%");
-                return false;
-            }
-        } finally {
-            Config.unloadObject(equipment);
         }
     }
 

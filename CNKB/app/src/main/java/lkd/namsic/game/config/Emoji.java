@@ -18,6 +18,7 @@ public class Emoji {
     public final static String HOME = "\uD83C\uDFE0";
     public final static String MONSTER = "\uD83D\uDC3E";
     public final static String BOSS = "❗";
+    public final static String STAR = "★";
 
     public static String focus(String text) {
         return OPENER + text + CLOSER;

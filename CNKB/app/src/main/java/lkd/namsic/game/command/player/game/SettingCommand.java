@@ -64,27 +64,6 @@ public class SettingCommand extends PlayerCommand {
             } else {
                 throw new WeirdCommandException();
             }
-        } else if(second.equals("pvp")) {
-            KakaoTalk.checkDoing(player);
-
-            if(third == null) {
-                player.replyPlayer("현재 PVP가 " + (player.isPvp() ? "활성화" : "비활성화") + "되어있습니다");
-            } else {
-                if (third.equals("켜기") || third.equals("on")) {
-                    player.setPvp(true, null);
-                } else if (third.equals("끄기") || third.equals("off")) {
-                    if(fourth == null) {
-                        throw new WeirdCommandException();
-                    }
-
-                    int day = Integer.parseInt(fourth);
-                    if(day != 1 && day != 7) {
-                        throw new WeirdCommandException("PvP 비활성화는 1일 또는 7일만 가능합니다");
-                    }
-
-                    player.setPvp(false, day);
-                }
-            }
         }
     }
 

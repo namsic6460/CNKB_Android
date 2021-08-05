@@ -151,7 +151,7 @@ public enum ItemList {
     GEM_ABRASIVE_MATERIAL("보석 연마제", 126L),
     GLOW_GEM_ABRASIVE_MATERIAL("빛나는 보석 연마제", 127L),
 
-    WEAPON_SAFENER("무기 완화제", 128L),
+    EQUIP_SAFENER("장비 완화제", 128L),
 
     LOW_MINER_TOKEN("하급 광부의 증표", 129L),
     MINER_TOKEN("중급 광부의 증표", 130L),

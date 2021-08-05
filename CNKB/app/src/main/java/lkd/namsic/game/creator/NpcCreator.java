@@ -1,4 +1,4 @@
-package lkd.namsic.game.initializer;
+package lkd.namsic.game.creator;
 
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.config.Config;
@@ -8,7 +8,7 @@ import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.object.Npc;
 import lkd.namsic.setting.Logger;
 
-public class NpcCreator implements ObjectCreator {
+public class NpcCreator implements Creatable {
 
     @Override
     public void start() {

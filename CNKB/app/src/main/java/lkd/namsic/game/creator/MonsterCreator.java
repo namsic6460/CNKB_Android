@@ -1,4 +1,4 @@
-package lkd.namsic.game.initializer;
+package lkd.namsic.game.creator;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
@@ -13,7 +13,7 @@ import lkd.namsic.game.enums.object.MonsterList;
 import lkd.namsic.game.object.Monster;
 import lkd.namsic.setting.Logger;
 
-public class MonsterCreator implements ObjectCreator {
+public class MonsterCreator implements Creatable {
 
     @Override
     public void start() {

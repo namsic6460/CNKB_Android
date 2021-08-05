@@ -274,7 +274,7 @@ public class FightManager {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    Logger.e("Player.fightThread", e);
+                    Logger.e("FightManager", e);
                     throw new RuntimeException(e.getMessage());
                 }
 
@@ -365,7 +365,7 @@ public class FightManager {
                             try {
                                 player.wait(Config.FIGHT_WAIT_TIME);
                             } catch (InterruptedException e) {
-                                Logger.e("Entity.fightThread", e);
+                                Logger.e("FightManager", e);
                                 throw new RuntimeException(e.getMessage());
                             }
 

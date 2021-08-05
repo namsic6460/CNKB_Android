@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +38,7 @@ import lkd.namsic.game.event.MoneyChangeEvent;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.UnhandledEnumException;
+import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.manager.EquipManager;
 import lkd.namsic.game.object.interfaces.EntityEvents;
 import lombok.Getter;
@@ -49,6 +51,9 @@ import lombok.Setter;
 
 @Getter
 public abstract class Entity extends NamedObject {
+
+    @Setter
+    double version = 1.0;
 
     final LimitInteger lv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
     final LimitLong money = new LimitLong(0, 0L, null);
@@ -139,15 +144,6 @@ public abstract class Entity extends NamedObject {
         Config.unloadMap(map);
     }
 
-    public void addSkill(long skillId) {
-        this.skill.add(skillId);
-    }
-
-    public boolean canAddSkill(long skillId) {
-        Skill skill = Config.getData(Id.SKILL, skillId);
-        return this.checkStatRange(skill.getLimitStat().getMin(), skill.getLimitStat().getMax());
-    }
-
     public boolean setBasicStat(@NonNull StatType statType, int stat) {
         this.revalidateBuff();
 
@@ -214,6 +210,28 @@ public abstract class Entity extends NamedObject {
 
     public void addEquipStat(@NonNull StatType statType, int stat) {
         this.setEquipStat(statType, this.getEquipStat(statType) + stat);
+    }
+
+    public void revalidateEquipStat() {
+        this.equipStat.clear();
+
+        int stat;
+        Equipment equipment;
+        for(long equipId : this.getEquipped().values()) {
+            equipment = Config.getData(Id.EQUIPMENT, equipId);
+
+            for(StatType statType : StatType.values()) {
+                try {
+                    Config.checkStatType(statType);
+                } catch (UnhandledEnumException e) {
+                    continue;
+                }
+
+                if ((stat = equipment.getStat(statType)) != 0) {
+                    this.addEquipStat(statType, stat);
+                }
+            }
+        }
     }
 
     public void setBuffStat(@NonNull StatType statType, int stat) {
@@ -317,6 +335,10 @@ public abstract class Entity extends NamedObject {
 
     public long getEquipped(@NonNull EquipType equipType) {
         return this.equipped.getOrDefault(equipType, EquipList.NONE.getId());
+    }
+
+    public boolean isEquipped(@NonNull EquipType equipType, long equipId) {
+        return this.getEquipped(equipType) == equipId;
     }
 
     public void setBuff(long time, @NonNull StatType statType, int stat) {
@@ -466,6 +488,19 @@ public abstract class Entity extends NamedObject {
         GameMap map = Config.loadMap(this.location);
         map.addEquip(this, equipId);
         Config.unloadMap(map);
+    }
+
+    public long getEquipIdByIndex(int index) {
+        List<Long> list = new ArrayList<>(this.getEquipInventory());
+
+        int size = list.size();
+        if(index <= 0 || index > size) {
+            throw new WeirdCommandException("알 수 없는 장비입니다");
+        }
+
+        Collections.sort(list);
+
+        return list.get(index - 1);
     }
 
     public void addEnemy(@NonNull Id id, long objectId) {

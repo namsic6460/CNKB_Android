@@ -1,4 +1,4 @@
-package lkd.namsic.game.initializer;
+package lkd.namsic.game.creator;
 
 import androidx.annotation.NonNull;
 
@@ -11,7 +11,7 @@ import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.object.Item;
 import lkd.namsic.setting.Logger;
 
-public class ItemCreator implements ObjectCreator {
+public class ItemCreator implements Creatable {
 
     private void createItem(@NonNull ItemList itemData, @NonNull String description) {
         Item item = new Item(itemData, description);
@@ -527,7 +527,7 @@ public class ItemCreator implements ObjectCreator {
         createItem(ItemList.GEM_ABRASIVE_MATERIAL, "보석을 연마할 수 있는 아이템이다");
         createItem(ItemList.GLOW_GEM_ABRASIVE_MATERIAL, "중심 보석을 연마할 수 있는 아이템이다");
 
-        createItem(ItemList.WEAPON_SAFENER, "무기의 제한 레벨을 낮출 수 있는 아이템이다");
+        createItem(ItemList.EQUIP_SAFENER, "무기의 제한 레벨을 낮출 수 있는 아이템이다");
 
         createItem(ItemList.LOW_MINER_TOKEN, "간단한 광질을 완수했다는 증표이다");
         createItem(ItemList.MINER_TOKEN, "광질을 완수했다는 증표이다");

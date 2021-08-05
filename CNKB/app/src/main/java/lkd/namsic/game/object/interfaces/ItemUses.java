@@ -16,14 +16,14 @@ public class ItemUses {
 
     public final static Map<Long, Use> USE_MAP = new HashMap<Long, Use>() {{
         put(ItemList.SMALL_GOLD_BAG.getId(), (self, other) -> {
-            int money = new Random().nextInt(10 * self.getLv().get()) + 500;
+            int money = Math.min(1000, new Random().nextInt(10 * self.getLv().get()) + 500);
 
             self.addMoney(money);
             return "골드 주머니를 사용하여 " + money + "G 를 획득했습니다\n" + Emoji.GOLD + " 골드: " + self.getMoney() + "\n";
         });
 
         put(ItemList.GOLD_BAG.getId(), (self, other) -> {
-            int money = new Random().nextInt(50 * self.getLv().get()) + 3000;
+            int money = Math.min(10000, new Random().nextInt(50 * self.getLv().get()) + 3000);
 
             self.addMoney(money);
             return "골드 보따리를 사용하여 " + money + "G 를 획득했습니다\n" + Emoji.GOLD + " 골드: " + self.getMoney() + "\n";
@@ -57,16 +57,6 @@ public class ItemUses {
         put(ItemList.HIGH_MP_POTION.getId(), (self, other) -> {
             self.setBasicStat(StatType.MN, self.getStat(StatType.MAXMN));
             return "마나를 100% 회복했습니다\n현재 마나: " + self.getDisplayMn() + "\n";
-        });
-
-        put(ItemList.PVP_DISABLE_1.getId(), (self, other) -> {
-            ((Player) self).setPvp(false, 1);
-            return "1일간 PvP를 비활성화했습니다(중첩 불가)\n활성화 설정은 설정 명령어로 할 수 있습니다\n";
-        });
-
-        put(ItemList.PVP_DISABLE_7.getId(), (self, other) -> {
-            ((Player) self).setPvp(false, 7);
-            return "7일간 PvP를 비활성화했습니다(중첩 불가)\n활성화 설정은 설정 명령어로 할 수 있습니다\n";
         });
 
         put(ItemList.STAT_POINT.getId(), (self, other) -> {

@@ -395,4 +395,11 @@ public class DisplayManager {
         self.replyPlayer("퀘스트 정보는 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
+    public void displayReinforceExplanation(@NonNull Player self) {
+        self.replyPlayer("1. 장비는 최대 " + Config.MAX_REINFORCE_COUNT + "강 까지 강화할 수 있습니다\n" +
+                "2. 강화에 성공할 시 모든 스텟이 균등하게 증가하지만 제한 레벨 또한 증가될 수 있습니다\n" +
+                "3. 일정 횟수 이상 강화에 실패하면 무조건 강화에 성공하는 천장 시스템이 있습니다\n" +
+                "4. 장비의 입수 난이도 및 다양한 조건에 따라 강화의 난이도 및 성장치가 변화합니다");
+    }
+
 }

@@ -1,4 +1,4 @@
-package lkd.namsic.game.initializer;
+package lkd.namsic.game.creator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,7 +13,7 @@ import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.object.Chat;
 import lkd.namsic.setting.Logger;
 
-public class ChatCreator implements ObjectCreator {
+public class ChatCreator implements Creatable {
 
     @NonNull
     private Chat createChat(@Nullable String name, long chatId, @NonNull String...texts) {

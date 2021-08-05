@@ -1,4 +1,4 @@
-package lkd.namsic.game.initializer;
+package lkd.namsic.game.creator;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
@@ -9,7 +9,7 @@ import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.object.Quest;
 import lkd.namsic.setting.Logger;
 
-public class QuestCreator implements ObjectCreator {
+public class QuestCreator implements Creatable {
 
     @Override
     public void start() {

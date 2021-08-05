@@ -102,7 +102,7 @@ public class MineManager {
         try {
             Thread.sleep(new Random().nextInt(1000));
         } catch (InterruptedException e) {
-            Logger.e("player.mineThread", e);
+            Logger.e("MineManager", e);
             throw new RuntimeException(e.getMessage());
         }
 

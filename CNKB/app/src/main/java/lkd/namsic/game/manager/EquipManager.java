@@ -3,13 +3,13 @@ package lkd.namsic.game.manager;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.EquipUse;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
@@ -29,21 +29,42 @@ public class EquipManager {
         return instance;
     }
 
+    public boolean canEquip(@NonNull Player self, long equipId) {
+        Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+        return equipment.getTotalLimitLv() <= self.getLv().get() && self.compareStat(equipment.getLimitStat());
+    }
+
     public void equip(@NonNull Entity self, int index) {
-        List<Long> list = new ArrayList<>(self.getEquipInventory());
-
-        int size = list.size();
-        if(index <= 0 || index > size) {
-            throw new WeirdCommandException("1 ~ " + size + " 의 숫자를 입력해주세요");
-        }
-
-        Collections.sort(list);
-
-        long equipId = list.get(index - 1);
+        long equipId = self.getEquipIdByIndex(index);
 
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
         EquipType equipType = equipment.getEquipType();
         long equippedId = self.getEquipped(equipType);
+
+        if(self.getId().getId().equals(Id.PLAYER)) {
+            Player player = (Player) self;
+
+            if(!this.canEquip(player, equipId)) {
+                StringBuilder innerBuilder = new StringBuilder("장착 제한 레벨: ")
+                        .append(equipment.getTotalLimitLv())
+                        .append("\n\n")
+                        .append("---장착 제한 스텟---");
+
+                if(equipment.getLimitStat().isEmpty()) {
+                    innerBuilder.append("\n장착 제한 스텟이 없습니다");
+                } else {
+                    for (Map.Entry<StatType, Integer> entry : equipment.getLimitStat().entrySet()) {
+                        innerBuilder.append(Emoji.LIST)
+                                .append(entry.getKey().getDisplayName())
+                                .append(": ")
+                                .append(entry.getValue());
+                    }
+                }
+
+                player.replyPlayer("장비를 장착할 수 없습니다", innerBuilder.toString());
+                return;
+            }
+        }
 
         if(equippedId == equipId) {
             this.unEquip(self, equipType);
@@ -86,7 +107,7 @@ public class EquipManager {
         self.getRemovedEquipEvent().put(equipType, new ConcurrentHashSet<>());
 
         if(self.getId().getId().equals(Id.PLAYER)) {
-            ((Player) self).replyPlayer(equipment.getName() + "(을/를) 착용했습니다", innerBuilder.toString());
+            ((Player) self).replyPlayer(equipment.getName() + " (을/를) 착용했습니다", innerBuilder.toString());
         }
     }
 

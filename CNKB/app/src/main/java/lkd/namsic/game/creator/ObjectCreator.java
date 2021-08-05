@@ -1,4 +1,4 @@
-package lkd.namsic.game.initializer;
+package lkd.namsic.game.creator;
 
 import android.widget.Button;
 
@@ -8,9 +8,8 @@ import lkd.namsic.MainActivity;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.setting.Logger;
 
-public class Initializer {
+public class ObjectCreator {
 
-    //TODO : Use, EquipUse, Event 등등은 직렬화 대신 코드 내에 저장해두고 직접 호출하는 방식으로 변경
     //TODO : 좀비 영혼 드롭 테스트
 
     public static void start(@NonNull Button button) {

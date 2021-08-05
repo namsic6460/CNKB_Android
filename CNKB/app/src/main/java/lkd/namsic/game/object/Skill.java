@@ -4,8 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.HashMap;
+import java.util.Map;
 
-import lkd.namsic.game.base.RangeIntegerMap;
 import lkd.namsic.game.base.Use;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
@@ -24,9 +24,7 @@ public class Skill extends NamedObject {
 
     boolean isWaitSkill = false;
 
-    final RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(
-            new HashMap<>(), new HashMap<>(), StatType.class
-    );
+    final Map<StatType, Integer> limitStat = new HashMap<>();
 
     public Skill(@NonNull String name) {
         super(name);
