@@ -13,8 +13,8 @@ import lkd.namsic.game.exception.EventRemoveException;
 import lkd.namsic.game.exception.EventSkipException;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
-import lkd.namsic.game.object.interfaces.EntityEvents;
-import lkd.namsic.game.object.interfaces.EquipEvents;
+import lkd.namsic.game.object.implement.EntityEvents;
+import lkd.namsic.game.object.implement.EquipEvents;
 
 public abstract class MoveEvent implements Event {
 

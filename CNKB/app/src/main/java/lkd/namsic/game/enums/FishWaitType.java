@@ -17,14 +17,17 @@ public enum FishWaitType {
     RESIST("버티기", "resist", "r"),
     CATCH("잡기", "catch", "c");
 
-    private final List<String> texts = new ArrayList<>(2);
+    private final List<String> texts;
 
-    FishWaitType() {}
-
-    FishWaitType(@NonNull String...texts) {
-        this.texts.addAll(Arrays.asList(texts));
+    FishWaitType() {
+        texts = null;
     }
 
+    FishWaitType(@NonNull String...texts) {
+        this.texts = Arrays.asList(texts);
+    }
+
+    @NonNull
     public static FishWaitType parseWaitType(@NonNull String command) throws WeirdCommandException {
         if(SHAKE.texts.contains(command)) {
             return SHAKE;

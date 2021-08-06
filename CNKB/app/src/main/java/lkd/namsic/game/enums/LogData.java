@@ -3,6 +3,7 @@ package lkd.namsic.game.enums;
 public enum LogData {
 
     BUY,
+    SELL,
     BUFF_RECEIVE,
     CHAT,
     DEATH,

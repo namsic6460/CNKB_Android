@@ -1,4 +1,4 @@
-package lkd.namsic.game.object.interfaces;
+package lkd.namsic.game.object.implement;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -202,6 +202,11 @@ public class ItemUses {
             self.setBasicStat(StatType.HP, self.getStat(StatType.MAXHP));
             self.setBasicStat(StatType.MN, self.getStat(StatType.MAXMN));
             return "최대 체력과 마나의 모두 회복했습니다\n현재 체력: " + self.getDisplayHp() + "\n현재 마나: " + self.getDisplayMn();
+        });
+
+        put(ItemList.STONE_LUMP.getId(), (self, other) -> {
+            self.addItem(ItemList.STONE.getId(), 10, false);
+            return "돌 10개를 얻었습니다\n현재 개수: " + self.getItem(ItemList.STONE.getId()) + "개";
         });
     }};
 

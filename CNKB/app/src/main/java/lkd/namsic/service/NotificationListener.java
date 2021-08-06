@@ -81,6 +81,10 @@ public class NotificationListener extends NotificationListenerService {
                             isGroupChat = true;
                         }
 
+                        if(room.equals("CNKB") || sender.equals("CNKB")) {
+                            return;
+                        }
+
                         if (msg.equals("null")) {
                             msg = "";
                         }

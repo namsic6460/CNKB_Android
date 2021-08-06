@@ -17,6 +17,7 @@ public enum Id {
     PLAYER("p"),
     QUEST,
     RESEARCH,
+    SHOP,
     SKILL;
 
     @Getter

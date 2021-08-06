@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import lkd.namsic.game.base.IdClass;
 import lombok.Getter;
 
-public abstract class GameObject implements Cloneable {
+public abstract class GameObject {
 
     @Getter
     final IdClass id = new IdClass();
@@ -19,7 +19,7 @@ public abstract class GameObject implements Cloneable {
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public <T extends GameObject> T newObject() {
+    public <T extends GameObject & Cloneable> T newObject() {
         try {
             return (T) this.clone();
         } catch (CloneNotSupportedException e) {

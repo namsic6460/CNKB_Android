@@ -27,6 +27,7 @@ public class ObjectCreator {
                 new MapCreator().start();
                 new ChatCreator().start();
                 new QuestCreator().start();
+                new ShopCreator().start();
                 new NpcCreator().start();
 
                 Config.IGNORE_FILE_LOG = false;

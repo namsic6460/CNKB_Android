@@ -318,7 +318,7 @@ public class FightManager {
                             .append(Emoji.LIST)
                             .append(" (전투/fight/f) (장비/equip/e) {장비 부위} - 장비를 사용합니다\n")
                             .append(Emoji.LIST)
-                            .append(" (전투/fight/f) (도망/도주/run/r) - 50% 확률로 도주합니다\n(예시: ")
+                            .append(" (전투/fight/f) (도망/도주/run/r) - 50% 확률로 도주합니다\n\n예시: ")
                             .append(Emoji.focus("n 전투 공격 1"))
                             .append("\n\n---대상 목록---");
 
@@ -584,7 +584,7 @@ public class FightManager {
             return;
         }
         
-        FightWaitType response = FightWaitType.parseWaitType(command, subCommand);
+        FightWaitType response = FightWaitType.parseWaitType(command);
 
         if(response.equals(FightWaitType.ATTACK)) {
             if(subCommand.equals("")) {

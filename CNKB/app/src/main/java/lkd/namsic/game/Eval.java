@@ -44,6 +44,7 @@ import lkd.namsic.game.object.Player;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.object.Quest;
 import lkd.namsic.game.object.Research;
+import lkd.namsic.game.object.Shop;
 import lkd.namsic.game.object.Skill;
 import lkd.namsic.game.base.Use;
 
@@ -107,6 +108,7 @@ public class Eval {
             ScriptableObject.putProperty(scope, "Player", Player.class);
             ScriptableObject.putProperty(scope, "Quest", Quest.class);
             ScriptableObject.putProperty(scope, "Research", Research.class);
+            ScriptableObject.putProperty(scope, "Shop", Shop.class);
             ScriptableObject.putProperty(scope, "Skill", Skill.class);
             ScriptableObject.putProperty(scope, "Use", Use.class);
 

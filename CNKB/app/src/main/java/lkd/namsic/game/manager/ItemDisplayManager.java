@@ -35,8 +35,7 @@ public class ItemDisplayManager {
             return;
         }
 
-        int maxPage = (int) Math.ceil(self.getInventory().size() / 30D);
-
+        int maxPage = Config.getMaxPage(self.getInventory().size());
         if(page < 1 || page > maxPage) {
             throw new WeirdCommandException("1 ~ " + maxPage + " 페이지 범위 내의 숫자를 입력해주세요");
         }
@@ -67,22 +66,22 @@ public class ItemDisplayManager {
         Collections.sort(sortedList);
 
         long itemId;
-        int startId = 30 * (page - 1);
-        for(int i = 0; i < 30; i++) {
+        int startIndex = Config.MAX_COUNT_PER_PAGE * (page - 1);
+        for(int i = 0; i < Config.MAX_COUNT_PER_PAGE; i++) {
             try {
-                itemId = sortedList.get(startId + i);
-
-                if(highPriorityItems.contains(itemId)) {
-                    continue;
-                }
-
-                innerMsg.append(ItemList.findById(itemId))
-                        .append(": ")
-                        .append(self.getItem(itemId))
-                        .append("개\n");
+                itemId = sortedList.get(startIndex + i);
             } catch (IndexOutOfBoundsException e) {
                 break;
             }
+
+            if(highPriorityItems.contains(itemId)) {
+                continue;
+            }
+
+            innerMsg.append(ItemList.findById(itemId))
+                    .append(": ")
+                    .append(self.getItem(itemId))
+                    .append("개\n");
         }
 
         self.replyPlayer(msg.toString(), innerMsg.toString());
@@ -350,23 +349,22 @@ public class ItemDisplayManager {
             return;
         }
 
-        int maxPage = (int) Math.ceil(self.getEquipInventory().size() / 30D);
-        int skipIdx = (page - 1) * 30;
-
+        int maxPage = Config.getMaxPage(self.getEquipInventory().size());
         if(page < 1 || page > maxPage) {
             throw new WeirdCommandException("1 ~ " + maxPage + " 페이지 범위 내의 숫자를 입력해주세요");
         }
 
         Collections.sort(list);
-        Set<Long> set = new HashSet<>(self.getEquipped().values());
+        Set<Long> equippedSet = new HashSet<>(self.getEquipped().values());
 
         StringBuilder innerBuilder = new StringBuilder(Config.SPLIT_BAR);
 
         long equipId;
         Equipment equipment;
+        int startIndex = (page - 1) * Config.MAX_COUNT_PER_PAGE;
         for(int i = 0; i < 30; i++) {
             try {
-                equipId = list.get(skipIdx + i);
+                equipId = list.get(startIndex + i);
             } catch (IndexOutOfBoundsException e) {
                 break;
             }
@@ -374,10 +372,10 @@ public class ItemDisplayManager {
             equipment = Config.getData(Id.EQUIPMENT, equipId);
 
             innerBuilder.append("\n")
-                    .append(skipIdx + i + 1)
+                    .append(startIndex + i + 1)
                     .append(". ");
 
-            if(set.contains(equipId)) {
+            if(equippedSet.contains(equipId)) {
                 innerBuilder.append("[E] ");
             }
 

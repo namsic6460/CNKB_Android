@@ -5,6 +5,7 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.enums.object.QuestList;
+import lkd.namsic.game.enums.object.ShopList;
 import lkd.namsic.game.object.Npc;
 import lkd.namsic.setting.Logger;
 
@@ -14,18 +15,17 @@ public class NpcCreator implements Creatable {
     public void start() {
         Npc npc;
 
-        npc = new Npc(NpcList.SECRET);
+        npc = new Npc(NpcList.SECRET, 0L);
         npc.getLocation().set(0, 0, 1, 1);
         Config.unloadObject(npc);
 
-        npc = new Npc(NpcList.ABEL);
+        npc = new Npc(NpcList.ABEL, 0L);
         npc.getLocation().set(0, 0, 1, 1);
         Config.unloadObject(npc);
 
 
-        npc = new Npc(NpcList.NOAH);
+        npc = new Npc(NpcList.NOAH, 5L);
         npc.getLocation().set(0, 0, 16, 16);
-        npc.setFirstChat(5L);
 
         npc.setBaseChat(new ChatLimit(), 6L);
 
@@ -74,9 +74,9 @@ public class NpcCreator implements Creatable {
         Config.unloadObject(npc);
 
 
-        npc = new Npc(NpcList.HYEONG_SEOK);
+        npc = new Npc(NpcList.HYEONG_SEOK, 25L);
         npc.getLocation().set(0, 0, 40, 40);
-        npc.setFirstChat(25L);
+        npc.getShop().add(ShopList.HYEONG_SEOK_REINFORCE.getId());
 
         npc.setBaseChat(new ChatLimit(), 26L);
 
@@ -96,9 +96,8 @@ public class NpcCreator implements Creatable {
         Config.unloadObject(npc);
 
 
-        npc = new Npc(NpcList.BOAM_E);
+        npc = new Npc(NpcList.BOAM_E, 29L);
         npc.getLocation().set(0, 0, 41, 40);
-        npc.setFirstChat(29L);
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(6, 23);
@@ -117,9 +116,9 @@ public class NpcCreator implements Creatable {
         Config.unloadObject(npc);
 
 
-        npc = new Npc(NpcList.EL);
+        npc = new Npc(NpcList.EL, 32L);
         npc.getLocation().set(0, 0, 41, 40);
-        npc.setFirstChat(32L);
+        npc.getShop().add(ShopList.EL_FLOWER.getId());
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(6, 23);
@@ -147,9 +146,8 @@ public class NpcCreator implements Creatable {
         Config.unloadObject(npc);
 
 
-        npc = new Npc(NpcList.JOON_SIK);
+        npc = new Npc(NpcList.JOON_SIK, 35L);
         npc.getLocation().set(1, 1, 32, 32);
-        npc.setFirstChat(35L);
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(8, 22);
@@ -178,9 +176,8 @@ public class NpcCreator implements Creatable {
         Config.unloadObject(npc);
 
 
-        npc = new Npc(NpcList.KANG_TAE_GONG);
+        npc = new Npc(NpcList.KANG_TAE_GONG, 39L);
         npc.getLocation().set(0, 1, 32, 32);
-        npc.setFirstChat(39L);
 
         npc.setBaseChat(new ChatLimit(), 40L);
 
@@ -195,9 +192,8 @@ public class NpcCreator implements Creatable {
         Config.unloadObject(npc);
 
 
-        npc = new Npc(NpcList.PEDRO);
+        npc = new Npc(NpcList.PEDRO, 42L);
         npc.getLocation().set(0, 0, 64, 64);
-        npc.setFirstChat(42L);
 
         npc.setBaseChat(new ChatLimit(), 43L);
 
@@ -205,14 +201,14 @@ public class NpcCreator implements Creatable {
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.NEED_COAL.getId());
+        chatLimit.getLimitQuest().addMax(QuestList.NEED_COAL.getId(), 3);
         npc.setChat(chatLimit, 70L);
 
         Config.unloadObject(npc);
 
 
-        npc = new Npc(NpcList.MOO_MYEONG);
+        npc = new Npc(NpcList.MOO_MYEONG, 45L);
         npc.getLocation().set(1, 0, 1, 1);
-        npc.setFirstChat(45L);
 
         npc.setBaseChat(new ChatLimit(), 46L);
 
@@ -233,9 +229,8 @@ public class NpcCreator implements Creatable {
         Config.unloadObject(npc);
 
 
-        npc = new Npc(NpcList.SELINA);
+        npc = new Npc(NpcList.SELINA, 48L);
         npc.getLocation().set(1, 0, 2, 2);
-        npc.setFirstChat(48L);
 
         npc.setBaseChat(new ChatLimit(), 49L);
 
@@ -266,9 +261,8 @@ public class NpcCreator implements Creatable {
         Config.unloadObject(npc);
 
 
-        npc = new Npc(NpcList.SYLVIA);
+        npc = new Npc(NpcList.SYLVIA, 128L);
         npc.getLocation().set(3, 1, 16, 16);
-        npc.setFirstChat(128L);
 
         Config.unloadObject(npc);
 

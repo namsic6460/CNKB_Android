@@ -27,11 +27,8 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.LEAF, "평범한 나뭇잎이다");
         createItem(ItemList.GRASS, "평범한 잡초다");
 
-        item = new Item(ItemList.SMALL_GOLD_BAG, "골드가 소량 들어간 주머니다");
-        Config.unloadObject(item);
-
-        item = new Item(ItemList.GOLD_BAG, "골드가 들어간 주머니다");
-        Config.unloadObject(item);
+        createItem(ItemList.SMALL_GOLD_BAG, "골드가 소량 들어간 주머니다");
+        createItem(ItemList.GOLD_BAG, "골드가 들어간 주머니다");
 
         createItem(ItemList.HERB, "약의 기운이 있는 풀이다");
 
@@ -462,11 +459,8 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
 
-        item = new Item(ItemList.PVP_DISABLE_1, "PvP를 1일간 비활성화 하기 위해 필요한 아이템이다(중첩 불가)");
-        Config.unloadObject(item);
-
-        item = new Item(ItemList.PVP_DISABLE_7, "PvP를 7일간 비활성화 하기 위해 필요한 아이템이다(중첩 불가)");
-        Config.unloadObject(item);
+        createItem(ItemList.PVP_DISABLE_1, "PvP를 1일간 비활성화 하기 위해 필요한 아이템이다(중첩 불가)");
+        createItem(ItemList.PVP_DISABLE_7, "PvP를 7일간 비활성화 하기 위해 필요한 아이템이다(중첩 불가)");
 
         item = new Item(ItemList.STAT_POINT, "스텟 포인트(SP)를 50% 확률로 1 얻을 수 있게 해주는 아이템이다");
         Config.unloadObject(item);
@@ -474,8 +468,7 @@ public class ItemCreator implements Creatable {
         item = new Item(ItemList.ADV_STAT, "모험 스텟(ADV)를 50% 확률로 1 얻을 수 있게 해주는 아이템이다");
         Config.unloadObject(item);
 
-        item = new Item(ItemList.LOW_RECIPE, "하급 아이템 또는 하급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
-        Config.unloadObject(item);
+        createItem(ItemList.LOW_RECIPE, "하급 아이템 또는 하급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
 
         item = new Item(ItemList.RECIPE, "중급 아이템 또는 중급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
         item.addRecipe(new HashMap<Long, Integer>() {{
@@ -484,6 +477,9 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_RECIPE, "상급 아이템 또는 상급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.RECIPE.getId(), 10);
+        }});
         Config.unloadObject(item);
 
         createItem(ItemList.RED_SPHERE, "불의 기운을 담고 있는 구체다");
@@ -499,25 +495,29 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.RED_SPHERE, "어둠의 기운을 담고 있는 구체다");
         createItem(ItemList.WHITE_SPHERE, "빛의 기운을 담고 있는 구체다");
 
-        item = new Item(ItemList.LOW_EXP_POTION, "경험치를 소량 제공해주는 포션이다");
-        Config.unloadObject(item);
-
-        item = new Item(ItemList.EXP_POTION, "경험치를 제공해주는 포션이다");
-        Config.unloadObject(item);
-
-        item = new Item(ItemList.HIGH_EXP_POTION, "경험치를 대량 제공해주는 포션이다");
-        Config.unloadObject(item);
+        createItem(ItemList.LOW_EXP_POTION, "경험치를 소량 제공해주는 포션이다");
+        createItem(ItemList.EXP_POTION, "경험치를 제공해주는 포션이다");
+        createItem(ItemList.HIGH_EXP_POTION, "경험치를 대량 제공해주는 포션이다");
 
         createItem(ItemList.LOW_ADV_TOKEN, "간단한 모험을 완수했다는 증표이다");
         createItem(ItemList.ADV_TOKEN, "모험을 완수했다는 증표이다");
         createItem(ItemList.HIGH_ADV_TOKEN, "어려운 모험을 완수했다는 증표이다");
 
-        item = new Item(ItemList.EMPTY_SPHERE, "무슨 색이든 될 수 있는 구체이다");
-        Config.unloadObject(item);
+        createItem(ItemList.EMPTY_SPHERE, "무슨 색이든 될 수 있는 구체이다");
 
         createItem(ItemList.LOW_REINFORCE_STONE, "0~4강 무기를 강화할 수 있는 아이템이다");
-        createItem(ItemList.REINFORCE_STONE, "5~9강 무기를 강화할 수 있는 아이템이다");
-        createItem(ItemList.HIGH_REINFORCE_STONE, "10~14강 무기를 강화할 수 있는 아이템이다");
+
+        item = new Item(ItemList.REINFORCE_STONE, "5~9강 무기를 강화할 수 있는 아이템이다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.LOW_REINFORCE_STONE.getId(), 10);
+        }});
+        Config.unloadObject(item);
+
+        item = new Item(ItemList.HIGH_REINFORCE_STONE, "10~14강 무기를 강화할 수 있는 아이템이다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.REINFORCE_STONE.getId(), 5);
+        }});
+        Config.unloadObject(item);
 
         createItem(ItemList.PIECE_OF_LOW_AMULET, "장착은 불가하지만 약간의 부적의 기운을 띄고 있는 파편이다");
         createItem(ItemList.PIECE_OF_AMULET, "장착은 불가하지만 부적의 기운을 띄고 있는 파편이다");
@@ -640,6 +640,7 @@ public class ItemCreator implements Creatable {
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.ELIXIR_HERB.getId(), 3);
             put(ItemList.GLASS_BOTTLE.getId(), 1);
+            put(ItemList.COAL.getId(), 1);
         }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 2);
@@ -653,6 +654,7 @@ public class ItemCreator implements Creatable {
             put(ItemList.LOW_ELIXIR.getId(), 3);
             put(ItemList.HP_POTION.getId(), 1);
             put(ItemList.MP_POTION.getId(), 1);
+            put(ItemList.RED_SPHERE.getId(), 3);
         }});
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 2);
@@ -666,6 +668,7 @@ public class ItemCreator implements Creatable {
             put(ItemList.ELIXIR.getId(), 5);
             put(ItemList.HIGH_HP_POTION.getId(), 1);
             put(ItemList.HIGH_MP_POTION.getId(), 1);
+            put(ItemList.HARD_COAL.getId(), 1);
         }});
         Config.unloadObject(item);
 
@@ -794,8 +797,16 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         createItem(ItemList.MAGIC_STONE, "어둠의 힘이 담긴 돌이다");
+        
+        createItem(ItemList.FLOWER, "아름다운 꽃이다");
+        
+        item = new Item(ItemList.STONE_LUMP, "돌 10개다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.STONE.getId(), 10);
+        }});
+        Config.unloadObject(item);
 
-        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 177L));
+        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 179L));
         Logger.i("ObjectMaker", "Item making is done!");
     }
 

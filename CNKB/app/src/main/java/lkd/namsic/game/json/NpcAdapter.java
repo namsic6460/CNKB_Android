@@ -12,11 +12,12 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 import lkd.namsic.game.base.ChatLimit;
-import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.object.Npc;
 
 public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
@@ -36,7 +37,7 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
         JsonObject chatLimitObject;
         JsonArray setArray;
 
-        for(Map.Entry<ChatLimit, ConcurrentHashSet<Long>> entry : npc.getBaseChat().entrySet()) {
+        for(Map.Entry<ChatLimit, Set<Long>> entry : npc.getBaseChat().entrySet()) {
             wrapArray = new JsonArray();
 
             chatLimitObject = gson.toJsonTree(entry.getKey()).getAsJsonObject();
@@ -48,7 +49,7 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
             commonChatArray.add(wrapArray);
         }
 
-        for(Map.Entry<ChatLimit, ConcurrentHashSet<Long>> entry : npc.getChat().entrySet()) {
+        for(Map.Entry<ChatLimit, Set<Long>> entry : npc.getChat().entrySet()) {
             wrapArray = new JsonArray();
 
             chatLimitObject = gson.toJsonTree(entry.getKey()).getAsJsonObject();
@@ -79,16 +80,16 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
 
         Npc npc = gson.fromJson(jsonObject, Npc.class);
 
-        Map<ChatLimit, ConcurrentHashSet<Long>> commonChat = new ConcurrentHashMap<>();
-        Map<ChatLimit, ConcurrentHashSet<Long>> chat = new ConcurrentHashMap<>();
+        Map<ChatLimit, Set<Long>> commonChat = new HashMap<>();
+        Map<ChatLimit, Set<Long>> chat = new HashMap<>();
 
         JsonArray wrapArray;
         JsonObject chatLimitObject;
         JsonArray setArray;
 
         ChatLimit chatLimit;
-        ConcurrentHashSet<Double> tempSet;
-        ConcurrentHashSet<Long> chatSet;
+        Set<Double> tempSet;
+        Set<Long> chatSet;
 
         for(JsonElement element : commonChatArray) {
             wrapArray = element.getAsJsonArray();
@@ -96,10 +97,10 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
             chatLimitObject = wrapArray.get(0).getAsJsonObject();
             setArray = wrapArray.get(1).getAsJsonArray();
 
-            tempSet = gson.fromJson(setArray, ConcurrentHashSet.class);
+            tempSet = gson.fromJson(setArray, HashSet.class);
             chatLimit = gson.fromJson(chatLimitObject, ChatLimit.class);
 
-            chatSet = new ConcurrentHashSet<>();
+            chatSet = new HashSet<>();
             for(Double chatId : tempSet) {
                 chatSet.add(chatId.longValue());
             }
@@ -113,10 +114,10 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
             chatLimitObject = wrapArray.get(0).getAsJsonObject();
             setArray = wrapArray.get(1).getAsJsonArray();
 
-            tempSet = gson.fromJson(setArray, ConcurrentHashSet.class);
+            tempSet = gson.fromJson(setArray, HashSet.class);
             chatLimit = gson.fromJson(chatLimitObject, ChatLimit.class);
 
-            chatSet = new ConcurrentHashSet<>();
+            chatSet = new HashSet<>();
             for(Double chatId : tempSet) {
                 chatSet.add(chatId.longValue());
             }

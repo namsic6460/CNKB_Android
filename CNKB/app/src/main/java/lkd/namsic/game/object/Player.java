@@ -703,7 +703,7 @@ public class Player extends Entity {
         }
 
         this.log.put(LogData.LOG_COUNT, this.getLog(LogData.LOG_COUNT) + 1);
-        Logger.i("LogData", this.getName() + " {" + logData.toString() + " : " + count + "}");
+//        Logger.i("LogData", this.getName() + " {" + logData.toString() + " : " + count + "}");
     }
 
     public long getLog(@NonNull LogData logData) {

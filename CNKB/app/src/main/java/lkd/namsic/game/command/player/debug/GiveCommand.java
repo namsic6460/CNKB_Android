@@ -6,9 +6,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
+import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Player;
 
 public class GiveCommand extends PlayerCommand {
@@ -18,7 +21,11 @@ public class GiveCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if(player.getId().getObjectId() == 1) {
-            player.addItem(Long.parseLong(second), Integer.parseInt(third), false);
+            if(second == null) {
+                throw new WeirdCommandException();
+            }
+
+            player.addItem(Objects.requireNonNull(ItemList.findByName(second)), Integer.parseInt(third), false);
             KakaoTalk.reply(session, "Success");
         }
     }

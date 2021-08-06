@@ -14,7 +14,7 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
-import lkd.namsic.game.object.interfaces.ItemUses;
+import lkd.namsic.game.object.implement.ItemUses;
 import lombok.Getter;
 import lombok.Setter;
 

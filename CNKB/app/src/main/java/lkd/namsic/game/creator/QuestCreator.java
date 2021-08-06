@@ -77,7 +77,8 @@ public class QuestCreator implements Creatable {
         quest = new Quest(QuestList.NEED_COAL, NpcList.PEDRO.getId(), 73L);
         quest.setNeedItem(ItemList.COAL.getId(), 100);
         quest.setRewardCloseRate(NpcList.PEDRO.getId(), 2);
-        quest.setRewardItem(ItemList.LOW_REINFORCE_STONE.getId(), 1);
+        quest.setRewardItem(ItemList.LOW_REINFORCE_STONE.getId(), 10);
+        quest.getRewardMoney().set(2000L);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.ANOTHER_PRESENT, NpcList.EL.getId(), 77L);

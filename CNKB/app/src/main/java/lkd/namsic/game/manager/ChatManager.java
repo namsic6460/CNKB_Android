@@ -19,9 +19,7 @@ import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.exception.InvalidNumberException;
-import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Chat;
-import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
@@ -66,15 +64,7 @@ public class ChatManager {
     }
 
     public void startChat(@NonNull Player self, @NonNull String npcName) {
-        Long npcId = NpcList.findByName(npcName);
-        GameMap map = Config.getMapData(self.getLocation());
-
-        if(npcId == null || !map.getEntity(Id.NPC).contains(npcId) ||
-                npcId == NpcList.SECRET.getId() || npcId == NpcList.ABEL.getId()) {
-            throw new WeirdCommandException("해당 NPC 를 찾을 수 없습니다\n" +
-                    "존재하지 않거나 현재 맵에 없는 NPC 일 수 있습니다\n" +
-                    "현재 위치 정보를 확인해보세요");
-        }
+        long npcId = NpcList.checkByName(self, npcName);
 
         Set<Long> questSet = self.getQuestNpc().get(npcId);
         if(questSet != null) {
@@ -88,9 +78,8 @@ public class ChatManager {
         }
 
         Npc npc = Config.getData(Id.NPC, npcId);
-        long chatCount = self.getChatCount(npcId);
 
-        if(chatCount == 0 && npc.getFirstChat() != null) {
+        if(self.getChatCount(npcId) == 0) {
             this.startChat(self, npc.getFirstChat(), npcId);
         } else {
             npc.startChat(self);

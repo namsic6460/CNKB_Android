@@ -6,6 +6,11 @@ import androidx.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Player;
 import lombok.Getter;
 
 @SuppressWarnings("SpellCheckingInspection")
@@ -59,6 +64,20 @@ public enum NpcList {
     public static String findById(long id) {
         NpcList npc = idMap.get(id);
         return npc == null ? null : npc.displayName;
+    }
+
+    public static long checkByName(@NonNull Player player, @NonNull String npcName) {
+        Long npcId = NpcList.findByName(npcName);
+        GameMap map = Config.getMapData(player.getLocation());
+
+        if(npcId == null || !map.getEntity(Id.NPC).contains(npcId) ||
+                npcId == NpcList.SECRET.getId() || npcId == NpcList.ABEL.getId()) {
+            throw new WeirdCommandException("해당 NPC 를 찾을 수 없습니다\n" +
+                    "존재하지 않거나 현재 맵에 없는 NPC 일 수 있습니다\n" +
+                    "현재 위치 정보를 확인해보세요");
+        }
+
+        return npcId;
     }
 
 }

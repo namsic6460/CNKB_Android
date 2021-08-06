@@ -1,7 +1,6 @@
 package lkd.namsic.game.enums;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +26,7 @@ public enum FightWaitType {
         this.texts.addAll(Arrays.asList(texts));
     }
 
-    public static FightWaitType parseWaitType(@NonNull String command, @Nullable String subCommand) throws WeirdCommandException {
+    public static FightWaitType parseWaitType(@NonNull String command) throws WeirdCommandException {
         if(ATTACK.texts.contains(command)) {
             return ATTACK;
         } else if(DEFENCE.texts.contains(command)) {
@@ -35,16 +34,8 @@ public enum FightWaitType {
         } else if(WAIT.texts.contains(command)) {
             return WAIT;
         } else if(ITEM.texts.contains(command)) {
-            if(subCommand == null) {
-                throw new WeirdCommandException("아이템 이름도 함께 적어야합니다");
-            }
-
             return ITEM;
         } else if(EQUIP.texts.contains(command)) {
-            if(subCommand == null) {
-                throw new WeirdCommandException("장비 종류도 함께 적어야합니다");
-            }
-
             return EQUIP;
         } else if(RUN.texts.contains(command)) {
             return RUN;

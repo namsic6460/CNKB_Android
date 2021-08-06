@@ -22,6 +22,7 @@ public class HelpCommand extends CommonCommand {
                         Emoji.LIST + " *(도움말/명령어/?/h/help) : 도움말을 표시합니다\n\n" +
                         Emoji.LIST + " (회원가입/가입/register) ({닉네임}) : 회원가입을 합니다\n\n" +
                         Emoji.LIST + " *(개발자/dev) : 개발자 정보를 표시합니다\n\n" +
+                        Emoji.LIST + " *(규칙/룰/rule) : 게임 규칙을 표시합니다\n\n" +
                         "\n---유저 명령어---\n" +
                         Emoji.LIST + " *(정보/info/i) [{플레이어 닉네임}] : 플레이어의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(정보/info/i) (아이템/item) ({아이템 이름}) : 아이템의 정보를 표시합니다\n\n" +
@@ -59,9 +60,12 @@ public class HelpCommand extends CommonCommand {
                         Emoji.LIST + " (제작/craft) ({아이템 또는 장비 이름}) [{아이템 개수}] : 해당 아이템 또는 장비를 제작합니다\n\n" +
                         Emoji.LIST + " (제작/craft) ({아이템 또는 장비 이름}) ({아이템 개수}) [{레시피 번호}] : " +
                         "해당 아이템 또는 장비를 특정 레시피로 제작합니다\n\n" +
-                        Emoji.LIST + " (강화/reinforce/r) : 강화에 대한 설명을 표시합니다\n\n" +
-                        Emoji.LIST + " (강화/reinforce/r) (정보/info) : 현재 장착중인 장비들의 강화 상태를 표시합니다\n\n" +
-                        Emoji.LIST + " (강화/reinforce/r) ({장비 번호}) : 장비를 강화합니다\n\n" +
+                        Emoji.LIST + " (강화/제련/reinforce/r) : 강화에 대한 설명을 표시합니다\n\n" +
+                        Emoji.LIST + " (강화/제련/reinforce/r) (정보/info) : 현재 장착중인 장비들의 강화 상태를 표시합니다\n\n" +
+                        Emoji.LIST + " (강화/제련/reinforce/r) ({장비 번호}) : 장비를 강화합니다\n\n" +
+                        Emoji.LIST + " *(상점/shop) (도움말/명령어/?/help/h) : 상점 도움말을 표시합니다\n\n" +
+                        Emoji.LIST + " (상점/shop) ({Npc 이름}) : 해당 Npc 에게서 이용 가능한 상점들을 표시합니다\n\n" +
+                        Emoji.LIST + " (상점/shop) ({Npc 이름}) ({번호}) : 해당 상점을 이용합니다\n\n" +
                         Emoji.LIST + " *(랭킹/랭크/ranking/rank) [레벨] : 레벨 랭킹을 표시합니다\n\n" +
                         Emoji.LIST + " *(설정/setting/set) (가방/인벤토리/inventory/inven) (추가/add) ({아이템 이름}) : " +
                         "해당 아이템을 인벤토리 표시 우선순위 목록에 추가합니다\n\n" +

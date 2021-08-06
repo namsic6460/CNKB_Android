@@ -1,4 +1,4 @@
-package lkd.namsic.game.object.interfaces;
+package lkd.namsic.game.object.implement;
 
 import androidx.annotation.NonNull;
 

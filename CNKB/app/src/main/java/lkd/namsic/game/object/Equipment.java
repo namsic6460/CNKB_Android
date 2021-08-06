@@ -19,13 +19,13 @@ import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.event.Event;
 import lkd.namsic.game.manager.EquipManager;
-import lkd.namsic.game.object.interfaces.EquipEvents;
-import lkd.namsic.game.object.interfaces.EquipUses;
+import lkd.namsic.game.object.implement.EquipEvents;
+import lkd.namsic.game.object.implement.EquipUses;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public class Equipment extends Item {
+public class Equipment extends Item implements Cloneable {
 
     final long originalId;
 

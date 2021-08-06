@@ -6,13 +6,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 import lkd.namsic.game.base.ChatLimit;
-import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.object.NpcList;
@@ -25,17 +26,20 @@ import lombok.Setter;
 @Setter
 public class Npc extends Entity {
 
-    @Nullable
-    Long firstChat = null;
+    final long firstChat;
 
-    Map<ChatLimit, ConcurrentHashSet<Long>> baseChat = new ConcurrentHashMap<>();
-    Map<ChatLimit, ConcurrentHashSet<Long>> chat = new ConcurrentHashMap<>();
+    Map<ChatLimit, Set<Long>> baseChat = new HashMap<>();
+    Map<ChatLimit, Set<Long>> chat = new HashMap<>();
 
-    public Npc(@NonNull NpcList npcData) {
+    final Set<Long> shop = new HashSet<>();
+
+    public Npc(@NonNull NpcList npcData, long firstChat) {
         super(npcData.getDisplayName());
 
         this.id.setId(Id.NPC);
         this.id.setObjectId(npcData.getId());
+
+        this.firstChat = firstChat;
     }
 
     public void setBaseChat(@NonNull ChatLimit chatLimit, long chatId) {
@@ -46,9 +50,9 @@ public class Npc extends Entity {
             throw new RuntimeException("common chat must be base msg");
         }
 
-        ConcurrentHashSet<Long> chatSet = this.baseChat.get(chatLimit);
+        Set<Long> chatSet = this.baseChat.get(chatLimit);
         if(chatSet == null) {
-            chatSet = new ConcurrentHashSet<>();
+            chatSet = new HashSet<>();
             chatSet.add(chatId);
             this.baseChat.put(chatLimit, chatSet);
         } else {
@@ -57,9 +61,9 @@ public class Npc extends Entity {
     }
 
     public void setChat(@NonNull ChatLimit chatLimit, long chatId) {
-        ConcurrentHashSet<Long> chatSet = this.chat.get(chatLimit);
+        Set<Long> chatSet = this.chat.get(chatLimit);
         if(chatSet == null) {
-            chatSet = new ConcurrentHashSet<>();
+            chatSet = new HashSet<>();
             chatSet.add(chatId);
             this.chat.put(chatLimit, chatSet);
         } else {
@@ -72,7 +76,7 @@ public class Npc extends Entity {
         List<Long> list = new ArrayList<>();
 
         Log.i("namsic!", this.baseChat.toString());
-        for(Map.Entry<ChatLimit, ConcurrentHashSet<Long>> entry : this.baseChat.entrySet()) {
+        for(Map.Entry<ChatLimit, Set<Long>> entry : this.baseChat.entrySet()) {
             if(entry.getKey().isAvailable(player)) {
                 list.addAll(entry.getValue());
             }
@@ -87,7 +91,7 @@ public class Npc extends Entity {
         List<Long> list = new ArrayList<>();
 
         Chat chat;
-        for(Map.Entry<ChatLimit, ConcurrentHashSet<Long>> entry : this.chat.entrySet()) {
+        for(Map.Entry<ChatLimit, Set<Long>> entry : this.chat.entrySet()) {
             if(entry.getKey().isAvailable(player)) {
                 for(long chatId : entry.getValue()) {
                     chat = Config.getData(Id.CHAT, chatId);

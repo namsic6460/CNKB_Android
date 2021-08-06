@@ -216,7 +216,10 @@ public enum ItemList {
     GOD_WATER("신의 물", 174L),
     PURIFIED_ZOMBIE_SOUL("하얘진 좀비 영혼", 175L),
     HARDENED_SLIME("굳은 슬라임", 176L),
-    MAGIC_STONE("마정석", 177L);
+    MAGIC_STONE("마정석", 177L),
+
+    FLOWER("꽃", 178L),
+    STONE_LUMP("돌 뭉텅이", 179L);
 
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();

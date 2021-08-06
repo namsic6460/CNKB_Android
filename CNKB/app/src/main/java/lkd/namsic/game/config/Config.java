@@ -46,6 +46,7 @@ import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.game.object.Quest;
 import lkd.namsic.game.object.Research;
+import lkd.namsic.game.object.Shop;
 import lkd.namsic.game.object.Skill;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.setting.Logger;
@@ -87,6 +88,8 @@ public class Config {
     public static final double MONEY_BOOST = 1;
     public static final double EXP_BOOST = 1;
 
+    public static final int MAX_COUNT_PER_PAGE = 30;
+
     public static final int MIN_MAP_X = 0;
     public static final int MAX_MAP_X = 10;
     public static final int MIN_MAP_Y = 0;
@@ -114,9 +117,9 @@ public class Config {
 
     public static final double REINFORCE_EFFICIENCY = 0.2;
     public static final double REINFORCE_EFFICIENCY_PER_HANDLE_LV = 0.035;
-    public static final long REINFORCE_BASE_COST = 3000;
-    public static final long REINFORCE_COST_PER_HANDLE_LV = 1000;
-    public static final double REINFORCE_COST_MULTIPLIER = 0.1;
+    public static final long REINFORCE_BASE_COST = 1000;
+    public static final long REINFORCE_COST_PER_HANDLE_LV = 500;
+    public static final double REINFORCE_COST_MULTIPLIER = 0.12;
     public static final long REINFORCE_DELAY_TIME = 2000;
 
     public static final double TOTAL_MONEY_LOSE_RANDOM = 0.1;
@@ -146,6 +149,7 @@ public class Config {
     public static final long ADVENTURE_WAIT_TIME = 30000;
     public static final int EXPLORE_HARD_SUCCESS_PERCENT = 20;
     public static final int APPRAISE_LIMIT = 999;
+    public static final long SHOPPING_WAIT_TIME = 120000;
 
     public static final String SPLIT_BAR = "------------------------------------------";
     public static final String HARD_SPLIT_BAR = "==========================================";
@@ -166,6 +170,7 @@ public class Config {
         ID_CLASS.put(Id.PLAYER, Player.class);
         ID_CLASS.put(Id.QUEST, Quest.class);
         ID_CLASS.put(Id.RESEARCH, Research.class);
+        ID_CLASS.put(Id.SHOP, Shop.class);
         ID_CLASS.put(Id.SKILL, Skill.class);
 
         for(Id id : Id.values()) {
@@ -261,7 +266,7 @@ public class Config {
     }
 
     @NonNull
-    public static <T extends GameObject> T newObject(@NonNull T t) {
+    public static <T extends GameObject & Cloneable> T newObject(@NonNull T t) {
         Id id = t.getId().getId();
         long objectId = ID_COUNT.get(id);
 
@@ -504,8 +509,13 @@ public class Config {
         Long objectCount = OBJECT_COUNT.get(Id.PLAYER).get(objectId);
 
         if(count) {
-            OBJECT.get(Id.PLAYER).put(objectId, player);
-            OBJECT_COUNT.get(Id.PLAYER).put(objectId, 1L);
+            if(objectCount == null) {
+                OBJECT.get(Id.PLAYER).put(objectId, player);
+                OBJECT_COUNT.get(Id.PLAYER).put(objectId, 1L);
+            } else {
+                player = Objects.requireNonNull((Player) OBJECT.get(Id.PLAYER).get(objectId));
+                OBJECT_COUNT.get(Id.PLAYER).put(objectId, objectCount + 1);
+            }
         }
 
         if(objectCount != null) {
@@ -797,12 +807,13 @@ public class Config {
             } else {
                 player.replyPlayer("업데이트가 완료되었습니다\nv" + player.getVersion() + " -> v" + Config.VERSION);
             }
-        } else if(unavailable) {
-            Logger.w("Update", "Non-Player Entity equip limit stat warning - " + entity.getId().getObjectId() + "\n" +
-                    unavailableEquipList.toString());
         }
 
         entity.setVersion(Config.VERSION);
+    }
+
+    public static int getMaxPage(int size) {
+        return (int) Math.ceil((double) size / MAX_COUNT_PER_PAGE);
     }
 
 }

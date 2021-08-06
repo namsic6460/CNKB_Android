@@ -10,17 +10,17 @@ import lombok.Getter;
 public enum Doing {
 
     NONE("없음"),
+    ADVENTURE("모험"),
     APPRAISE("감정"),
-    BUY("구매"),
     CHAT("대화"),
     FIGHT("전투"),
     FIGHT_ONE("1대1 전투"),
     FISH("낚시"),
-    ADVENTURE("모험"),
-    MINE("광질"),
     GATHER("채집"),
     HARVEST("농사"),
+    MINE("광질"),
     REINFORCE("강화"),
+    SHOP("상점"),
     WAIT_RESPONSE("대화(대답 대기)");
 
     @NonNull

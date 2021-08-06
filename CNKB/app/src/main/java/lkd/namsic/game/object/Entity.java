@@ -40,7 +40,7 @@ import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.manager.EquipManager;
-import lkd.namsic.game.object.interfaces.EntityEvents;
+import lkd.namsic.game.object.implement.EntityEvents;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -48,6 +48,8 @@ import lombok.Setter;
     Must be Thread-Safe
     Entity class can be frequently changed
 */
+
+//TODO : separate as Fightable(Npc never fight)
 
 @Getter
 public abstract class Entity extends NamedObject {
@@ -559,7 +561,7 @@ public abstract class Entity extends NamedObject {
             Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
             Map<String, Event> eventMap = equipment.getEvent();
 
-            if(eventMap.containsKey(eventName) && !Objects.requireNonNull(
+            if(eventMap != null && eventMap.containsKey(eventName) && !Objects.requireNonNull(
                     this.removedEquipEvent.get(equipment.getEquipType())).contains(eventName)) {
                 eventSet.add(equipId);
             }

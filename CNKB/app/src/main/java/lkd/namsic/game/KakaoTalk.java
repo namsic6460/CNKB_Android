@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
@@ -23,6 +24,7 @@ import lkd.namsic.game.command.NonPlayerCommand;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.command.common.DevCommand;
 import lkd.namsic.game.command.common.HelpCommand;
+import lkd.namsic.game.command.common.RuleCommand;
 import lkd.namsic.game.command.non_player.RegisterCommand;
 import lkd.namsic.game.command.player.debug.CleanCommand;
 import lkd.namsic.game.command.player.debug.DoingCommand;
@@ -45,6 +47,7 @@ import lkd.namsic.game.command.player.game.MoveCommand;
 import lkd.namsic.game.command.player.game.RankingCommand;
 import lkd.namsic.game.command.player.game.ReinforceCommand;
 import lkd.namsic.game.command.player.game.SettingCommand;
+import lkd.namsic.game.command.player.game.ShopCommand;
 import lkd.namsic.game.command.player.game.StatCommand;
 import lkd.namsic.game.command.player.game.UseCommand;
 import lkd.namsic.game.command.player.register.PlayerRegisterCommand;
@@ -56,6 +59,7 @@ import lkd.namsic.game.exception.EquipUseException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.manager.ChatManager;
+import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.service.NotificationListener;
 import lkd.namsic.setting.Logger;
@@ -81,8 +85,9 @@ public class KakaoTalk {
         Logger.i("CommandRegister", "Commands cleared");
 
         try {
-            registerCommonCommand(new HelpCommand(), "도움말", "명령어", "?", "h", "help");
-            registerCommonCommand(new DevCommand(), "개발자", "dev");
+            registerCommonCommand(new HelpCommand(),    "도움말", "명령어", "?", "h", "help");
+            registerCommonCommand(new DevCommand(),     "개발자", "dev");
+            registerCommonCommand(new RuleCommand(),    "규칙", "룰", "rule");
 
             registerNonPlayerCommand(new RegisterCommand(), "회원가입", "가입", "register");
 
@@ -94,11 +99,11 @@ public class KakaoTalk {
 
     private static void registerPlayerCommands() {
         //Debug
-        registerPlayerCommand(new GiveCommand(), "give");
-        registerPlayerCommand(new DoingCommand(), "doing");
-        registerPlayerCommand(new SaveCommand(), "save");
-        registerPlayerCommand(new EvalCommand(), "eval");
-        registerPlayerCommand(new CleanCommand(), "clean");
+        registerPlayerCommand(new GiveCommand(),    "give");
+        registerPlayerCommand(new DoingCommand(),   "doing");
+        registerPlayerCommand(new SaveCommand(),    "save");
+        registerPlayerCommand(new EvalCommand(),    "eval");
+        registerPlayerCommand(new CleanCommand(),   "clean");
 
         //Register
         registerPlayerCommand(new PlayerRegisterCommand(), "회원가입", "가입", "register");
@@ -118,8 +123,9 @@ public class KakaoTalk {
         registerPlayerCommand(new MineCommand(),        "광질", "mine");
         registerPlayerCommand(new MoveCommand(),        "이동", "move");
         registerPlayerCommand(new RankingCommand(),     "랭킹", "랭크", "ranking", "rank");
-        registerPlayerCommand(new ReinforceCommand(),   "강화", "reinforce", "r");
+        registerPlayerCommand(new ReinforceCommand(),   "강화", "제련", "reinforce", "r");
         registerPlayerCommand(new SettingCommand(),     "설정", "setting", "set");
+        registerPlayerCommand(new ShopCommand(),        "상점", "shop");
         registerPlayerCommand(new StatCommand(),        "스텟", "stat");
         registerPlayerCommand(new UseCommand(),         "사용", "use");
     }
@@ -178,6 +184,7 @@ public class KakaoTalk {
         Thread gameThread = new Thread(() -> {
             CommandListener listener;
             Player player = null;
+            GameMap map = null;
 
             try {
                 if(lastSender.equals(sender) && lastMsg.equals(msg)) {
@@ -192,6 +199,7 @@ public class KakaoTalk {
 
                 try {
                     player = Config.loadPlayer(sender, image, room, isGroupChat, true);
+                    map = Config.loadMap(player.getLocation());
                 } catch (ObjectNotFoundException ignore) {}
 
                 if(isCommand) {
@@ -247,6 +255,7 @@ public class KakaoTalk {
                     }
 
                     Config.unloadObject(player);
+                    Config.unloadMap(Objects.requireNonNull(map));
                 }
             } catch (Exception e) {
                 Logger.e("onChat", e);

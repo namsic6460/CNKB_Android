@@ -458,8 +458,8 @@ public class RandomList {
             ItemList.LOW_ALLOY.getId(),
             ItemList.LOW_AMULET.getId(),
             ItemList.HARD_IRON.getId(),
-            ItemList.RECIPE.getId(),
-            ItemList.LOW_ELIXIR.getId()
+            ItemList.LOW_ELIXIR.getId(),
+            ItemList.REINFORCE_STONE.getId()
     );
 
     public static final List<Long> middleRecipeItems = Arrays.asList(
@@ -468,7 +468,8 @@ public class RandomList {
             ItemList.WHITE_GOLD.getId(),
             ItemList.ALLOY.getId(),
             ItemList.AMULET.getId(),
-            ItemList.ELIXIR.getId()
+            ItemList.ELIXIR.getId(),
+            ItemList.HIGH_REINFORCE_STONE.getId()
     );
 
     public static final List<Long> highRecipeItems = Arrays.asList(

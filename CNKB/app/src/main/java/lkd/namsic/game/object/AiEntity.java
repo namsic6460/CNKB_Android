@@ -20,7 +20,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 
 @Getter
-public abstract class AiEntity extends Entity {
+public abstract class AiEntity extends Entity implements Cloneable {
 
     final LimitInteger maxIncrease = new LimitInteger(Config.MIN_AI_INCREASE, Config.MIN_AI_INCREASE, null);
 
