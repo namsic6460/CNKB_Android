@@ -135,4 +135,11 @@ public class Npc extends Entity {
         return "[NPC] " + this.name;
     }
 
+    @Deprecated
+    @NonNull
+    @Override
+    public String getFightName() {
+        throw new RuntimeException("Deprecated");
+    }
+
 }

@@ -6,17 +6,24 @@ import androidx.annotation.NonNull;
 
 import lkd.namsic.MainActivity;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.enums.Id;
 import lkd.namsic.setting.Logger;
 
 public class ObjectCreator {
-
-    //TODO : 좀비 영혼 드롭 테스트
 
     public static void start(@NonNull Button button) {
         Logger.i("ObjectMaker", "Making objects...");
 
         Thread thread = new Thread(() -> {
             MainActivity.mainActivity.runOnUiThread(() -> button.setEnabled(false));
+
+            for(Id id : Id.values()) {
+                if(id.equals(Id.EQUIPMENT) || id.equals(Id.PLAYER)) {
+                    continue;
+                }
+
+                Config.ID_COUNT.put(id, 1L);
+            }
 
             try {
                 Config.IGNORE_FILE_LOG = true;

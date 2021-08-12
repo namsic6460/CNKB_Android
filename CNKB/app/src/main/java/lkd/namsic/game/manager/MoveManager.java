@@ -135,7 +135,8 @@ public class MoveManager {
                             self.getLv().get()) * Config.ATTACKED_PERCENT_INCREASE, Config.MAX_ATTACKED_PERCENT);
 
                     if (Math.random() < attackedPercent) {
-                        FightManager.getInstance().startFight((Player) self, Config.getData(Id.MONSTER, monsterId));
+                        //TODO : unlock after fix
+//                        FightManager.getInstance().startFight((Player) self, Config.getData(Id.MONSTER, monsterId));
                         break;
                     }
                 }

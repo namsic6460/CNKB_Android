@@ -46,7 +46,10 @@ public class MineManager {
             percents.add(minePercent.get(mineLv));
         }
 
-        List<Long> output = Arrays.asList(ItemList.STONE.getId(), ItemList.COAL.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.SILVER.getId(), ItemList.GLOW_STONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.ORICHALCON.getId(), ItemList.NONE.getId());
+        List<Long> output = Arrays.asList(ItemList.STONE.getId(), ItemList.COAL.getId(),
+                ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.SILVER.getId(),
+                ItemList.GLOW_STONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(), ItemList.NONE.getId(),
+                ItemList.ORICHALCON.getId(), ItemList.NONE.getId());
 
         double percent;
         long itemId = 0;
@@ -59,7 +62,7 @@ public class MineManager {
             if(randomPercent < percent) {
                 itemId = output.get(itemTier);
 
-                if(itemId == 0) {
+                if(itemId == ItemList.NONE.getId()) {
                     long[] itemList;
 
                     switch(itemTier) {
@@ -99,6 +102,10 @@ public class MineManager {
             }
         }
 
+        if(itemId == ItemList.NONE.getId()) {
+            itemId = ItemList.STONE.getId();
+        }
+
         try {
             Thread.sleep(new Random().nextInt(1000));
         } catch (InterruptedException e) {
@@ -131,7 +138,9 @@ public class MineManager {
 
         if(this.checkMineLevel(self)) {
             self.addVariable(Variable.MINE, 1);
-            self.replyPlayer("광질 레벨이 올랐습니다!\n광질 레벨: " + mineLv + " -> " + (mineLv + 1));
+
+            mineLv = self.getVariable(Variable.MINE);
+            self.replyPlayer("광질 레벨이 올랐습니다!\n광질 레벨: " + (mineLv - 1) + " -> " + mineLv);
         }
 
         self.replyPlayer(builder.toString().trim());

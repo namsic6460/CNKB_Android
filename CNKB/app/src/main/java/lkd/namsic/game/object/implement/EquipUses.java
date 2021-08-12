@@ -3,18 +3,15 @@ package lkd.namsic.game.object.implement;
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.EquipUse;
-import lkd.namsic.game.config.Config;
-import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EquipList;
+import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.GameObject;
 import lkd.namsic.game.object.Player;
@@ -80,21 +77,12 @@ public class EquipUses {
             @NonNull
             @Override
             public String use(@NonNull Entity self, @NonNull List<GameObject> other) {
-                Id id;
-                Entity entity;
-                Set<Player> playerSet = new HashSet<>();
-                for(Map.Entry<Id, ConcurrentHashSet<Long>> entry : self.getEnemy().entrySet()) {
-                    id = entry.getKey();
+                long fightId = FightManager.getInstance().getFightId(self.getId().getObjectId());
+                Set<Entity> entitySet = FightManager.getInstance().getEntitySet(fightId);
+                Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
 
-                    for(long objectId : entry.getValue()) {
-                        entity = Config.getData(id, objectId);
-
-                        if(id.equals(Id.PLAYER)) {
-                            playerSet.add((Player) entity);
-                        }
-
-                        entity.addBuff(System.currentTimeMillis() + 30000L, StatType.ATS, -25);
-                    }
+                for(Entity entity : entitySet) {
+                    entity.addBuff(System.currentTimeMillis() + 30000L, StatType.ATS, -25);
                 }
 
                 Player.replyPlayers(playerSet, self.getName() + " 이 슬라임 바지 아이템을 사용하여 모든 적의 공격속도를 25 감소시켰습니다");

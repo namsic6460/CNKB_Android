@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,8 +32,6 @@ import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
-import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -286,7 +283,8 @@ public class Player extends Entity {
             itemId = ((ItemList) entry[0]).getId();
             itemCount = (int) entry[1];
 
-            innerBuilder.append(ItemList.findById(itemId))
+            innerBuilder.append("\n")
+                    .append(ItemList.findById(itemId))
                     .append(" ")
                     .append(itemCount)
                     .append("개");
@@ -900,8 +898,14 @@ public class Player extends Entity {
 
     @NonNull
     @Override
-    public String getRealName() {
+    public String getFightName() {
         return this.getNickName();
+    }
+
+    @NonNull
+    @Override
+    public String getRealName() {
+        return this.nickName + " (Lv." + this.getLv().get() + ")";
     }
 
 }

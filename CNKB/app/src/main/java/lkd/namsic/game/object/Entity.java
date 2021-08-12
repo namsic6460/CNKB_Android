@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lkd.namsic.game.base.Bool;
 import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.base.ConcurrentHashSet;
+import lkd.namsic.game.base.IdClass;
 import lkd.namsic.game.base.Int;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
@@ -78,7 +79,6 @@ public abstract class Entity extends NamedObject {
     final Map<Long, Integer> inventory = new ConcurrentHashMap<>();
     final Set<Long> equipInventory = new ConcurrentHashSet<>();
 
-    final Map<Id, ConcurrentHashSet<Long>> enemy = new ConcurrentHashMap<>();
     final Map<String, ConcurrentArrayList<Long>> event = new ConcurrentHashMap<>();
     final Map<EquipType, ConcurrentHashSet<String>> removedEquipEvent = new ConcurrentHashMap<>();
 
@@ -88,6 +88,10 @@ public abstract class Entity extends NamedObject {
     long lastDropMoney = 0L;
     final Map<Long, Integer> lastDropItem = new HashMap<>();
     final Set<Long> lastDropEquip = new HashSet<>();
+
+    @Setter
+    @Nullable
+    IdClass killer = null;
 
     protected Entity(@NonNull String name) {
         super(name);
@@ -182,10 +186,9 @@ public abstract class Entity extends NamedObject {
 
         if(isDeath) {
             this.onDeath();
-            return true;
         }
 
-        return false;
+        return isDeath;
     }
 
     public int getBasicStat(@NonNull StatType statType) {
@@ -505,34 +508,6 @@ public abstract class Entity extends NamedObject {
         return list.get(index - 1);
     }
 
-    public void addEnemy(@NonNull Id id, long objectId) {
-        Id.checkEntityId(id);
-
-        ConcurrentHashSet<Long> enemySet = this.enemy.get(id);
-        if(enemySet == null) {
-            enemySet = new ConcurrentHashSet<>();
-            enemySet.add(objectId);
-            this.enemy.put(id, enemySet);
-        } else {
-            enemySet.add(objectId);
-        }
-    }
-
-    public void removeEnemy(@NonNull Id id, long objectId) {
-        Id.checkEntityId(id);
-
-        Set<Long> enemySet = this.enemy.get(id);
-        if(enemySet == null) {
-            return;
-        }
-
-        enemySet.remove(objectId);
-
-        if(enemySet.isEmpty()) {
-            this.enemy.remove(id);
-        }
-    }
-
     public void addEvent(@NonNull EventList eventData) {
         long eventId = eventData.getId();
         Event event = EntityEvents.getEvent(eventId);
@@ -639,6 +614,7 @@ public abstract class Entity extends NamedObject {
 
             String hp;
             if (isDeath) {
+                entity.setKiller(this.id);
                 hp = entity.getDisplayHp(0);
             } else {
                 hp = entity.getDisplayHp();
@@ -791,6 +767,9 @@ public abstract class Entity extends NamedObject {
     public String getName() {
         return this.name + " (Lv." + this.getLv().get() + ")";
     }
+
+    @NonNull
+    public abstract String getFightName();
 
     @NonNull
     public String getRealName() {

@@ -89,8 +89,13 @@ public class Equipment extends Item implements Cloneable {
             newStatIncrease *= 1 + statIncrease;
         }
 
+        int stat;
         for(Map.Entry<StatType, Integer> entry : this.basicStat.entrySet()) {
-            this.setReinforceStat(entry.getKey(), (int) (entry.getValue() * totalIncrease));
+            stat = entry.getValue();
+
+            if(stat > 0) {
+                this.setReinforceStat(entry.getKey(), (int) (stat * totalIncrease));
+            }
         }
 
         Config.unloadObject(equipment);

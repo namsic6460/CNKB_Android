@@ -158,4 +158,10 @@ public abstract class AiEntity extends Entity implements Cloneable {
         }
     }
 
+    @NonNull
+    @Override
+    public String getFightName() {
+        return super.getName();
+    }
+
 }

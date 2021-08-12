@@ -1,5 +1,6 @@
 package lkd.namsic.game.base;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.Objects;
@@ -13,9 +14,14 @@ import lombok.Setter;
 public class IdClass {
 
     Id id = null;
-    long objectId = 0;
+    long objectId = 0L;
 
     public IdClass() {}
+
+    public IdClass(@NonNull Id id, long objectId) {
+        this.id = id;
+        this.objectId = objectId;
+    }
 
     @Override
     public int hashCode() {

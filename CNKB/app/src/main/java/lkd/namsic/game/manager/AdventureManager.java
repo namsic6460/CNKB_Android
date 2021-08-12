@@ -16,12 +16,11 @@ import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.AdventureType;
 import lkd.namsic.game.enums.AdventureWaitType;
-import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
+import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.object.Item;
 import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
@@ -58,7 +57,7 @@ public class AdventureManager {
         self.setVariable(Variable.ADVENTURE_FIGHT, false);
         self.replyPlayer("모험을 시작합니다\n모험 중 전투에 주의하세요!");
 
-        boolean gotReward = false;
+        List<Long> rewardList = new ArrayList<>();
         StringBuilder innerMsg = new StringBuilder("---모험 종료---");
 
         Random random = new Random();
@@ -172,16 +171,13 @@ public class AdventureManager {
                         throw new NullPointerException();
                     }
 
-                    self.addItem(itemId, 1, false);
+                    rewardList.add(itemId);
                     msg = adventureType.getSuccessMsg() + "\n난관을 성공적으로 해결하여 보상을 획득했습니다";
 
-                    Item item = Config.getData(Id.ITEM, itemId);
                     innerMsg.append("\n")
                             .append(i + 1)
                             .append("번째 난관 보상: ")
-                            .append(item.getName());
-
-                    gotReward = true;
+                            .append(ItemList.findById(itemId));
                 } else {
                     if(canSkip && random.nextInt(100) < Config.EXPLORE_HARD_SUCCESS_PERCENT) {
                         msg = "보상을 획득하는 데에는 실패했으나, 난관에서 겨우 빠져나왔습니다";
@@ -205,6 +201,10 @@ public class AdventureManager {
                 }
             }
 
+            for(long itemId : rewardList) {
+                self.addItem(itemId, 1, false);
+            }
+
             self.replyPlayer("모험을 완료했습니다!", innerMsg.toString());
         } catch (Exception e) {
             if(Objects.equals(e.getMessage(), "F")) {
@@ -212,10 +212,10 @@ public class AdventureManager {
 
                 String msg = "전투가 발생하여 모험을 종료합니다";
 
-                if(gotReward) {
-                    self.replyPlayer(msg, innerMsg.toString());
-                } else {
+                if(rewardList.isEmpty()) {
                     self.replyPlayer(msg, innerMsg.toString() + "\n획득한 보상이 없습니다");
+                } else {
+                    self.replyPlayer(msg, innerMsg.toString());
                 }
             } else if(Objects.equals(e.getMessage(), "G")) {
                 self.replyPlayer(adventureType.getFailMsg(),"난관에 막히며 모험에 실패했습니다...\n" +

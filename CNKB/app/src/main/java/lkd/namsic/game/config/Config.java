@@ -1,5 +1,7 @@
 package lkd.namsic.game.config;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -22,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.ConcurrentHashSet;
+import lkd.namsic.game.base.IdClass;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
@@ -53,7 +56,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 1.0;
+    public static final double VERSION = 1.1;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -61,6 +64,8 @@ public class Config {
             .registerTypeAdapter(ChatLimit.class, new ChatLimitAdapter())
             .setVersion(VERSION)
             .create();
+
+    public static final Map<Player, String> RUNNING_COMMAND = new ConcurrentHashMap<>();
 
     public static final Map<Id, Long> ID_COUNT = new ConcurrentHashMap<>();
     public static final Map<Id, Class<?>> ID_CLASS = new HashMap<>();
@@ -193,6 +198,8 @@ public class Config {
             }
 
             try {
+                Config.IGNORE_FILE_LOG = true;
+
                 json = FileManager.read(file);
                 Player player = fromJson(json, Player.class);
 
@@ -206,6 +213,8 @@ public class Config {
                 }
             } catch (Exception e) {
                 Logger.e("Config.init(" + file.getName() + ")", e);
+            } finally {
+                Config.IGNORE_FILE_LOG = false;
             }
         }
 
@@ -469,7 +478,7 @@ public class Config {
                 Id.checkEntityId(id);
 
                 if(!id.equals(Id.PLAYER)) {
-                    check((Entity) t);
+                    checkUpdate((Entity) t);
                 }
             } catch (UnhandledEnumException ignore) {}
         } else {
@@ -477,7 +486,7 @@ public class Config {
 
             if(t == null) {
                 t = (T) Objects.requireNonNull(OBJECT.get(id).get(objectId));
-                Logger.i("loadObject(" + objectCount + ")", objectId + " - " + objectId);
+                Logger.i("loadObject(" + objectCount + ")", id + " - " + objectId);
             }
 
             try {
@@ -513,12 +522,12 @@ public class Config {
                 OBJECT.get(Id.PLAYER).put(objectId, player);
                 OBJECT_COUNT.get(Id.PLAYER).put(objectId, 1L);
             } else {
-                player = Objects.requireNonNull((Player) OBJECT.get(Id.PLAYER).get(objectId));
                 OBJECT_COUNT.get(Id.PLAYER).put(objectId, objectCount + 1);
             }
         }
 
         if(objectCount != null) {
+            player = Objects.requireNonNull((Player) OBJECT.get(Id.PLAYER).get(objectId));
             Logger.i("loadPlayer(" + objectCount + ")", sender);
         }
 
@@ -527,7 +536,7 @@ public class Config {
             player.setGroup(isGroupChat);
         }
 
-        check(player);
+        checkUpdate(player);
 
         return player;
     }
@@ -549,6 +558,21 @@ public class Config {
 
             MAP.put(fileName, map);
             MAP_COUNT.put(fileName, 1L);
+
+            for(long monsterId : new HashSet<>(map.getEntity(Id.MONSTER))) {
+                if(FileManager.read(getPath(Id.MONSTER, monsterId)).equals("")) {
+                    map.removeEntity(new IdClass(Id.MONSTER, monsterId));
+                    Log.w("loadMap", "Monster " + monsterId + " removed");
+                }
+            }
+
+            for(long bossId : new HashSet<>(map.getEntity(Id.BOSS))) {
+                if(FileManager.read(getPath(Id.BOSS, bossId)).equals("")) {
+                    map.removeEntity(new IdClass(Id.BOSS, bossId));
+                    Log.w("loadMap", "Boss " + bossId + " removed");
+                }
+            }
+
             return map;
         } else {
             MAP_COUNT.put(fileName, mapCount + 1);
@@ -637,7 +661,7 @@ public class Config {
 
     @NonNull
     private static String getPlayerPath(@NonNull String sender, @NonNull String image) {
-        return FileManager.DATA_PATH_MAP.get(Id.PLAYER) + sender + "-" + image + ".json";
+        return FileManager.DATA_PATH_MAP.get(Id.PLAYER) + getRegex(sender, "") + "-" + image + ".json";
     }
 
     @NonNull
@@ -760,7 +784,7 @@ public class Config {
         return text.replaceFirst("(?s)" + regex + "(?!.*?" + regex + ")", replacement).trim();
     }
 
-    private static void check(@NonNull Entity entity) {
+    private static void checkUpdate(@NonNull Entity entity) {
         entity.revalidateBuff();
 
         if(entity.getVersion() != Config.VERSION) {

@@ -174,7 +174,7 @@ public class ShopManager {
                 boolean buying = response.equals(ShopWaitType.BUY);
                 if(!(buying ? shop.getSellPrice() : shop.getBuyPrice()).containsKey(itemId)) {
                     String msg = "이 상점에서 ";
-                    if(isBuy) {
+                    if(buying) {
                         msg += "구매";
                     } else {
                         msg += "판매";

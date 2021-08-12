@@ -14,6 +14,7 @@ import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
@@ -42,7 +43,12 @@ public class DisplayManager {
             }
         }
 
-        innerMsg.append(this.getDisplayStat(target))
+        innerMsg.append("광질 레벨: ")
+                .append(self.getVariable(Variable.MINE))
+                .append("\n낚시 레벨: ")
+                .append(self.getVariable(Variable.FISH))
+                .append("\n\n")
+                .append(this.getDisplayStat(target))
                 .append("\n\n")
                 .append(this.getDisplayQuest(target))
                 .append("\n\n")
@@ -56,11 +62,13 @@ public class DisplayManager {
                         Emoji.GOLD + " 골드: " + target.getMoney() + "G\n" +
                         Emoji.HEART + " 체력: " + target.getDisplayHp() + "\n" +
                         Emoji.MANA + " 마나: " + target.getDisplayMn() + "\n" +
-                        Emoji.WORLD + " 위치: " + Config.getMapData(target.getLocation()).getName() + "(" + target.getLocation().toString() + ")\n" +
+                        Emoji.WORLD + " 위치: " + Config.getMapData(target.getLocation()).getName() +
+                        "(" + target.getLocation().toString() + ")\n" +
                         Emoji.LV + " 레벨: " + target.getDisplayLv() + "\n" +
                         Emoji.SP + " 스텟 포인트: " + target.getSp().get() + "\n" +
                         Emoji.ADV + " 모험 포인트: " + target.getAdv().get() + "\n" +
-                        Emoji.HOME + " 거점: " + Config.getMapData(target.getBaseLocation()).getName() + "(" + target.getBaseLocation().toString() + ")",
+                        Emoji.HOME + " 거점: " + Config.getMapData(target.getBaseLocation()).getName() +
+                        "(" + target.getBaseLocation().toString() + ")",
                 innerMsg.toString());
     }
 

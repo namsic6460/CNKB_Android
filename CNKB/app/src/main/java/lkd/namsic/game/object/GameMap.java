@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.base.ConcurrentHashSet;
+import lkd.namsic.game.base.IdClass;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
@@ -398,11 +399,11 @@ public class GameMap {
     }
 
     @NonNull
-    public Set<Long> getEntity(Id id) {
+    public Set<Long> getEntity(@NonNull Id id) {
         return Objects.requireNonNull(this.entity.get(id));
     }
 
-    public void addEntity(Entity entity) {
+    public void addEntity(@NonNull Entity entity) {
         if(!entity.getLocation().equalsMap(this.location)) {
             throw new WeirdDataException(this.location, entity.getLocation());
         }
@@ -410,10 +411,14 @@ public class GameMap {
         this.getEntity(entity.id.getId()).add(entity.id.getObjectId());
     }
 
-    public void removeEntity(Entity entity) {
-        Id id = entity.getId().getId();
+    public void removeEntity(@NonNull Entity entity) {
+        this.removeEntity(entity.getId());
+    }
 
-        this.getEntity(id).remove(entity.id.getObjectId());
+    public void removeEntity(@NonNull IdClass idClass) {
+        Id id = idClass.getId();
+
+        this.getEntity(id).remove(idClass.getObjectId());
         if(id.equals(Id.MONSTER) || id.equals(Id.BOSS)) {
             this.respawn();
         }

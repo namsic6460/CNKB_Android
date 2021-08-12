@@ -8,6 +8,7 @@ import java.util.Set;
 
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.enums.FightWaitType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MonsterType;
 import lkd.namsic.game.enums.StatType;
@@ -73,8 +74,10 @@ public class Monster extends AiEntity {
         Object[] playerArray;
         Random random = new Random();
         if(type.equals(MonsterType.BAD)) {
+            output[0] = FightWaitType.ATTACK;
+
             playerArray = players.toArray();
-            output[0] = playerArray[random.nextInt(playerArray.length)];
+            output[1] = playerArray[random.nextInt(playerArray.length)];
         } else if(type.equals(MonsterType.MIDDLE)) {
             Set<Player> duplicateSet = new HashSet<>();
             for(Player player : players) {
@@ -85,16 +88,16 @@ public class Monster extends AiEntity {
 
             playerArray = duplicateSet.toArray();
             if(playerArray.length != 0) {
-                output[0] = playerArray[random.nextInt(playerArray.length)];
+                output[0] = FightWaitType.ATTACK;
+                output[1] = playerArray[random.nextInt(playerArray.length)];
             } else {
-                output[0] = null;
+                output[0] = FightWaitType.WAIT;
             }
         } else {
-            return new Object[] { null, 0 };
+            output[0] = FightWaitType.WAIT;
         }
-
-        //TODO: 스킬 id
-        output[1] = 0;
+        
+        //TODO : 공격 외 다른 행동
 
         return output;
     }

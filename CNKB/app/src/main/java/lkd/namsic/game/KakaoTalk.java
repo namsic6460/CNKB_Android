@@ -223,8 +223,9 @@ public class KakaoTalk {
                     } else {
                         try {
                             if (player != null && (listener = KakaoTalk.playerCommands.get(first)) != null) {
-                                player.checkNewDay();
+                                Config.RUNNING_COMMAND.put(player, command);
 
+                                player.checkNewDay();
                                 listener.execute(player, cmd, commands, second, third, fourth, session);
                             } else if (player == null) {
                                 listener = KakaoTalk.nonPlayerCommands.get(first);
@@ -254,6 +255,7 @@ public class KakaoTalk {
                         ChatManager.getInstance().checkResponseChat(player, msg);
                     }
 
+                    Config.RUNNING_COMMAND.remove(player);
                     Config.unloadObject(player);
                     Config.unloadMap(Objects.requireNonNull(map));
                 }

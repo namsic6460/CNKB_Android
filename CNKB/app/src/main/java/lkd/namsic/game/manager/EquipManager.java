@@ -160,7 +160,7 @@ public class EquipManager {
             throw new WeirdCommandException("해당 부위의 장비는 사용이 불가능합니다");
         }
 
-        return equipId;
+        return equipment.getOriginalId();
     }
 
     public void tryUse(@NonNull Player self, @NonNull EquipType equipType) {
@@ -168,9 +168,7 @@ public class EquipManager {
         this.use(self, equipId);
     }
 
-    public void use(@NonNull Player self, long equipId) {
-        self.addLog(LogData.TOTAL_EQUIP_USE, 1);
-
+    public void use(@NonNull Entity self, long equipId) {
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
 
         String msg = equipment.getName() + " 을 사용했습니다\n";
@@ -178,7 +176,12 @@ public class EquipManager {
         EquipUse use = Objects.requireNonNull(equipment.getEquipUse());
         String result = use.tryUse(self, new ArrayList<>());
 
-        self.replyPlayer(msg + result);
+        if(self.getId().getId().equals(Id.PLAYER)) {
+            Player player = (Player) self;
+
+            player.addLog(LogData.TOTAL_EQUIP_USE, 1);
+            player.replyPlayer(msg + result);
+        }
     }
 
 }

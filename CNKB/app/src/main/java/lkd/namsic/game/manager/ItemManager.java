@@ -20,6 +20,7 @@ import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.event.ItemEatEvent;
 import lkd.namsic.game.event.ItemUseEvent;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Item;
 import lkd.namsic.game.object.Player;
 
@@ -60,11 +61,10 @@ public class ItemManager {
         this.use(self, itemId, count);
     }
 
-    public void use(@NonNull Player self, long itemId, int count) {
+    public void use(@NonNull Entity self, long itemId, int count) {
         String eventName = ItemUseEvent.getName();
         ItemUseEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), itemId, count);
 
-        self.addLog(LogData.TOTAL_ITEM_USE, 1);
 
         Item item = Config.getData(Id.ITEM, itemId);
 
@@ -78,7 +78,13 @@ public class ItemManager {
         }
 
         self.addItem(itemId, count * -1);
-        self.replyPlayer(msg, innerBuilder.toString());
+
+        if(self.getId().getId().equals(Id.PLAYER)) {
+            Player player = (Player) self;
+
+            player.replyPlayer(msg, innerBuilder.toString());
+            player.addLog(LogData.TOTAL_ITEM_USE, 1);
+        }
     }
 
     public void tryEat(@NonNull Player self, @NonNull String itemName, int count) {

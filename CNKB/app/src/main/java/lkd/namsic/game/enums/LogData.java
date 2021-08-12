@@ -10,7 +10,6 @@ public enum LogData {
     ADVENTURE,
     FIELD_MOVE_DISTANCE,
     FIGHT,
-    FIGHT_ENEMY,
     FISH,
     GATHER,
     LOG_COUNT,
