@@ -374,11 +374,12 @@ public class FightManager {
                     entity.setKiller(null);
 
                     if(entity.equals(self)) {
-                        for(Entity entity_ : entitySet) {
+                        Player.replyPlayersExcept(playerSet, "전투를 시작한 유저가 사망하여 전투가 종료되었습니다", self);
+
+                        for(Entity entity_ : new HashSet<>(entitySet)) {
                             this.endFight(entity_);
                         }
 
-                        Player.replyPlayersExcept(playerSet, "전투를 시작한 유저가 사망하여 전투가 종료되었습니다", self);
                         return;
                     } else {
                         this.endFight(entity);
