@@ -23,6 +23,7 @@ import lkd.namsic.game.command.CommonCommand;
 import lkd.namsic.game.command.NonPlayerCommand;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.command.common.DevCommand;
+import lkd.namsic.game.command.common.DetailHelpCommand;
 import lkd.namsic.game.command.common.HelpCommand;
 import lkd.namsic.game.command.common.RuleCommand;
 import lkd.namsic.game.command.non_player.RegisterCommand;
@@ -82,19 +83,18 @@ public class KakaoTalk {
         playerCommands.clear();
         nonPlayerCommands.clear();
 
-        Logger.i("CommandRegister", "Commands cleared");
-
         try {
-            registerCommonCommand(new HelpCommand(),    "도움말", "명령어", "?", "h", "help");
-            registerCommonCommand(new DevCommand(),     "개발자", "dev");
-            registerCommonCommand(new RuleCommand(),    "규칙", "룰", "rule");
+            registerCommonCommand(new HelpCommand(),        "도움말", "명령어", "?", "h", "help");
+            registerCommonCommand(new DetailHelpCommand(),  "??");
+            registerCommonCommand(new DevCommand(),         "개발자", "dev");
+            registerCommonCommand(new RuleCommand(),        "규칙", "룰", "rule");
 
             registerNonPlayerCommand(new RegisterCommand(), "회원가입", "가입", "register");
 
             registerPlayerCommands();
         } catch (WeirdCommandException ignore) {}
 
-        Logger.i("CommandRegister", "Commands register complete");
+        Logger.i("CommandRegister", "Command register complete");
     }
 
     private static void registerPlayerCommands() {

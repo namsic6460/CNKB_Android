@@ -19,6 +19,7 @@ import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.NpcList;
+import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Npc;
@@ -272,7 +273,12 @@ public class DisplayManager {
         self.replyPlayer("레벨 랭킹은 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
-    public void displayQuestInfo(@NonNull Player self, long questId) {
+    public void displayQuestInfo(@NonNull Player self, @NonNull String questName) {
+        Long questId = QuestList.findByName(questName);
+        if(questId == null) {
+            throw new WeirdCommandException("알 수 없는 퀘스트입니다");
+        }
+
         if(!(self.getQuest().containsKey(questId) || self.getClearedQuest().containsKey(questId))) {
             throw new WeirdCommandException("받아본 적 없는 퀘스트의 정보는 확인할 수 없습니다");
         }

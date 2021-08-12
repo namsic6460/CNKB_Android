@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 0, 1000);
 
-        Logger.i("Start", "Debug 3 Started");
         Logger.logCount = 0;
         Logger.logs = "";
     }

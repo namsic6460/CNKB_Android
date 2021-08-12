@@ -39,7 +39,8 @@ public class ShopManager {
                 Emoji.LIST + " (다음/next/n) - 다음 페이지의 상점 물품을 표시합니다\n" +
                 Emoji.LIST + " (이전/prev/p) - 이전 페이지의 상점 물품을 표시합니다\n" +
                 Emoji.LIST + " (구매/buy/b) ({아이템 이름}) [{아이템 개수}] - 아이템을 구매합니다\n" +
-                Emoji.LIST + " (판매/sell/s) ({아이템 이름}) [{아이템 개수}] - 아이템을 판매합니다");
+                Emoji.LIST + " (판매/sell/s) ({아이템 이름}) [{아이템 개수}] - 아이템을 판매합니다\n\n" +
+                "예시: " + Emoji.focus("n 상점 구매 하급 체력 포션 1"));
     }
 
     public void displayShopList(@NonNull Player self, @NonNull String npcName) {
