@@ -20,10 +20,6 @@ public class FightCommand extends PlayerCommand {
     public void executeCommand(@NonNull final Player player, @NonNull String command, @NonNull List<String> commands,
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
-        if(player.getId().getObjectId() != 1) {
-            throw new WeirdCommandException("현재 전투는 버그로 인해 비활성화 되었습니다");
-        }
-
         if(second == null) {
             throw new WeirdCommandException("전투 대상을 선택해주세요");
         } else {

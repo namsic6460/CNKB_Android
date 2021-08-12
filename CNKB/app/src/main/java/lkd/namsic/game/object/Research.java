@@ -7,7 +7,6 @@ import java.util.Map;
 
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
-import lkd.namsic.game.base.RangeInteger;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.exception.NumberRangeException;

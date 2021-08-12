@@ -8,7 +8,6 @@ import androidx.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
-import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.ItemList;

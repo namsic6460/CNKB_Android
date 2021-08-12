@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.CommonCommand;
-import lkd.namsic.game.config.Emoji;
 
 public class RuleCommand extends CommonCommand {
 

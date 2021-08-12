@@ -21,11 +21,14 @@ public class GiveCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if(player.getId().getObjectId() == 1) {
-            if(second == null) {
+            if(second == null || third == null) {
                 throw new WeirdCommandException();
             }
 
-            player.addItem(Objects.requireNonNull(ItemList.findByName(second)), Integer.parseInt(third), false);
+            String countStr = commands.get(commands.size() - 1);
+            String itemName = command.replace(countStr, "").trim();
+
+            player.addItem(Objects.requireNonNull(ItemList.findByName(itemName)), Integer.parseInt(countStr), false);
             KakaoTalk.reply(session, "Success");
         }
     }

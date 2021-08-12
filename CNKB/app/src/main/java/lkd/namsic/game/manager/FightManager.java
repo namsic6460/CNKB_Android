@@ -38,7 +38,6 @@ public class FightManager {
 
     private static final FightManager instance = new FightManager();
 
-    //TODO
     private final Map<Long, Long> preventMap = new ConcurrentHashMap<>();
 
     private final Map<Long, Long> fightId = new ConcurrentHashMap<>();
@@ -129,18 +128,15 @@ public class FightManager {
     public void startFight(@NonNull Player self, @NonNull Entity enemy, boolean isFightOne) {
         self.addLog(LogData.FIGHT, 1);
 
-        if (this.checkInject(self, enemy)) {
-            return;
-        }
+        self = Config.loadObject(self.getId().getId(), self.getId().getObjectId());
+        enemy = Config.loadObject(enemy.getId().getId(), enemy.getId().getObjectId());
 
         this.setPrevDoing(self);
         this.setDoing(self, isFightOne);
 
-        if(enemy.getId().getId().equals(Id.PLAYER)) {
-            this.setPrevDoing((Player) enemy);
+        if (this.checkInject(self, enemy, isFightOne)) {
+            return;
         }
-
-        this.setDoing(enemy, isFightOne);
 
         long fightId = self.getId().getObjectId();
         String is = " (이/가) ";
@@ -313,15 +309,20 @@ public class FightManager {
                         Player.replyPlayers(playerSet, msg);
                     }
 
-                    if (attacker.equals(self)) {
-                        for (Entity entity : new HashSet<>(entitySet)) {
-                            this.endFight(entity);
-                        }
+                    if(success) {
+                        preventMap.put(attacker.getId().getObjectId(), System.currentTimeMillis() + Config.PREVENT_FIGHT_TIME);
 
-                        Player.replyPlayersExcept(playerSet, "전투를 시작한 유저가 도주하여 전투가 종료되었습니다", self);
-                        return;
-                    } else {
-                        this.endFight(attacker);
+                        if (attacker.equals(self)) {
+                            Player.replyPlayersExcept(playerSet, "전투를 시작한 유저가 도주하여 전투가 종료되었습니다", self);
+
+                            for (Entity entity : new HashSet<>(entitySet)) {
+                                this.endFight(entity);
+                            }
+
+                            return;
+                        } else {
+                            this.endFight(attacker);
+                        }
                     }
 
                     break;
@@ -462,15 +463,9 @@ public class FightManager {
         }
     }
 
-    private boolean checkInject(@NonNull Player self, @NonNull Entity enemy) {
-        Id id = self.getId().getId();
+    private boolean checkInject(@NonNull Player self, @NonNull Entity enemy, boolean isFightOne) {
         long objectId = self.getId().getObjectId();
-
-        Id enemyId = enemy.getId().getId();
         long enemyObjectId = enemy.getId().getObjectId();
-
-        self = Config.loadObject(id, objectId);
-        enemy = Config.loadObject(enemyId, enemyObjectId);
 
         if (Doing.fightList().contains(enemy.getDoing())) {
             StringBuilder innerBuilder = new StringBuilder("---적 목록---");
@@ -478,6 +473,8 @@ public class FightManager {
             long fightId = this.getFightId(enemyObjectId);
             Set<Entity> entitySet = this.getEntitySet(fightId);
             Set<Player> playerSet = this.getPlayerSet(fightId);
+
+            this.fightId.put(objectId, fightId);
 
             for(Entity entity : entitySet) {
                 innerBuilder.append("\n")
@@ -512,10 +509,13 @@ public class FightManager {
 
                 playerSet.add(player);
 
+                this.setPrevDoing(player);
+
                 player.addLog(LogData.FIGHT, 1);
                 player.replyPlayer(self.getName() + " (와/과) 의 전투가 시작되었습니다");
             }
 
+            this.setDoing(enemy, isFightOne);
             this.playerSet.put(objectId, playerSet);
 
             self.replyPlayer(enemy.getName() + " (와/과) 의 전투가 시작되었습니다");

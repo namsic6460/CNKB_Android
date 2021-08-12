@@ -2,7 +2,6 @@ package lkd.namsic.game.enums;
 
 import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
