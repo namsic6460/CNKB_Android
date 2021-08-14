@@ -38,7 +38,8 @@ public enum EquipList {
     HARD_IRON_CHESTPLATE("강철 갑옷", 25L),
     WEIRD_LEGGINGS("기괴한 바지", 26L),
     MINER_SHOES("광부의 신발", 27L),
-    TROLL_CLUB("트롤의 몽둥이", 28L);
+    TROLL_CLUB("트롤의 몽둥이", 28L),
+    BETA1_GEM("베타 보석", 38L);
 
     public static final Map<String, EquipList> nameMap = new HashMap<>();
     public static final Map<Long, EquipList> idMap = new HashMap<>();

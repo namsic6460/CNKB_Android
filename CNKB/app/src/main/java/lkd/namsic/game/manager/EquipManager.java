@@ -1,6 +1,7 @@
 package lkd.namsic.game.manager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -163,18 +164,18 @@ public class EquipManager {
         return equipment.getOriginalId();
     }
 
-    public void tryUse(@NonNull Player self, @NonNull EquipType equipType) {
+    public void tryUse(@NonNull Player self, @NonNull EquipType equipType, @Nullable String other) {
         long equipId = checkUse(self, equipType);
-        this.use(self, equipId);
+        this.use(self, equipId, other);
     }
 
-    public void use(@NonNull Entity self, long equipId) {
+    public void use(@NonNull Entity self, long equipId, @Nullable String other) {
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
 
         String msg = equipment.getName() + " 을 사용했습니다\n";
 
         EquipUse use = Objects.requireNonNull(equipment.getEquipUse());
-        String result = use.tryUse(self, new ArrayList<>());
+        String result = use.tryUse(self, other);
 
         if(self.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) self;

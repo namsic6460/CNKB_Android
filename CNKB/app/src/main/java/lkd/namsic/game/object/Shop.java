@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.object.ItemList;
-import lkd.namsic.game.enums.object.ShopList;
+import lkd.namsic.game.enums.object.NpcList;
 import lombok.Getter;
 
 @Getter
@@ -17,11 +17,11 @@ public class Shop extends NamedObject {
     final Map<Long, Long> sellPrice = new HashMap<>();
     final Map<Long, Long> buyPrice = new HashMap<>();
 
-    public Shop(@NonNull ShopList shopData) {
-        super(shopData.getDisplayName());
+    public Shop(@NonNull NpcList npcData) {
+        super(npcData.getDisplayName());
 
         this.id.setId(Id.SHOP);
-        this.id.setObjectId(shopData.getId());
+        this.id.setObjectId(npcData.getId());
     }
 
     public double getCloseRatePercent(@NonNull Player player, long npcId) {

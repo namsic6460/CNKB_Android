@@ -3,7 +3,6 @@ package lkd.namsic.game.manager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -56,15 +55,14 @@ public class ItemManager {
         return itemId;
     }
 
-    public void tryUse(@NonNull Player self, @NonNull String itemName, int count) {
+    public void tryUse(@NonNull Player self, @NonNull String itemName, @Nullable String other, int count) {
         long itemId = checkUse(self, itemName, count);
-        this.use(self, itemId, count);
+        this.use(self, itemId, other, count);
     }
 
-    public void use(@NonNull Entity self, long itemId, int count) {
+    public void use(@NonNull Entity self, long itemId, @Nullable String other, int count) {
         String eventName = ItemUseEvent.getName();
-        ItemUseEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), itemId, count);
-
+        ItemUseEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), itemId, other, count);
 
         Item item = Config.getData(Id.ITEM, itemId);
 
@@ -73,7 +71,7 @@ public class ItemManager {
 
         Use use = Objects.requireNonNull(item.getUse());
         for(int i = 1; i <= count; i++) {
-            innerBuilder.append(use.use(self, new ArrayList<>()))
+            innerBuilder.append(use.use(self, other))
                     .append("\n");
         }
 

@@ -72,6 +72,8 @@ public class ReinforceManager {
                 self.replyPlayer("강화에 실패했습니다...\n다음 강화 성공 확률: " +
                         Config.getDisplayPercent(equipment.getReinforcePercent(1)));
             }
+
+            self.setReinforceMultiplier(1);
         } finally {
             self.setDoing(Doing.NONE);
             Config.unloadObject(equipment);

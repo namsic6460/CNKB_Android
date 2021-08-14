@@ -666,17 +666,17 @@ public abstract class Entity extends NamedObject {
         return false;
     }
 
-    public int getFieldDistance(Location location) {
+    public int getFieldDistance(@NonNull Location location) {
         return (int) Math.sqrt(Math.pow(this.location.getFieldX().get() - location.getFieldX().get(), 2) +
                 Math.pow(this.location.getFieldY().get() - location.getFieldX().get(), 2));
     }
 
-    public int getMapDistance(Location location) {
+    public int getMapDistance(@NonNull Location location) {
         return (int) Math.sqrt(Math.pow(this.location.getX().get() - location.getX().get(), 2) +
                 Math.pow(this.location.getY().get() - location.getY().get(), 2));
     }
 
-    public void setVariable(Variable variable, Object value) {
+    public void setVariable(@NonNull Variable variable, @Nullable Object value) {
         this.variable.put(variable, value);
     }
 

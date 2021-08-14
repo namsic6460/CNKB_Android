@@ -16,8 +16,8 @@ import lkd.namsic.game.enums.ShopWaitType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.NpcList;
+import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.game.object.Shop;
 import lkd.namsic.setting.Logger;
@@ -43,49 +43,19 @@ public class ShopManager {
                 "예시: " + Emoji.focus("n 상점 구매 하급 체력 포션 1"));
     }
 
-    public void displayShopList(@NonNull Player self, @NonNull String npcName) {
+    public void startShopping(@NonNull Player self, @NonNull String npcName) {
         long npcId = NpcList.checkByName(self, npcName);
-        Npc npc = Config.getData(Id.NPC, npcId);
-
-        StringBuilder builder = new StringBuilder("---상점 목록---");
-
-        if(npc.getShop().isEmpty()) {
-            builder.append("\n해당 Npc 에게서 이용 가능한 상점이 없습니다");
-        } else {
-            List<Long> sortedList = new ArrayList<>(npc.getShop());
-            Collections.sort(sortedList);
-
-            Shop shop;
-            int index = 1;
-            for (long shopId : sortedList) {
-                shop = Config.getData(Id.SHOP, shopId);
-                builder.append("\n")
-                        .append(index++)
-                        .append(". ")
-                        .append(shop.getName());
-            }
-        }
-
-        self.replyPlayer(builder.toString());
-    }
-
-    public void startShopping(@NonNull Player self, @NonNull String npcName, int shopIndex) {
-        long npcId = NpcList.checkByName(self, npcName);
-        Npc npc = Config.getData(Id.NPC, npcId);
 
         if(self.getChatCount(npcId) == 0) {
             throw new WeirdCommandException("해당 Npc 와 최소 1번 이상 대화를 한 후 상점을 이용할 수 있습니다");
         }
 
-        List<Long> sortedList = new ArrayList<>(npc.getShop());
-        Collections.sort(sortedList);
-
-        if(shopIndex < 1 || shopIndex > sortedList.size()) {
-            throw new WeirdCommandException("알 수 없는 상점 번호입니다");
+        Shop shop;
+        try {
+            shop = Config.getData(Id.SHOP, npcId);
+        } catch (ObjectNotFoundException e) {
+            throw new WeirdCommandException("해당 Npc 에게는 상점 이용이 불가합니다");
         }
-
-        long shopId = sortedList.get(shopIndex - 1);
-        Shop shop = Config.getData(Id.SHOP, shopId);
 
         int page = 1;
         boolean isBuy;
@@ -96,6 +66,7 @@ public class ShopManager {
         List<Long> sortedBuyList = new ArrayList<>(shop.getBuyPrice().keySet());
         Collections.sort(sortedBuyList);
 
+        List<Long> sortedList;
         if(!shop.getSellPrice().isEmpty()) {
             sortedList = sortedSellList;
             isBuy = true;
@@ -107,7 +78,7 @@ public class ShopManager {
         }
 
         self.setDoing(Doing.SHOP);
-        self.replyPlayer(shop.getName() + " 상점 이용을 시작합니다\n" +
+        self.replyPlayer(shop.getName() + "의 상점 이용을 시작합니다\n" +
                 "상점 관련 명령어는 " + Emoji.focus("n 상점 ?") + " 를 참고해주세요");
 
         displayPage(self, sortedList, shop, npcId, page, isBuy);

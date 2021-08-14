@@ -1,6 +1,7 @@
 package lkd.namsic.game.base;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public abstract class EquipUse {
     final double useMnCurrent;
 
     @NonNull
-    public String tryUse(@NonNull Entity self, @NonNull List<GameObject> other) {
+    public String tryUse(@NonNull Entity self, @Nullable String other) {
         int hp = self.getStat(StatType.HP);
         int maxHp = self.getStat(StatType.MAXHP);
         int mn = self.getStat(StatType.MN);
@@ -65,6 +66,6 @@ public abstract class EquipUse {
     }
 
     @NonNull
-    public abstract String use(@NonNull Entity self, @NonNull List<GameObject> other);
+    public abstract String use(@NonNull Entity self, @Nullable String other);
 
 }

@@ -5,11 +5,15 @@ import java.util.Map;
 import java.util.Random;
 
 import lkd.namsic.game.base.Use;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.config.RandomList;
+import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.object.Equipment;
 import lkd.namsic.game.object.Player;
 
 public class ItemUses {
@@ -209,9 +213,49 @@ public class ItemUses {
             return "돌 10개를 얻었습니다\n현재 개수: " + self.getItem(ItemList.STONE.getId()) + "개";
         });
 
-//        put(ItemList.EQUIP_SAFENER, (self, other) -> {
-//
-//        });
+        put(ItemList.EQUIP_SAFENER.getId(), (self, other) -> {
+            Use.checkOther(other);
+
+            int index = Integer.parseInt(other);
+            long equipId = self.getEquipIdByIndex(index);
+
+            Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
+
+            try {
+                if(equipment.getLvDown() >= 100) {
+                    return "더이상 이 장비의 제한 레벨을 완화제로 낮출 수 없습니다";
+                }
+
+                equipment.addLvDown(5);
+                return equipment.getName() + " 의 장착 제한 레벨을 5 낮췄습니다\n장착 제한 레벨: " + equipment.getTotalLimitLv();
+            } finally {
+                Config.unloadObject(equipment);
+            }
+        });
+
+        put(ItemList.REINFORCE_MULTIPLIER.getId(), (self, other) -> {
+            Player player = (Player) self;
+
+            double reinforceMultiplier = player.getReinforceMultiplier();
+            if(reinforceMultiplier > 2) {
+                throw new WeirdCommandException("이미 강화 확률이 " + reinforceMultiplier + "배로 증가되어 있습니다");
+            }
+
+            player.setReinforceMultiplier(2);
+            return "다음 강화 확률이 2배로 증가되었습니다";
+        });
+
+        put(ItemList.GLOW_REINFORCE_MULTIPLIER.getId(), (self, other) -> {
+            Player player = (Player) self;
+
+            double reinforceMultiplier = player.getReinforceMultiplier();
+            if(reinforceMultiplier > 3) {
+                throw new WeirdCommandException("이미 강화 확률이 " + reinforceMultiplier + "배로 증가되어 있습니다");
+            }
+
+            player.setReinforceMultiplier(3);
+            return "다음 강화 확률이 3배로 증가되었습니다";
+        });
     }};
 
 }

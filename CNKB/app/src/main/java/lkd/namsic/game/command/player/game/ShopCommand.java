@@ -28,19 +28,7 @@ public class ShopCommand extends PlayerCommand {
             if(Arrays.asList("도움말", "명령어", "?", "help", "h").contains(second)) {
                 ShopManager.getInstance().displayHelp(player);
             } else if(player.getDoing().equals(Doing.NONE)) {
-                if(third != null) {
-                    String shopIndexStr = commands.get(commands.size() - 1);
-
-                    try {
-                        int shopIndex = Integer.parseInt(shopIndexStr);
-                        ShopManager.getInstance().startShopping(player,
-                                Config.replaceLast(command, shopIndexStr, "").trim(), shopIndex);
-
-                        return;
-                    } catch (NumberFormatException ignore) {}
-                }
-
-                ShopManager.getInstance().displayShopList(player, command);
+                ShopManager.getInstance().startShopping(player, command);
             } else if(player.getDoing().equals(Doing.SHOP)) {
                 String subCommand = command.replace(second, "").trim();
                 int count = 0;

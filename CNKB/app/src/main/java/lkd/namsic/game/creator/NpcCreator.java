@@ -5,7 +5,6 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.enums.object.QuestList;
-import lkd.namsic.game.enums.object.ShopList;
 import lkd.namsic.game.object.Npc;
 import lkd.namsic.setting.Logger;
 
@@ -76,7 +75,6 @@ public class NpcCreator implements Creatable {
 
         npc = new Npc(NpcList.HYEONG_SEOK, 25L);
         npc.getLocation().set(0, 0, 40, 40);
-        npc.getShop().add(ShopList.HYEONG_SEOK_REINFORCE.getId());
 
         npc.setBaseChat(new ChatLimit(), 26L);
 
@@ -118,7 +116,6 @@ public class NpcCreator implements Creatable {
 
         npc = new Npc(NpcList.EL, 32L);
         npc.getLocation().set(0, 0, 41, 40);
-        npc.getShop().add(ShopList.EL_FLOWER.getId());
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitHour1().set(6, 23);

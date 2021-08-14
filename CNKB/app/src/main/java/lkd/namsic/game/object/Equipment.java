@@ -66,6 +66,8 @@ public class Equipment extends Item implements Cloneable {
         Equipment equipment = Config.loadObject(Id.EQUIPMENT, this.originalId);
 
         if(checkBasic) {
+            assert entity != null;
+
             this.limitStat.clear();
             this.limitStat.putAll(equipment.limitStat);
 
@@ -128,7 +130,7 @@ public class Equipment extends Item implements Cloneable {
     }
 
     public int getTotalLimitLv() {
-        return Math.max(this.limitLv.get() - this.lvDown, Config.MIN_LV);
+        return Math.min(Math.max(this.limitLv.get() - this.lvDown, Config.MIN_LV), Config.MAX_LV);
     }
 
     @Deprecated
@@ -146,6 +148,10 @@ public class Equipment extends Item implements Cloneable {
     @Nullable
     public Map<String, Event> getEvent() {
         return EquipEvents.EVENT_MAP.get(this.id.getObjectId());
+    }
+
+    public void addLvDown(int lvDown) {
+        this.setLvDown(this.getLvDown() + lvDown);
     }
 
     public Equipment setBasicStat(@NonNull StatType statType, int stat) {

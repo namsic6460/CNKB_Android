@@ -50,8 +50,7 @@ public class HelpCommand extends CommonCommand {
                         "\uD83C\uDD99 ㅜ 강화 정보 -> 장착중인 장비들의 강화 상태를 표시합니다\n\n" +
                         "\uD83C\uDD99 ㅜ 강화 (장비 번호) -> 장비 인벤토리에서 확인한 번호로 장비를 강화합니다\n\n" +
                         "\uD83C\uDFEA ㅜ 상점 도움말 -> 상점 도움말을 표시합니다\n\n" +
-                        "\uD83C\uDFEA ㅜ 상점 (Npc 이름) -> Npc 에게서 이용 가능한 상점 목록을 표시합니다\n\n" +
-                        "\uD83C\uDFEA ㅜ 상점 (Npc 이름) (상점 번호) -> 상점을 이용합니다\n\n" +
+                        "\uD83C\uDFEA ㅜ 상점 (Npc 이름) -> 상점을 이용합니다\n\n" +
                         "\uD83D\uDCCA ㅜ 랭킹 -> 레벨 랭킹을 표시합니다");
     }
 

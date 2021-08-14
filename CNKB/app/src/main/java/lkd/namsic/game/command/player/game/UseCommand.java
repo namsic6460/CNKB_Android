@@ -9,6 +9,7 @@ import java.util.List;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.ItemManager;
 
@@ -26,10 +27,17 @@ public class UseCommand extends PlayerCommand {
         int count = 1;
         try {
             count = Integer.parseInt(lastWord);
-            itemName = command.replace(lastWord, "");
+            itemName = Config.replaceLast(command, lastWord, "");
         } catch (NumberFormatException ignore) {}
 
-        ItemManager.getInstance().tryUse(player, itemName.trim(), count);
+        String other = null;
+        String[] split = itemName.split(",");
+        if(split.length == 2) {
+            itemName = split[0];
+            other = split[1].trim();
+        }
+
+        ItemManager.getInstance().tryUse(player, itemName.trim(), other, count);
     }
 
 }

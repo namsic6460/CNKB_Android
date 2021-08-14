@@ -13,6 +13,7 @@ import java.util.Random;
 import java.util.Set;
 
 import lkd.namsic.game.base.ChatLimit;
+import lkd.namsic.game.base.LimitId;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.object.NpcList;
@@ -29,8 +30,6 @@ public class Npc extends Entity {
 
     Map<ChatLimit, Set<Long>> baseChat = new HashMap<>();
     Map<ChatLimit, Set<Long>> chat = new HashMap<>();
-
-    final Set<Long> shop = new HashSet<>();
 
     public Npc(@NonNull NpcList npcData, long firstChat) {
         super(npcData.getDisplayName());

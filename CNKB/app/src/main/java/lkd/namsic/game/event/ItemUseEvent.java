@@ -24,8 +24,8 @@ public abstract class ItemUseEvent implements Event {
         return "ItemUseEvent";
     }
 
-    public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events,
-                                   @NonNull Set<Long> eventEquipSet, long itemId, int count) {
+    public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events, @NonNull Set<Long> eventEquipSet,
+                                   long itemId, @Nullable String other, int count) {
         Item item = Config.getData(Id.ITEM, itemId);
 
         if (events != null) {
@@ -35,7 +35,7 @@ public abstract class ItemUseEvent implements Event {
                 ItemUseEvent itemUseEvent = EntityEvents.getEvent(eventId);
 
                 try {
-                    itemUseEvent.onUse(self, item, count);
+                    itemUseEvent.onUse(self, item, other, count);
                 } catch (EventRemoveException e) {
                     removeList.add(eventId);
                 } catch (EventSkipException ignore) {}
@@ -48,7 +48,7 @@ public abstract class ItemUseEvent implements Event {
             ItemUseEvent itemUseEvent = EquipEvents.getEvent(equipId, getName());
 
             try {
-                itemUseEvent.onUse(self, item, count);
+                itemUseEvent.onUse(self, item, other, count);
             } catch (EventRemoveException e) {
                 Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
                 self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
@@ -56,7 +56,7 @@ public abstract class ItemUseEvent implements Event {
         }
     }
 
-    public abstract void onUse(@NonNull Entity self, @NonNull Item item, int count);
+    public abstract void onUse(@NonNull Entity self, @NonNull Item item, @Nullable String other, int count);
 
     @NonNull
     @Override

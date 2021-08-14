@@ -85,7 +85,7 @@ public class KakaoTalk {
 
         try {
             registerCommonCommand(new HelpCommand(),        "도움말", "명령어", "?", "h", "help");
-            registerCommonCommand(new DetailHelpCommand(),  "??");
+            registerCommonCommand(new DetailHelpCommand(),  "??", "hh");
             registerCommonCommand(new DevCommand(),         "개발자", "dev");
             registerCommonCommand(new RuleCommand(),        "규칙", "룰", "rule");
 

@@ -2,18 +2,16 @@ package lkd.namsic;
 
 import org.junit.Test;
 
-import java.io.File;
-import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.object.Equipment;
-import lkd.namsic.game.object.Player;
-import lkd.namsic.setting.FileManager;
 
-public class ExampleUnitTest implements Serializable {
+public class ExampleUnitTest {
 
     @Test
     public void evalTest() {
@@ -25,16 +23,30 @@ public class ExampleUnitTest implements Serializable {
     }
 
     @Test
-    public void test() throws Exception {
-        File[] files = new File("C:\\Users\\user\\Downloads\\players").listFiles();
+    public void test() {
+        String command = "장비 완화제 1";
+        List<String> commands = Arrays.asList(command.split(" "));
 
-        for(File file : files) {
-            Player player = Config.fromJson(FileManager.read(file), Player.class);
+        String itemName = command;
+        String lastWord = commands.get(commands.size() - 1);
 
-            if(!player.getEquipInventory().isEmpty()) {
-                System.out.println(player.getName() + ": " + player.getEquipInventory());
-            }
+        int count = 1;
+        try {
+            count = Integer.parseInt(lastWord);
+            itemName = Config.replaceLast(command, lastWord, "");
+        } catch (NumberFormatException ignore) {}
+
+        String other = null;
+        String[] split = itemName.split(",");
+
+        if(split.length == 2) {
+            itemName = split[0];
+            other = split[1].trim();
         }
+
+        System.out.println(itemName);
+        System.out.println(other);
+        System.out.println(count);
     }
 
     @Test

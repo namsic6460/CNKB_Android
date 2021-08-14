@@ -295,7 +295,20 @@ public class EquipCreator implements Creatable {
         equipment.addBasicStat(StatType.ATS, -20);
         Config.unloadObject(equipment);
 
-        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 29L));
+        equipment = new Equipment(EquipType.GEM, EquipList.BETA1_GEM, "베타에 참여해주셔서 감사합니다!");
+        equipment.getHandleLv().set(5);
+        equipment.addBasicStat(StatType.MAXHP, 5);
+        equipment.addBasicStat(StatType.ATK, 5);
+        equipment.addBasicStat(StatType.MATK, 5);
+        equipment.addBasicStat(StatType.DEF, 5);
+        equipment.addBasicStat(StatType.MDEF, 5);
+        equipment.addBasicStat(StatType.BRE, 5);
+        equipment.addBasicStat(StatType.MBRE, 5);
+        equipment.addBasicStat(StatType.ACC, 5);
+        equipment.addBasicStat(StatType.EVA, 5);
+        Config.unloadObject(equipment);
+
+        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 39L));
         Logger.i("ObjectMaker", "Equipment making is done!");
     }
 

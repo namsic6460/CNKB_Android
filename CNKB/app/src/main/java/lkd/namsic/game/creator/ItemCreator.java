@@ -527,7 +527,7 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.GEM_ABRASIVE_MATERIAL, "보석을 연마할 수 있는 아이템이다");
         createItem(ItemList.GLOW_GEM_ABRASIVE_MATERIAL, "중심 보석을 연마할 수 있는 아이템이다");
 
-        createItem(ItemList.EQUIP_SAFENER, "무기의 제한 레벨을 낮출 수 있는 아이템이다");
+        createItem(ItemList.EQUIP_SAFENER, "무기의 제한 레벨을 낮출 수 있는 아이템이다\n명령어 대상 : 장비 번호");
 
         createItem(ItemList.LOW_MINER_TOKEN, "간단한 광질을 완수했다는 증표이다");
         createItem(ItemList.MINER_TOKEN, "광질을 완수했다는 증표이다");
@@ -805,6 +805,9 @@ public class ItemCreator implements Creatable {
             put(ItemList.STONE.getId(), 10);
         }});
         Config.unloadObject(item);
+        
+        createItem(ItemList.REINFORCE_MULTIPLIER, "다음 강화 확률을 2배로 증가시켜주는 아이템이다");
+        createItem(ItemList.GLOW_REINFORCE_MULTIPLIER, "다음 강화 확률을 3배로 증가시켜주는 아이템이다");
 
         Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 179L));
         Logger.i("ObjectMaker", "Item making is done!");

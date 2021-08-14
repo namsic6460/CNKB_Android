@@ -328,26 +328,18 @@ public class FightManager {
                     break;
 
                 case ITEM:
-                    long itemId = attacker.getObjectVariable(Variable.FIGHT_ITEM_ID, ItemList.NONE.getId());
+                case EQUIP:
+                    long objectId = attacker.getObjectVariable(Variable.FIGHT_ITEM_ID, ItemList.NONE.getId());
+                    String other = attacker.getObjectVariable(Variable.FIGHT_USE_OTHER);
 
-                    ItemManager.getInstance().use(attacker, itemId, 1);
-
-                    baseMsg = ItemList.findById(itemId) + " (을/를) 사용했습니다";
-                    msg = attacker.getFightName() + is + baseMsg;
-                    if(player != null) {
-                        Player.replyPlayersExcept(playerSet, msg, player);
+                    if(response.equals(FightWaitType.ITEM)) {
+                        ItemManager.getInstance().use(attacker, objectId, other, 1);
+                        baseMsg = ItemList.findById(objectId) + " (을/를) 사용했습니다";
                     } else {
-                        Player.replyPlayers(playerSet, msg);
+                        EquipManager.getInstance().use(attacker, objectId, other);
+                        baseMsg = EquipList.findById(objectId) + " (을/를) 사용했습니다";
                     }
 
-                    break;
-
-                case EQUIP:
-                    long equipId = attacker.getObjectVariable(Variable.FIGHT_ITEM_ID, EquipList.NONE.getId());
-
-                    EquipManager.getInstance().use(attacker, equipId);
-
-                    baseMsg = EquipList.findById(equipId) + " (을/를) 사용했습니다";
                     msg = attacker.getFightName() + is + baseMsg;
                     if(player != null) {
                         Player.replyPlayersExcept(playerSet, msg, player);
@@ -409,9 +401,9 @@ public class FightManager {
                 .append(Emoji.LIST)
                 .append(" (전투/fight/f) (대기/wait/w) - 아무 행동도 하지 않습니다\n")
                 .append(Emoji.LIST)
-                .append(" (전투/fight/f) (아이템/item/i) {아이템 이름} - 아이템을 사용합니다(연속 사용 불가)\n")
+                .append(" (전투/fight/f) (아이템/item/i) {아이템 이름[,{대상}]} - 아이템을 사용합니다(연속 사용 불가)\n")
                 .append(Emoji.LIST)
-                .append(" (전투/fight/f) (장비/equip/e) {장비 부위} - 장비를 사용합니다\n")
+                .append(" (전투/fight/f) (장비/equip/e) {장비 부위[,{대상}]} - 장비를 사용합니다\n")
                 .append(Emoji.LIST)
                 .append(" (전투/fight/f) (도망/도주/run/r) - 50% 확률로 도주합니다\n\n예시: ")
                 .append(Emoji.focus("n 전투 공격 1"))
@@ -583,17 +575,31 @@ public class FightManager {
                 self.replyPlayer("이미 방어태세입니다");
                 return;
             }
-        } else if(response.equals(FightWaitType.ITEM)) {
-            long itemId = ItemManager.getInstance().checkUse(self, subCommand, 1);
+        } else if(response.equals(FightWaitType.ITEM) || response.equals(FightWaitType.EQUIP)) {
+            String objectName;
+            String other = null;
 
-            if(itemId >= ItemList.LOW_EXP_POTION.getId() && itemId <= ItemList.HIGH_EXP_POTION.getId()) {
-                throw new WeirdCommandException("전투중에는 경험치 포션을 사용할 수 없습니다");
+            String[] split = subCommand.split(",");
+            if(split.length == 2) {
+                objectName = split[0];
+                other = split[1];
+            } else {
+                objectName = subCommand;
             }
 
-            self.setVariable(Variable.FIGHT_ITEM_ID, itemId);
-        } else if(response.equals(FightWaitType.EQUIP)) {
-            long equipId = EquipManager.getInstance().checkUse(self, EquipType.findByName(subCommand));
-            self.setVariable(Variable.FIGHT_ITEM_ID, equipId);
+            long objectId;
+            if(response.equals(FightWaitType.ITEM)) {
+                objectId = ItemManager.getInstance().checkUse(self, objectName, 1);
+
+                if (objectId >= ItemList.LOW_EXP_POTION.getId() && objectId <= ItemList.HIGH_EXP_POTION.getId()) {
+                    throw new WeirdCommandException("전투중에는 경험치 포션을 사용할 수 없습니다");
+                }
+            } else {
+                objectId = EquipManager.getInstance().checkUse(self, EquipType.findByName(objectName));
+            }
+
+            self.setVariable(Variable.FIGHT_ITEM_ID, objectId);
+            self.setVariable(Variable.FIGHT_USE_OTHER, other);
         }
 
         self.setVariable(Variable.FIGHT_WAIT_TYPE, response);
