@@ -99,8 +99,14 @@ public class MapCreator implements Creatable {
         for(String[] playerData : Config.PLAYER_LIST.values()) {
             player = Config.loadPlayer(playerData[0], playerData[1]);
             Config.unloadObject(player);
+
             map = Config.loadMap(player.getLocation());
             map.addEntity(player);
+
+            if(!map.getSpawnMonster().isEmpty()) {
+                map.respawn();
+            }
+
             Config.unloadMap(map);
         }
 

@@ -56,7 +56,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 1.1;
+    public static final double VERSION = 1.3;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -268,14 +268,18 @@ public class Config {
                 }
             }
 
-            FileManager.save(FileManager.CONFIG_PATH, createConfig().toString());
+            saveConfig();
         } catch (Exception e) {
             Logger.e("onTerminate", e);
         }
     }
 
+    public static void saveConfig() {
+        FileManager.save(FileManager.CONFIG_PATH, createConfig().toString());
+    }
+
     @NonNull
-    public static <T extends GameObject & Cloneable> T newObject(@NonNull T t) {
+    public static <T extends GameObject & Cloneable> T newObject(@NonNull T t, boolean save) {
         Id id = t.getId().getId();
         long objectId = ID_COUNT.get(id);
 
@@ -285,6 +289,10 @@ public class Config {
         ID_COUNT.put(id, objectId + 1);
 
         Logger.i("newObject", id.toString() + "-" + objectId);
+
+        if(save) {
+            saveConfig();
+        }
 
         return t;
     }

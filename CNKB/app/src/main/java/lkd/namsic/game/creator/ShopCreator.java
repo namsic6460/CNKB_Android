@@ -7,6 +7,7 @@ import lkd.namsic.game.enums.object.ShopList;
 import lkd.namsic.game.object.Shop;
 import lkd.namsic.setting.Logger;
 
+//TODO : Npc 당 상점 1개로 통일
 public class ShopCreator implements Creatable {
 
     @Override

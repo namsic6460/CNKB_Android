@@ -273,7 +273,7 @@ public class GameMap {
     }
 
     public void addMoney(@NonNull Entity self, long money) {
-        Location location = self.getLocation();
+        Location location = new Location(self.getLocation());
         this.setMoney(self, location, this.getMoney(location) + money);
     }
 
@@ -345,12 +345,12 @@ public class GameMap {
     }
 
     public void addItem(@NonNull Entity self, long itemId, int count) {
-        Location location = self.getLocation();
+        Location location = new Location(self.getLocation());
         this.setItem(self, location, itemId, this.getItem(location, itemId) + count);
     }
 
     public void addEquip(@NonNull Entity self, long equipId) {
-        Location location = self.getLocation();
+        Location location = new Location(self.getLocation());
 
         if(!location.equalsMap(this.location)) {
             throw new WeirdDataException(this.location, location);
@@ -459,6 +459,8 @@ public class GameMap {
             existSet.add(monster.getOriginalId());
         }
 
+        boolean created = false;
+
         for(long monsterId : spawnMonster) {
             if(existSet.contains(monsterId)) {
                 continue;
@@ -469,10 +471,12 @@ public class GameMap {
 
             if(random.nextDouble() < percent || percent == 1) {
                 for(int count = 0; count < spawnCount; count++) {
+                    created = true;
+
                     int fieldX = random.nextInt(Config.MAX_FIELD_X - 4) + 5;
                     int fieldY = random.nextInt(Config.MAX_FIELD_Y - 4) + 5;
 
-                    Monster monster = Config.newObject(Config.getData(Id.MONSTER, monsterId));
+                    Monster monster = Config.newObject(Config.getData(Id.MONSTER, monsterId), false);
                     monster.randomLevel();
                     monster.location = new Location();
                     MoveManager.getInstance().setMap(monster, this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
@@ -496,10 +500,12 @@ public class GameMap {
             percent = this.spawnPercent.get(Id.MONSTER).get(bossId);
 
             if(random.nextDouble() < percent || percent == 1) {
+                created = true;
+
                 int fieldX = random.nextInt(Config.MAX_FIELD_X) + 1;
                 int fieldY = random.nextInt(Config.MAX_FIELD_Y) + 1;
 
-                Boss boss = Config.newObject(Config.getData(Id.BOSS, bossId));
+                Boss boss = Config.newObject(Config.getData(Id.BOSS, bossId), false);
                 boss.randomLevel();
                 boss.location = new Location();
                 MoveManager.getInstance().setMap(boss, this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
@@ -509,6 +515,10 @@ public class GameMap {
                 //Boss must exist only one
                 break;
             }
+        }
+
+        if(created) {
+            Config.saveConfig();
         }
     }
 

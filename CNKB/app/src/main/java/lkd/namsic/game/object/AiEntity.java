@@ -114,7 +114,7 @@ public abstract class AiEntity extends Entity implements Cloneable {
             dropPercent = this.getEquipDropPercent(equip.getEquipType());
 
             if(random.nextDouble() < dropPercent) {
-                Equipment newEquip = Config.newObject(Config.getData(Id.EQUIPMENT, equipId));
+                Equipment newEquip = Config.newObject(Config.getData(Id.EQUIPMENT, equipId), true);
                 long newEquipId = newEquip.getId().getObjectId();
                 Config.unloadObject(newEquip);
 

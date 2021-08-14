@@ -2,15 +2,16 @@ package lkd.namsic;
 
 import org.junit.Test;
 
+import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.Player;
+import lkd.namsic.setting.FileManager;
 
 public class ExampleUnitTest implements Serializable {
 
@@ -24,11 +25,16 @@ public class ExampleUnitTest implements Serializable {
     }
 
     @Test
-    public void test() {
-        List<Integer> list = new ArrayList<>();
-        list.add(1);
+    public void test() throws Exception {
+        File[] files = new File("C:\\Users\\user\\Downloads\\players").listFiles();
 
-        System.out.println(list);
+        for(File file : files) {
+            Player player = Config.fromJson(FileManager.read(file), Player.class);
+
+            if(!player.getEquipInventory().isEmpty()) {
+                System.out.println(player.getName() + ": " + player.getEquipInventory());
+            }
+        }
     }
 
     @Test

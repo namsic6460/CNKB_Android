@@ -465,7 +465,7 @@ public abstract class Entity extends NamedObject {
     }
 
     public void addEquip(long equipId) {
-        Equipment newEquip = Config.newObject(Config.getData(Id.EQUIPMENT, equipId));
+        Equipment newEquip = Config.newObject(Config.getData(Id.EQUIPMENT, equipId), true);
         long newEquipId = newEquip.getId().getObjectId();
         this.equipInventory.add(newEquipId);
         Config.unloadObject(newEquip);
@@ -685,7 +685,11 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getVariable(Variable variable) {
-        Object value = this.variable.getOrDefault(variable, 0);
+        return this.getVariable(variable, 0);
+    }
+
+    public int getVariable(Variable variable, int defaultValue) {
+        Object value = this.variable.getOrDefault(variable, defaultValue);
 
         if(value instanceof Double) {
             return ((Double) value).intValue();

@@ -27,6 +27,10 @@ public class Location {
         this.fieldY.set(fieldY);
     }
 
+    public Location(@NonNull Location location) {
+        this(location.x.get(), location.y.get(), location.fieldX.get(), location.fieldY.get());
+    }
+
     public void setMap(int x, int y) {
         this.x.set(x);
         this.y.set(y);

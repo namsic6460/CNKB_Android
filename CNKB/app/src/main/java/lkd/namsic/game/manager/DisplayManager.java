@@ -45,9 +45,9 @@ public class DisplayManager {
         }
 
         innerMsg.append("광질 레벨: ")
-                .append(self.getVariable(Variable.MINE))
+                .append(target.getVariable(Variable.MINE, 1))
                 .append("\n낚시 레벨: ")
-                .append(self.getVariable(Variable.FISH))
+                .append(target.getVariable(Variable.FISH, 1))
                 .append("\n\n")
                 .append(this.getDisplayStat(target))
                 .append("\n\n")

@@ -99,6 +99,7 @@ public class QuestCreator implements Creatable {
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.LV100, NpcList.NOAH.getId(), 132L);
+        quest.getClearLimitLv().set(100);
         quest.setRewardItem(ItemList.STAT_POINT.getId(), 150);
         Config.unloadObject(quest);
 
@@ -139,7 +140,7 @@ public class QuestCreator implements Creatable {
             ItemList gem = Config.GEMS[i];
 
             quest = new Quest(QuestList.nameMap.get("보석 수집 - " + gem.getDisplayName()),
-                    NpcList.BOAM_E.getId(), 99L + (i * 2));
+                    NpcList.BOAM_E.getId(), 133L);
             quest.setNeedItem(gem.getId(), 1);
             quest.setRewardCloseRate(NpcList.BOAM_E.getId(), 5);
             quest.setRewardItem(ItemList.STAT_POINT.getId(), 5);

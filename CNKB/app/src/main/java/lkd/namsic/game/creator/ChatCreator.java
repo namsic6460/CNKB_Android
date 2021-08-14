@@ -524,6 +524,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 82L, "고마워. 대신 구해오면 괜찮은거 알려줄게");
+        chat.getQuestId().set(QuestList.MEMORIAL_CEREMONY.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 83L,
@@ -630,7 +631,7 @@ public class ChatCreator implements Creatable {
 
             chat = createChat("보석 수집 - " + gemName, chatId,
                     "모험가님... 혹시 " + gemName + " 하나 구해줄 수 있어요?",
-                    "보석을 모으고 있는데 " + gemName + "이 필요해서요..."
+                    "보석을 모으고 있는데 " + gemName + " (이/가) 필요해서요..."
             );
             chat.setResponseChat(WaitResponse.YES, chatId + 1);
             chat.setResponseChat(WaitResponse.NO, 97L);
@@ -673,6 +674,9 @@ public class ChatCreator implements Creatable {
                 "역시 자네라면 이번에도 금방 받아갈 줄 알았지 허허",
                 "자 여기 유용하게 쓰게나"
         );
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 133L, "고마워요!");
         Config.unloadObject(chat);
 
         Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 133L));

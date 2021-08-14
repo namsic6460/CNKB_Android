@@ -109,21 +109,19 @@ public class AdventureManager {
                 self.setVariable(Variable.ADVENTURE_WAIT_TYPE, AdventureWaitType.WAIT);
 
                 synchronized (self) {
-                    while(true) {
-                        try {
-                            self.wait(Config.ADVENTURE_WAIT_TIME);
-                        } catch (InterruptedException e) {
-                            Logger.e("Player.adventureThread", e);
-                            throw new RuntimeException(e.getMessage());
-                        }
+                    try {
+                        self.wait(Config.ADVENTURE_WAIT_TIME);
+                    } catch (InterruptedException e) {
+                        Logger.e("Player.adventureThread", e);
+                        throw new RuntimeException(e.getMessage());
+                    }
 
-                        self.notifyAll();
+                    self.notifyAll();
 
-                        Boolean isFightResponse = self.getObjectVariable(Variable.IS_FIGHT_RESPONSE, true);
-                        if(!isFightResponse) {
-                            self.removeVariable(Variable.IS_FIGHT_RESPONSE);
-                            break;
-                        }
+                    Boolean isFightResponse = self.getObjectVariable(Variable.IS_FIGHT_RESPONSE, false);
+                    if(isFightResponse) {
+                        self.removeVariable(Variable.IS_FIGHT_RESPONSE);
+                        return;
                     }
                 }
 

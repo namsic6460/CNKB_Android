@@ -208,6 +208,10 @@ public class ItemUses {
             self.addItem(ItemList.STONE.getId(), 10, false);
             return "돌 10개를 얻었습니다\n현재 개수: " + self.getItem(ItemList.STONE.getId()) + "개";
         });
+
+//        put(ItemList.EQUIP_SAFENER, (self, other) -> {
+//
+//        });
     }};
 
 }
