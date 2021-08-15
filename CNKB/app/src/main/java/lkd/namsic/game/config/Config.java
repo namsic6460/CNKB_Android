@@ -56,7 +56,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 1.4;
+    public static final double VERSION = 1.54;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -120,8 +120,8 @@ public class Config {
     public static final long MAX_PAUSE_TIME = 5000;
     public static final int MAX_SPAWN_COUNT = 16;
 
-    public static final double REINFORCE_EFFICIENCY = 0.2;
-    public static final double REINFORCE_EFFICIENCY_PER_HANDLE_LV = 0.035;
+    public static final double REINFORCE_EFFICIENCY = 0.18;
+    public static final double REINFORCE_EFFICIENCY_PER_HANDLE_LV = 0.01;
     public static final long REINFORCE_BASE_COST = 1000;
     public static final long REINFORCE_COST_PER_HANDLE_LV = 500;
     public static final double REINFORCE_COST_MULTIPLIER = 0.12;
@@ -308,12 +308,6 @@ public class Config {
         } else {
             Logger.i("deleteAiEntity", id + "-" + objectId + " added");
             DELETE_LIST.get(entity.getId().getId()).add(entity.getId().getObjectId());
-
-            for(long equipId : entity.getEquipInventory()) {
-                if(!entity.getLastDropEquip().contains(equipId)) {
-                    DELETE_LIST.get(Id.EQUIPMENT).add(equipId);
-                }
-            }
         }
     }
 
@@ -825,6 +819,13 @@ public class Config {
 
         if(entity.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) entity;
+
+            if(player.getVersion() <= 1.4) {
+                player.addMoney(30000);
+                player.addItem(ItemList.EQUIP_SAFENER.getId(), 10);
+                player.addItem(ItemList.REINFORCE_MULTIPLIER.getId(), 5);
+                player.addItem(ItemList.HIGH_ELIXIR.getId(), 1);
+            }
 
             if (unavailable) {
                 StringBuilder innerBuilder = new StringBuilder("---장비 업데이트 경고---\n(장착 해제할 경우 재장착이 불가능한 장비 목록)");

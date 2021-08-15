@@ -134,7 +134,7 @@ public class MonsterCreator implements Creatable {
         monster.setBasicStat(StatType.DRA, 50);
 
         monster.addBasicEquip(EquipList.TROLL_CLUB.getId());
-        monster.setEquipDropPercent(EquipType.WEAPON, 0.03);
+        monster.setEquipDropPercent(EquipType.WEAPON, 0.01);
 
         monster.setItemDrop(ItemList.MAGIC_STONE.getId(), 0.1, 1, 1);
 

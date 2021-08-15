@@ -291,7 +291,7 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.WEAPON, EquipList.TROLL_CLUB, "트롤이 가지고 다니는 무식하게 생긴 몽둥이다\n" +
                 "사용 시 마나 1을 소모하여 다음 공격이 자신보다 낮은 레벨의 몬스터를 공격하는 것이라면 데미지를 3배로 준다");
         equipment.getHandleLv().set(4);
-        equipment.addBasicStat(StatType.ATK, 35);
+        equipment.addBasicStat(StatType.ATK, 25);
         equipment.addBasicStat(StatType.ATS, -20);
         Config.unloadObject(equipment);
 

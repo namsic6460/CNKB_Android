@@ -80,6 +80,7 @@ public class Equipment extends Item implements Cloneable {
         }
 
         this.handleLv.set(equipment.handleLv.get());
+        this.limitLv.set(equipment.limitLv.get());
 
         double totalIncrease = 0;
         double statIncrease = Config.REINFORCE_EFFICIENCY + Config.REINFORCE_EFFICIENCY_PER_HANDLE_LV * this.handleLv.get();
@@ -142,7 +143,7 @@ public class Equipment extends Item implements Cloneable {
 
     @Nullable
     public EquipUse getEquipUse() {
-        return EquipUses.EQUIP_USE_MAP.get(this.id.getObjectId());
+        return EquipUses.EQUIP_USE_MAP.get(this.originalId);
     }
 
     @Nullable

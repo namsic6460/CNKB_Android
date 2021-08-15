@@ -52,7 +52,7 @@ public class MineManager {
                 ItemList.ORICHALCON.getId(), ItemList.NONE.getId());
 
         double percent;
-        long itemId = 0;
+        long itemId = ItemList.NONE.getId();
 
         //0 ~ 11
         int itemTier = 0;

@@ -41,21 +41,23 @@ public class CraftCommand extends PlayerCommand {
 
                 try {
                     lastNumber = Integer.parseInt(lastStr);
+                } catch (NumberFormatException e) {
+                    lastStr = "";
+                }
 
-                    if(fourth != null) {
+                if(!lastStr.equals("") && fourth != null) {
+                    try {
                         String frontStr = commands.get(commands.size() - 2);
                         int frontNumber = Integer.parseInt(frontStr);
 
-                        if(lastNumber < 1) {
+                        if (lastNumber < 1) {
                             throw new WeirdCommandException("레시피 번호는 1 이상이어야 합니다");
                         }
 
                         ItemManager.getInstance().craft(player, Config.replaceLast(Config.replaceLast(
                                 command, lastStr, ""), frontStr, ""), frontNumber, lastNumber);
                         return;
-                    }
-                } catch (NumberFormatException e) {
-                    lastStr = "";
+                    } catch (NumberFormatException ignore) {}
                 }
             }
 

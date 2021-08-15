@@ -56,7 +56,7 @@ import lombok.Setter;
 public abstract class Entity extends NamedObject {
 
     @Setter
-    double version = 1.0;
+    double version = Config.VERSION;
 
     final LimitInteger lv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
     final LimitLong money = new LimitLong(0, 0L, null);

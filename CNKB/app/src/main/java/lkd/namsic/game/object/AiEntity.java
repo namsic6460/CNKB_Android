@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.base.LimitInteger;
@@ -108,8 +107,7 @@ public abstract class AiEntity extends Entity implements Cloneable {
         }
 
         Equipment equip;
-        Set<Long> equipCopy = new HashSet<>(this.equipInventory);
-        for(Long equipId : equipCopy) {
+        for(Long equipId : new HashSet<>(this.equipInventory)) {
             equip = Config.getData(Id.EQUIPMENT, equipId);
             dropPercent = this.getEquipDropPercent(equip.getEquipType());
 
