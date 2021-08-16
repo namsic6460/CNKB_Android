@@ -62,7 +62,7 @@ public class ItemManager {
 
     public void use(@NonNull Entity self, long itemId, @Nullable String other, int count) {
         String eventName = ItemUseEvent.getName();
-        ItemUseEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), itemId, other, count);
+        ItemUseEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), itemId, other, count);
 
         Item item = Config.getData(Id.ITEM, itemId);
 
@@ -111,7 +111,7 @@ public class ItemManager {
 
     public void eat(@NonNull Player self, long itemId, int count) {
         String eventName = ItemEatEvent.getName();
-        ItemEatEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), itemId, count);
+        ItemEatEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), itemId, count);
 
         self.addLog(LogData.TOTAL_ITEM_EAT, 1);
 

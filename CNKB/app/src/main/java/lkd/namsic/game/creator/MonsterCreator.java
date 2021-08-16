@@ -132,6 +132,7 @@ public class MonsterCreator implements Creatable {
         monster.setBasicStat(StatType.HP, 500);
         monster.setBasicStat(StatType.ATK, 50);
         monster.setBasicStat(StatType.DRA, 50);
+        monster.setBasicStat(StatType.ACC, 40);
 
         monster.addBasicEquip(EquipList.TROLL_CLUB.getId());
         monster.setEquipDropPercent(EquipType.WEAPON, 0.01);
@@ -159,7 +160,29 @@ public class MonsterCreator implements Creatable {
         Config.unloadObject(monster);
 
 
-        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 9L));
+        monster = new Monster(MonsterList.OAK);
+        monster.getLv().set(90);
+        monster.setLocation(null);
+
+        monster.setBasicStat(StatType.MAXHP, 300);
+        monster.setBasicStat(StatType.HP, 300);
+        monster.setBasicStat(StatType.ATK, 40);
+        monster.setBasicStat(StatType.ATS, 150);
+        monster.setBasicStat(StatType.DEF, 30);
+        monster.setBasicStat(StatType.MDEF, 15);
+        monster.setBasicStat(StatType.BRE, 50);
+        monster.setBasicStat(StatType.ACC, 60);
+        monster.setBasicStat(StatType.EVA, 30);
+
+        monster.setItemDrop(ItemList.OAK_TOOTH.getId(), 0.3, 1, 1);
+        monster.setItemDrop(ItemList.OAK_LEATHER.getId(), 0.5, 1, 1);
+
+        monster.addEvent(EventList.OAK_START_FIGHT);
+
+        Config.unloadObject(monster);
+
+
+        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 10L));
         Logger.i("ObjectMaker", "Monster making is done!");
     }
 

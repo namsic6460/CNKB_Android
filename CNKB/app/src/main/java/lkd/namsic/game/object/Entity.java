@@ -121,7 +121,7 @@ public abstract class Entity extends NamedObject {
         LoNg wrappedMoney = new LoNg(money);
 
         String eventName = MoneyChangeEvent.class.getName();
-        MoneyChangeEvent.handleEvent(this, this.event.get(eventName), this.getEventEquipSet(eventName), wrappedMoney);
+        MoneyChangeEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName), wrappedMoney);
 
         this.money.set(wrappedMoney.get());
     }
@@ -163,7 +163,7 @@ public abstract class Entity extends NamedObject {
                 isDeath = true;
 
                 String eventName = DeathEvent.class.getName();
-                DeathEvent.handleEvent(this, this.event.get(eventName), this.getEventEquipSet(eventName),
+                DeathEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName),
                         this.getStat(StatType.HP), stat);
             }
         } else if(statType.equals(StatType.MN)) {
@@ -529,7 +529,7 @@ public abstract class Entity extends NamedObject {
     }
 
     @NonNull
-    public Set<Long> getEventEquipSet(@NonNull String eventName) {
+    public Set<Long> getEquipEvents(@NonNull String eventName) {
         Set<Long> eventSet = new HashSet<>();
 
         for(long equipId : this.equipped.values()) {
@@ -538,7 +538,7 @@ public abstract class Entity extends NamedObject {
 
             if(eventMap != null && eventMap.containsKey(eventName) && !Objects.requireNonNull(
                     this.removedEquipEvent.get(equipment.getEquipType())).contains(eventName)) {
-                eventSet.add(equipId);
+                eventSet.add(equipment.getOriginalId());
             }
         }
 
@@ -573,8 +573,8 @@ public abstract class Entity extends NamedObject {
             int def = Math.max(entity.getStat(StatType.DEF) - this.getStat(StatType.BRE), 0);
             int mdef = Math.max(entity.getStat(StatType.MDEF) - this.getStat(StatType.MBRE), 0);
 
-            physicDmg.set(Math.max(physicDmg.get() - def, 0));
-            magicDmg.set(Math.max(magicDmg.get() - mdef, 0));
+            physicDmg.set(Math.max(physicDmg.get() - def, 1));
+            magicDmg.set(Math.max(magicDmg.get() - mdef, 1));
 
             int heal = 0;
             boolean isDefencing = entity.getObjectVariable(Variable.IS_DEFENCING, false);
@@ -602,12 +602,22 @@ public abstract class Entity extends NamedObject {
             }
 
             String eventName = DamageEvent.getName();
-            DamageEvent.handleEvent(this, this.event.get(eventName), this.getEventEquipSet(eventName),
+            DamageEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName),
                     entity, totalDmg, totalDra, isCrit);
 
             eventName = DamagedEvent.getName();
-            DamagedEvent.handleEvent(entity, entity.event.get(eventName), entity.getEventEquipSet(eventName),
+            DamagedEvent.handleEvent(entity, entity.event.get(eventName), entity.getEquipEvents(eventName),
                     this, totalDmg, totalDra, isCrit);
+
+            if(this.id.getId().equals(Id.PLAYER)) {
+                Player player = (Player) this;
+
+                if(isCrit.get()) {
+                    player.setLastCrit(true);
+                } else {
+                    player.setLastCrit(false);
+                }
+            }
 
             boolean isDeath = entity.addBasicStat(StatType.HP, -1 * totalDmg.get());
             this.addBasicStat(StatType.HP, totalDra.get());
@@ -674,6 +684,67 @@ public abstract class Entity extends NamedObject {
     public int getMapDistance(@NonNull Location location) {
         return (int) Math.sqrt(Math.pow(this.location.getX().get() - location.getX().get(), 2) +
                 Math.pow(this.location.getY().get() - location.getY().get(), 2));
+    }
+
+    public Map<Id, Map<Long, Integer>> getEntityDistant() {
+        Map<Id, Map<Long, Integer>> output = new HashMap<>();
+        Map<Long, Integer> distantMap;
+
+        GameMap map = Config.getMapData(this.location);
+
+        Id id;
+        Entity entity;
+        for(Map.Entry<Id, Set<Long>> entry : map.getEntity().entrySet()) {
+            id = entry.getKey();
+
+            distantMap = new HashMap<>();
+            output.put(id, distantMap);
+
+            for(long objectId : entry.getValue()) {
+                entity = Config.getData(id, objectId);
+
+                if(entity.equals(this)) {
+                    continue;
+                }
+
+                distantMap.put(objectId, getFieldDistance(entity.getLocation()));
+            }
+        }
+
+        return output;
+    }
+
+    @Nullable
+    public Object[] getNearestEntity(@Nullable Id id) {
+        Map<Id, Map<Long, Integer>> distantMap = this.getEntityDistant();
+
+        IdClass idClass = null;
+        int minDistant = Integer.MAX_VALUE;
+
+        Id key;
+        int distant;
+        for(Map.Entry<Id, Map<Long, Integer>> entry : distantMap.entrySet()) {
+            key = entry.getKey();
+
+            if(key != null && !key.equals(id)) {
+                continue;
+            }
+
+            for(Map.Entry<Long, Integer> entry_ : entry.getValue().entrySet()) {
+                distant = entry_.getValue();
+
+                if(distant < minDistant) {
+                    minDistant = distant;
+                    idClass = new IdClass(id, entry_.getKey());
+                }
+            }
+        }
+
+        if(idClass == null) {
+            return null;
+        } else {
+            return new Object[]{idClass, minDistant};
+        }
     }
 
     public void setVariable(@NonNull Variable variable, @Nullable Object value) {

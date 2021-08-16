@@ -28,6 +28,7 @@ import lkd.namsic.game.event.ItemEatEvent;
 import lkd.namsic.game.event.ItemUseEvent;
 import lkd.namsic.game.event.MoneyChangeEvent;
 import lkd.namsic.game.event.MoveEvent;
+import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Achieve;
 import lkd.namsic.game.object.AiEntity;
 import lkd.namsic.game.object.Boss;
@@ -92,6 +93,8 @@ public class Eval {
             ScriptableObject.putProperty(scope, "ItemUseEvent", ItemUseEvent.class);
             ScriptableObject.putProperty(scope, "MoneyChangeEvent", MoneyChangeEvent.class);
             ScriptableObject.putProperty(scope, "MoveEvent", MoveEvent.class);
+
+            ScriptableObject.putProperty(scope, "FightManager", FightManager.class);
 
             ScriptableObject.putProperty(scope, "Achieve", Achieve.class);
             ScriptableObject.putProperty(scope, "AiEntity", AiEntity.class);

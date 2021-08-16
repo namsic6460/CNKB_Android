@@ -148,7 +148,7 @@ public class Equipment extends Item implements Cloneable {
 
     @Nullable
     public Map<String, Event> getEvent() {
-        return EquipEvents.EVENT_MAP.get(this.id.getObjectId());
+        return EquipEvents.EVENT_MAP.get(this.originalId);
     }
 
     public void addLvDown(int lvDown) {

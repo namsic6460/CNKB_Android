@@ -81,6 +81,13 @@ public class MapCreator implements Creatable {
         map.setSpawnMonster(MonsterList.TROLL.getId(), 1D, 3);
         Config.unloadMap(map);
 
+        map = new GameMap(MapList.findByLocation(3, 2));
+        map.setMapType(MapType.MOUNTAIN);
+        map.getRequireLv().set(75);
+        map.getLocation().set(3, 2, 1, 1);
+        map.setSpawnMonster(MonsterList.OAK.getId(), 1D, 8);
+        Config.unloadMap(map);
+
         for(int x = 0; x <= 10; x++) {
             for(int y = 0; y <= 10; y++) {
                 if(!MapList.findByLocation(x, y).equals(Config.INCOMPLETE)) {

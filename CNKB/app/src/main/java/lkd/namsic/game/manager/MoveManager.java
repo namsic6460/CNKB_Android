@@ -41,7 +41,7 @@ public class MoveManager {
         }
 
         String eventName = MoveEvent.getName();
-        MoveEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), distance, true);
+        MoveEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), distance, true);
 
         if (self.getId().getId().equals(Id.PLAYER)) {
             ((Player) self).addLog(LogData.FIELD_MOVE_DISTANCE, distance);
@@ -172,7 +172,7 @@ public class MoveManager {
         }
 
         String eventName = MoveEvent.getName();
-        MoveEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), distance, false);
+        MoveEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), distance, false);
 
         if(self.getId().getId().equals(Id.PLAYER)) {
             ((Player) self).addLog(LogData.MAP_MOVE_DISTANCE, distance);

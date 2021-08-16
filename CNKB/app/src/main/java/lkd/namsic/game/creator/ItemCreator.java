@@ -808,8 +808,11 @@ public class ItemCreator implements Creatable {
         
         createItem(ItemList.REINFORCE_MULTIPLIER, "다음 강화 확률을 2배로 증가시켜주는 아이템이다");
         createItem(ItemList.GLOW_REINFORCE_MULTIPLIER, "다음 강화 확률을 3배로 증가시켜주는 아이템이다");
+        
+        createItem(ItemList.OAK_TOOTH, "생각보단 깨끗한 오크의 이빨이다");
+        createItem(ItemList.OAK_LEATHER, "상당히 질긴 고품질의 가죽이다");
 
-        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 179L));
+        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 184));
         Logger.i("ObjectMaker", "Item making is done!");
     }
 

@@ -27,6 +27,7 @@ import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.event.StartFightEvent;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.GameMap;
@@ -40,9 +41,9 @@ public class FightManager {
 
     private final Map<Long, Long> preventMap = new ConcurrentHashMap<>();
 
-    private final Map<Long, Long> fightId = new ConcurrentHashMap<>();
-    private final Map<Long, Set<Entity>> entitySet = new ConcurrentHashMap<>();
-    private final Map<Long, Set<Player>> playerSet = new ConcurrentHashMap<>();
+    public final Map<IdClass, Long> fightId = new ConcurrentHashMap<>();
+    public final Map<Long, Set<Entity>> entitySet = new ConcurrentHashMap<>();
+    public final Map<Long, Set<Player>> playerSet = new ConcurrentHashMap<>();
 
     public static FightManager getInstance() {
         return instance;
@@ -65,6 +66,17 @@ public class FightManager {
 
             if(!self.getLocation().equalsMap(player.getLocation())) {
                 throw new WeirdCommandException("해당 플레이어와 같은 맵에 있지 않습니다");
+            }
+
+            if(player.getCurrentTitle().equals("관리자")) {
+                String msg = "관리자를 공격하려 하다니...";
+
+                if(self.getStat(StatType.HP) > 1) {
+                    self.addBasicStat(StatType.HP, -1);
+                    msg += "\n벌로 1데미지를 드리곘읍니다";
+                }
+
+                throw new WeirdCommandException(msg);
             }
 
             if(self.canFight(player)) {
@@ -177,7 +189,8 @@ public class FightManager {
                 synchronized (player) {
                     while (true) {
                         try {
-                            player.wait(Config.FIGHT_WAIT_TIME);
+//                            player.wait(Config.FIGHT_WAIT_TIME);
+                            player.wait();
                         } catch (InterruptedException e) {
                             Logger.e("FightManager", e);
                             throw new RuntimeException(e.getMessage());
@@ -457,17 +470,14 @@ public class FightManager {
     }
 
     private boolean checkInject(@NonNull Player self, @NonNull Entity enemy, boolean isFightOne) {
-        long objectId = self.getId().getObjectId();
-        long enemyObjectId = enemy.getId().getObjectId();
-
         if (Doing.fightList().contains(enemy.getDoing())) {
             StringBuilder innerBuilder = new StringBuilder("---적 목록---");
 
-            long fightId = this.getFightId(enemyObjectId);
+            long fightId = this.getFightId(enemy.getId());
             Set<Entity> entitySet = this.getEntitySet(fightId);
             Set<Player> playerSet = this.getPlayerSet(fightId);
 
-            this.fightId.put(objectId, fightId);
+            this.fightId.put(self.getId(), fightId);
 
             for(Entity entity : entitySet) {
                 innerBuilder.append("\n")
@@ -486,8 +496,10 @@ public class FightManager {
 
             return true;
         } else {
-            fightId.put(objectId, objectId);
-            fightId.put(enemyObjectId, objectId);
+            long objectId = self.getId().getObjectId();
+
+            fightId.put(self.getId(), objectId);
+            fightId.put(enemy.getId(), objectId);
 
             Set<Entity> entitySet = new HashSet<>();
             entitySet.add(self);
@@ -510,6 +522,10 @@ public class FightManager {
 
             this.setDoing(enemy, isFightOne);
             this.playerSet.put(objectId, playerSet);
+
+            String eventName = StartFightEvent.getName();
+            StartFightEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), enemy, true);
+            StartFightEvent.handleEvent(enemy, enemy.getEvent().get(eventName), enemy.getEquipEvents(eventName), self, false);
 
             self.replyPlayer(enemy.getName() + " (와/과) 의 전투가 시작되었습니다");
 
@@ -611,20 +627,17 @@ public class FightManager {
     }
 
     private void endFight(@NonNull Entity self) {
-        Id id = self.getId().getId();
-        long objectId = self.getId().getObjectId();
-
-        long fightId = this.getFightId(objectId);
+        long fightId = this.getFightId(self.getId());
         Set<Entity> entitySet = this.getEntitySet(fightId);
         Set<Player> playerSet = this.getPlayerSet(fightId);
 
-        this.fightId.remove(objectId);
+        this.fightId.remove(self.getId());
         entitySet.remove(self);
 
         self.removeVariable(Variable.IS_DEFENCING);
         self.removeVariable(Variable.IS_TURN);
 
-        if(id.equals(Id.PLAYER)) {
+        if(self.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) self;
 
             player.setDoing(player.getPrevDoing());
@@ -641,8 +654,8 @@ public class FightManager {
         Config.unloadObject(self);
     }
 
-    public long getFightId(long objectId) {
-        return Objects.requireNonNull(fightId.get(objectId));
+    public long getFightId(IdClass id) {
+        return Objects.requireNonNull(fightId.get(id));
     }
 
     @NonNull

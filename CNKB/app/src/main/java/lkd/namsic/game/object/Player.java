@@ -179,6 +179,9 @@ public class Player extends Entity {
     @Setter
     double reinforceMultiplier = 1;
 
+    @Setter
+    boolean isLastCrit = false;
+
     public Player(@NonNull String sender, @NonNull String nickName, @NonNull String image, @NonNull String recentRoom) {
         super(sender);
         this.id.setId(Id.PLAYER);
@@ -378,7 +381,7 @@ public class Player extends Entity {
 
         int gap = lv - enemyLv;
         if(Math.abs(gap) > 10 && lv > 10) {
-            double sqrt = Math.sqrt(lv - 9) - 1;
+            double sqrt = Math.sqrt(Math.sqrt(lv - 9));
 
             if(gap > 0) {
                 exp /= sqrt;
@@ -387,7 +390,7 @@ public class Player extends Entity {
             }
         }
 
-        return (int) ((0.1 * enemyLv + 1) * exp);
+        return (int) ((1 + 0.125 * enemyLv) * exp);
     }
 
     public void lvUp(long needExp) {
@@ -832,7 +835,13 @@ public class Player extends Entity {
         long killExp = this.getKillExp(entity.lv.get());
         this.addExp(killExp);
 
-        String msg = entity.getName() + "을 처치했습니다!\n" +
+        String msg = entity.getName() + "을 ";
+
+        if(this.isLastCrit) {
+            msg += "크리티컬로 ";
+        }
+
+        msg += "처치했습니다!\n" +
                 Emoji.EXP + " " + Config.getIncrease(killExp) + "\n" +
                 Emoji.LV + " 레벨: " + this.getDisplayLv();
         

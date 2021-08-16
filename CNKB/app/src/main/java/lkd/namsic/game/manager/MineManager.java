@@ -116,7 +116,7 @@ public class MineManager {
         Int mineCount = new Int(1);
 
         String eventName = MineEvent.getName();
-        MineEvent.handleEvent(self, self.getEvent().get(eventName), self.getEventEquipSet(eventName), itemId, mineCount);
+        MineEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), itemId, mineCount);
 
         int count = self.getItem(itemId);
         self.addItem(itemId, mineCount.get(), false);

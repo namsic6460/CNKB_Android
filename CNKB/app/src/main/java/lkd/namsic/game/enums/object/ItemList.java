@@ -222,7 +222,10 @@ public enum ItemList {
     STONE_LUMP("돌 뭉텅이", 179L),
 
     REINFORCE_MULTIPLIER("강화 증폭제", 180L),
-    GLOW_REINFORCE_MULTIPLIER("빛나는 강화 증폭제", 181L);
+    GLOW_REINFORCE_MULTIPLIER("빛나는 강화 증폭제", 181L),
+
+    OAK_TOOTH("오크 이빨", 182L),
+    OAK_LEATHER("오크 가죽", 183L);
 
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();

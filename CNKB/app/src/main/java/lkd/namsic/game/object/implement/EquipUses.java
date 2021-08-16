@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,9 +11,9 @@ import lkd.namsic.game.base.EquipUse;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EquipList;
+import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Entity;
-import lkd.namsic.game.object.GameObject;
 import lkd.namsic.game.object.Player;
 
 public class EquipUses {
@@ -78,7 +77,12 @@ public class EquipUses {
             @NonNull
             @Override
             public String use(@NonNull Entity self, @Nullable String other) {
-                long fightId = FightManager.getInstance().getFightId(self.getId().getObjectId());
+                Long fightId = FightManager.getInstance().fightId.get(self.getId());
+                
+                if(fightId == null) {
+                    throw new WeirdCommandException("전투중에만 사용이 가능합니다");
+                }
+                
                 Set<Entity> entitySet = FightManager.getInstance().getEntitySet(fightId);
                 Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
 

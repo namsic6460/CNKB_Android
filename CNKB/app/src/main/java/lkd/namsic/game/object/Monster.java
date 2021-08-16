@@ -56,11 +56,11 @@ public class Monster extends AiEntity {
         this.lv.set(newLv);
 
         double statIncrease = 0.1 * (newLv - prevLv);
-        for(StatType statType : StatType.values()) {
-            try {
-                Config.checkStatType(statType);
-            } catch (UnhandledEnumException ignore) {}
+        if(statIncrease < 0) {
+            statIncrease /= 2;
+        }
 
+        for(StatType statType : StatType.values()) {
             this.addBasicStat(statType, (int) (this.getBasicStat(statType) * statIncrease));
         }
 

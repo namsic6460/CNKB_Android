@@ -18,6 +18,8 @@ public class ShopCreator implements Creatable {
 
         shop = new Shop(NpcList.NOAH);
 
+        shop.addSellItem(ItemList.LOW_RECIPE, 800L);
+
         shop.addBuyItem(ItemList.SHEEP_LEATHER, 10L);
         shop.addBuyItem(ItemList.WOOL, 5L);
         shop.addBuyItem(ItemList.PIG_HEAD, 60L);
@@ -28,6 +30,9 @@ public class ShopCreator implements Creatable {
         shop.addBuyItem(ItemList.PIECE_OF_SLIME, 65L);
         shop.addBuyItem(ItemList.SPIDER_LEG, 150L);
         shop.addBuyItem(ItemList.SPIDER_EYE, 180L);
+        shop.addBuyItem(ItemList.MAGIC_STONE, 150L);
+        shop.addBuyItem(ItemList.OAK_TOOTH, 220L);
+        shop.addBuyItem(ItemList.OAK_LEATHER, 190L);
 
         Config.unloadObject(shop);
 
@@ -69,7 +74,8 @@ public class ShopCreator implements Creatable {
 
         shop = new Shop(NpcList.PEDRO);
 
-        shop.addBuyItem(ItemList.STONE_LUMP, 3L);
+        shop.addBuyItem(ItemList.STONE_LUMP, 10L);
+        shop.addBuyItem(ItemList.COAL, 2L);
 
         for(ItemList gem : Config.GEMS) {
             shop.addBuyItem(gem, 1000L);
@@ -122,7 +128,7 @@ public class ShopCreator implements Creatable {
         Config.unloadObject(shop);
 
 
-        Config.ID_COUNT.put(Id.SHOP, Math.max(Config.ID_COUNT.get(Id.SHOP), 2L));
+        Config.ID_COUNT.put(Id.SHOP, Math.max(Config.ID_COUNT.get(Id.SHOP), 7L));
         Logger.i("ObjectMaker", "Shop making is done!");
     }
 

@@ -22,7 +22,8 @@ public enum MapList {
     BLUE_FIELD("푸른 초원", 2, 1),
     VILLAGE_CEMETERY("마을 공동묘지", 2, 2),
     GLOOMY_FIELD("스산한 평야", 3, 0),
-    OVERGROWN_FOREST("우거진 숲", 3, 1);
+    OVERGROWN_FOREST("우거진 숲", 3, 1),
+    OAK_MOUNTAIN("오크 산", 3, 2);
 
     public static final Map<String, MapList> nameMap = new HashMap<>();
     public static final Map<Location, MapList> locationMap = new HashMap<>();

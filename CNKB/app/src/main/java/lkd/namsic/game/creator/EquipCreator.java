@@ -291,6 +291,7 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.WEAPON, EquipList.TROLL_CLUB, "트롤이 가지고 다니는 무식하게 생긴 몽둥이다\n" +
                 "사용 시 마나 1을 소모하여 다음 공격이 자신보다 낮은 레벨의 몬스터를 공격하는 것이라면 데미지를 3배로 준다");
         equipment.getHandleLv().set(4);
+        equipment.getLimitLv().set(30);
         equipment.addBasicStat(StatType.ATK, 25);
         equipment.addBasicStat(StatType.ATS, -20);
         Config.unloadObject(equipment);
@@ -308,7 +309,21 @@ public class EquipCreator implements Creatable {
         equipment.addBasicStat(StatType.EVA, 5);
         Config.unloadObject(equipment);
 
-        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 39L));
+        equipment = new Equipment(EquipType.NECKLACE, EquipList.OAK_TOOTH_NECKLACE, "오크의 이빨로 만든 목걸이다");
+        equipment.getHandleLv().set(3);
+        equipment.getLimitLv().set(20);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.BRANCH.getId(), 10);
+            put(ItemList.GRASS.getId(), 20);
+            put(ItemList.ELIXIR_HERB.getId(), 20);
+            put(ItemList.OAK_TOOTH.getId(), 10);
+        }});
+        equipment.addBasicStat(StatType.ATS, 20);
+        equipment.addBasicStat(StatType.EVA, 10);
+        equipment.addBasicStat(StatType.ACC, 20);
+        Config.unloadObject(equipment);
+
+        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 56L));
         Logger.i("ObjectMaker", "Equipment making is done!");
     }
 
