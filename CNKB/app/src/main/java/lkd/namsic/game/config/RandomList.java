@@ -497,7 +497,6 @@ public class RandomList {
             EquipList.LOW_ALLOY_SHOES.getId(),
             EquipList.LOW_MANA_SWORD.getId(),
             EquipList.WOOL_HELMET.getId(),
-            EquipList.HARD_IRON_CHESTPLATE.getId(),
             EquipList.MINER_SHOES.getId()
     );
 
@@ -510,7 +509,9 @@ public class RandomList {
             EquipList.SLIME_CHESTPLATE.getId(),
             EquipList.SLIME_LEGGINGS.getId(),
             EquipList.SLIME_SHOES.getId(),
-            EquipList.WEIRD_LEGGINGS.getId()
+            EquipList.WEIRD_LEGGINGS.getId(),
+            EquipList.OAK_TOOTH_NECKLACE.getId(),
+            EquipList.HARD_IRON_CHESTPLATE.getId()
     );
 
     public static final List<Long> highRecipeEquips = Collections.emptyList();

@@ -37,7 +37,7 @@ public class AppraiseManager {
 
         self.setDoing(Doing.APPRAISE);
 
-        int totalTime = 5 * count;
+        int totalTime = 10 * count;
         self.replyPlayer("감정을 시작합니다...\n소요 시간: " + (totalTime / 60) + "분 " + (totalTime % 60) + "초");
 
         boolean stopped = false;
@@ -68,7 +68,7 @@ public class AppraiseManager {
                     usedStone++;
                     self.addItem(ItemList.STONE.getId(), -1);
 
-                    if(random.nextDouble() < 0.15) {
+                    if(random.nextDouble() < 0.2) {
                         long itemId = RandomList.getRandomJewelry();
                         successCount.put(itemId, successCount.getOrDefault(itemId, 0) + 1);
                     } else {

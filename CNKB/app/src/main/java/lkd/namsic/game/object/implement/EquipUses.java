@@ -24,10 +24,10 @@ public class EquipUses {
             @NonNull
             public String use(@NonNull Entity self, @Nullable String other) {
                 int lostHp = self.getStat(StatType.MAXHP) - self.getStat(StatType.HP);
-                int heal = (int) (lostHp * 0.1);
+                int heal = (int) (lostHp * 0.3);
 
                 self.addBasicStat(StatType.HP, heal);
-                return "마나 10을 사용하여 체력을 " + lostHp + "만큼 회복했습니다";
+                return "마나 10을 사용하여 체력을 " + heal + "만큼 회복했습니다";
             }
         });
 

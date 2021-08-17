@@ -9,6 +9,8 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import lkd.namsic.MainActivity;
+import lkd.namsic.game.base.Use;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.EquipType;
@@ -28,26 +30,23 @@ import lkd.namsic.game.event.ItemEatEvent;
 import lkd.namsic.game.event.ItemUseEvent;
 import lkd.namsic.game.event.MoneyChangeEvent;
 import lkd.namsic.game.event.MoveEvent;
-import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Achieve;
 import lkd.namsic.game.object.AiEntity;
 import lkd.namsic.game.object.Boss;
 import lkd.namsic.game.object.Chat;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.GameObject;
 import lkd.namsic.game.object.Item;
-import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Monster;
 import lkd.namsic.game.object.NamedObject;
 import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
-import lkd.namsic.game.config.Config;
 import lkd.namsic.game.object.Quest;
 import lkd.namsic.game.object.Research;
 import lkd.namsic.game.object.Shop;
 import lkd.namsic.game.object.Skill;
-import lkd.namsic.game.base.Use;
 
 public class Eval {
 
@@ -94,8 +93,6 @@ public class Eval {
             ScriptableObject.putProperty(scope, "MoneyChangeEvent", MoneyChangeEvent.class);
             ScriptableObject.putProperty(scope, "MoveEvent", MoveEvent.class);
 
-            ScriptableObject.putProperty(scope, "FightManager", FightManager.class);
-
             ScriptableObject.putProperty(scope, "Achieve", Achieve.class);
             ScriptableObject.putProperty(scope, "AiEntity", AiEntity.class);
             ScriptableObject.putProperty(scope, "Boss", Boss.class);
@@ -114,6 +111,8 @@ public class Eval {
             ScriptableObject.putProperty(scope, "Shop", Shop.class);
             ScriptableObject.putProperty(scope, "Skill", Skill.class);
             ScriptableObject.putProperty(scope, "Use", Use.class);
+
+            ScriptableObject.putProperty(scope, "KakaoTalk", KakaoTalk.class);
 
             ScriptableObject.putProperty(scope, "self", self);
 

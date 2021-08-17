@@ -189,8 +189,7 @@ public class FightManager {
                 synchronized (player) {
                     while (true) {
                         try {
-//                            player.wait(Config.FIGHT_WAIT_TIME);
-                            player.wait();
+                            player.wait(Config.FIGHT_WAIT_TIME);
                         } catch (InterruptedException e) {
                             Logger.e("FightManager", e);
                             throw new RuntimeException(e.getMessage());

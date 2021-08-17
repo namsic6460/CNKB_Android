@@ -96,6 +96,7 @@ public class ShopManager {
             }
 
             ShopWaitType response = self.getObjectVariable(Variable.SHOP, ShopWaitType.END);
+            self.removeVariable(Variable.SHOP);
 
             if(response.equals(ShopWaitType.END)) {
                 self.replyPlayer("상점 이용을 종료합니다");

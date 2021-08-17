@@ -2,7 +2,6 @@ package lkd.namsic.game.creator;
 
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.config.Config;
-import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.object.Npc;
@@ -264,7 +263,6 @@ public class NpcCreator implements Creatable {
         Config.unloadObject(npc);
 
 
-        Config.ID_COUNT.put(Id.NPC, Math.max(Config.ID_COUNT.get(Id.NPC), 12L));
         Logger.i("ObjectMaker", "Npc making is done!");
     }
 

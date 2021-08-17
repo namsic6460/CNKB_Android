@@ -757,8 +757,13 @@ public class Player extends Entity {
         long dropMoney = (long) (totalLoseMoney * dropPercent);
         long loseMoney = totalLoseMoney - dropMoney;
 
-        this.dropMoney(dropMoney);
-        this.addMoney(loseMoney);
+        if(dropMoney > 0L) {
+            this.dropMoney(dropMoney);
+        }
+
+        if(loseMoney > 0L) {
+            this.addMoney(loseMoney);
+        }
 
         StringBuilder dropItemBuilder = new StringBuilder("G\n\n---떨어트린 아이템 목록---");
         StringBuilder loseItemBuilder = new StringBuilder("\n\n---잃어버린 아이템 목록---");

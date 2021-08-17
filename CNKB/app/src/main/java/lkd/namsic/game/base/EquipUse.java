@@ -3,13 +3,10 @@ package lkd.namsic.game.base;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.List;
-
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.EquipUseException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.object.Entity;
-import lkd.namsic.game.object.GameObject;
 
 public abstract class EquipUse {
 

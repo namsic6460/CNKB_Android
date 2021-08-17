@@ -74,9 +74,9 @@ public class EquipEvents {
                 public void onDamage(@NonNull Entity self, @NonNull Entity victim,
                                      @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
                     if(!isCrit.get()) {
-                        if(Math.random() < 0.2) {
+                        if(Math.random() < 0.25) {
                             isCrit.set(true);
-                            totalDmg.multiple(1.8);
+                            totalDmg.multiple(2);
                         }
                     }
                 }

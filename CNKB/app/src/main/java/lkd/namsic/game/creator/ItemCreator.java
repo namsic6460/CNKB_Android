@@ -812,7 +812,6 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.OAK_TOOTH, "생각보단 깨끗한 오크의 이빨이다");
         createItem(ItemList.OAK_LEATHER, "상당히 질긴 고품질의 가죽이다");
 
-        Config.ID_COUNT.put(Id.ITEM, Math.max(Config.ID_COUNT.get(Id.ITEM), 184));
         Logger.i("ObjectMaker", "Item making is done!");
     }
 

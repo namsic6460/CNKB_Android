@@ -573,8 +573,8 @@ public abstract class Entity extends NamedObject {
             int def = Math.max(entity.getStat(StatType.DEF) - this.getStat(StatType.BRE), 0);
             int mdef = Math.max(entity.getStat(StatType.MDEF) - this.getStat(StatType.MBRE), 0);
 
-            physicDmg.set(Math.max(physicDmg.get() - def, 1));
-            magicDmg.set(Math.max(magicDmg.get() - mdef, 1));
+            physicDmg.set(Math.max(physicDmg.get() - def, 0));
+            magicDmg.set(Math.max(magicDmg.get() - mdef, 0));
 
             int heal = 0;
             boolean isDefencing = entity.getObjectVariable(Variable.IS_DEFENCING, false);
@@ -589,7 +589,7 @@ public abstract class Entity extends NamedObject {
             Int dra = new Int(physicDmg.get() * Math.min(this.getStat(StatType.DRA), 100) / 100);
             Int mdra = new Int(magicDmg.get() * Math.min(this.getStat(StatType.MDRA), 100) / 100);
 
-            Int totalDmg = new Int(physicDmg.get() + magicDmg.get() + staticDmg.get());
+            Int totalDmg = new Int(Math.min(physicDmg.get() + magicDmg.get() + staticDmg.get(), 1));
             Int totalDra = new Int(dra.get() + mdra.get());
 
             Bool isCrit = new Bool();
@@ -610,13 +610,7 @@ public abstract class Entity extends NamedObject {
                     this, totalDmg, totalDra, isCrit);
 
             if(this.id.getId().equals(Id.PLAYER)) {
-                Player player = (Player) this;
-
-                if(isCrit.get()) {
-                    player.setLastCrit(true);
-                } else {
-                    player.setLastCrit(false);
-                }
+                ((Player) this).setLastCrit(isCrit.get());
             }
 
             boolean isDeath = entity.addBasicStat(StatType.HP, -1 * totalDmg.get());
@@ -715,7 +709,7 @@ public abstract class Entity extends NamedObject {
     }
 
     @Nullable
-    public Object[] getNearestEntity(@Nullable Id id) {
+    public Object[] getNearestEntity(@NonNull Id id) {
         Map<Id, Map<Long, Integer>> distantMap = this.getEntityDistant();
 
         IdClass idClass = null;

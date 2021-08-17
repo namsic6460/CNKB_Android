@@ -3,7 +3,6 @@ package lkd.namsic.game.manager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 

@@ -56,7 +56,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 1.6;
+    public static final double VERSION = 1.61;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())

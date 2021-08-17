@@ -33,6 +33,8 @@ public class EquipCommand extends PlayerCommand {
                 throw new WeirdCommandException();
             }
 
+            KakaoTalk.checkDoing(player);
+
             EquipType equipType = EquipType.findByName(third.toLowerCase());
 
             String other = Config.replaceLast(Config.replaceLast(command, second, ""), third, "").trim();

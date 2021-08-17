@@ -128,7 +128,6 @@ public class ShopCreator implements Creatable {
         Config.unloadObject(shop);
 
 
-        Config.ID_COUNT.put(Id.SHOP, Math.max(Config.ID_COUNT.get(Id.SHOP), 7L));
         Logger.i("ObjectMaker", "Shop making is done!");
     }
 

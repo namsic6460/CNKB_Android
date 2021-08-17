@@ -7,13 +7,11 @@ import java.util.Random;
 import java.util.Set;
 
 import lkd.namsic.game.base.ConcurrentHashSet;
-import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.FightWaitType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MonsterType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object.MonsterList;
-import lkd.namsic.game.exception.UnhandledEnumException;
 import lombok.Getter;
 import lombok.Setter;
 

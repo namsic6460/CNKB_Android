@@ -679,7 +679,6 @@ public class ChatCreator implements Creatable {
         chat = createChat(null, 133L, "고마워요!");
         Config.unloadObject(chat);
 
-        Config.ID_COUNT.put(Id.CHAT, Math.max(Config.ID_COUNT.get(Id.CHAT), 133L));
         Logger.i("ObjectMaker", "Chat making is done!");
     }
 

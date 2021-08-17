@@ -38,7 +38,7 @@ public class EquipCreator implements Creatable {
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.MIX_SWORD,
                 "공격 시 33% 확률로 데미지 1.1배, 33% 확률로 +2 데미지를 준다\n" +
-                        "사용 시 5 마나를 소모하여 잃은 체력의 10%를 회복한다");
+                        "사용 시 10 마나를 소모하여 잃은 체력의 30%를 회복한다");
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_ALLOY.getId(), 3);
             put(ItemList.QUARTZ.getId(), 4);
@@ -59,7 +59,7 @@ public class EquipCreator implements Creatable {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.HEAD_HUNTER_1,
-                "치명타 미 발동시 20% 확률로 1.8배의 치명타를 발동시킨다");
+                "치명타 미 발동시 25% 확률로 2배의 치명타를 발동시킨다");
         equipment.getHandleLv().set(2);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.RED_STONE.getId(), 30);
@@ -256,12 +256,13 @@ public class EquipCreator implements Creatable {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.HARD_IRON_CHESTPLATE, "강철로 만든 단단한 갑옷이다");
-        equipment.getHandleLv().set(3);
-        equipment.addBasicStat(StatType.MAXHP, 75);
-        equipment.addBasicStat(StatType.DEF, 10);
+        equipment.getLimitLv().set(30);
+        equipment.getHandleLv().set(5);
+        equipment.addBasicStat(StatType.MAXHP, 100);
+        equipment.addBasicStat(StatType.DEF, 25);
+        equipment.addBasicStat(StatType.ATS, -40);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.HARD_IRON.getId(), 5);
-            put(ItemList.COAL.getId(), 100);
         }});
         Config.unloadObject(equipment);
 

@@ -13,7 +13,6 @@ import java.util.Random;
 import java.util.Set;
 
 import lkd.namsic.game.base.ChatLimit;
-import lkd.namsic.game.base.LimitId;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.object.NpcList;
