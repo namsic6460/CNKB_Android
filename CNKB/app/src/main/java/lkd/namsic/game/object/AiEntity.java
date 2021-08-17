@@ -93,8 +93,7 @@ public abstract class AiEntity extends Entity implements Cloneable {
 
         long itemId;
         int minCount, count;
-        Map<Long, Integer> itemCopy = new HashMap<>(this.inventory);
-        for(Map.Entry<Long, Integer> entry : itemCopy.entrySet()) {
+        for(Map.Entry<Long, Integer> entry : new HashMap<>(this.inventory).entrySet()) {
             itemId = entry.getKey();
             count = entry.getValue();
 
@@ -102,6 +101,7 @@ public abstract class AiEntity extends Entity implements Cloneable {
 
             if(random.nextDouble() < dropPercent) {
                 minCount = this.getItemDropMinCount(itemId);
+                this.addItem(itemId, minCount);
                 this.dropItem(itemId, random.nextInt(count) + minCount);
             }
         }

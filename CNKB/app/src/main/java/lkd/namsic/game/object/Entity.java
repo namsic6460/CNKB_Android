@@ -589,7 +589,7 @@ public abstract class Entity extends NamedObject {
             Int dra = new Int(physicDmg.get() * Math.min(this.getStat(StatType.DRA), 100) / 100);
             Int mdra = new Int(magicDmg.get() * Math.min(this.getStat(StatType.MDRA), 100) / 100);
 
-            Int totalDmg = new Int(Math.min(physicDmg.get() + magicDmg.get() + staticDmg.get(), 1));
+            Int totalDmg = new Int(Math.max(physicDmg.get() + magicDmg.get() + staticDmg.get(), 1));
             Int totalDra = new Int(dra.get() + mdra.get());
 
             Bool isCrit = new Bool();
