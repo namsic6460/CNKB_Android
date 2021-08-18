@@ -16,6 +16,7 @@ public enum FightWaitType {
     WAIT("대기", "wait", "w"),
     ITEM("아이템", "item", "i"),
     EQUIP("장비", "equip", "e"),
+    SKILL("스킬", "skill", "s"),
     RUN("도주", "도망", "run", "r");
 
     private final List<String> texts = new ArrayList<>(3);
@@ -27,18 +28,14 @@ public enum FightWaitType {
     }
 
     public static FightWaitType parseWaitType(@NonNull String command) throws WeirdCommandException {
-        if(ATTACK.texts.contains(command)) {
-            return ATTACK;
-        } else if(DEFENCE.texts.contains(command)) {
-            return DEFENCE;
-        } else if(WAIT.texts.contains(command)) {
-            return WAIT;
-        } else if(ITEM.texts.contains(command)) {
-            return ITEM;
-        } else if(EQUIP.texts.contains(command)) {
-            return EQUIP;
-        } else if(RUN.texts.contains(command)) {
-            return RUN;
+        for(FightWaitType waitType : FightWaitType.values()) {
+            if(waitType.equals(NONE)) {
+                continue;
+            }
+
+            if(waitType.texts.contains(command)) {
+                return waitType;
+            }
         }
 
         throw new WeirdCommandException();

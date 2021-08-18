@@ -179,7 +179,8 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.WEAPON, EquipList.LOW_MANA_SWORD, "마나의 기운을 담고 있는 검이다\n" +
                 "공격 시 마나 1을 회복한다");
         equipment.getHandleLv().set(2);
-        equipment.addBasicStat(StatType.ATS, 15);
+        equipment.addBasicStat(StatType.MAXMN, 5);
+        equipment.addBasicStat(StatType.ATS, 10);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_MANA.getId(), 5);
             put(ItemList.LAPIS.getId(), 20);

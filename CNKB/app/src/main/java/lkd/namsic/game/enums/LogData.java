@@ -28,6 +28,7 @@ public enum LogData {
     TOTAL_EQUIP_USE,
     TOTAL_ITEM_USE,
     TOTAL_ITEM_EAT,
-    TOTAL_MONEY
+    TOTAL_MONEY,
+    TOTAL_SKILL_USE
 
 }

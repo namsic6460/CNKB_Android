@@ -25,7 +25,7 @@ import lkd.namsic.game.object.Player;
 
 public class EntityEvents {
 
-    private final static Map<Long, Event> EVENT_MAP = new HashMap<Long, Event>() {{
+    private final static Map<Long, Event> MAP = new HashMap<Long, Event>() {{
         put(EventList.ENT_DAMAGED.getId(), new DamagedEvent() {
             @Override
             public void onDamaged(@NonNull Entity self, @NonNull Entity attacker,
@@ -88,7 +88,7 @@ public class EntityEvents {
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T extends Event> T getEvent(long eventId) {
-        return (T) Objects.requireNonNull(EVENT_MAP.get(eventId));
+        return (T) Objects.requireNonNull(MAP.get(eventId));
     }
 
 }

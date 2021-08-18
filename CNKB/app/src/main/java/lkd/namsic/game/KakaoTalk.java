@@ -22,8 +22,8 @@ import lkd.namsic.game.command.CommandListener;
 import lkd.namsic.game.command.CommonCommand;
 import lkd.namsic.game.command.NonPlayerCommand;
 import lkd.namsic.game.command.PlayerCommand;
-import lkd.namsic.game.command.common.DevCommand;
 import lkd.namsic.game.command.common.DetailHelpCommand;
+import lkd.namsic.game.command.common.DevCommand;
 import lkd.namsic.game.command.common.HelpCommand;
 import lkd.namsic.game.command.common.RuleCommand;
 import lkd.namsic.game.command.non_player.RegisterCommand;
@@ -56,7 +56,6 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.exception.DoingFilterException;
-import lkd.namsic.game.exception.EquipUseException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.manager.ChatManager;
@@ -237,7 +236,7 @@ public class KakaoTalk {
                                             "회원가입 명령어 : " + Emoji.focus("n 회원가입 {닉네임}"));
                                 }
                             }
-                        } catch (WeirdCommandException | DoingFilterException | EquipUseException e) {
+                        } catch (WeirdCommandException | DoingFilterException e) {
                             KakaoTalk.reply(session,"[오류]\n" + e.getMessage());
                         } catch (NumberFormatException e) {
                             String message = e.getMessage();

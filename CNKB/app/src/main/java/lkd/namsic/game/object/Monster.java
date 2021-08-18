@@ -94,8 +94,6 @@ public class Monster extends AiEntity {
         } else {
             output[0] = FightWaitType.WAIT;
         }
-        
-        //TODO : 공격 외 다른 행동
 
         return output;
     }

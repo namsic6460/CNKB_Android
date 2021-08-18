@@ -10,12 +10,11 @@ import java.util.List;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
-import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.EquipManager;
 import lkd.namsic.game.manager.ItemDisplayManager;
+import lkd.namsic.game.object.Player;
 
 public class EquipCommand extends PlayerCommand {
 
@@ -35,11 +34,13 @@ public class EquipCommand extends PlayerCommand {
 
             KakaoTalk.checkDoing(player);
 
-            EquipType equipType = EquipType.findByName(third.toLowerCase());
+            EquipType equipType;
+            String other = null;
 
-            String other = Config.replaceLast(Config.replaceLast(command, second, ""), third, "").trim();
-            if(other.equals("")) {
-                other = null;
+            String[] split = command.replace(second, "").trim().split("\\.");
+            equipType = EquipType.findByName(split[0]);
+            if(split.length == 2) {
+                other = split[1].trim();
             }
 
             EquipManager.getInstance().tryUse(player, equipType, other);

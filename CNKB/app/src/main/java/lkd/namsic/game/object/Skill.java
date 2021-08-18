@@ -3,32 +3,38 @@ package lkd.namsic.game.object;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import lkd.namsic.game.base.Use;
+import lkd.namsic.game.base.SkillUse;
 import lkd.namsic.game.enums.Id;
-import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object.SkillList;
+import lkd.namsic.game.event.Event;
+import lkd.namsic.game.object.implement.EntityEvents;
+import lkd.namsic.game.object.implement.SkillUses;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class Skill extends NamedObject {
 
-    @Setter
-    boolean isPassive = false;
+    final String description;
+
+    public Skill(@NonNull SkillList skillData, @NonNull String description) {
+        super(skillData.getDisplayName());
+
+        this.id.setId(Id.SKILL);
+        this.id.setObjectId(skillData.getId());
+
+        this.description = description;
+    }
 
     @Nullable
-    @Setter
-    Use use = null;
+    public SkillUse getSkillUse() {
+        return SkillUses.MAP.get(this.id.getObjectId());
+    }
 
-    boolean isWaitSkill = false;
-
-    final Map<StatType, Integer> limitStat = new HashMap<>();
-
-    public Skill(@NonNull String name) {
-        super(name);
-        this.id.setId(Id.SKILL);
+    @Nullable
+    public Map<String, Event> getEvent() {
+        return EntityEvents.getEvent(this.id.getObjectId());
     }
 
 }

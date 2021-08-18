@@ -87,21 +87,9 @@ public class Npc extends Entity {
     public List<Long> getAvailableChat(@NonNull Player player) {
         List<Long> list = new ArrayList<>();
 
-        Chat chat;
         for(Map.Entry<ChatLimit, Set<Long>> entry : this.chat.entrySet()) {
             if(entry.getKey().isAvailable(player)) {
-                for(long chatId : entry.getValue()) {
-                    chat = Config.getData(Id.CHAT, chatId);
-                    long questId = chat.getQuestId().get();
-
-                    if(questId != 0) {
-                        if(player.canAddQuest(questId)) {
-                            list.add(chatId);
-                        }
-                    } else {
-                        list.add(chatId);
-                    }
-                }
+                list.addAll(entry.getValue());
             }
         }
 

@@ -46,7 +46,7 @@ public class Item extends NamedObject {
 
     @Nullable
     public Use getUse() {
-        return ItemUses.USE_MAP.get(this.id.getObjectId());
+        return ItemUses.MAP.get(this.id.getObjectId());
     }
 
     public void setEatBuff(long time, @NonNull StatType statType, int stat) {

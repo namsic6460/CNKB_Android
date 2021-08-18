@@ -148,7 +148,7 @@ public class EquipManager {
         }
     }
 
-    public long checkUse(@NonNull Player self, @NonNull EquipType equipType) {
+    public long checkUse(@NonNull Player self, @NonNull EquipType equipType, @Nullable String other) {
         long equipId = self.getEquipped(equipType);
 
         if(equipId == EquipList.NONE.getId()) {
@@ -156,22 +156,22 @@ public class EquipManager {
         }
 
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
-        if(equipment.getEquipUse() == null) {
+        EquipUse equipUse = equipment.getEquipUse();
+        if(equipUse == null) {
             throw new WeirdCommandException("해당 부위의 장비는 사용이 불가능합니다");
         }
 
+        equipUse.checkUse(self, other);
         return equipment.getOriginalId();
     }
 
     public void tryUse(@NonNull Player self, @NonNull EquipType equipType, @Nullable String other) {
-        long equipId = checkUse(self, equipType);
+        long equipId = checkUse(self, equipType, other);
         this.use(self, equipId, other);
     }
 
     public void use(@NonNull Entity self, long equipId, @Nullable String other) {
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
-
-        String msg = equipment.getName() + " 을 사용했습니다\n";
 
         EquipUse use = Objects.requireNonNull(equipment.getEquipUse());
         String result = use.tryUse(self, other);
@@ -180,6 +180,8 @@ public class EquipManager {
             Player player = (Player) self;
 
             player.addLog(LogData.TOTAL_EQUIP_USE, 1);
+
+            String msg = equipment.getName() + " 을 사용했습니다\n";
             player.replyPlayer(msg + result);
         }
     }

@@ -31,7 +31,7 @@ public class UseCommand extends PlayerCommand {
         } catch (NumberFormatException ignore) {}
 
         String other = null;
-        String[] split = itemName.split(",");
+        String[] split = itemName.split("\\.");
         if(split.length == 2) {
             itemName = split[0];
             other = split[1].trim();

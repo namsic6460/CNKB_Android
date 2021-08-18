@@ -31,16 +31,11 @@ public class ItemManager {
         return instance;
     }
 
-    public long checkUse(@NonNull Player self, @NonNull String itemName, int count) {
+    public long checkUse(@NonNull Player self, @NonNull String itemName, @Nullable String other, int count) {
         Long itemId = ItemList.findByName(itemName);
 
         if(itemId == null) {
             throw new WeirdCommandException("알 수 없는 아이템입니다\n아이템의 이름을 다시 확인해주세요");
-        }
-
-        Item item = Config.getData(Id.ITEM, itemId);
-        if(item.getUse() == null) {
-            throw new WeirdCommandException("사용이 불가능한 아이템입니다");
         }
 
         int currentCount = self.getItem(itemId);
@@ -52,11 +47,18 @@ public class ItemManager {
             }
         }
 
+        Item item = Config.getData(Id.ITEM, itemId);
+        Use use = item.getUse();
+        if(use == null) {
+            throw new WeirdCommandException("사용이 불가능한 아이템입니다");
+        }
+
+        use.checkUse(self, other);
         return itemId;
     }
 
     public void tryUse(@NonNull Player self, @NonNull String itemName, @Nullable String other, int count) {
-        long itemId = checkUse(self, itemName, count);
+        long itemId = checkUse(self, itemName, other, count);
         this.use(self, itemId, other, count);
     }
 
@@ -72,7 +74,7 @@ public class ItemManager {
         Use use = Objects.requireNonNull(item.getUse());
         for(int i = 1; i <= count; i++) {
             innerBuilder.append(use.use(self, other))
-                    .append("\n");
+                    .append("\n\n");
         }
 
         self.addItem(itemId, count * -1);

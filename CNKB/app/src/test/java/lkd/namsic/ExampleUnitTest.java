@@ -1,17 +1,29 @@
 package lkd.namsic;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Random;
 
+import lkd.namsic.game.base.ChatLimit;
+import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.MonsterList;
+import lkd.namsic.game.json.ChatLimitAdapter;
+import lkd.namsic.game.json.LocationAdapter;
+import lkd.namsic.game.json.NpcAdapter;
 import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Equipment;
 import lkd.namsic.game.object.Monster;
+import lkd.namsic.game.object.Npc;
+import lkd.namsic.game.object.Player;
+import lkd.namsic.setting.FileManager;
 
 public class ExampleUnitTest {
 
@@ -47,23 +59,31 @@ public class ExampleUnitTest {
         System.out.println(monster.getBasicStat());
     }
 
-    public long getNeedExp(int lv) {
-        long needExp;
-        if (lv <= 100) {
-            needExp = 10_000 + 5_000 * lv;
-        } else if (lv <= 300) {
-            needExp = -200_000 + (long) (Math.pow(lv - 10, 2.5) * 2) + 10_000 * lv;
-        } else if (lv <= 500) {
-            needExp = -50_000_000 + 200_000 * lv;
-        } else if(lv <= 750) {
-            needExp = -50_000_000 + (long) (Math.pow(lv, 3.1) / 1.5);
-        } else if(lv <= 950) {
-            needExp = 45_000_000L * (lv - 750) + 1_000_000_000L;
-        } else {
-            needExp = -30_000_000_000L + (long) Math.pow(lv - 600, 4.2);
-        }
+    @Test
+    public void loadTest() throws Exception {
+        File[] files = new File("C:\\Users\\user\\Downloads\\players").listFiles();
+        Gson gson  =new GsonBuilder()
+                .registerTypeAdapter(Npc.class, new NpcAdapter())
+                .registerTypeAdapter(Location.class, new LocationAdapter())
+                .registerTypeAdapter(ChatLimit.class, new ChatLimitAdapter())
+                .create();
 
-        return needExp;
+        assert files != null;
+
+        String jsonString;
+        for(File file : files) {
+            jsonString = FileManager.read(file);
+
+            try {
+                gson.fromJson(jsonString, Player.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(file.getName());
+                System.out.println(jsonString);
+
+                return;
+            }
+        }
     }
 
     @Test

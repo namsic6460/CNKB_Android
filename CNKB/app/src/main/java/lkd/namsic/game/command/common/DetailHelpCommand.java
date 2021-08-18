@@ -34,7 +34,7 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " *(장비/equip) (인벤토리/인벤/inventory/inven) [{페이지}] : 장비 인벤토리를 표시합니다\n\n" +
                         Emoji.LIST + " (장비/equip) ({장비 번호}) : 장비를 착용 또는 착용 해제합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) (정보/info) ({장비 번호}) : 보유중인 장비의 정보를 표시합니다\n\n" +
-                        Emoji.LIST + " (장비/equip) (사용/use) ({장비 부위[,{대상}]}) : 장비를 사용합니다\n\n" +
+                        Emoji.LIST + " (장비/equip) (사용/use) ({장비 부위[.{대상}]}) : 장비를 사용합니다\n\n" +
                         Emoji.LIST + " (대화/chat) ({Npc 이름}) : Npc 와 대화합니다\n\n" +
                         Emoji.LIST + " *(맵/map) : 현재 위치의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(맵/map) (목록/list) : 이동 가능한 맵 목록을 표시합니다\n\n" +
@@ -44,8 +44,8 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.focus("n move map 시작의 마을") + ")\n\n" +
                         Emoji.LIST + " (이동/move) (필드/field) ({x좌표}-{y좌표}) : 현재 맵의 필드 좌표로 이동합니다(예시: " +
                         Emoji.focus("n move field 16-10") + ")\n\n" +
-                        Emoji.LIST + " (사용/use) ({아이템 이름[,{대상}]}) [{사용 개수}] : 아이템을 일정 개수 사용합니다(예시: " +
-                        Emoji.focus("n 사용 장비 완화제,무기 5") + ")\n\n" +
+                        Emoji.LIST + " (사용/use) ({아이템 이름[.{대상}]}) [{사용 개수}] : 아이템을 일정 개수 사용합니다(예시: " +
+                        Emoji.focus("n 사용 장비 완화제.무기 5") + ")\n\n" +
                         Emoji.LIST + " (먹기/eat) ({아이템 이름}) [{사용 개수}] : 아이템을 일정 개수 먹습니다(예시: " +
                         Emoji.focus("n 먹기 양고기 3") + ")\n\n" +
                         Emoji.LIST + " (광질/mine) [{광질 레벨}] : 광질을 합니다\n\n" +

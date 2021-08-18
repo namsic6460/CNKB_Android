@@ -10,8 +10,6 @@ import java.util.Set;
 import lkd.namsic.game.base.LimitId;
 import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.LimitLong;
-import lkd.namsic.game.base.RangeInteger;
-import lkd.namsic.game.base.RangeIntegerMap;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
@@ -21,14 +19,6 @@ import lombok.Getter;
 
 @Getter
 public class Quest extends NamedObject {
-
-    final RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);
-    final RangeIntegerMap<Long> limitCloseRate = new RangeIntegerMap<>(
-            new HashMap<>(), new HashMap<>(), Long.class
-    );
-    final RangeIntegerMap<StatType> limitStat = new RangeIntegerMap<>(
-            new HashMap<>(), new HashMap<>(), StatType.class
-    );
 
     final LimitInteger clearLimitLv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
 
@@ -55,22 +45,8 @@ public class Quest extends NamedObject {
         this.id.setId(Id.QUEST);
         this.id.setObjectId(questData.getId());
 
-        this.setClearNpcId(clearNpcId);
-        this.setClearChatId(clearChatId);
-    }
-
-    //Only use in constructor
-    private void setClearNpcId(long clearNpcId) {
-        if(clearNpcId < 1) {
-            throw new NumberRangeException(clearNpcId, 0L);
-        }
-
-        //Since npc creating is after creating quests
         this.clearNpcId.set(clearNpcId);
-    }
-
-    public void setClearChatId(long chatId) {
-        this.clearChatId.set(chatId);
+        this.clearChatId.set(clearChatId);
     }
 
     public void setNeedItem(long itemId, int count) {

@@ -1,5 +1,7 @@
 package lkd.namsic.game.enums;
 
+import com.google.gson.annotations.Since;
+
 public enum Variable {
 
     IS_TUTORIAL,
@@ -11,11 +13,17 @@ public enum Variable {
     FISH_SKILL,
     IS_TURN,
     FIGHT_WAIT_TYPE,
-    FIGHT_ITEM_ID,
-    FIGHT_USE_OTHER,
+
+    @Since(2.0)
+    FIGHT_OBJECT_ID,
+
+    FIGHT_OTHER,
     FIGHT_USED_ITEM,
     FIGHT_TARGET_MAX_INDEX,
     FIGHT_TARGET_INDEX,
+    FIGHT_TARGET_MAP,
+    FIGHT_CASTING_SKILL,
+    FIGHT_SKILL_CAST_WAIT_TURN,
     IS_DEFENCING,
     IS_FIGHT_RESPONSE,
     ADVENTURE_FIGHT,

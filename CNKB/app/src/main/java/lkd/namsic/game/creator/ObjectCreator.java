@@ -36,6 +36,7 @@ public class ObjectCreator {
                 new QuestCreator().start();
                 new ShopCreator().start();
                 new NpcCreator().start();
+                new SkillCreator().start();
 
                 Config.IGNORE_FILE_LOG = false;
                 Logger.i("ObjectMaker", "Object making is done!");

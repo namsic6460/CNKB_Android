@@ -573,12 +573,6 @@ public class Player extends Entity {
         }
     }
 
-    public boolean canAddQuest(long questId) {
-        Quest quest = Config.getData(Id.QUEST, questId);
-        return quest.limitLv.isInRange(this.lv.get()) && quest.limitCloseRate.isInRange(this.closeRate)
-                && this.checkStatRange(quest.limitStat.getMin(), quest.limitStat.getMax());
-    }
-
     public void addQuest(long questId) {
         Quest quest = Config.getData(Id.QUEST, questId);
 

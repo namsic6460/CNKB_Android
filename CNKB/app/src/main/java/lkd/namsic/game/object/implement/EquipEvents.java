@@ -27,12 +27,12 @@ import lkd.namsic.game.object.Player;
 
 public class EquipEvents {
 
-    public final static Map<Long, Map<String, Event>> EVENT_MAP = new HashMap<Long, Map<String, Event>>() {{
+    public final static Map<Long, Map<String, Event>> MAP = new HashMap<Long, Map<String, Event>>() {{
         put(EquipList.MIX_SWORD.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim,
-                                     @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     int randomValue = new Random().nextInt(3);
 
                     switch (randomValue) {
@@ -57,8 +57,8 @@ public class EquipEvents {
         put(EquipList.HEART_BREAKER_1.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim,
-                                     @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     int hp = victim.getStat(StatType.HP);
                     double remainPercent = (double) hp / victim.getStat(StatType.MAXHP);
                     if(remainPercent < 0.1) {
@@ -71,9 +71,9 @@ public class EquipEvents {
         put(EquipList.HEAD_HUNTER_1.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim,
-                                     @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
-                    if(!isCrit.get()) {
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
+                    if(canCrit && !isCrit.get()) {
                         if(Math.random() < 0.25) {
                             isCrit.set(true);
                             totalDmg.multiple(2);
@@ -86,8 +86,8 @@ public class EquipEvents {
         put(EquipList.GHOST_SWORD_1.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim,
-                                     @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     int maxHp = victim.getStat(StatType.MAXHP);
                     totalDmg.add(maxHp * 0.06);
 
@@ -130,8 +130,8 @@ public class EquipEvents {
         put(EquipList.LOW_ALLOY_SHOES.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim,
-                                     @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     long equippedId = self.getEquipped(EquipType.WEAPON);
                     Equipment equipped = Config.getData(Id.EQUIPMENT, equippedId);
 
@@ -145,8 +145,8 @@ public class EquipEvents {
         put(EquipList.LOW_MANA_SWORD.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim,
-                                     @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     self.addBasicStat(StatType.MN, 1);
                 }
             });
@@ -188,8 +188,8 @@ public class EquipEvents {
             });
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim,
-                                     @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     boolean used = self.getObjectVariable(Variable.SLIME_CHESTPLATE_USE, false);
 
                     if(used) {
@@ -220,13 +220,15 @@ public class EquipEvents {
             });
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim,
-                                     @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     boolean weirdLeggings = self.getObjectVariable(Variable.WEIRD_LEGGINGS, false);
 
                     if(weirdLeggings) {
-                        isCrit.set(true);
-                        totalDmg.multiple(1.5);
+                        if(canCrit) {
+                            isCrit.set(true);
+                            totalDmg.multiple(1.5);
+                        }
 
                         self.removeVariable(Variable.WEIRD_LEGGINGS);
                     }
@@ -248,8 +250,8 @@ public class EquipEvents {
         put(EquipList.TROLL_CLUB.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim,
-                                     @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     boolean trollClub = self.getObjectVariable(Variable.TROLL_CLUB, false);
 
                     if(trollClub) {
@@ -267,7 +269,7 @@ public class EquipEvents {
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T extends Event> T getEvent(long equipId, @NonNull String eventName) {
-        return (T) Objects.requireNonNull(Objects.requireNonNull(EVENT_MAP.get(equipId)).get(eventName));
+        return (T) Objects.requireNonNull(Objects.requireNonNull(MAP.get(equipId)).get(eventName));
     }
 
 }

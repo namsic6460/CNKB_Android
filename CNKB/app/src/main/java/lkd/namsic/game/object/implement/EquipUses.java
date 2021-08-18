@@ -18,7 +18,7 @@ import lkd.namsic.game.object.Player;
 
 public class EquipUses {
 
-    public final static Map<Long, EquipUse> EQUIP_USE_MAP = new HashMap<Long, EquipUse>() {{
+    public final static Map<Long, EquipUse> MAP = new HashMap<Long, EquipUse>() {{
         put(EquipList.MIX_SWORD.getId(), new EquipUse(0, 10) {
             @Override
             @NonNull
@@ -103,7 +103,6 @@ public class EquipUses {
                 return "다음 공격을 강화했습니다";
             }
         });
-
     }};
 
 }

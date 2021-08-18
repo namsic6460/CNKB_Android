@@ -26,7 +26,8 @@ public abstract class DamageEvent implements Event {
     }
 
     public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events, @NonNull Set<Long> eventEquipSet,
-                                   @NonNull Entity victim, @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
+                                   @NonNull Entity victim, @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit,
+                                   boolean canCrit) {
         if (events != null) {
             List<Long> removeList = new ArrayList<>();
 
@@ -34,7 +35,7 @@ public abstract class DamageEvent implements Event {
                 DamageEvent event = EntityEvents.getEvent(eventId);
 
                 try {
-                    event.onDamage(self, victim, totalDmg, totalDra, isCrit);
+                    event.onDamage(self, victim, totalDmg, totalDra, isCrit, canCrit);
                 } catch (EventRemoveException e) {
                     removeList.add(eventId);
                 } catch (EventSkipException ignore) {}
@@ -47,7 +48,7 @@ public abstract class DamageEvent implements Event {
             DamageEvent damageEvent = EquipEvents.getEvent(equipId, getName());
 
             try {
-                damageEvent.onDamage(self, victim, totalDmg, totalDra, isCrit);
+                damageEvent.onDamage(self, victim, totalDmg, totalDra, isCrit, canCrit);
             } catch (EventRemoveException e) {
                 Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
                 self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
@@ -55,8 +56,8 @@ public abstract class DamageEvent implements Event {
         }
     }
 
-    public abstract void onDamage(@NonNull Entity self, @NonNull Entity victim,
-                                  @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit);
+    public abstract void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
+                                  @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit);
 
     @NonNull
     @Override

@@ -56,7 +56,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 1.63;
+    public static final double VERSION = 2.0;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -819,13 +819,6 @@ public class Config {
 
         if(entity.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) entity;
-
-            if(player.getVersion() <= 1.4) {
-                player.addMoney(30000);
-                player.addItem(ItemList.EQUIP_SAFENER.getId(), 10);
-                player.addItem(ItemList.REINFORCE_MULTIPLIER.getId(), 5);
-                player.addItem(ItemList.HIGH_ELIXIR.getId(), 1);
-            }
 
             if (unavailable) {
                 StringBuilder innerBuilder = new StringBuilder("---장비 업데이트 경고---\n(장착 해제할 경우 재장착이 불가능한 장비 목록)");
