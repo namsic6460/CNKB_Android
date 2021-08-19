@@ -12,7 +12,8 @@ public enum EventList {
 
     NONE(0L),
     ENT_DAMAGED(1L),
-    OAK_START_FIGHT(2L);
+    OAK_START_FIGHT(2L),
+    SKILL_SMITE(3L);
 
     public static final Map<Long, EventList> idMap = new HashMap<>();
 

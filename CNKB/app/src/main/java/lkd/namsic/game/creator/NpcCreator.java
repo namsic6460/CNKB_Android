@@ -65,8 +65,8 @@ public class NpcCreator implements Creatable {
         chatLimit = new ChatLimit();
         chatLimit.getNotClearedQuest().add(QuestList.LV50.getId());
         chatLimit.getNotRunningQuest().add(QuestList.LV50.getId());
-        chatLimit.getLimitQuest().addMin(QuestList.WORK_OF_MINER.getId(), 5);
-        chatLimit.getLimitQuest().addMin(QuestList.TRASH_COLLECTING.getId(), 5);
+        chatLimit.getLimitQuest().addMin(QuestList.WORK_OF_MINER.getId(), 3);
+        chatLimit.getLimitQuest().addMin(QuestList.TRASH_COLLECTING.getId(), 3);
         npc.setChat(chatLimit, 78L);
 
         Config.unloadObject(npc);
@@ -87,7 +87,7 @@ public class NpcCreator implements Creatable {
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.GOLD_RING_GIFT.getId());
         chatLimit.getNotClearedQuest().add(QuestList.GOLD_RING_GIFT.getId());
-        chatLimit.getLimitQuest().addMin(QuestList.WORK_OF_MINER.getId(), 10);
+        chatLimit.getLimitQuest().addMin(QuestList.WORK_OF_MINER.getId(), 7);
         npc.setChat(chatLimit, 66L);
 
         Config.unloadObject(npc);
@@ -182,7 +182,7 @@ public class NpcCreator implements Creatable {
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.NEED_FISHING_ROD_ITEM.getId());
         chatLimit.getNotClearedQuest().add(QuestList.NEED_FISHING_ROD_ITEM.getId());
-        chatLimit.getLimitQuest().addMin(QuestList.TRASH_COLLECTING.getId(), 5);
+        chatLimit.getLimitQuest().addMin(QuestList.TRASH_COLLECTING.getId(), 3);
         npc.setChat(chatLimit, 58L);
 
         Config.unloadObject(npc);
@@ -197,7 +197,7 @@ public class NpcCreator implements Creatable {
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.NEED_COAL.getId());
-        chatLimit.getLimitQuest().addMax(QuestList.NEED_COAL.getId(), 3);
+        chatLimit.getLimitQuest().addMax(QuestList.NEED_COAL.getId(), 2);
         npc.setChat(chatLimit, 70L);
 
         Config.unloadObject(npc);

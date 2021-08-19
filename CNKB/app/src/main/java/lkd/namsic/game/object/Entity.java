@@ -37,6 +37,7 @@ import lkd.namsic.game.event.DamagedEvent;
 import lkd.namsic.game.event.DeathEvent;
 import lkd.namsic.game.event.Event;
 import lkd.namsic.game.event.MoneyChangeEvent;
+import lkd.namsic.game.event.PreDamageEvent;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.UnhandledEnumException;
@@ -567,6 +568,11 @@ public abstract class Entity extends NamedObject {
         return this.damage(entity, new Int(this.getStat(StatType.ATK)), new Int(), new Int(), true, true, print);
     }
 
+    public boolean damage(@NonNull Entity entity, double physicDmg, double magicDmg, double staticDmg,
+                          boolean canEvade, boolean canCrit, boolean print) {
+        return damage(entity, (int) physicDmg, (int) magicDmg, (int) staticDmg, canEvade, canCrit, print);
+    }
+
     public boolean damage(@NonNull Entity entity, int physicDmg, int magicDmg, int staticDmg,
                           boolean canEvade, boolean canCrit, boolean print) {
         return damage(entity, new Int(physicDmg), new Int(magicDmg), new Int(staticDmg), canEvade, canCrit, print);
@@ -589,6 +595,10 @@ public abstract class Entity extends NamedObject {
 
         if(!evade) {
             lastAttackSuccess = true;
+
+            String eventName = PreDamageEvent.getName();
+            PreDamageEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName),
+                    entity, physicDmg, magicDmg, staticDmg, canCrit);
 
             int def = Math.max(entity.getStat(StatType.DEF) - this.getStat(StatType.BRE), 0);
             int mdef = Math.max(entity.getStat(StatType.MDEF) - this.getStat(StatType.MBRE), 0);
@@ -621,7 +631,7 @@ public abstract class Entity extends NamedObject {
                 }
             }
 
-            String eventName = DamageEvent.getName();
+            eventName = DamageEvent.getName();
             DamageEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName),
                     entity, totalDmg, totalDra, isCrit, canCrit);
 

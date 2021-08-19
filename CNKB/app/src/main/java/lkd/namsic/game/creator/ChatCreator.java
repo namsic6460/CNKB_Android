@@ -7,7 +7,6 @@ import java.util.Arrays;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
-import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.object.Chat;

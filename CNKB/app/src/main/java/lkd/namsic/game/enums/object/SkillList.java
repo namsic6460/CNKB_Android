@@ -11,7 +11,9 @@ import lombok.Getter;
 public enum SkillList {
 
     NONE("NONE", 0L),
-    MAGIC_BALL("마력 구체", 1L);
+    MAGIC_BALL("매직 볼", 1L),
+    SMITE("강타", 2L, EventList.SKILL_SMITE),
+    LASER("레이저", 3L);
 
     public static final Map<String, SkillList> nameMap = new HashMap<>();
     public static final Map<Long, SkillList> idMap = new HashMap<>();
@@ -34,13 +36,13 @@ public enum SkillList {
     private final long eventId;
 
     SkillList(@NonNull String displayName, long id) {
-        this(displayName, id, EventList.NONE.getId());
+        this(displayName, id, EventList.NONE);
     }
 
-    SkillList(@NonNull String displayName, long id, long eventId) {
+    SkillList(@NonNull String displayName, long id, @NonNull EventList eventData) {
         this.displayName = displayName;
         this.id = id;
-        this.eventId = eventId;
+        this.eventId = eventData.getId();
     }
 
     @Nullable

@@ -184,7 +184,7 @@ public class FightManager {
                 player.setVariable(Variable.IS_TURN, true);
 
                 Map<Integer, Entity> targets = new HashMap<>();
-                this.printFightMsg(player, entitySet, targets);
+                this.printFightMsg(player, entitySet, targets, casting);
 
                 Player.replyPlayersExcept(playerSet, attacker.getName() + "의 턴입니다" +
                         "\n유저의 턴을 기다려주세요(최대 30초)", player);
@@ -269,7 +269,10 @@ public class FightManager {
                     msg = attacker.getFightName() + " (은/는) 아무 행동도 하지 않고 " + baseMsg;
 
                     if (player != null) {
-                        player.replyPlayer(baseMsg);
+                        if(!casting) {
+                            player.replyPlayer(baseMsg);
+                        }
+
                         Player.replyPlayersExcept(playerSet, msg, player);
                     } else {
                         Player.replyPlayers(playerSet, msg);
@@ -395,7 +398,7 @@ public class FightManager {
             Entity caster;
 
             List<Entity> targetList;
-            for (Map.Entry<Entity, List<Entity>> entry : this.castingMap.entrySet()) {
+            for (Map.Entry<Entity, List<Entity>> entry : new HashMap<>(this.castingMap).entrySet()) {
                 caster = entry.getKey();
                 waitTurn = caster.getVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN);
 
@@ -421,6 +424,25 @@ public class FightManager {
 
                     Player.replyPlayersExcepts(playerSet, caster.getFightName() + is + skill.getName() +
                             " 의 캐스팅을 완료했습니다!", exceptSet);
+
+                    caster.removeVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN);
+                    caster.removeVariable(Variable.FIGHT_CASTING_SKILL);
+
+                    List<Entity> castingList = this.castingMap.remove(caster);
+
+                    if(castingList != null) {
+                        List<Entity> castedList;
+
+                        for (Entity casted : castingList) {
+                            castedList = Objects.requireNonNull(this.castedMap.get(casted));
+
+                            if(castedList.size() == 1) {
+                                this.castedMap.remove(casted);
+                            } else {
+                                castedList.remove(caster);
+                            }
+                        }
+                    }
                 } else {
                     caster.setVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN, waitTurn - 1);
                 }
@@ -463,7 +485,8 @@ public class FightManager {
         }
     }
 
-    private void printFightMsg(@NonNull Player self, @NonNull Set<Entity> entitySet, @NonNull Map<Integer, Entity> targets) {
+    private void printFightMsg(@NonNull Player self, @NonNull Set<Entity> entitySet,
+                               @NonNull Map<Integer, Entity> targets, boolean casting) {
         int index = 1;
 
         StringBuilder innerBuilder = new StringBuilder("---행동 목록---\n")
@@ -502,16 +525,21 @@ public class FightManager {
             }
 
             targets.put(index, entity);
-            innerBuilder.append("\n")
-                    .append(index++)
-                    .append(". ")
-                    .append(entity.getName())
-                    .append(" - 남은 체력 : [ ")
-                    .append(entity.getDisplayHp())
-                    .append(" ]");
+
+            if(!casting) {
+                innerBuilder.append("\n")
+                        .append(index++)
+                        .append(". ")
+                        .append(entity.getName())
+                        .append(" - 남은 체력 : [ ")
+                        .append(entity.getDisplayHp())
+                        .append(" ]");
+            }
         }
 
-        self.replyPlayer("당신의 턴입니다\n대상과 행동을 30초 이내에 선택해주세요", innerBuilder.toString());
+        if(!casting) {
+            self.replyPlayer("당신의 턴입니다\n대상과 행동을 30초 이내에 선택해주세요", innerBuilder.toString());
+        }
     }
 
     private void setPrevDoing(@NonNull Player self) {
@@ -698,20 +726,21 @@ public class FightManager {
         this.fightId.remove(self.getId());
         entitySet.remove(self);
 
-        List<Entity> casterList = this.castedMap.remove(self);
-        if (casterList != null) {
+        List<Entity> castedList = this.castedMap.remove(self);
+        if (castedList != null) {
             List<Entity> castingList;
 
-            for (Entity caster : casterList) {
-                castingList = this.castingMap.get(caster);
-                castingList.remove(self);
+            for (Entity caster : castedList) {
+                castingList = Objects.requireNonNull(this.castingMap.get(caster));
 
-                if (castingList.isEmpty()) {
+                if(castingList.size() == 1) {
                     this.castingMap.remove(caster);
 
                     if (caster.getId().getId().equals(Id.PLAYER)) {
                         ((Player) caster).replyPlayer("스킬 캐스팅이 취소되었습니다");
                     }
+                } else {
+                    castingList.remove(self);
                 }
             }
         }

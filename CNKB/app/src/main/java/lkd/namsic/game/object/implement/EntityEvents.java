@@ -17,11 +17,13 @@ import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EventList;
 import lkd.namsic.game.event.DamagedEvent;
 import lkd.namsic.game.event.Event;
+import lkd.namsic.game.event.PreDamageEvent;
 import lkd.namsic.game.event.StartFightEvent;
 import lkd.namsic.game.exception.EventRemoveException;
 import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Player;
+import lkd.namsic.setting.Logger;
 
 public class EntityEvents {
 
@@ -80,6 +82,17 @@ public class EntityEvents {
                     Player player = (Player) enemy;
 
                     player.replyPlayer("주변에 있던 다른 오크가 분노하여 달려듭니다!");
+                }
+            }
+        });
+
+        put(EventList.SKILL_SMITE.getId(), new PreDamageEvent() {
+            @Override
+            public void onPreDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+                                    @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
+                if(magicDmg.get() == 0) {
+                    Logger.i("NamsicDebug", ((int) (physicDmg.get() * 0.05)) + "");
+                    magicDmg.add((int) (physicDmg.get() * 0.05));
                 }
             }
         });

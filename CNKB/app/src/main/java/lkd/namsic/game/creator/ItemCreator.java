@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import java.util.HashMap;
 
 import lkd.namsic.game.config.Config;
-import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.object.Item;
@@ -811,6 +811,13 @@ public class ItemCreator implements Creatable {
         
         createItem(ItemList.OAK_TOOTH, "생각보단 깨끗한 오크의 이빨이다");
         createItem(ItemList.OAK_LEATHER, "상당히 질긴 고품질의 가죽이다");
+        
+        createItem(ItemList.SKILL_BOOK_MAGIC_BALL, "스킬 " + Emoji.focus("매직 볼") +
+                " 을 배울 수 있게 해주는 스킬 북이다");
+        createItem(ItemList.SKILL_BOOK_SMITE, "스킬 " + Emoji.focus("강타") +
+                " 를 배울 수 있게 해주는 스킬 북이다");
+        createItem(ItemList.SKILL_BOOK_LASER, "스킬 " + Emoji.focus("레이저") +
+                " 를 배울 수 있게 해주는 스킬 북이다");
 
         Logger.i("ObjectMaker", "Item making is done!");
     }

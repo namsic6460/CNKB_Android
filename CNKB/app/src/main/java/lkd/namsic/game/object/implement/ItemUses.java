@@ -16,12 +16,16 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
 import lkd.namsic.game.object.Player;
 
 public class ItemUses {
+    
+    private final static String SKILL_BOOK = "스킬 북을 사용했습니다";
+    private final static String SKILL_ALREADY_EXIST = "이미 해당 스킬을 보유하고 있습니다";
 
     public final static Map<Long, Use> MAP = new HashMap<Long, Use>() {{
         put(ItemList.SMALL_GOLD_BAG.getId(), new Use() {
@@ -394,6 +398,60 @@ public class ItemUses {
 
                 player.setReinforceMultiplier(3);
                 return "다음 강화 확률이 3배로 증가되었습니다";
+            }
+        });
+
+        put(ItemList.SKILL_BOOK_MAGIC_BALL.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+                
+                if(self.getSkill().contains(SkillList.MAGIC_BALL.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.MAGIC_BALL.getId());
+                return SKILL_BOOK;
+            }
+        });
+
+        put(ItemList.SKILL_BOOK_SMITE.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+
+                if(self.getSkill().contains(SkillList.SMITE.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.SMITE.getId());
+                return SKILL_BOOK;
+            }
+        });
+
+        put(ItemList.SKILL_BOOK_LASER.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+
+                if(self.getSkill().contains(SkillList.LASER.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.LASER.getId());
+                return SKILL_BOOK;
             }
         });
     }};

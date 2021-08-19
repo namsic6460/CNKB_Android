@@ -56,7 +56,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 2.0;
+    public static final double VERSION = 2.02;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -819,6 +819,10 @@ public class Config {
 
         if(entity.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) entity;
+
+            if(player.getVersion() < 2.02) {
+                player.addItem(ItemList.SKILL_BOOK_MAGIC_BALL.getId(), 1);
+            }
 
             if (unavailable) {
                 StringBuilder innerBuilder = new StringBuilder("---장비 업데이트 경고---\n(장착 해제할 경우 재장착이 불가능한 장비 목록)");

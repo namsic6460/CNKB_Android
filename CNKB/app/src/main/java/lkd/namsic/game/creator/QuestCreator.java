@@ -23,9 +23,9 @@ public class QuestCreator implements Creatable {
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.TRASH_COLLECTING, NpcList.NOAH.getId(), 13L);
-        quest.setNeedItem(ItemList.TRASH.getId(), 3);
+        quest.setNeedItem(ItemList.TRASH.getId(), 1);
         quest.setRewardCloseRate(NpcList.NOAH.getId(), 1);
-        quest.getRewardExp().set(100000L);
+        quest.getRewardExp().set(50000L);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.NEED_FIRE, NpcList.NOAH.getId(), 19L);

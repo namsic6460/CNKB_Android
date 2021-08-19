@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import lkd.namsic.game.base.Bool;
 import lkd.namsic.game.base.Int;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
@@ -18,24 +17,24 @@ import lkd.namsic.game.object.Equipment;
 import lkd.namsic.game.object.implement.EntityEvents;
 import lkd.namsic.game.object.implement.EquipEvents;
 
-public abstract class DamageEvent implements Event {
+public abstract class PreDamageEvent implements Event {
 
     @NonNull
     public static String getName() {
-        return "DamageEvent";
+        return "PreDamageEvent";
     }
 
     public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events, @NonNull Set<Long> eventEquipSet,
-                                   @NonNull Entity victim, @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit,
+                                   @NonNull Entity victim, @NonNull Int physicDmg, @NonNull Int magicDmg, @NonNull Int staticDmg,
                                    boolean canCrit) {
         if (events != null) {
             List<Long> removeList = new ArrayList<>();
 
             for (long eventId : events) {
-                DamageEvent damageEvent = EntityEvents.getEvent(eventId);
+                PreDamageEvent preDamageEvent = EntityEvents.getEvent(eventId);
 
                 try {
-                    damageEvent.onDamage(self, victim, totalDmg, totalDra, isCrit, canCrit);
+                    preDamageEvent.onPreDamage(self, victim, physicDmg, magicDmg, staticDmg, canCrit);
                 } catch (EventRemoveException e) {
                     removeList.add(eventId);
                 } catch (EventSkipException ignore) {}
@@ -45,10 +44,10 @@ public abstract class DamageEvent implements Event {
         }
 
         for(long equipId : eventEquipSet) {
-            DamageEvent damageEvent = EquipEvents.getEvent(equipId, getName());
+            PreDamageEvent preDamageEvent = EquipEvents.getEvent(equipId, getName());
 
             try {
-                damageEvent.onDamage(self, victim, totalDmg, totalDra, isCrit, canCrit);
+                preDamageEvent.onPreDamage(self, victim, physicDmg, magicDmg, staticDmg, canCrit);
             } catch (EventRemoveException e) {
                 Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
                 self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
@@ -56,8 +55,8 @@ public abstract class DamageEvent implements Event {
         }
     }
 
-    public abstract void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
-                                  @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit);
+    public abstract void onPreDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+                                     @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit);
 
     @NonNull
     @Override

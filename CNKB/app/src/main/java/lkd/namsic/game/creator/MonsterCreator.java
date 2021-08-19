@@ -113,7 +113,7 @@ public class MonsterCreator implements Creatable {
         monster.setBasicStat(StatType.HP, 75);
         monster.setBasicStat(StatType.ATK, 30);
         monster.setBasicStat(StatType.DEF, 10);
-        monster.setBasicStat(StatType.ATS, 200);
+        monster.setBasicStat(StatType.ATS, 150);
         monster.setBasicStat(StatType.ACC, 20);
         monster.setBasicStat(StatType.EVA, 40);
         monster.setBasicStat(StatType.AGI, 200);
@@ -128,8 +128,8 @@ public class MonsterCreator implements Creatable {
         monster.getLv().set(70);
         monster.setLocation(null);
 
-        monster.setBasicStat(StatType.MAXHP, 500);
-        monster.setBasicStat(StatType.HP, 500);
+        monster.setBasicStat(StatType.MAXHP, 550);
+        monster.setBasicStat(StatType.HP, 550);
         monster.setBasicStat(StatType.ATK, 50);
         monster.setBasicStat(StatType.DRA, 50);
         monster.setBasicStat(StatType.ACC, 40);
@@ -146,8 +146,8 @@ public class MonsterCreator implements Creatable {
         monster.getLv().set(60);
         monster.setLocation(null);
 
-        monster.setBasicStat(StatType.MAXHP, 100);
-        monster.setBasicStat(StatType.HP, 100);
+        monster.setBasicStat(StatType.MAXHP, 150);
+        monster.setBasicStat(StatType.HP, 150);
         monster.setBasicStat(StatType.DEF, 999);
 
         monster.setItemDrop(ItemList.BRANCH.getId(), 1, 3, 5);
@@ -164,8 +164,8 @@ public class MonsterCreator implements Creatable {
         monster.getLv().set(90);
         monster.setLocation(null);
 
-        monster.setBasicStat(StatType.MAXHP, 300);
-        monster.setBasicStat(StatType.HP, 300);
+        monster.setBasicStat(StatType.MAXHP, 400);
+        monster.setBasicStat(StatType.HP, 400);
         monster.setBasicStat(StatType.ATK, 40);
         monster.setBasicStat(StatType.ATS, 150);
         monster.setBasicStat(StatType.DEF, 30);

@@ -20,11 +20,13 @@ import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.enums.object.QuestList;
+import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.game.object.Quest;
+import lkd.namsic.game.object.Skill;
 
 public class DisplayManager {
 
@@ -407,6 +409,16 @@ public class DisplayManager {
                 .append(Config.HARD_SPLIT_BAR);
         
         self.replyPlayer("퀘스트 정보는 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+
+    public void displaySkillInfo(@NonNull Player self, @NonNull String skillName) {
+        Long skillId = SkillList.findByName(skillName);
+        if(skillId == null) {
+            throw new WeirdCommandException("알 수 없는 스킬입니다");
+        }
+
+        Skill skill = Config.getData(Id.SKILL, skillId);
+        self.replyPlayer(Emoji.focus(skillName) + "\n" + skill.getDescription());
     }
 
     public void displayReinforceExplanation(@NonNull Player self) {

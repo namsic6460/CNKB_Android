@@ -17,14 +17,16 @@ import lombok.Getter;
 @Getter
 public abstract class SkillUse extends LimitUse {
 
-    final LimitInteger waitTurn = new LimitInteger(0, 0, null);
-
     public SkillUse(int useHp, int useMn) {
         this(useHp, 0, 0, useMn, 0, 0);
     }
 
     public SkillUse(int useHp, double useHpTotal, double useHpCurrent, int useMn, double useMnTotal, double useMnCurrent) {
         super(useHp, useHpTotal, useHpCurrent, useMn, useMnTotal, useMnCurrent);
+    }
+
+    public int getWaitTurn() {
+        return 0;
     }
 
     @Override
@@ -103,7 +105,7 @@ public abstract class SkillUse extends LimitUse {
             output = self.getName();
         }
 
-        if(this.waitTurn.get() == 0) {
+        if(this.getWaitTurn() == 0) {
             this.useSkill(self, targetList);
         } else {
             FightManager.getInstance().castingMap.put(self, targetList);

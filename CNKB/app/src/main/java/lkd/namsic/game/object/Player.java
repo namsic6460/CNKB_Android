@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +31,7 @@ import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lombok.Getter;
@@ -727,6 +729,14 @@ public class Player extends Entity {
                 this.setLog(LogData.MAX_PAYMENT, gap);
             }
         }
+    }
+
+    @Override
+    public void addSkill(long skillId) {
+        super.addSkill(skillId);
+
+        SkillList skillData = Objects.requireNonNull(SkillList.idMap.get(skillId));
+        replyPlayer(skillData.getDisplayName() + " 스킬을 배웠습니다!");
     }
 
     @Override

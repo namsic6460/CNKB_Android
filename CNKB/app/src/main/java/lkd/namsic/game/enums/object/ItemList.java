@@ -225,7 +225,11 @@ public enum ItemList {
     GLOW_REINFORCE_MULTIPLIER("빛나는 강화 증폭제", 181L),
 
     OAK_TOOTH("오크 이빨", 182L),
-    OAK_LEATHER("오크 가죽", 183L);
+    OAK_LEATHER("오크 가죽", 183L),
+    
+    SKILL_BOOK_MAGIC_BALL("스킬 북 - 매직 볼", 184L),
+    SKILL_BOOK_SMITE("스킬 북 - 강타", 185L),
+    SKILL_BOOK_LASER("스킬 북 - 레이저", 186L);
 
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();

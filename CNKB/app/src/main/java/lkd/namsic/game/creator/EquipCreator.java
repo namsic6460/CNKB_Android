@@ -33,7 +33,7 @@ public class EquipCreator implements Creatable {
         }});
         equipment.addBasicStat(StatType.ATK, 3);
         equipment.addBasicStat(StatType.ATS, 5);
-        equipment.addBasicStat(StatType.ACC, 10);
+        equipment.addBasicStat(StatType.ACC, 8);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.MIX_SWORD,
@@ -48,39 +48,41 @@ public class EquipCreator implements Creatable {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.HEART_BREAKER_1, "공격 시 체력이 10% 미만인 적을 처형시킨다");
-        equipment.getHandleLv().set(2);
+        equipment.getHandleLv().set(4);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.IRON.getId(), 30);
             put(ItemList.ZOMBIE_HEART.getId(), 10);
         }});
         equipment.addBasicStat(StatType.ATK, 15);
-        equipment.addBasicStat(StatType.ATS, 50);
-        equipment.getHandleLv().set(4);
+        equipment.addBasicStat(StatType.ATS, 30);
+        equipment.getLimitLv().set(40);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.HEAD_HUNTER_1,
                 "치명타 미 발동시 25% 확률로 2배의 치명타를 발동시킨다");
-        equipment.getHandleLv().set(2);
+        equipment.getHandleLv().set(4);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.RED_STONE.getId(), 30);
             put(ItemList.PIG_HEAD.getId(), 5);
             put(ItemList.ZOMBIE_HEAD.getId(), 5);
         }});
-        equipment.addBasicStat(StatType.ATK, 20);
+        equipment.addBasicStat(StatType.ATK, 10);
         equipment.addBasicStat(StatType.ATS, 10);
         equipment.addBasicStat(StatType.ACC, 10);
         equipment.addBasicStat(StatType.AGI, 10);
+        equipment.getLimitLv().set(40);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.GHOST_SWORD_1,
                 "공격시 적 최대 체력의 6%에 해당하는 추가 데미지를 입힌다\n" +
                         "사용 시 최대 체력의 6%를 소모하여 다음 공격의 데미지를 66% 증가시킨다");
-        equipment.getHandleLv().set(2);
+        equipment.getHandleLv().set(4);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.ZOMBIE_SOUL.getId(), 3);
             put(ItemList.SILVER.getId(), 20);
         }});
-        equipment.addBasicStat(StatType.ATS, 150);
+        equipment.addBasicStat(StatType.ATS, 60);
+        equipment.getLimitLv().set(40);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.AMULET, EquipList.HEALTH_AMULET, "착용하고 있으면 건강해지는 기분이 드는 부적이다");
@@ -91,6 +93,7 @@ public class EquipCreator implements Creatable {
         equipment.getHandleLv().set(3);
         equipment.addBasicStat(StatType.MAXHP, 100);
         equipment.addBasicStat(StatType.ATK, 10);
+        equipment.getLimitLv().set(30);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.AMULET, EquipList.DRAGON_AMULET, "용이 지니고 다녔다는 부적이다");
@@ -98,6 +101,7 @@ public class EquipCreator implements Creatable {
         equipment.addBasicStat(StatType.MAXHP, 200);
         equipment.addBasicStat(StatType.DEF, 30);
         equipment.addBasicStat(StatType.EVA, 20);
+        equipment.getLimitLv().set(50);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.HELMET, EquipList.LEATHER_HELMET, "가죽으로 만든 간단한 보호구다\n" +
@@ -139,7 +143,7 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.HELMET, EquipList.LOW_ALLOY_HELMET, "하급 합금으로 만든 간단한 보호구다\n" +
                 "치명타 데미지를 20% 확률로 50% 방어한다");
         equipment.getHandleLv().set(2);
-        equipment.addBasicStat(StatType.MAXHP, 25);
+        equipment.addBasicStat(StatType.MAXHP, 30);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_ALLOY.getId(), 5);
             put(ItemList.GOLD.getId(), 5);
@@ -149,7 +153,7 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.LOW_ALLOY_CHESTPLATE, "하급 합금으로 만든 간단한 보호구다\n" +
                 "사용 시 4 마나를 사용하여 75% 확률로 방어를 한다");
         equipment.getHandleLv().set(2);
-        equipment.addBasicStat(StatType.MAXHP, 25);
+        equipment.addBasicStat(StatType.MAXHP, 30);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_ALLOY.getId(), 5);
             put(ItemList.GOLD.getId(), 5);
@@ -159,7 +163,7 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.LOW_ALLOY_LEGGINGS, "하급 합금으로 만든 간단한 보호구다\n" +
                 "사용 시 5 마나를 사용하여 20초간 회피 15의 버프를 얻는다");
         equipment.getHandleLv().set(2);
-        equipment.addBasicStat(StatType.MAXHP, 25);
+        equipment.addBasicStat(StatType.MAXHP, 30);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_ALLOY.getId(), 5);
             put(ItemList.GOLD.getId(), 5);
@@ -169,7 +173,7 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.SHOES, EquipList.LOW_ALLOY_SHOES, "하급 합금으로 만든 간단한 보호구다\n" +
                 "타격 시 합검을 장착하고 있다면 5의 추가 데미지를 준다");
         equipment.getHandleLv().set(2);
-        equipment.addBasicStat(StatType.MAXHP, 25);
+        equipment.addBasicStat(StatType.MAXHP, 30);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_ALLOY.getId(), 5);
             put(ItemList.GOLD.getId(), 5);
@@ -232,7 +236,7 @@ public class EquipCreator implements Creatable {
                 "사용 시 마나를 10 사용하여 30초간 모든 적의 공격 속도를 25 감소시킨다");
         equipment.getHandleLv().set(3);
         equipment.addBasicStat(StatType.ATS, -10);
-        equipment.addBasicStat(StatType.MAXHP, 20);
+        equipment.addBasicStat(StatType.MAXHP, 30);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_SLIME.getId(), 30);
         }});
@@ -250,7 +254,7 @@ public class EquipCreator implements Creatable {
 
         equipment = new Equipment(EquipType.HELMET, EquipList.WOOL_HELMET, "양털로 만든 따뜻한 모자다");
         equipment.addBasicStat(StatType.MAXHP, 15);
-        equipment.addBasicStat(StatType.MDEF, 5);
+        equipment.addBasicStat(StatType.MDEF, 8);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.WOOL.getId(), 10);
         }});
@@ -259,7 +263,7 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.HARD_IRON_CHESTPLATE, "강철로 만든 단단한 갑옷이다");
         equipment.getLimitLv().set(30);
         equipment.getHandleLv().set(5);
-        equipment.addBasicStat(StatType.MAXHP, 100);
+        equipment.addBasicStat(StatType.MAXHP, 80);
         equipment.addBasicStat(StatType.DEF, 25);
         equipment.addBasicStat(StatType.ATS, -40);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
@@ -271,12 +275,13 @@ public class EquipCreator implements Creatable {
                 "피격 시 10% 확률로 데미지를 50% 감소시키고 다음 자신의 공격의 데미지를 1.5배로 준다");
         equipment.getHandleLv().set(3);
         equipment.addBasicStat(StatType.MAXHP, 30);
-        equipment.addBasicStat(StatType.ATS, 50);
+        equipment.addBasicStat(StatType.ATS, 30);
         equipment.addBasicStat(StatType.DEF, 5);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_SLIME.getId(), 10);
-            put(ItemList.SPIDER_LEG.getId(), 4);
+            put(ItemList.SPIDER_LEG.getId(),4 );
         }});
+        equipment.getLimitLv().set(25);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.SHOES, EquipList.MINER_SHOES,
@@ -294,7 +299,7 @@ public class EquipCreator implements Creatable {
                 "사용 시 마나 1을 소모하여 다음 공격이 자신보다 낮은 레벨의 몬스터를 공격하는 것이라면 데미지를 3배로 준다");
         equipment.getHandleLv().set(4);
         equipment.getLimitLv().set(30);
-        equipment.addBasicStat(StatType.ATK, 25);
+        equipment.addBasicStat(StatType.ATK, 30);
         equipment.addBasicStat(StatType.ATS, -20);
         Config.unloadObject(equipment);
 

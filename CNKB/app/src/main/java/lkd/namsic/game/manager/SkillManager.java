@@ -54,11 +54,11 @@ public class SkillManager {
             Player player = (Player) self;
 
             String msg;
-            if(use.getWaitTurn().get() == 0) {
+            if(use.getWaitTurn() == 0) {
                 msg = result + " 에게 " + skillName + " (을/를) 사용했습니다";
             } else {
                 self.setVariable(Variable.FIGHT_CASTING_SKILL, skillId);
-                self.setVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN, use.getWaitTurn().get());
+                self.setVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN, use.getWaitTurn());
                 msg = result + " 에게 " + skillName + " 캐스팅을 시작했습니다";
             }
 
