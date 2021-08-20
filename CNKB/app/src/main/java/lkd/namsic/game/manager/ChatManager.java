@@ -93,166 +93,157 @@ public class ChatManager {
         Npc npc = Config.getData(Id.NPC, npcId);
         Notification.Action session = self.getSession();
 
-        Thread thread = new Thread(() -> {
+        self.addLog(LogData.CHAT, 1);
+        self.addChatCount(npcId, 1);
+
+        try {
+            Thread.sleep(chat.getDelayTime().get());
+        } catch (InterruptedException e) {
+            Logger.e("ChatManager", e);
+            return;
+        }
+
+        long pauseTime = chat.getPauseTime().get();
+        String preString = npc.getName() + " -> " + self.getNickName() + "\n";
+
+        List<String> texts = chat.getText();
+        int size = texts.size() - 1;
+        for (int i = 0; i <= size; i++) {
+            KakaoTalk.reply(session, preString + texts.get(i)
+                    .replaceAll("__nickname", self.getNickName())
+                    .replaceAll("__lv", self.getLv().get().toString()));
+
             try {
-                try {
-                    Thread.sleep(chat.getDelayTime().get());
-                } catch (InterruptedException e) {
-                    Logger.e("ChatManager", e);
+                if (i != size) {
+                    Thread.sleep(pauseTime);
+                }
+            } catch (InterruptedException e) {
+                Logger.e("ChatManager", e);
+                return;
+            }
+        }
+
+        self.addMoney(chat.getMoney().get());
+
+        for (Map.Entry<Long, Integer> entry : chat.getItem().entrySet()) {
+            self.addItem(entry.getKey(), entry.getValue(), false);
+        }
+
+        for (long equipId : chat.getEquipment()) {
+            self.addEquip(equipId);
+        }
+
+        for (Map.Entry<Variable, Integer> entry : chat.getVariable().entrySet()) {
+            self.addVariable(entry.getKey(), entry.getValue());
+        }
+
+        long questId = chat.getQuestId().get();
+        if (questId != 0) {
+            self.addQuest(chat.getQuestId().get());
+            self.replyPlayer("퀘스트 \"" + QuestList.findById(questId) + "\" (을/를) 수락하였습니다");
+        }
+
+        Location tpLocation = chat.getTpLocation();
+        if (tpLocation != null && !self.getLocation().equals(tpLocation)) {
+            moveManager.setMap(self, chat.getTpLocation());
+        }
+
+        if (chat.isBaseMsg()) {
+            self.getResponseChat().clear();
+            self.getAnyResponseChat().clear();
+
+            List<Long> availableChat = npc.getAvailableChat(self);
+
+            if (availableChat.isEmpty()) {
+                self.replyPlayer("가능한 대화가 없습니다");
+                self.setDoing(Doing.NONE);
+                return;
+            }
+
+            int index = 1;
+            String indexStr;
+            Chat chatData;
+            StringBuilder builder = new StringBuilder("대화를 선택해주세요\n");
+            for (long availableChatId : availableChat) {
+                chatData = Config.getData(Id.CHAT, availableChatId);
+                indexStr = Integer.toString(index++);
+
+                builder.append("\n")
+                        .append(indexStr)
+                        .append(": ")
+                        .append(chatData.getName());
+
+                self.setAnyResponseChat(indexStr, availableChatId);
+            }
+
+            self.setWaitNpcId(npcId);
+            self.setDoing(Doing.WAIT_RESPONSE);
+
+            self.replyPlayer(builder.toString().trim());
+        } else {
+            if (chat.getResponseChat().isEmpty() && chat.getAnyResponseChat().isEmpty()) {
+                self.setDoing(Doing.NONE);
+            } else {
+                long noneChatId = chat.getResponseChat(WaitResponse.NONE);
+                if (noneChatId != 0) {
+                    if (chatId == noneChatId) {
+                        throw new InvalidNumberException(noneChatId);
+                    }
+
+                    long noneNpcId = chat.getNoneNpcId().get();
+                    if(noneNpcId == NpcList.NONE.getId()) {
+                        noneNpcId = npcId;
+                    }
+
+                    this.startChat(self, noneChatId, noneNpcId);
                     return;
                 }
 
-                long pauseTime = chat.getPauseTime().get();
-                String preString = npc.getName() + " -> " + self.getNickName() + "\n";
+                self.setWaitNpcId(npcId);
 
-                List<String> texts = chat.getText();
-                int size = texts.size() - 1;
-                for (int i = 0; i <= size; i++) {
-                    KakaoTalk.reply(session, preString + texts.get(i)
-                            .replaceAll("__nickname", self.getNickName())
-                            .replaceAll("__lv", self.getLv().get().toString()));
+                self.getResponseChat().clear();
+                self.getResponseChat().putAll(chat.getResponseChat());
 
-                    try {
-                        if (i != size) {
-                            Thread.sleep(pauseTime);
+                self.getAnyResponseChat().clear();
+                for(Map.Entry<String, Long> entry : chat.getAnyResponseChat().entrySet()) {
+                    self.getAnyResponseChat().put(entry.getKey()
+                            .replace("__nickname", self.getNickName()), entry.getValue());
+                }
+
+                boolean isTutorial = self.getObjectVariable(Variable.IS_TUTORIAL, false);
+                if (!isTutorial) {
+                    StringBuilder builder = new StringBuilder("대답을 입력해주세요\n");
+
+                    if (!chat.getResponseChat().isEmpty()) {
+                        builder.append("\n");
+
+                        for (WaitResponse waitResponse : chat.getResponseChat().keySet()) {
+                            builder.append(waitResponse.getDisplay())
+                                    .append("\n");
                         }
-                    } catch (InterruptedException e) {
-                        Logger.e("ChatManager", e);
-                        return;
-                    }
-                }
-
-                self.addMoney(chat.getMoney().get());
-
-                for (Map.Entry<Long, Integer> entry : chat.getItem().entrySet()) {
-                    self.addItem(entry.getKey(), entry.getValue(), false);
-                }
-
-                for (long equipId : chat.getEquipment()) {
-                    self.addEquip(equipId);
-                }
-
-                for (Map.Entry<Variable, Integer> entry : chat.getVariable().entrySet()) {
-                    self.addVariable(entry.getKey(), entry.getValue());
-                }
-
-                long questId = chat.getQuestId().get();
-                if (questId != 0) {
-                    self.addQuest(chat.getQuestId().get());
-                    self.replyPlayer("퀘스트 \"" + QuestList.findById(questId) + "\" (을/를) 수락하였습니다");
-                }
-
-                Location tpLocation = chat.getTpLocation();
-                if (tpLocation != null && !self.getLocation().equals(tpLocation)) {
-                    moveManager.setMap(self, chat.getTpLocation());
-                }
-
-                if (chat.isBaseMsg()) {
-                    self.getResponseChat().clear();
-                    self.getAnyResponseChat().clear();
-
-                    List<Long> availableChat = npc.getAvailableChat(self);
-
-                    if (availableChat.isEmpty()) {
-                        self.replyPlayer("가능한 대화가 없습니다");
-                        self.setDoing(Doing.NONE);
-                        return;
                     }
 
-                    int index = 1;
-                    String indexStr;
-                    Chat chatData;
-                    StringBuilder builder = new StringBuilder("대화를 선택해주세요\n");
-                    for (long availableChatId : availableChat) {
-                        chatData = Config.getData(Id.CHAT, availableChatId);
-                        indexStr = Integer.toString(index++);
+                    if (!chat.getAnyResponseChat().isEmpty()) {
+                        builder.append("\n(다른 메세지 목록)");
 
-                        builder.append("\n")
-                                .append(indexStr)
-                                .append(": ")
-                                .append(chatData.getName());
+                        String waitResponse;
+                        for (String response : chat.getAnyResponseChat().keySet()) {
+                            if (response.startsWith("__")) {
+                                waitResponse = response.replace("__", "(ㅜ/n) ");
+                            } else {
+                                waitResponse = response;
+                            }
 
-                        self.setAnyResponseChat(indexStr, availableChatId);
+                            builder.append("\n")
+                                    .append(waitResponse);
+                        }
                     }
-
-                    self.setWaitNpcId(npcId);
-                    self.setDoing(Doing.WAIT_RESPONSE);
 
                     self.replyPlayer(builder.toString().trim());
-                } else {
-                    if (chat.getResponseChat().isEmpty() && chat.getAnyResponseChat().isEmpty()) {
-                        self.setDoing(Doing.NONE);
-                    } else {
-                        long noneChatId = chat.getResponseChat(WaitResponse.NONE);
-                        if (noneChatId != 0) {
-                            if (chatId == noneChatId) {
-                                throw new InvalidNumberException(noneChatId);
-                            }
-
-                            this.startChat(self, noneChatId, npcId);
-                            return;
-                        }
-
-                        self.setWaitNpcId(npcId);
-
-                        self.getResponseChat().clear();
-                        self.getResponseChat().putAll(chat.getResponseChat());
-
-                        self.getAnyResponseChat().clear();
-                        for(Map.Entry<String, Long> entry : chat.getAnyResponseChat().entrySet()) {
-                            self.getAnyResponseChat().put(entry.getKey()
-                                    .replace("__nickname", self.getNickName()), entry.getValue());
-                        }
-
-                        boolean isTutorial = self.getObjectVariable(Variable.IS_TUTORIAL, false);
-                        if (!isTutorial) {
-                            StringBuilder builder = new StringBuilder("대답을 입력해주세요\n");
-
-                            if (!chat.getResponseChat().isEmpty()) {
-                                builder.append("\n");
-
-                                for (WaitResponse waitResponse : chat.getResponseChat().keySet()) {
-                                    builder.append(waitResponse.getDisplay())
-                                            .append("\n");
-                                }
-                            }
-
-                            if (!chat.getAnyResponseChat().isEmpty()) {
-                                builder.append("\n(다른 메세지 목록)");
-
-                                String waitResponse;
-                                for (String response : chat.getAnyResponseChat().keySet()) {
-                                    if (response.startsWith("__")) {
-                                        waitResponse = response.replace("__", "(ㅜ/n) ");
-                                    } else {
-                                        waitResponse = response;
-                                    }
-
-                                    builder.append("\n")
-                                            .append(waitResponse);
-                                }
-                            }
-
-                            self.replyPlayer(builder.toString().trim());
-                        }
-
-                        self.setDoing(Doing.WAIT_RESPONSE);
-                    }
                 }
-            } catch (Exception e) {
-                Logger.e("ChatManager", e);
+
+                self.setDoing(Doing.WAIT_RESPONSE);
             }
-        });
-
-        self.addLog(LogData.CHAT, 1);
-        self.addChatCount(npcId, 1);
-        thread.start();
-
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            Logger.e("ChatManager", e);
-            throw new RuntimeException(e);
         }
     }
 

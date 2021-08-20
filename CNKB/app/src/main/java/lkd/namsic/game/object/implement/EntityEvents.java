@@ -15,6 +15,7 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EventList;
+import lkd.namsic.game.event.DamageEvent;
 import lkd.namsic.game.event.DamagedEvent;
 import lkd.namsic.game.event.Event;
 import lkd.namsic.game.event.PreDamageEvent;
@@ -23,7 +24,6 @@ import lkd.namsic.game.exception.EventRemoveException;
 import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Player;
-import lkd.namsic.setting.Logger;
 
 public class EntityEvents {
 
@@ -91,8 +91,25 @@ public class EntityEvents {
             public void onPreDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
                                     @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
                 if(magicDmg.get() == 0) {
-                    Logger.i("NamsicDebug", ((int) (physicDmg.get() * 0.05)) + "");
                     magicDmg.add((int) (physicDmg.get() * 0.05));
+                }
+            }
+        });
+
+        put(EventList.IMP_ATTACK.getId(), new DamageEvent() {
+            @Override
+            public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
+                                 @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
+                int basicAtk = self.getVariable(Variable.IMP_ORIGINAL_ATK);
+                int atk = self.getStat(StatType.ATK);
+
+                if(basicAtk == 0) {
+                    basicAtk = atk;
+                    self.setVariable(Variable.IMP_ORIGINAL_ATK, basicAtk);
+                }
+
+                if(atk <= basicAtk * 3) {
+                    self.addBasicStat(StatType.ATK, (int) (atk * 0.15));
                 }
             }
         });

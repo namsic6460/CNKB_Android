@@ -797,6 +797,16 @@ public abstract class Entity extends NamedObject {
         }
     }
 
+    public long getVariable(Variable variable, long defaultValue) {
+        Object value = this.variable.getOrDefault(variable, defaultValue);
+
+        if(value instanceof Double) {
+            return ((Double) value).longValue();
+        } else {
+            return (long) value;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Nullable
     public <T> T getObjectVariable(Variable variable) {

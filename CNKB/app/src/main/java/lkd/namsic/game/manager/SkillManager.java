@@ -31,6 +31,10 @@ public class SkillManager {
             throw new WeirdCommandException("알 수 없는 스킬입니다");
         }
 
+        if(!self.getSkill().contains(skillId)) {
+            throw new WeirdCommandException("보유하지 않은 스킬입니다");
+        }
+
         Skill skill = Config.getData(Id.SKILL, skillId);
 
         SkillUse use = skill.getSkillUse();

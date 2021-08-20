@@ -25,13 +25,18 @@ public class ShopCreator implements Creatable {
         shop.addBuyItem(ItemList.LEATHER, 30L);
         shop.addBuyItem(ItemList.ZOMBIE_HEAD, 60L);
         shop.addBuyItem(ItemList.ZOMBIE_SOUL, 500L);
-        shop.addBuyItem(ItemList.ZOMBIE_HEART, 60L);
+        shop.addBuyItem(ItemList.ZOMBIE_HEART, 100L);
         shop.addBuyItem(ItemList.PIECE_OF_SLIME, 65L);
         shop.addBuyItem(ItemList.SPIDER_LEG, 125L);
         shop.addBuyItem(ItemList.SPIDER_EYE, 150L);
-        shop.addBuyItem(ItemList.MAGIC_STONE, 130L);
+        shop.addBuyItem(ItemList.MAGIC_STONE, 110L);
         shop.addBuyItem(ItemList.OAK_TOOTH, 200L);
         shop.addBuyItem(ItemList.OAK_LEATHER, 175L);
+        shop.addBuyItem(ItemList.PIECE_OF_BONE, 30L);
+        shop.addBuyItem(ItemList.HORN_OF_IMP, 150L);
+        shop.addBuyItem(ItemList.IMP_HEART, 300L);
+        shop.addBuyItem(ItemList.HORN_OF_LOW_DEVIL, 250L);
+        shop.addBuyItem(ItemList.LOW_DEVIL_SOUL, 1500L);
 
         Config.unloadObject(shop);
 

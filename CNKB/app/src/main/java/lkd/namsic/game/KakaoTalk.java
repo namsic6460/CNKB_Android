@@ -47,6 +47,7 @@ import lkd.namsic.game.command.player.game.MineCommand;
 import lkd.namsic.game.command.player.game.MoveCommand;
 import lkd.namsic.game.command.player.game.RankingCommand;
 import lkd.namsic.game.command.player.game.ReinforceCommand;
+import lkd.namsic.game.command.player.game.RestCommand;
 import lkd.namsic.game.command.player.game.SettingCommand;
 import lkd.namsic.game.command.player.game.ShopCommand;
 import lkd.namsic.game.command.player.game.StatCommand;
@@ -55,6 +56,8 @@ import lkd.namsic.game.command.player.register.PlayerRegisterCommand;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Doing;
+import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.exception.DoingFilterException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
@@ -123,6 +126,7 @@ public class KakaoTalk {
         registerPlayerCommand(new MoveCommand(),        "이동", "move");
         registerPlayerCommand(new RankingCommand(),     "랭킹", "랭크", "ranking", "rank");
         registerPlayerCommand(new ReinforceCommand(),   "강화", "제련", "reinforce", "r");
+        registerPlayerCommand(new RestCommand(),        "휴식", "rest");
         registerPlayerCommand(new SettingCommand(),     "설정", "setting", "set");
         registerPlayerCommand(new ShopCommand(),        "상점", "shop");
         registerPlayerCommand(new StatCommand(),        "스텟", "stat");
@@ -278,8 +282,18 @@ public class KakaoTalk {
     }
 
     public static void checkDoing(@NonNull Player player) throws DoingFilterException {
-        if(!player.getDoing().equals(Doing.NONE)) {
-            throw new DoingFilterException(player.getDoing());
+        Doing doing = player.getDoing();
+
+        if(!doing.equals(Doing.NONE)) {
+            if(doing.equals(Doing.REST) && player.getVariable(Variable.REST, 0L) <= System.currentTimeMillis()) {
+                player.setDoing(Doing.NONE);
+                player.setBasicStat(StatType.HP, player.getStat(StatType.MAXHP));
+                player.setBasicStat(StatType.MN, player.getStat(StatType.MAXMN));
+
+                player.removeVariable(Variable.REST);
+            } else {
+                throw new DoingFilterException(player.getDoing());
+            }
         }
     }
 

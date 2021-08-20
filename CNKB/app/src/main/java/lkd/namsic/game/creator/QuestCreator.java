@@ -158,7 +158,46 @@ public class QuestCreator implements Creatable {
         quest.setRewardCloseRate(NpcList.SYLVIA.getId(), 10);
         Config.unloadObject(quest);
 
-        Config.ID_COUNT.put(Id.QUEST, Math.max(Config.ID_COUNT.get(Id.QUEST), 35L));
+        quest = new Quest(QuestList.LEATHER_COLLECTING1, NpcList.HYEONG_SEOK.getId(), 141L);
+        quest.setNeedItem(ItemList.SHEEP_LEATHER.getId(), 10);
+        quest.getRewardMoney().set(500L);
+        quest.getRewardExp().set(100000L);
+        quest.setRewardCloseRate(NpcList.HYEONG_SEOK.getId(), 2);
+        Config.unloadObject(quest);
+
+        quest = new Quest(QuestList.LEATHER_COLLECTING2, NpcList.HYEONG_SEOK.getId(), 141L);
+        quest.setNeedItem(ItemList.LEATHER.getId(), 10);
+        quest.getRewardMoney().set(1000L);
+        quest.getRewardExp().set(180000L);
+        quest.setRewardCloseRate(NpcList.HYEONG_SEOK.getId(), 3);
+        Config.unloadObject(quest);
+
+        quest = new Quest(QuestList.LEATHER_COLLECTING3, NpcList.HYEONG_SEOK.getId(), 141L);
+        quest.setNeedItem(ItemList.OAK_LEATHER.getId(), 5);
+        quest.getRewardMoney().set(3500L);
+        quest.getRewardExp().set(250000L);
+        quest.setRewardCloseRate(NpcList.HYEONG_SEOK.getId(), 5);
+        Config.unloadObject(quest);
+
+        quest = new Quest(QuestList.INCREASING_ZOMBIE, NpcList.PEDRO.getId(), 145L);
+        quest.setNeedItem(ItemList.ZOMBIE_HEAD.getId(), 5);
+        quest.getRewardMoney().set(2000L);
+        quest.getRewardExp().set(150000L);
+        quest.setRewardCloseRate(NpcList.PEDRO.getId(), 3);
+        Config.unloadObject(quest);
+
+        quest = new Quest(QuestList.BONE_IN_THE_SEA, NpcList.KANG_TAE_GONG.getId(), 149L);
+        quest.setNeedItem(ItemList.PIECE_OF_BONE.getId(), 30);
+        quest.getRewardMoney().set(3000L);
+        quest.getRewardExp().set(100000L);
+        quest.setRewardCloseRate(NpcList.KANG_TAE_GONG.getId(), 3);
+        Config.unloadObject(quest);
+
+        quest = new Quest(QuestList.SOUND_IN_THE_SINKHOLE, NpcList.NOAH.getId(), 153L);
+        quest.setNeedItem(ItemList.HORN_OF_IMP.getId(), 1);
+        quest.getRewardExp().set(300000L);
+        Config.unloadObject(quest);
+
         Logger.i("ObjectMaker", "Quest making is done!");
     }
 

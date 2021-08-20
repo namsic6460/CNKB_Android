@@ -69,6 +69,12 @@ public class NpcCreator implements Creatable {
         chatLimit.getLimitQuest().addMin(QuestList.TRASH_COLLECTING.getId(), 3);
         npc.setChat(chatLimit, 78L);
 
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(QuestList.SOUND_IN_THE_SINKHOLE.getId());
+        chatLimit.getNotClearedQuest().add(QuestList.SOUND_IN_THE_SINKHOLE.getId());
+        chatLimit.getLimitLv().setMin(70);
+        npc.setChat(chatLimit, 150L);
+
         Config.unloadObject(npc);
 
 
@@ -89,6 +95,29 @@ public class NpcCreator implements Creatable {
         chatLimit.getNotClearedQuest().add(QuestList.GOLD_RING_GIFT.getId());
         chatLimit.getLimitQuest().addMin(QuestList.WORK_OF_MINER.getId(), 7);
         npc.setChat(chatLimit, 66L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING1.getId());
+        chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING2.getId());
+        chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING3.getId());
+        chatLimit.getLimitLv().set(1, 30);
+        npc.setChat(chatLimit, 134L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING1.getId());
+        chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING2.getId());
+        chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING3.getId());
+        chatLimit.getLimitQuest().addMax(QuestList.LEATHER_COLLECTING2.getId(), 10);
+        chatLimit.getLimitLv().setMin(25);
+        npc.setChat(chatLimit, 137L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING1.getId());
+        chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING2.getId());
+        chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING3.getId());
+        chatLimit.getLimitQuest().addMin(QuestList.LEATHER_COLLECTING2.getId(), 5);
+        chatLimit.getLimitLv().setMin(80);
+        npc.setChat(chatLimit, 139L);
 
         Config.unloadObject(npc);
 
@@ -185,6 +214,11 @@ public class NpcCreator implements Creatable {
         chatLimit.getLimitQuest().addMin(QuestList.TRASH_COLLECTING.getId(), 3);
         npc.setChat(chatLimit, 58L);
 
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(QuestList.BONE_IN_THE_SEA.getId());
+        chatLimit.getClearedQuest().put(QuestList.NEED_FISHING_ROD_ITEM.getId(), 1);
+        npc.setChat(chatLimit, 146L);
+
         Config.unloadObject(npc);
 
 
@@ -197,8 +231,12 @@ public class NpcCreator implements Creatable {
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.NEED_COAL.getId());
-        chatLimit.getLimitQuest().addMax(QuestList.NEED_COAL.getId(), 2);
+        chatLimit.getLimitQuest().addMax(QuestList.NEED_COAL.getId(), 3);
         npc.setChat(chatLimit, 70L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(QuestList.INCREASING_ZOMBIE.getId());
+        npc.setChat(chatLimit, 142L);
 
         Config.unloadObject(npc);
 

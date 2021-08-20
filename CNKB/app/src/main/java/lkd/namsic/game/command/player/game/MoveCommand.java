@@ -46,7 +46,6 @@ public class MoveCommand extends PlayerCommand {
             MoveManager.getInstance().moveField(player, third);
         } else {
             KakaoTalk.checkDoing(player);
-
             MoveManager.getInstance().moveMap(player, command);
         }
     }

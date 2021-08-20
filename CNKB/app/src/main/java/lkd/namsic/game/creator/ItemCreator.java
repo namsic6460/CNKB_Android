@@ -154,10 +154,6 @@ public class ItemCreator implements Creatable {
             put(ItemList.COBBLE_STONE.getId(), 10);
             put(ItemList.COAL.getId(), 5);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.MAGIC_STONE.getId(), 1);
-            put(ItemList.GOD_WATER.getId(), 1);
-        }});
         Config.unloadObject(item);
 
         createItem(ItemList.COAL, "불이 잘 붙는 흔한 광물이다");
@@ -780,24 +776,7 @@ public class ItemCreator implements Creatable {
         item.setCanEat(true);
         Config.unloadObject(item);
 
-        createItem(ItemList.GOD_WATER, "천계의 신의 힘이 담긴 물이다");
-
-        item = new Item(ItemList.PURIFIED_ZOMBIE_SOUL, "신의 힘으로 어둠이 사라진 좀비의 영혼이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.ZOMBIE_SOUL.getId(), 3);
-            put(ItemList.GOD_WATER.getId(), 1);
-        }});
-        Config.unloadObject(item);
-
-        item = new Item(ItemList.HARDENED_SLIME, "신의 힘으로 어둠이 사라져 굳어버린 슬라임이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.PIECE_OF_SLIME.getId(), 30);
-            put(ItemList.GOD_WATER.getId(), 1);
-        }});
-        Config.unloadObject(item);
-
         createItem(ItemList.MAGIC_STONE, "어둠의 힘이 담긴 돌이다");
-        
         createItem(ItemList.FLOWER, "아름다운 꽃이다");
         
         item = new Item(ItemList.STONE_LUMP, "돌 10개다");
@@ -818,6 +797,12 @@ public class ItemCreator implements Creatable {
                 " 를 배울 수 있게 해주는 스킬 북이다");
         createItem(ItemList.SKILL_BOOK_LASER, "스킬 " + Emoji.focus("레이저") +
                 " 를 배울 수 있게 해주는 스킬 북이다");
+
+        createItem(ItemList.PIECE_OF_BONE, "많이 부서진 뼛조각이다");
+        createItem(ItemList.HORN_OF_IMP, "임프의 뿔이다. 상당히 단단하다");
+        createItem(ItemList.IMP_HEART, "임프의 심장이다. 마족이라 그런지 색깔이 어둡다");
+        createItem(ItemList.HORN_OF_LOW_DEVIL, "하급 악마의 뿔이지만 내부에 마력이 상당하다");
+        createItem(ItemList.LOW_DEVIL_SOUL, "하급 악마여도 희귀한 악마의 영혼이다");
 
         Logger.i("ObjectMaker", "Item making is done!");
     }

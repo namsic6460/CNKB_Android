@@ -12,6 +12,7 @@ import lkd.namsic.game.base.Int;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EquipList;
@@ -20,8 +21,10 @@ import lkd.namsic.game.event.DamageEvent;
 import lkd.namsic.game.event.DamagedEvent;
 import lkd.namsic.game.event.Event;
 import lkd.namsic.game.event.MineEvent;
+import lkd.namsic.game.event.PreDamageEvent;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Item;
 import lkd.namsic.game.object.Player;
 
@@ -89,7 +92,7 @@ public class EquipEvents {
                 public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
                                      @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     int maxHp = victim.getStat(StatType.MAXHP);
-                    totalDmg.add(maxHp * 0.06);
+                    totalDmg.add(maxHp * 0.03);
 
                     if(self.getId().getId().equals(Id.PLAYER)) {
                         Player player = (Player) self;
@@ -133,8 +136,11 @@ public class EquipEvents {
                 public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
                                      @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     long equippedId = self.getEquipped(EquipType.WEAPON);
-                    Equipment equipped = Config.getData(Id.EQUIPMENT, equippedId);
+                    if(equippedId == EquipList.NONE.getId()) {
+                        return;
+                    }
 
+                    Equipment equipped = Config.getData(Id.EQUIPMENT, equippedId);
                     if(equipped.getOriginalId() == EquipList.MIX_SWORD.getId()) {
                         totalDmg.add(5);
                     }
@@ -260,6 +266,92 @@ public class EquipEvents {
                         }
 
                         self.removeVariable(Variable.TROLL_CLUB);
+                    }
+                }
+            });
+        }});
+
+        put(EquipList.BONE_SWORD.getId(), new HashMap<String, Event>() {{
+            put(DamagedEvent.getName(), new DamagedEvent() {
+                @Override
+                public void onDamaged(@NonNull Entity self, @NonNull Entity attacker, @NonNull Int totalDmg,
+                                      @NonNull Int totalDra, @NonNull Bool isCrit) {
+                    long helmetId = self.getEquipped(EquipType.HELMET);
+                    long chestplateId = self.getEquipped(EquipType.CHESTPLATE);
+                    long leggingsId = self.getEquipped(EquipType.LEGGINGS);
+                    long shoesId = self.getEquipped(EquipType.SHOES);
+
+                    if(helmetId == EquipList.NONE.getId() || chestplateId == EquipList.NONE.getId() ||
+                            leggingsId == EquipList.NONE.getId() || shoesId == EquipList.NONE.getId()) {
+                        return;
+                    }
+
+                    Equipment helmet = Config.getData(Id.EQUIPMENT, helmetId);
+                    Equipment chestplate = Config.getData(Id.EQUIPMENT, chestplateId);
+                    Equipment leggings = Config.getData(Id.EQUIPMENT, leggingsId);
+                    Equipment shoes = Config.getData(Id.EQUIPMENT, shoesId);
+
+                    helmetId = helmet.getOriginalId();
+                    chestplateId = chestplate.getOriginalId();
+                    leggingsId = leggings.getOriginalId();
+                    shoesId = shoes.getOriginalId();
+
+                    if((helmetId == EquipList.BONE_HELMET.getId() || helmetId == EquipList.DEMON_BONE_HELMET.getId()) &&
+                            (chestplateId == EquipList.BONE_CHESTPLATE.getId() || chestplateId == EquipList.DEMON_BONE_CHESTPLATE.getId()) &&
+                            (leggingsId == EquipList.BONE_LEGGINGS.getId() || leggingsId == EquipList.DEMON_BONE_LEGGINGS.getId()) &&
+                            (shoesId == EquipList.BONE_SHOES.getId() || shoesId == EquipList.DEMON_BONE_SHOES.getId())) {
+                        totalDmg.multiple(0.8);
+                    }
+                }
+            });
+        }});
+
+        put(EquipList.SEA_STAFF.getId(), new HashMap<String, Event>() {{
+            put(PreDamageEvent.getName(), new PreDamageEvent() {
+                @Override
+                public void onPreDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+                                        @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
+                    GameMap map = Config.getMapData(self.getLocation());
+                    MapType mapType = map.getMapType();
+
+                    if(MapType.waterList().contains(mapType) || mapType.equals(MapType.CORRUPTED_RIVER)) {
+                        if(canCrit && Math.random() < 0.5) {
+                            magicDmg.multiple(1.25);
+                        }
+                    }
+                }
+            });
+        }});
+
+        put(EquipList.HEART_BREAKER_2.getId(), new HashMap<String, Event>() {{
+            put(DamageEvent.getName(), new DamageEvent() {
+                @Override
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
+                    int hp = victim.getStat(StatType.HP);
+                    double remainPercent = (double) hp / victim.getStat(StatType.MAXHP);
+                    if(remainPercent < 0.15) {
+                        totalDmg.set(Math.max(hp, totalDmg.get()));
+                    }
+                }
+            });
+        }});
+
+        put(EquipList.GHOST_SWORD_2.getId(), new HashMap<String, Event>() {{
+            put(DamageEvent.getName(), new DamageEvent() {
+                @Override
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
+                    int maxHp = victim.getStat(StatType.MAXHP);
+                    totalDmg.add(maxHp * 0.06);
+
+                    if(self.getId().getId().equals(Id.PLAYER)) {
+                        Player player = (Player) self;
+
+                        if(player.getObjectVariable(Variable.GHOST_SWORD_2, false)) {
+                            totalDmg.multiple(2);
+                            player.removeVariable(Variable.GHOST_SWORD_2);
+                        }
                     }
                 }
             });

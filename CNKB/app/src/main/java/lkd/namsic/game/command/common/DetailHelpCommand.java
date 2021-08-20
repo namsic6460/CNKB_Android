@@ -25,10 +25,12 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " *(개발자/dev) : 개발자 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(규칙/룰/rule) : 게임 규칙을 표시합니다\n\n" +
                         "\n---유저 명령어---\n" +
+                        Emoji.LIST + " (휴식/rest) : 10분간 휴식하여 체력과 마나를 모두 회복합니다\n\n" +
                         Emoji.LIST + " *(정보/info/i) [{플레이어 닉네임}] : 플레이어의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(정보/info/i) (아이템/item) ({아이템 이름}) : 아이템의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(정보/info/i) (장비/equip) ({장비 이름}) : 장비의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(정보/info/i) (퀘스트/quest) ({퀘스트 이름}) : 퀘스트의 정보를 표시합니다\n\n" +
+                        Emoji.LIST + " *(정보/info/i) (스킬/skill) ({스킬 이름}) : 스킬의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(가방/인벤토리/인벤/inventory/inven) [{페이지}] : 인벤토리를 표시합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) : 착용된 장비를 표시합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) (인벤토리/인벤/inventory/inven) [{페이지}] : 장비 인벤토리를 표시합니다\n\n" +

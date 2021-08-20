@@ -71,6 +71,22 @@ public class MonsterCreator implements Creatable {
         Config.unloadObject(monster);
 
 
+        monster = new Monster(MonsterList.SKELETON);
+        monster.getLv().set(25);
+        monster.setLocation(null);
+        monster.setType(MonsterType.BAD);
+
+        monster.setBasicStat(StatType.MAXHP, 150);
+        monster.setBasicStat(StatType.HP, 150);
+        monster.setBasicStat(StatType.ATK, 15);
+        monster.setBasicStat(StatType.BRE, 10);
+        monster.setBasicStat(StatType.AGI, 40);
+
+        monster.setItemDrop(ItemList.PIECE_OF_BONE.getId(), 1D, 1, 5);
+
+        Config.unloadObject(monster);
+
+
         monster = new Monster(MonsterList.ZOMBIE);
         monster.getLv().set(30);
         monster.setLocation(null);
@@ -160,6 +176,29 @@ public class MonsterCreator implements Creatable {
         Config.unloadObject(monster);
 
 
+        monster = new Monster(MonsterList.IMP);
+        monster.getLv().set(70);
+        monster.setLocation(null);
+
+        monster.setBasicStat(StatType.MAXHP, 250);
+        monster.setBasicStat(StatType.HP, 250);
+        monster.setBasicStat(StatType.ATK, 30);
+        monster.setBasicStat(StatType.ATS, 180);
+        monster.setBasicStat(StatType.DEF, 20);
+        monster.setBasicStat(StatType.MDEF, 100);
+        monster.setBasicStat(StatType.AGI, 20);
+        monster.setBasicStat(StatType.ACC, 100);
+        monster.setBasicStat(StatType.EVA, 100);
+
+        monster.setItemDrop(ItemList.HORN_OF_IMP.getId(), 0.25, 1, 1);
+        monster.setItemDrop(ItemList.IMP_HEART.getId(), 0.1, 1, 1);
+        monster.setItemDrop(ItemList.MAGIC_STONE.getId(), 1, 1, 2);
+
+        monster.addEvent(EventList.IMP_ATTACK);
+
+        Config.unloadObject(monster);
+
+
         monster = new Monster(MonsterList.OAK);
         monster.getLv().set(90);
         monster.setLocation(null);
@@ -182,7 +221,33 @@ public class MonsterCreator implements Creatable {
         Config.unloadObject(monster);
 
 
-        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 10L));
+        monster = new Monster(MonsterList.LOW_DEVIL);
+        monster.getLv().set(110);
+        monster.setLocation(null);
+        monster.setType(MonsterType.MIDDLE);
+
+        monster.setBasicStat(StatType.MAXHP, 400);
+        monster.setBasicStat(StatType.HP, 400);
+        monster.setBasicStat(StatType.ATK, 50);
+        monster.setBasicStat(StatType.ATS, 140);
+        monster.setBasicStat(StatType.BRE, 15);
+        monster.setBasicStat(StatType.DEF, 20);
+        monster.setBasicStat(StatType.MDEF, 20);
+        monster.setBasicStat(StatType.DRA, 40);
+        monster.setBasicStat(StatType.ACC, 50);
+        monster.setBasicStat(StatType.EVA, 15);
+
+        monster.setItemDrop(ItemList.HORN_OF_LOW_DEVIL.getId(), 0.1, 1, 1);
+        monster.setItemDrop(ItemList.LOW_DEVIL_SOUL.getId(), 0.01, 1, 1);
+        monster.setItemDrop(ItemList.MAGIC_STONE.getId(), 1, 2, 2);
+
+        monster.addBasicEquip(EquipList.DEVIL_RING.getId());
+        monster.setEquipDropPercent(EquipType.RINGS, 0.01);
+
+        Config.unloadObject(monster);
+
+
+        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 13L));
         Logger.i("ObjectMaker", "Monster making is done!");
     }
 

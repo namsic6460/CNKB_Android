@@ -82,7 +82,7 @@ public class FileManager {
         char[] c = new char[(int) file.length()];
         bufferedReader.read(c);
         bufferedReader.close();
-//        Logger.i("FileManager", "read - " + file.getPath());
+        Logger.i("FileManager", "read - " + file.getPath());
 
         return new String(c).trim();
     }

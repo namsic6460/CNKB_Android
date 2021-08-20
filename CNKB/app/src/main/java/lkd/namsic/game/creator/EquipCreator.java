@@ -63,7 +63,7 @@ public class EquipCreator implements Creatable {
         equipment.getHandleLv().set(4);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.RED_STONE.getId(), 30);
-            put(ItemList.PIG_HEAD.getId(), 5);
+            put(ItemList.PIG_HEAD.getId(), 10);
             put(ItemList.ZOMBIE_HEAD.getId(), 5);
         }});
         equipment.addBasicStat(StatType.ATK, 10);
@@ -74,11 +74,11 @@ public class EquipCreator implements Creatable {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.GHOST_SWORD_1,
-                "공격시 적 최대 체력의 6%에 해당하는 추가 데미지를 입힌다\n" +
+                "공격시 적 최대 체력의 3%에 해당하는 추가 데미지를 입힌다\n" +
                         "사용 시 최대 체력의 6%를 소모하여 다음 공격의 데미지를 66% 증가시킨다");
         equipment.getHandleLv().set(4);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.ZOMBIE_SOUL.getId(), 3);
+            put(ItemList.ZOMBIE_SOUL.getId(), 1);
             put(ItemList.SILVER.getId(), 20);
         }});
         equipment.addBasicStat(StatType.ATS, 60);
@@ -233,7 +233,7 @@ public class EquipCreator implements Creatable {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.SLIME_LEGGINGS, "끈적끈적한 바지다\n" +
-                "사용 시 마나를 10 사용하여 30초간 모든 적의 공격 속도를 25 감소시킨다");
+                "사용 시 마나를 10 사용하여 30초간 모든 적의 공격 속도를 30 감소시킨다");
         equipment.getHandleLv().set(3);
         equipment.addBasicStat(StatType.ATS, -10);
         equipment.addBasicStat(StatType.MAXHP, 30);
@@ -330,7 +330,183 @@ public class EquipCreator implements Creatable {
         equipment.addBasicStat(StatType.ACC, 20);
         Config.unloadObject(equipment);
 
-        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 56L));
+        equipment = new Equipment(EquipType.WEAPON, EquipList.BONE_SWORD, "많은 뼈를 녹여 만든 검이다\n" +
+                "보호구가 모두 뼈 장비 또는 마족의 뼈 장비라면 피격 시 피해를 20% 줄여서 받는다");
+        equipment.getHandleLv().set(2);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.PIECE_OF_BONE.getId(), 100);
+            put(ItemList.COAL.getId(), 10);
+        }});
+        equipment.addBasicStat(StatType.ATK, 5);
+        equipment.addBasicStat(StatType.AGI, 5);
+        equipment.addBasicStat(StatType.ACC, 5);
+        Config.unloadObject(equipment);
+        
+        equipment = new Equipment(EquipType.WEAPON, EquipList.BASIC_STAFF, "기본적인 스태프다");
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.BRANCH.getId(), 5);
+            put(ItemList.WATER_GRASS.getId(), 5);
+        }});
+        equipment.addBasicStat(StatType.MATK, 3);
+        equipment.addBasicStat(StatType.MAXMN, 1);
+        Config.unloadObject(equipment);
+        
+        equipment = new Equipment(EquipType.WEAPON, EquipList.SEA_STAFF, "물가에서 사용하면 위력이 강해지는 스태프다\n" +
+                "강/바다/오염된 강 에서 공격 시 데미지가 25% 증가한다");
+        equipment.getHandleLv().set(2);
+        equipment.getLimitLv().set(10);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.LITHIUM.getId(), 20);
+            put(ItemList.LAPIS.getId(), 10);
+            put(ItemList.RED_STONE.getId(), 10);
+            put(ItemList.BLUE_SPHERE.getId(), 1);
+        }});
+        equipment.addBasicStat(StatType.MATK, 8);
+        equipment.addBasicStat(StatType.MBRE, 3);
+        equipment.addBasicStat(StatType.MDRA, 5);
+        equipment.addBasicStat(StatType.MAXMN, 2);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.WEAPON, EquipList.DEMON_STAFF, "마족의 힘이 담긴 스태프다\n" +
+                "사용 시 현재 체력의 10% 를 소모하여 60초간 마법 공격력 + 8, 마법 방어 관통력 + 8 을 획득하고 마나를 4 회복한다");
+        equipment.getHandleLv().set(3);
+        equipment.getLimitLv().set(25);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.BLACK_SPHERE.getId(), 3);
+            put(ItemList.MAGIC_STONE.getId(), 20);
+            put(ItemList.PIECE_OF_SLIME.getId(), 20);
+            put(ItemList.ZOMBIE_HEAD.getId(), 5);
+        }});
+        equipment.addBasicStat(StatType.MATK, 10);
+        equipment.addBasicStat(StatType.MBRE, 5);
+        equipment.addBasicStat(StatType.ATS, 10);
+        equipment.addBasicStat(StatType.MAXMN, 3);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.HELMET, EquipList.BONE_HELMET, "많은 뼈를 녹여 만든 투구다");
+        equipment.getHandleLv().set(2);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.PIECE_OF_BONE.getId(), 80);
+            put(ItemList.COAL.getId(), 10);
+        }});
+        equipment.addBasicStat(StatType.MAXHP, 10);
+        equipment.addBasicStat(StatType.DEF, 3);
+        equipment.addBasicStat(StatType.MDEF, 3);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.CHESTPLATE, EquipList.BONE_CHESTPLATE, "많은 뼈를 녹여 만든 갑옷이다");
+        equipment.getHandleLv().set(2);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.PIECE_OF_BONE.getId(), 100);
+            put(ItemList.COAL.getId(), 10);
+        }});
+        equipment.addBasicStat(StatType.DEF, 6);
+        equipment.addBasicStat(StatType.MDEF, 6);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.LEGGINGS, EquipList.BONE_LEGGINGS, "많은 뼈를 녹여 만든 바지다");
+        equipment.getHandleLv().set(2);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.PIECE_OF_BONE.getId(), 90);
+            put(ItemList.COAL.getId(), 10);
+        }});
+        equipment.addBasicStat(StatType.MAXHP, 20);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.SHOES, EquipList.BONE_SHOES, "많은 뼈를 녹여 만든 신발이다");
+        equipment.getHandleLv().set(2);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.PIECE_OF_BONE.getId(), 70);
+            put(ItemList.COAL.getId(), 10);
+        }});
+        equipment.addBasicStat(StatType.MAXHP, 5);
+        equipment.addBasicStat(StatType.DEF, 3);
+        equipment.addBasicStat(StatType.MDEF, 3);
+        equipment.addBasicStat(StatType.EVA, 5);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.RINGS, EquipList.DEVIL_RING, "악마의 기운이 가득 담긴 반지다");
+        equipment.getHandleLv().set(4);
+        equipment.addBasicStat(StatType.MATK, 20);
+        equipment.addBasicStat(StatType.MDRA, 10);
+        equipment.addBasicStat(StatType.ATS, 10);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.WEAPON, EquipList.HEART_BREAKER_2,
+                "공격 시 체력이 15% 미만인 적을 처형시킨다");
+        equipment.getHandleLv().set(6);
+        equipment.getLimitLv().set(70);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.TITANIUM.getId(), 30);
+            put(ItemList.HARD_COAL.getId(), 10);
+            put(ItemList.IMP_HEART.getId(), 10);
+        }});
+        equipment.addBasicStat(StatType.ATK, 30);
+        equipment.addBasicStat(StatType.ATS, 40);
+        equipment.addBasicStat(StatType.ACC, 20);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.WEAPON, EquipList.GHOST_SWORD_2,
+                "공격시 적 최대 체력의 6%에 해당하는 추가 데미지를 입힌다\n" +
+                        "사용 시 최대 체력의 6%를 소모하여 다음 공격의 데미지를 100% 증가시킨다");
+        equipment.getHandleLv().set(6);
+        equipment.getLimitLv().set(70);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.LOW_DEVIL_SOUL.getId(), 1);
+            put(ItemList.LIQUID_STONE.getId(), 30);
+            put(ItemList.HARD_COAL.getId(), 10);
+        }});
+        equipment.addBasicStat(StatType.ATS, 100);
+        equipment.addBasicStat(StatType.ATK, 15);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.HELMET, EquipList.DEMON_BONE_HELMET, "많은 마족의 뼈를 녹여 만든 투구다");
+        equipment.getHandleLv().set(5);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.HORN_OF_IMP.getId(), 5);
+            put(ItemList.HORN_OF_LOW_DEVIL.getId(), 5);
+            put(ItemList.COAL.getId(), 80);
+        }});
+        equipment.addBasicStat(StatType.MAXHP, 20);
+        equipment.addBasicStat(StatType.DEF, 5);
+        equipment.addBasicStat(StatType.MDEF, 5);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.CHESTPLATE, EquipList.BONE_CHESTPLATE, "많은 마족의 뼈를 녹여 만든 갑옷이다");
+        equipment.getHandleLv().set(5);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.HORN_OF_IMP.getId(), 5);
+            put(ItemList.HORN_OF_LOW_DEVIL.getId(), 5);
+            put(ItemList.COAL.getId(), 100);
+        }});
+        equipment.addBasicStat(StatType.DEF, 10);
+        equipment.addBasicStat(StatType.MDEF, 10);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.LEGGINGS, EquipList.BONE_LEGGINGS, "많은 마족의 뼈를 녹여 만든 바지다");
+        equipment.getHandleLv().set(5);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.HORN_OF_IMP.getId(), 5);
+            put(ItemList.HORN_OF_LOW_DEVIL.getId(), 5);
+            put(ItemList.COAL.getId(), 90);
+        }});
+        equipment.addBasicStat(StatType.MAXHP, 30);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.SHOES, EquipList.BONE_SHOES, "많은 마족의 뼈를 녹여 만든 신발이다");
+        equipment.getHandleLv().set(5);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.HORN_OF_IMP.getId(), 5);
+            put(ItemList.HORN_OF_LOW_DEVIL.getId(), 5);
+            put(ItemList.COAL.getId(), 70);
+        }});
+        equipment.addBasicStat(StatType.MAXHP, 10);
+        equipment.addBasicStat(StatType.DEF, 5);
+        equipment.addBasicStat(StatType.MDEF, 5);
+        equipment.addBasicStat(StatType.EVA, 10);
+        Config.unloadObject(equipment);
+
+        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 90L));
         Logger.i("ObjectMaker", "Equipment making is done!");
     }
 

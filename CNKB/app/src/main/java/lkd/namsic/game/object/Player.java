@@ -402,7 +402,7 @@ public class Player extends Entity {
         this.sp.add(5);
         this.exp.add(-1 * needExp);
 
-        if(this.id.getObjectId() != 1 && this.lv.get() >= Config.MIN_RANK_LV) {
+        if(!this.currentTitle.equals("관리자") && this.lv.get() >= Config.MIN_RANK_LV) {
             Config.PLAYER_LV_RANK.put(this.getName(), this.lv.get());
         }
     }

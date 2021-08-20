@@ -28,6 +28,20 @@ public class MapCreator implements Creatable {
         map.setSpawnMonster(MonsterList.SPIDER.getId(), 1D, 4);
         Config.unloadMap(map);
 
+        map = new GameMap(MapList.findByLocation(0, 3));
+        map.setMapType(MapType.SINKHOLE);
+        map.getRequireLv().set(60);
+        map.getLocation().set(0, 3, 1, 1);
+        map.setSpawnMonster(MonsterList.IMP.getId(), 1D, 4);
+        Config.unloadMap(map);
+
+        map = new GameMap(MapList.findByLocation(0, 4));
+        map.setMapType(MapType.CORRUPTED_RIVER);
+        map.getRequireLv().set(100);
+        map.getLocation().set(0, 4, 1, 1);
+        map.setSpawnMonster(MonsterList.LOW_DEVIL.getId(), 1D, 3);
+        Config.unloadMap(map);
+
         map = new GameMap(MapList.findByLocation(1, 0));
         map.setMapType(MapType.FIELD);
         map.getLocation().set(1, 0, 1, 1);
@@ -64,6 +78,7 @@ public class MapCreator implements Creatable {
         map.setMapType(MapType.CEMETERY);
         map.getRequireLv().set(20);
         map.getLocation().set(2, 2, 1, 1);
+        map.setSpawnMonster(MonsterList.SKELETON.getId(), 1D, 6);
         map.setSpawnMonster(MonsterList.ZOMBIE.getId(), 1D, 3);
         Config.unloadMap(map);
 

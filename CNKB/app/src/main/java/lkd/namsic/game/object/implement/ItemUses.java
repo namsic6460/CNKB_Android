@@ -183,18 +183,17 @@ public class ItemUses {
                 Random random = new Random();
                 Player player = (Player) self;
 
-                //TODO : 고급 장비 생성 시 주석 해제
-//            if(random.nextBoolean()) {
+            if(random.nextBoolean()) {
                 long itemId = RandomList.highRecipeItems.get(random.nextInt(RandomList.highRecipeItems.size()));
 
                 player.getItemRecipe().add(itemId);
                 return ItemList.findById(itemId) + " 의 제작법을 획득했습니다";
-//            } else {
-//                long equipId = RandomList.highRecipeEquips.get(random.nextInt(RandomList.highRecipeEquips.size()));
-//
-//                player.getEquipRecipe().add(equipId);
-//                return ItemList.findById(equipId) + " 의 제작법을 획득했습니다";
-//            }
+            } else {
+                long equipId = RandomList.highRecipeEquips.get(random.nextInt(RandomList.highRecipeEquips.size()));
+
+                player.getEquipRecipe().add(equipId);
+                return ItemList.findById(equipId) + " 의 제작법을 획득했습니다";
+            }
             }
         });
 

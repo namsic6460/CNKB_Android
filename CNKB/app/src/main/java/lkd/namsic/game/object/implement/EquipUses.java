@@ -87,7 +87,7 @@ public class EquipUses {
                 Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
 
                 for(Entity entity : entitySet) {
-                    entity.addBuff(System.currentTimeMillis() + 30000L, StatType.ATS, -25);
+                    entity.addBuff(System.currentTimeMillis() + 30000L, StatType.ATS, -30);
                 }
 
                 Player.replyPlayers(playerSet, self.getName() + " 이 슬라임 바지 아이템을 사용하여 모든 적의 공격속도를 25 감소시켰습니다");
@@ -101,6 +101,26 @@ public class EquipUses {
             public String use(@NonNull Entity self, @Nullable String other) {
                 self.setVariable(Variable.TROLL_CLUB, true);
                 return "다음 공격을 강화했습니다";
+            }
+        });
+        
+        put(EquipList.DEMON_STAFF.getId(), new EquipUse(0, 0.1, 0, 0, 0, 0) {
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addBuff(System.currentTimeMillis() + 60000, StatType.MATK, 8);
+                self.addBuff(System.currentTimeMillis() + 60000, StatType.MBRE, 8);
+                self.addBasicStat(StatType.MN, 4);
+                return "힘이 빠져나가고 또 다른 힘이 들어왔습니다";
+            }
+        });
+
+        put(EquipList.GHOST_SWORD_2.getId(), new EquipUse(0, 0.06, 0, 0, 0, 0) {
+            @Override
+            @NonNull
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.setVariable(Variable.GHOST_SWORD_2, true);
+                return "최대 체력의 6%를 소모하여 다음 공격을 강화했습니다";
             }
         });
     }};

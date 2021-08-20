@@ -41,7 +41,7 @@ public abstract class GameObject {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return id.hashCode() + 1;
     }
 
 }

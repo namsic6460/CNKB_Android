@@ -203,6 +203,8 @@ public class FightManager {
                             break;
                         }
 
+                        int entitySize = entitySet.size();
+
                         try {
                             player.wait(Config.FIGHT_WAIT_TIME);
                         } catch (InterruptedException e) {
@@ -220,7 +222,7 @@ public class FightManager {
                                 player.replyPlayer("시간이 초과되어 랜덤한 적을 공격합니다");
 
                                 response = FightWaitType.ATTACK;
-                                player.setVariable(Variable.FIGHT_TARGET_INDEX, random.nextInt(entitySet.size() - 1) + 1);
+                                player.setVariable(Variable.FIGHT_TARGET_INDEX, random.nextInt(entitySize - 1) + 1);
                             }
 
                             boolean usedItem = player.getObjectVariable(Variable.FIGHT_USED_ITEM, false);

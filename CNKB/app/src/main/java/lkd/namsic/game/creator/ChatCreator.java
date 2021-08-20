@@ -8,6 +8,7 @@ import java.util.Arrays;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.WaitResponse;
+import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.object.Chat;
 import lkd.namsic.setting.Logger;
@@ -676,6 +677,151 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 133L, "고마워요!");
+        Config.unloadObject(chat);
+
+        chat = createChat("혹시 일하시는데 필요한 재료가 있나요?", 134L,
+                "재료라... 아 그래",
+                "장비를 만들 때 가죽이 필요한데 앞으로 좀 구해주겠나?",
+                "양 가죽 10개 정도면 적당할 것 같군"
+        );
+        chat.setResponseChat(WaitResponse.YES, 135L);
+        chat.setResponseChat(WaitResponse.NO, 136L);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 135L,
+                "하하 역시 시원시원할 줄 알았어",
+                "그럼 기다릴테니 빨리 구해와라"
+        );
+        chat.getQuestId().set(QuestList.LEATHER_COLLECTING1.getId());
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 136L, "이런 아쉽구만");
+        Config.unloadObject(chat);
+
+        chat = createChat("이번에도 양가죽을 구해오면 될까요?", 137L,
+                "하하 괜찮네. 덕분에 양가죽은 충분해졌어",
+                "이번엔 소 가죽을 구해오는건 어떤가"
+        );
+        chat.setResponseChat(WaitResponse.YES, 138L);
+        chat.setResponseChat(WaitResponse.NO, 136L);
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 138L,
+                "좋아 좋아. 덕분에 일이 편해지는군",
+                "이번에도 10개 정도면 될거다"
+        );
+        chat.getQuestId().set(QuestList.LEATHER_COLLECTING2.getId());
+        Config.unloadObject(chat);
+
+        chat = createChat("이제 가죽은 한동안 충분하겠네요", 139L,
+                "일반적인 장비를 만들 가죽은 충분한 것 같군",
+                "하지만 이번에는 도전을 해보고싶단 말이지",
+                "혹시 오크 가죽도 구해다줄 수 있겠나?"
+        );
+        chat.setResponseChat(WaitResponse.YES, 140L);
+        chat.setResponseChat(WaitResponse.NO, 136L);
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 140L,
+                "크으 오랜만에 몸 쓸 준비를 좀 해야겠구만",
+                "기다리고 있을테니 5개 정도만 가져와"
+        );
+        chat.getQuestId().set(QuestList.LEATHER_COLLECTING3.getId());
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 141L,
+                "이야 빨리 왔구만",
+                "여기 보상이다"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat("왜 이렇게 다치셨어요..?", 142L,
+                "요즘 좀비가 너무 불어나서...",
+                "지하 어딘가에 통로가 있는지 계속 튀어나오네요",
+                "혹시 좀비를 좀 처리해주실 수 있을까요?"
+        );
+        chat.setResponseChat(WaitResponse.YES, 143L);
+        chat.setResponseChat(WaitResponse.NO, 144L);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 143L, "감사합니다..! 꼭 보상해드릴게요");
+        chat.getQuestId().set(QuestList.INCREASING_ZOMBIE.getId());
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 144L, "생각보다 훨씬 차가운 분이셨네요...");
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 145L,
+                "확실히 좀비 숫자가 줄어든 것 같네요!",
+                "감사합니다. 여기 보상이예요"
+        );
+        Config.unloadObject(chat);
+        
+        chat = createChat("왜... 이렇게 화가 나셨나요?", 146L,
+                "또 너로군",
+                "이 망할 스켈레톤들이 계속 바닷속에서 죽는다",
+                "덕분에 계속 죽은 물고기들만 낚이고 있지",
+                "모험가라면 이 정도는 해결해 줄 수 있곘지?"
+        );
+        chat.setResponseChat(WaitResponse.YES, 147L);
+        chat.setResponseChat(WaitResponse.NO, 148L);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 147L, "그래, 빨리가서 저 망할 뼈다귀들을 없애버리라고");
+        chat.getQuestId().set(QuestList.BONE_IN_THE_SEA.getId());
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 148L,
+                "....",
+                "꺼져라"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 149L, "이제 좀 제대로 된 물고기들이 낚이곘군");
+        Config.unloadObject(chat);
+        
+        chat = createChat("불안해 보이시네요", 150L,
+                "자네가 오기 며칠 전, 마을 주변에 싱크홀이 생겼었다네",
+                "그런데 요즘들어 싱크홀에서 이상한 소리가 들린다는 신고가 많아져서 말이지...",
+                "그래서 말인데 혹시 확인좀 해줄 수 있겠나?"
+        );
+        chat.setResponseChat(WaitResponse.YES, 151L);
+        chat.setResponseChat(WaitResponse.NO, 152L);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 151L,
+                "아이고 고맙네",
+                "싱크홀이 생각보다 깊으니 조심하게나"
+        );
+        chat.getQuestId().set(QuestList.SOUND_IN_THE_SINKHOLE.getId());
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 152L,
+                "아이고 이번 한번만 좀 부탁하겠네...",
+                "어떻게 안되겠나?"
+        );
+        chat.setResponseChat(WaitResponse.YES, 151L);
+        chat.setResponseChat(WaitResponse.NO, 152L);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 153L,
+                "아니... 그런 곳에서 마물이 튀어나오다니...",
+                "아무래도 이건 내 선에서 해결되지 않을 것 같구만",
+                "일단 확인해줘서 고맙네"
+        );
+        chat.getNoneNpcId().set(NpcList.ABEL.getId());
+        chat.setResponseChat(WaitResponse.NONE, 154L);
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 154L,
+                "드디어 여기까지 왔네",
+                "이번에도 시간은 적으니까 잘 들어",
+                "첫번째, 왕국에 소속된 인간들을 믿지 마",
+                "두번째, 절대 왕국의 주요 인사들을 만나지 마",
+                "세번째, 넌 그 때 죽지 않았어",
+                "....."
+        );
+        chat.getDelayTime().set(1000L);
         Config.unloadObject(chat);
 
         Logger.i("ObjectMaker", "Chat making is done!");

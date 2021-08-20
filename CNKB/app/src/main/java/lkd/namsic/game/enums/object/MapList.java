@@ -15,6 +15,8 @@ public enum MapList {
     START_VILLAGE("시작의 마을", 0, 0),
     QUITE_SEASHORE("조용한 바닷가", 0, 1),
     DARK_CAVE("어두운 동굴", 0, 2),
+    ENTRANCE_OF_SINKHOLE("싱크홀 입구", 0, 3),
+    DIRTY_RIVER("더러운 강", 0, 4),
     ADVENTURE_FIELD("모험의 평원", 1, 0),
     PEACEFUL_RIVER("평화로운 강", 1, 1),
     SLIME_SWAMP("슬라임 늪지", 1, 2),

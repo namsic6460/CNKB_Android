@@ -497,7 +497,14 @@ public class RandomList {
             EquipList.LOW_ALLOY_SHOES.getId(),
             EquipList.LOW_MANA_SWORD.getId(),
             EquipList.WOOL_HELMET.getId(),
-            EquipList.MINER_SHOES.getId()
+            EquipList.MINER_SHOES.getId(),
+            EquipList.BONE_SWORD.getId(),
+            EquipList.BASIC_STAFF.getId(),
+            EquipList.SEA_STAFF.getId(),
+            EquipList.BONE_HELMET.getId(),
+            EquipList.BONE_CHESTPLATE.getId(),
+            EquipList.BONE_LEGGINGS.getId(),
+            EquipList.BONE_SHOES.getId()
     );
 
     public static final List<Long> middleRecipeEquips = Arrays.asList(
@@ -511,10 +518,18 @@ public class RandomList {
             EquipList.SLIME_SHOES.getId(),
             EquipList.WEIRD_LEGGINGS.getId(),
             EquipList.OAK_TOOTH_NECKLACE.getId(),
-            EquipList.HARD_IRON_CHESTPLATE.getId()
+            EquipList.HARD_IRON_CHESTPLATE.getId(),
+            EquipList.DEMON_STAFF.getId(),
+            EquipList.DEMON_BONE_HELMET.getId(),
+            EquipList.DEMON_BONE_CHESTPLATE.getId(),
+            EquipList.DEMON_BONE_LEGGINGS.getId(),
+            EquipList.DEMON_BONE_SHOES.getId()
     );
 
-    public static final List<Long> highRecipeEquips = Collections.emptyList();
+    public static final List<Long> highRecipeEquips = Arrays.asList(
+            EquipList.HEART_BREAKER_2.getId(),
+            EquipList.GHOST_SWORD_2.getId()
+    );
 
     public static final List<Long> lowAmulets = Collections.singletonList(EquipList.HEALTH_AMULET.getId());
 

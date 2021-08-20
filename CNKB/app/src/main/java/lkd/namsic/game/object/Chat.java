@@ -31,6 +31,7 @@ public class Chat extends GameObject {
     final LimitLong delayTime = new LimitLong(Config.MIN_DELAY_TIME, Config.MIN_DELAY_TIME, Config.MAX_DELAY_TIME);
     final LimitLong pauseTime = new LimitLong(Config.MIN_PAUSE_TIME, Config.MIN_PAUSE_TIME, Config.MAX_PAUSE_TIME);
     final LimitId questId = new LimitId(0, Id.QUEST);
+    final LimitId noneNpcId = new LimitId(0, Id.NPC);
 
     @Nullable
     final Location tpLocation = null;

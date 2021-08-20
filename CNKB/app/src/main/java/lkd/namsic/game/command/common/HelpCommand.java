@@ -22,6 +22,7 @@ public class HelpCommand extends CommonCommand {
                         "\uD83D\uDC4B ㅜ 회원가입 (이름) -> 회원가입을 합니다\n\n" +
                         "\uD83D\uDCBB ㅜ 개발자 -> 개발자 정보를 표시합니다\n\n" +
                         "\uD83D\uDCDD ㅜ 규칙 -> 게임 규칙을 표시합니다\n\n" +
+                        "\uD83D\uDE34 ㅜ 휴식 -> 10분간 휴식하여 체력과 마나를 회복합니다\n\n" +
                         "\uD83D\uDC66 ㅜ 정보 (다른 플레이어 이름) -> 자신 또는 다른 플레이어의 정보를 표시합니다\n\n" +
                         "\uD83D\uDCBC ㅜ 인벤토리 -> 인벤토리를 표시합니다\n\n" +
                         "\uD83D\uDC55 ㅜ 장비 -> 착용된 장비를 표시합니다\n\n" +

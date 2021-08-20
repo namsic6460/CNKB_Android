@@ -181,9 +181,9 @@ public enum ItemList {
     BEEF("소고기", 149L),
     LEATHER("가죽", 150L),
 
-    ZOMBIE_HEAD("좀비머리", 151L),
-    ZOMBIE_SOUL("좀비영혼파편", 152L),
-    ZOMBIE_HEART("좀비심장", 153L),
+    ZOMBIE_HEAD("좀비 머리", 151L),
+    ZOMBIE_SOUL("좀비 영혼", 152L),
+    ZOMBIE_HEART("좀비 심장", 153L),
 
     LOW_ALLOY("하급 합금", 154L),
     ALLOY("중급 합금", 155L),
@@ -213,9 +213,6 @@ public enum ItemList {
     COOKED_PORT("익힌 돼지고기", 172L),
     COOKED_BEEF("익힌 소고기", 173L),
 
-    GOD_WATER("신의 물", 174L),
-    PURIFIED_ZOMBIE_SOUL("하얘진 좀비 영혼", 175L),
-    HARDENED_SLIME("굳은 슬라임", 176L),
     MAGIC_STONE("마정석", 177L),
 
     FLOWER("꽃", 178L),
@@ -229,7 +226,13 @@ public enum ItemList {
     
     SKILL_BOOK_MAGIC_BALL("스킬 북 - 매직 볼", 184L),
     SKILL_BOOK_SMITE("스킬 북 - 강타", 185L),
-    SKILL_BOOK_LASER("스킬 북 - 레이저", 186L);
+    SKILL_BOOK_LASER("스킬 북 - 레이저", 186L),
+
+    PIECE_OF_BONE("뼛조각", 187L),
+    HORN_OF_IMP("임프의 뿔", 188L),
+    IMP_HEART("임프의 심장", 189L),
+    HORN_OF_LOW_DEVIL("하급 악마의 뿔", 190L),
+    LOW_DEVIL_SOUL("하급 악마의 영혼", 191L);
 
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();

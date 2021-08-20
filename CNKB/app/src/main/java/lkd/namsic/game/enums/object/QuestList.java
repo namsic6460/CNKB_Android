@@ -45,8 +45,12 @@ public enum QuestList {
     GEM_COLLECTING_TURQUOISE("보석 수집 - 터키석", 31L),
     HEALING_ELF1("엘프 치료하기1", 33L),
     HEALING_ELF2("엘프 치료하기2", 34L),
-    PURIFY_ZOMBIE("좀비 정화작전", 35L),
-    HARDEN_SLIME("슬라임 굳히기", 36L);
+    LEATHER_COLLECTING1("가죽 모으기1", 35L),
+    LEATHER_COLLECTING2("가죽 모으기2", 36L),
+    LEATHER_COLLECTING3("가죽 모으기3", 37L),
+    INCREASING_ZOMBIE("불어나는 좀비들", 38L),
+    BONE_IN_THE_SEA("바닷속의 뼛조각", 39L),
+    SOUND_IN_THE_SINKHOLE("싱크홀에서의 소리", 40L);
 
     public static final Map<String, QuestList> nameMap = new HashMap<>();
     public static final Map<Long, QuestList> idMap = new HashMap<>();

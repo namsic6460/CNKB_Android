@@ -56,7 +56,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 2.02;
+    public static final double VERSION = 2.11;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -155,6 +155,7 @@ public class Config {
     public static final int EXPLORE_HARD_SUCCESS_PERCENT = 20;
     public static final int APPRAISE_LIMIT = 999;
     public static final long SHOPPING_WAIT_TIME = 120000;
+    public static final long REST_TIME = 600000;
 
     public static final String SPLIT_BAR = "------------------------------------------";
     public static final String HARD_SPLIT_BAR = "==========================================";
@@ -208,7 +209,7 @@ public class Config {
                 PLAYER_ID.put(player.getNickName(), objectId);
                 PLAYER_LIST.put(objectId, new String[] {player.getSender(), player.getImage()});
 
-                if(objectId != 1 && player.getLv().get() >= MIN_RANK_LV) {
+                if(!player.getCurrentTitle().equals("관리자") && player.getLv().get() >= MIN_RANK_LV) {
                     PLAYER_LV_RANK.put(player.getName(), player.getLv().get());
                 }
             } catch (Exception e) {
@@ -820,8 +821,8 @@ public class Config {
         if(entity.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) entity;
 
-            if(player.getVersion() < 2.02) {
-                player.addItem(ItemList.SKILL_BOOK_MAGIC_BALL.getId(), 1);
+            if(player.getVersion() < 2.11) {
+                player.addMoney(50000L);
             }
 
             if (unavailable) {

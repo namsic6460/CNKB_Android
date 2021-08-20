@@ -40,7 +40,22 @@ public enum EquipList {
     MINER_SHOES("광부의 신발", 27L),
     TROLL_CLUB("트롤의 몽둥이", 28L),
     BETA1_GEM("베타 보석", 38L),
-    OAK_TOOTH_NECKLACE("오크 이빨 목걸이", 55L);
+    OAK_TOOTH_NECKLACE("오크 이빨 목걸이", 55L),
+    BONE_SWORD("뼈검", 75L),
+    BASIC_STAFF("기본 스태프", 76L),
+    SEA_STAFF("바다의 스태프", 77L),
+    DEMON_STAFF("마족의 스태프", 78L),
+    BONE_HELMET("뼈 투구", 79L),
+    BONE_CHESTPLATE("뼈 갑옷", 80L),
+    BONE_LEGGINGS("뼈 바지", 81L),
+    BONE_SHOES("뼈 신발", 82L),
+    DEVIL_RING("악마의 반지", 83L),
+    HEART_BREAKER_2("하트 브레이커2", 84L),
+    GHOST_SWORD_2("원혼의 검2", 85L),
+    DEMON_BONE_HELMET("마족의 뼈 투구", 86L),
+    DEMON_BONE_CHESTPLATE("마족의 뼈 갑옷", 87L),
+    DEMON_BONE_LEGGINGS("마족의 뼈 바지", 88L),
+    DEMON_BONE_SHOES("마족의 뼈 신발", 89L);
 
     public static final Map<String, EquipList> nameMap = new HashMap<>();
     public static final Map<Long, EquipList> idMap = new HashMap<>();

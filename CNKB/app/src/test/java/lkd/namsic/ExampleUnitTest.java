@@ -12,15 +12,12 @@ import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
-import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object.EquipList;
-import lkd.namsic.game.enums.object.MonsterList;
 import lkd.namsic.game.json.ChatLimitAdapter;
 import lkd.namsic.game.json.LocationAdapter;
 import lkd.namsic.game.json.NpcAdapter;
 import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Equipment;
-import lkd.namsic.game.object.Monster;
 import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.FileManager;
@@ -38,25 +35,15 @@ public class ExampleUnitTest {
 
     @Test
     public void test() {
-        Monster monster = new Monster(MonsterList.OAK);
-        monster.getLv().set(90);
+        Player player1 = new Player("", "", "", "");
+        player1.getId().setObjectId(1);
 
-        monster.setBasicStat(StatType.MAXHP, 300);
-        monster.setBasicStat(StatType.HP, 300);
-        monster.setBasicStat(StatType.ATK, 40);
-        monster.setBasicStat(StatType.ATS, 150);
-        monster.setBasicStat(StatType.DEF, 30);
-        monster.setBasicStat(StatType.MDEF, 15);
-        monster.setBasicStat(StatType.BRE, 50);
-        monster.setBasicStat(StatType.ACC, 60);
-        monster.setBasicStat(StatType.EVA, 30);
+        Player player2 = new Player("", "", "", "");
+        player2.getId().setObjectId(1);
 
-        System.out.println(monster.getBasicStat());
-
-        monster.randomLevel();
-
-        System.out.println(monster.getLv().get());
-        System.out.println(monster.getBasicStat());
+        System.out.println(player1.hashCode());
+        System.out.println(player2.hashCode());
+        System.out.println(player1.equals(player2));
     }
 
     @Test

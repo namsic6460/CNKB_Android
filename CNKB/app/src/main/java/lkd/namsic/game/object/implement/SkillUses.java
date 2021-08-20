@@ -15,7 +15,7 @@ import lkd.namsic.game.object.Entity;
 public class SkillUses {
 
     public final static Map<Long, SkillUse> MAP = new HashMap<Long, SkillUse>() {{
-        put(SkillList.MAGIC_BALL.getId(), new SkillUse(0, 2) {
+        put(SkillList.MAGIC_BALL.getId(), new SkillUse(0, 1) {
             @Override
             public void useSkill(@NonNull Entity self, @NonNull List<Entity> targets) {
                 Entity target = Objects.requireNonNull(targets.get(0));
@@ -46,7 +46,7 @@ public class SkillUses {
             public void useSkill(@NonNull Entity self, @NonNull List<Entity> targets) {
                 Entity target = Objects.requireNonNull(targets.get(0));
 
-                self.damage(target, 0, self.getBasicStat(StatType.MATK) * 2.5, 0,
+                self.damage(target, 0, self.getBasicStat(StatType.MATK) * 2.25, 0,
                         true, true, true);
             }
         });
