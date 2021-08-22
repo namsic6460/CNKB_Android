@@ -56,7 +56,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 2.11;
+    public static final double VERSION = 2.12;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -821,8 +821,19 @@ public class Config {
         if(entity.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) entity;
 
-            if(player.getVersion() < 2.11) {
+            if(player.getVersion() < 2.12) {
                 player.addMoney(50000L);
+
+                long objectId = player.getId().getObjectId();
+                if(objectId == 4 || objectId == 8 || objectId == 25 || objectId == 49 || objectId == 6) {
+                    player.addMoney(100000L);
+
+                    if(objectId == 8) {
+                        player.addMoney(100000L);
+                    } else if(objectId == 6) {
+                        player.addItem(ItemList.STAT_POINT.getId(), 40);
+                    }
+                }
             }
 
             if (unavailable) {

@@ -47,6 +47,7 @@ public class FightManager {
     public final Map<IdClass, Long> fightId = new ConcurrentHashMap<>();
     public final Map<Long, Set<Entity>> entityMap = new ConcurrentHashMap<>();
     public final Map<Long, Set<Player>> playerMap = new ConcurrentHashMap<>();
+    public final Map<Long, Map<Integer, Entity>> targetMap = new ConcurrentHashMap<>();
     public final Map<Entity, List<Entity>> castingMap = new ConcurrentHashMap<>();
     public final Map<Entity, List<Entity>> castedMap = new ConcurrentHashMap<>();
 
@@ -192,7 +193,8 @@ public class FightManager {
                 player.setVariable(Variable.FIGHT_WAIT_TYPE, FightWaitType.NONE);
                 player.setVariable(Variable.FIGHT_TARGET_INDEX, 0);
                 player.setVariable(Variable.FIGHT_TARGET_MAX_INDEX, entitySet.size() - 1);
-                player.setVariable(Variable.FIGHT_TARGET_MAP, targets);
+
+                this.targetMap.put(fightId, targets);
 
                 synchronized (player) {
                     while (true) {
@@ -390,8 +392,6 @@ public class FightManager {
                 default:
                     throw new RuntimeException();
             }
-
-            self.removeVariable(Variable.FIGHT_TARGET_MAP);
 
             int waitTurn;
             long skillId;
@@ -762,6 +762,7 @@ public class FightManager {
         if (entitySet.isEmpty()) {
             this.entityMap.remove(fightId);
             this.playerMap.remove(fightId);
+            this.targetMap.remove(fightId);
         }
 
         Config.unloadObject(self);
@@ -779,6 +780,11 @@ public class FightManager {
     @NonNull
     public Set<Player> getPlayerSet(long fightId) {
         return Objects.requireNonNull(this.playerMap.get(fightId));
+    }
+
+    @NonNull
+    public Map<Integer, Entity> getTargetMap(long fightId) {
+        return Objects.requireNonNull(this.targetMap.get(fightId));
     }
 
 }

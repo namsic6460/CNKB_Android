@@ -45,6 +45,7 @@ import lkd.namsic.game.command.player.game.InvenCommand;
 import lkd.namsic.game.command.player.game.MapCommand;
 import lkd.namsic.game.command.player.game.MineCommand;
 import lkd.namsic.game.command.player.game.MoveCommand;
+import lkd.namsic.game.command.player.game.PickCommand;
 import lkd.namsic.game.command.player.game.RankingCommand;
 import lkd.namsic.game.command.player.game.ReinforceCommand;
 import lkd.namsic.game.command.player.game.RestCommand;
@@ -124,6 +125,7 @@ public class KakaoTalk {
         registerPlayerCommand(new MapCommand(),         "맵", "map");
         registerPlayerCommand(new MineCommand(),        "광질", "mine");
         registerPlayerCommand(new MoveCommand(),        "이동", "move");
+        registerPlayerCommand(new PickCommand(),        "줍기", "pick", "p");
         registerPlayerCommand(new RankingCommand(),     "랭킹", "랭크", "ranking", "rank");
         registerPlayerCommand(new ReinforceCommand(),   "강화", "제련", "reinforce", "r");
         registerPlayerCommand(new RestCommand(),        "휴식", "rest");

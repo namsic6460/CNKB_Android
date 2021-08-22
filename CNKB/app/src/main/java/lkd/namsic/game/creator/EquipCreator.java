@@ -472,7 +472,7 @@ public class EquipCreator implements Creatable {
         equipment.addBasicStat(StatType.MDEF, 5);
         Config.unloadObject(equipment);
 
-        equipment = new Equipment(EquipType.CHESTPLATE, EquipList.BONE_CHESTPLATE, "많은 마족의 뼈를 녹여 만든 갑옷이다");
+        equipment = new Equipment(EquipType.CHESTPLATE, EquipList.DEMON_BONE_CHESTPLATE, "많은 마족의 뼈를 녹여 만든 갑옷이다");
         equipment.getHandleLv().set(5);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.HORN_OF_IMP.getId(), 5);
@@ -483,7 +483,7 @@ public class EquipCreator implements Creatable {
         equipment.addBasicStat(StatType.MDEF, 10);
         Config.unloadObject(equipment);
 
-        equipment = new Equipment(EquipType.LEGGINGS, EquipList.BONE_LEGGINGS, "많은 마족의 뼈를 녹여 만든 바지다");
+        equipment = new Equipment(EquipType.LEGGINGS, EquipList.DEMON_BONE_LEGGINGS, "많은 마족의 뼈를 녹여 만든 바지다");
         equipment.getHandleLv().set(5);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.HORN_OF_IMP.getId(), 5);
@@ -493,7 +493,7 @@ public class EquipCreator implements Creatable {
         equipment.addBasicStat(StatType.MAXHP, 30);
         Config.unloadObject(equipment);
 
-        equipment = new Equipment(EquipType.SHOES, EquipList.BONE_SHOES, "많은 마족의 뼈를 녹여 만든 신발이다");
+        equipment = new Equipment(EquipType.SHOES, EquipList.DEMON_BONE_SHOES, "많은 마족의 뼈를 녹여 만든 신발이다");
         equipment.getHandleLv().set(5);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.HORN_OF_IMP.getId(), 5);

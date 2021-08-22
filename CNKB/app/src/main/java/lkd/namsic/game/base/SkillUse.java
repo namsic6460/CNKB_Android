@@ -74,10 +74,8 @@ public abstract class SkillUse extends LimitUse {
     public String use(@NonNull Entity self, @Nullable String other) {
         List<Entity> targetList = new ArrayList<>();
 
-        Map<Integer, Entity> targetMap = self.getObjectVariable(Variable.FIGHT_TARGET_MAP);
-        if(targetMap == null) {
-            throw new NullPointerException();
-        }
+        long fightId = FightManager.getInstance().getFightId(self.getId());
+        Map<Integer, Entity> targetMap = FightManager.getInstance().getTargetMap(fightId);
 
         StringBuilder builder = new StringBuilder();
         String output;

@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.text);
         textView.setText(null);
         textView.setMovementMethod(new ScrollingMovementMethod());
+        textView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
         startService(new Intent(this, ForcedTerminationService.class));
 

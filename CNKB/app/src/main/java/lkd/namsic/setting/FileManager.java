@@ -82,7 +82,6 @@ public class FileManager {
         char[] c = new char[(int) file.length()];
         bufferedReader.read(c);
         bufferedReader.close();
-        Logger.i("FileManager", "read - " + file.getPath());
 
         return new String(c).trim();
     }
@@ -106,7 +105,6 @@ public class FileManager {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
             bufferedWriter.write(data.trim());
             bufferedWriter.close();
-            Logger.i("FileManager", "save - " + path);
         } catch (Exception e) {
             Logger.e("FileManager(path : " + path + ")", e);
         }

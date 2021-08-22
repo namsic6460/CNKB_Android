@@ -88,7 +88,7 @@ public class GameMap {
         } else {
             Player player;
 
-            for (long playerId : playerSet) {
+            for (long playerId : new HashSet<>(playerSet)) {
                 player = Config.getData(Id.PLAYER, playerId);
                 builder.append("\n[")
                         .append(player.getLocation().toFieldString())
@@ -108,7 +108,7 @@ public class GameMap {
         } else {
             Npc npc;
 
-            for(long npcId : npcSet) {
+            for(long npcId : new HashSet<>(npcSet)) {
                 npc = Config.getData(Id.NPC, npcId);
                 builder.append("\n[")
                         .append(npc.getLocation().toFieldString())
@@ -122,7 +122,7 @@ public class GameMap {
         if(this.money.isEmpty()) {
             builder.append("\n떨어진 골드 없음");
         } else {
-            for (Map.Entry<Location, Long> entry : this.money.entrySet()) {
+            for (Map.Entry<Location, Long> entry : new HashMap<>(this.money).entrySet()) {
                 builder.append("\n[")
                         .append(entry.getKey().toFieldString())
                         .append("] ")
@@ -171,7 +171,7 @@ public class GameMap {
         } else {
             Boss boss;
 
-            for(long bossId : bossSet) {
+            for(long bossId : new HashSet<>(bossSet)) {
                 boss = Config.getData(Id.BOSS, bossId);
                 builder.append("\n")
                         .append(index++)
@@ -210,7 +210,7 @@ public class GameMap {
         } else {
             Equipment equipment;
             String locationStr;
-            for (Map.Entry<Location, Set<Long>> entry : this.equip.entrySet()) {
+            for (Map.Entry<Location, Set<Long>> entry : new HashMap<>(this.equip).entrySet()) {
                 locationStr = "\n[" + entry.getKey().toFieldString() + "] ";
 
                 for(long equipId : entry.getValue()) {

@@ -46,6 +46,7 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.focus("n move map 시작의 마을") + ")\n\n" +
                         Emoji.LIST + " (이동/move) (필드/field) ({x좌표}-{y좌표}) : 현재 맵의 필드 좌표로 이동합니다(예시: " +
                         Emoji.focus("n move field 16-10") + ")\n\n" +
+                        Emoji.LIST + " (줍기/pick/p) : 현재 맵에 떨어진 모든 아이템을 줍습니다\n\n" +
                         Emoji.LIST + " (사용/use) ({아이템 이름[.{대상}]}) [{사용 개수}] : 아이템을 일정 개수 사용합니다(예시: " +
                         Emoji.focus("n 사용 장비 완화제.무기 5") + ")\n\n" +
                         Emoji.LIST + " (먹기/eat) ({아이템 이름}) [{사용 개수}] : 아이템을 일정 개수 먹습니다(예시: " +

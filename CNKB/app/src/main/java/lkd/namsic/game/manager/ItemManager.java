@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import lkd.namsic.game.base.Location;
 import lkd.namsic.game.base.Use;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
@@ -20,8 +21,10 @@ import lkd.namsic.game.event.ItemEatEvent;
 import lkd.namsic.game.event.ItemUseEvent;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Entity;
+import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Item;
 import lkd.namsic.game.object.Player;
+import lkd.namsic.setting.Logger;
 
 public class ItemManager {
 
@@ -270,6 +273,23 @@ public class ItemManager {
         }
 
         self.replyPlayer("제작이 완료되었습니다\n[" + itemName + " +" + resultCount + "]", innerMsg.toString());
+    }
+
+    public void pick(@NonNull Player self) {
+        GameMap gameMap = Config.loadMap(self.getLocation());
+
+        Map<Location, Map<Long, Integer>> itemMap = new HashMap<>(gameMap.getItem());
+
+        gameMap.getItem().clear();
+        Config.unloadMap(gameMap);
+
+        for(Map<Long, Integer> map : itemMap.values()) {
+            for(Map.Entry<Long, Integer> entry : map.entrySet()) {
+                self.addItem(entry.getKey(), entry.getValue(), false);
+            }
+        }
+
+        self.replyPlayer("맵에 떨어진 모든 아이템을 주웠습니다");
     }
 
 }
