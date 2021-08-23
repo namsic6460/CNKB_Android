@@ -473,6 +473,7 @@ public class DisplayManager {
 
         StringBuilder innerBuilder = new StringBuilder("---상점 목록---");
 
+        boolean exist = false;
         for(long npcId : npcSet) {
             try {
                 Config.getData(Id.SHOP, npcId);
@@ -480,8 +481,13 @@ public class DisplayManager {
                 continue;
             }
 
+            exist = true;
             innerBuilder.append("\n")
                     .append(Objects.requireNonNull(NpcList.findById(npcId)));
+        }
+
+        if(!exist) {
+            innerBuilder.append("\n현재 맵에서 이용 가능한 상점이 없습니다");
         }
 
         self.replyPlayer("상점 목록은 전체보기로 확인해주세요", innerBuilder.toString());

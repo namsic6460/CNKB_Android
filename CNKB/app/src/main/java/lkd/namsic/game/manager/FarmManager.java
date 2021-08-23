@@ -129,6 +129,10 @@ public class FarmManager {
                 gap = Math.min(currentTime - plant.getLastHarvestTime(), Config.MAX_HARVEST_DAY * 86_400_000);
                 harvestCount = (int) (gap / plant.getGrowTime());
 
+                if(harvestCount == 0) {
+                    continue;
+                }
+
                 for(Map.Entry<Long, Integer> entry : plant.getRewardItem().entrySet()) {
                     itemId = entry.getKey();
                     itemCount = entry.getValue() * harvestCount;
