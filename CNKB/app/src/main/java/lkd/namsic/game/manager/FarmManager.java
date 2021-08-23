@@ -1,6 +1,7 @@
 package lkd.namsic.game.manager;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -82,7 +83,9 @@ public class FarmManager {
                 throw new WeirdCommandException("해당 씨앗을 심기에 농장의 레벨이 부족합니다");
             }
 
-            farm.getPlanted().add(new Farm.Plant(Objects.requireNonNull(ItemList.idMap.get(itemId))));
+            for(int i = 0; i < count; i++) {
+                farm.getPlanted().add(new Farm.Plant(Objects.requireNonNull(ItemList.idMap.get(itemId))));
+            }
         } finally {
             Config.unloadObject(farm);
         }
@@ -97,14 +100,14 @@ public class FarmManager {
         Farm farm = Config.loadObject(Id.FARM, self.getId().getObjectId());
 
         try {
-            Set<Farm.Plant> plantSet = farm.getPlanted();
+            List<Farm.Plant> plantList = farm.getPlanted();
 
-            if(plantIndex < 1 || plantSet.size() < plantIndex) {
+            if(plantIndex < 1 || plantList.size() < plantIndex) {
                 throw new WeirdCommandException("알 수 없는 작물입니다");
             }
 
-            Farm.Plant plant = (Farm.Plant) plantSet.toArray()[plantIndex - 1];
-            plantSet.remove(plant);
+            Farm.Plant plant = plantList.get(plantIndex - 1);
+            plantList.remove(plant);
             
             self.replyPlayer("작물을 제거했습니다");
         } finally {
