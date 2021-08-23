@@ -31,7 +31,7 @@ public class EquipManager {
 
     public boolean canEquip(@NonNull Player self, long equipId) {
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
-        return equipment.getTotalLimitLv() <= self.getLv().get() && self.compareStat(equipment.getLimitStat());
+        return equipment.getTotalLimitLv() <= self.getLv() && self.compareStat(equipment.getLimitStat());
     }
 
     public void equip(@NonNull Entity self, int index) {
@@ -181,7 +181,7 @@ public class EquipManager {
 
             player.addLog(LogData.TOTAL_EQUIP_USE, 1);
 
-            String msg = equipment.getName() + " 을 사용했습니다\n";
+            String msg = Emoji.focus(equipment.getRealName()) + " 을 사용했습니다\n";
             player.replyPlayer(msg + result);
         }
     }

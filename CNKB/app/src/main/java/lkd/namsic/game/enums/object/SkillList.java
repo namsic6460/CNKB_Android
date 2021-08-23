@@ -23,6 +23,9 @@ public enum SkillList {
             nameMap.put(value.displayName, value);
             idMap.put(value.id, value);
         }
+
+        nameMap.remove(NONE.displayName);
+        idMap.remove(NONE.id);
     }
 
     @Getter

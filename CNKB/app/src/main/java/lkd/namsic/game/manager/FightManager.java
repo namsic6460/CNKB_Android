@@ -42,7 +42,8 @@ public class FightManager {
 
     private static final FightManager instance = new FightManager();
 
-    private final Map<Long, Long> preventMap = new ConcurrentHashMap<>();
+    private final Map<Long, Long> runPreventMap = new ConcurrentHashMap<>();
+    private final Map<Long, Long> pvpPreventMap = new ConcurrentHashMap<>();
 
     public final Map<IdClass, Long> fightId = new ConcurrentHashMap<>();
     public final Map<Long, Set<Entity>> entityMap = new ConcurrentHashMap<>();
@@ -89,21 +90,33 @@ public class FightManager {
                 long currentTime = System.currentTimeMillis();
 
                 long id = self.getId().getObjectId();
-                long preventTime = preventMap.getOrDefault(id, 0L);
+                long preventTime = runPreventMap.getOrDefault(id, 0L);
                 if (preventTime > currentTime) {
                     throw new WeirdCommandException("전투에서 도주한 후 30초 동안은 전투할 수 없습니다");
                 } else if (preventTime != 0) {
-                    preventMap.remove(id);
+                    runPreventMap.remove(id);
                 }
 
-                preventTime = preventMap.getOrDefault(playerId, 0L);
+                preventTime = runPreventMap.getOrDefault(playerId, 0L);
                 if (preventTime > currentTime) {
                     throw new WeirdCommandException("해당 대상은 현재 전투가 불가능합니다\n(도주 성공 후 30초간 PvP 불가)");
                 } else if (preventTime != 0) {
-                    preventMap.remove(playerId);
+                    runPreventMap.remove(playerId);
                 }
 
-                if (self.getLv().get() / 2 > player.getLv().get()) {
+                preventTime = pvpPreventMap.getOrDefault(id, 0L);
+                if (preventTime != 0) {
+                    runPreventMap.remove(id);
+                }
+
+                preventTime = pvpPreventMap.getOrDefault(playerId, 0L);
+                if (preventTime > currentTime) {
+                    throw new WeirdCommandException("해당 대상은 현재 전투가 불가능합니다\n(PvP 사망 후 30분간 PvP 불가)");
+                } else if (preventTime != 0) {
+                    pvpPreventMap.remove(playerId);
+                }
+
+                if (self.getLv() / 2 > player.getLv()) {
                     throw new WeirdCommandException("본인 레벨의 절반에 미치지 못하는 레벨의 플레이어는 공격할 수 없습니다\n\n" +
                             "뉴비 학살을 멈춰주세요\n-공익 봇 협의회-");
                 }
@@ -347,7 +360,7 @@ public class FightManager {
                     }
 
                     if (success) {
-                        preventMap.put(attacker.getId().getObjectId(), System.currentTimeMillis() + Config.PREVENT_FIGHT_TIME);
+                        runPreventMap.put(attacker.getId().getObjectId(), System.currentTimeMillis() + Config.PREVENT_RUN_FIGHT_TIME);
 
                         if (attacker.equals(self)) {
                             Player.replyPlayersExcept(playerSet, "전투를 시작한 유저가 도주하여 전투가 종료되었습니다", self);
@@ -456,6 +469,10 @@ public class FightManager {
                 if (entity.getKiller() != null) {
                     killerId = entity.getKiller();
                     killer = Config.getData(killerId.getId(), killerId.getObjectId());
+
+                    if(killerId.getId().equals(Id.PLAYER)) {
+                        pvpPreventMap.put(entity.getId().getObjectId(), System.currentTimeMillis() + Config.PREVENT_PVP_FIGHT_TIME);
+                    }
 
                     Player.replyPlayersExcepts(playerSet, entity.getFightName() + is +
                             killer.getFightName() + " 에 의해 사망했습니다", exceptSet);

@@ -1,11 +1,10 @@
 package lkd.namsic.game.enums;
 
-import com.google.gson.annotations.Since;
-
 public enum Variable {
 
     IS_TUTORIAL,
     HIGH_PRIORITY_ITEM,
+    INFO_PUBLIC,
     MINE,
     FISH,
     FISH_WAIT_TYPE,

@@ -9,8 +9,6 @@ import java.util.List;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
-import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.manager.ChatManager;
 import lkd.namsic.game.manager.ItemManager;
 import lkd.namsic.game.object.Player;
 

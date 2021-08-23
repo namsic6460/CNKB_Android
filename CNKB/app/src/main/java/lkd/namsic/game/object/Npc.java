@@ -41,7 +41,7 @@ public class Npc extends Entity {
 
     public void setBaseChat(@NonNull ChatLimit chatLimit, long chatId) {
         Chat chat = Config.getData(Id.CHAT, chatId);
-        if(chat.getQuestId().get() != 0) {
+        if(chat.getQuestId() != 0) {
             throw new InvalidNumberException(0);
         } else if(!chat.isBaseMsg()) {
             throw new RuntimeException("common chat must be base msg");

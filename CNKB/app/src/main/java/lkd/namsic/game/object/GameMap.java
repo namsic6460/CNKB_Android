@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.IdClass;
-import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
@@ -25,6 +24,7 @@ import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdDataException;
+import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.manager.MoveManager;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,7 +43,8 @@ public class GameMap {
     @NonNull
     MapType mapType = MapType.COUNTRY;
 
-    final LimitInteger requireLv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
+    @Setter
+    int requireLv = 1;
 
     final Location location = new Location();
 
@@ -72,7 +73,7 @@ public class GameMap {
 
     @NonNull
     public String getInfo() {
-        return this.name + "(요구 레벨: " + requireLv.get() + ") [" + this.mapType.getMapName() + "]\n" +
+        return this.name + "(요구 레벨: " + requireLv + ") [" + this.mapType.getMapName() + "]\n" +
                 Emoji.WORLD + ": " + this.location.toMapString() + "\n" +
                 Emoji.MONSTER + ": " + this.getEntity(Id.MONSTER).size() + ", " +
                 Emoji.BOSS + ": " + this.getEntity(Id.BOSS).size();
@@ -90,8 +91,13 @@ public class GameMap {
 
             for (long playerId : new HashSet<>(playerSet)) {
                 player = Config.getData(Id.PLAYER, playerId);
-                builder.append("\n[")
-                        .append(player.getLocation().toFieldString())
+                builder.append("\n[");
+
+                if(FightManager.getInstance().fightId.containsKey(player.getId())) {
+                    builder.append("F] [");
+                }
+
+                builder.append(player.getLocation().toFieldString())
                         .append("] ")
                         .append(player.getName());
             }
@@ -154,8 +160,13 @@ public class GameMap {
 
                 builder.append("\n")
                         .append(index++)
-                        .append(". [")
-                        .append(monster.getLocation().toFieldString())
+                        .append(". [");
+
+                if(FightManager.getInstance().fightId.containsKey(monster.getId())) {
+                    builder.append("F] [");
+                }
+
+                builder.append(monster.getLocation().toFieldString())
                         .append("] ")
                         .append(monster.getName());
             }
@@ -175,8 +186,13 @@ public class GameMap {
                 boss = Config.getData(Id.BOSS, bossId);
                 builder.append("\n")
                         .append(index++)
-                        .append(". [")
-                        .append(boss.getLocation().toFieldString())
+                        .append(". [");
+
+                if(FightManager.getInstance().fightId.containsKey(boss.getId())) {
+                    builder.append("F] [");
+                }
+
+                builder.append(boss.getLocation().toFieldString())
                         .append("] ")
                         .append(boss.getName());
             }
@@ -429,8 +445,8 @@ public class GameMap {
             throw new NumberRangeException(percent, 0, 1);
         }
 
-        if(maxCount < 1 || maxCount > Config.MAX_SPAWN_COUNT) {
-            throw new NumberRangeException(maxCount, 1, Config.MAX_SPAWN_COUNT);
+        if(maxCount < 1) {
+            throw new NumberRangeException(maxCount, 1, null);
         }
 
         this.spawnMonster.add(monsterId);
@@ -479,7 +495,7 @@ public class GameMap {
                     Monster monster = Config.newObject(Config.getData(Id.MONSTER, monsterId), false);
                     monster.randomLevel();
                     monster.location = new Location();
-                    MoveManager.getInstance().setMap(monster, this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
+                    MoveManager.getInstance().setMap(monster, this.location.getX(), this.location.getY(), fieldX, fieldY);
                     this.addEntity(monster);
                     Config.unloadObject(monster);
                 }
@@ -508,7 +524,7 @@ public class GameMap {
                 Boss boss = Config.newObject(Config.getData(Id.BOSS, bossId), false);
                 boss.randomLevel();
                 boss.location = new Location();
-                MoveManager.getInstance().setMap(boss, this.location.getX().get(), this.location.getY().get(), fieldX, fieldY);
+                MoveManager.getInstance().setMap(boss, this.location.getX(), this.location.getY(), fieldX, fieldY);
                 this.addEntity(boss);
                 Config.unloadObject(boss);
 

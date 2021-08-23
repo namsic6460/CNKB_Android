@@ -13,6 +13,7 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.exception.DoingFilterException;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.manager.DisplayManager;
 import lkd.namsic.game.manager.ShopManager;
 import lkd.namsic.game.object.Player;
 
@@ -26,7 +27,9 @@ public class ShopCommand extends PlayerCommand {
             throw new WeirdCommandException();
         } else {
             if(Arrays.asList("도움말", "명령어", "?", "help", "h").contains(second)) {
-                ShopManager.getInstance().displayHelp(player);
+                DisplayManager.getInstance().displayShopHelp(player);
+            } else if(second.equals("목록") || second.equals("list")) {
+                DisplayManager.getInstance().displayShopList(player);
             } else if(player.getDoing().equals(Doing.NONE)) {
                 ShopManager.getInstance().startShopping(player, command);
             } else if(player.getDoing().equals(Doing.SHOP)) {

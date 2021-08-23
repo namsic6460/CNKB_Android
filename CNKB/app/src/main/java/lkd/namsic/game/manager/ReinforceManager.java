@@ -31,7 +31,7 @@ public class ReinforceManager {
                 throw new WeirdCommandException("장착중인 장비는 강화가 불가능합니다");
             }
 
-            int reinforceCount = equipment.getReinforceCount().get();
+            int reinforceCount = equipment.getReinforceCount();
             if(reinforceCount == Config.MAX_REINFORCE_COUNT) {
                 throw new WeirdCommandException(Config.MAX_REINFORCE_COUNT + "강 장비는 더이상 강화가 불가능합니다");
             }

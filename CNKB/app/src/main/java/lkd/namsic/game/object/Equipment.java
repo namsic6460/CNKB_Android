@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lkd.namsic.game.base.EquipUse;
-import lkd.namsic.game.base.LimitDouble;
-import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.base.Use;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.RandomList;
@@ -29,16 +27,30 @@ public class Equipment extends Item implements Cloneable {
 
     final long originalId;
 
+    @Nullable
+    final String activeDes;
+
+    @Nullable
+    final String passiveDes;
+
     @Setter
     @NonNull
     EquipType equipType;
 
-    final LimitInteger handleLv = new LimitInteger(Config.MIN_HANDLE_LV, Config.MIN_HANDLE_LV, Config.MAX_HANDLE_LV);
+    @Setter
+    int handleLv = 1;
 
-    final LimitInteger reinforceCount = new LimitInteger(0, 0, Config.MAX_REINFORCE_COUNT);
-    final LimitDouble reinforceFloor1 = new LimitDouble(0, 0D, null);
-    final LimitInteger reinforceFloor2 = new LimitInteger(0, 0, null);
-    final LimitInteger limitLv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, null);
+    @Setter
+    int reinforceCount = 0;
+
+    @Setter
+    double reinforceFloor1 = 0;
+
+    @Setter
+    int reinforceFloor2 = 0;
+
+    @Setter
+    int limitLv = 1;
 
     @Setter
     int lvDown = 0;
@@ -47,16 +59,16 @@ public class Equipment extends Item implements Cloneable {
     final Map<StatType, Integer> basicStat = new HashMap<>();
     final Map<StatType, Integer> reinforceStat = new HashMap<>();
 
-    public Equipment(@NonNull EquipType equipType, @NonNull EquipList equipData, @NonNull String description) {
+    public Equipment(@NonNull EquipType equipType, @NonNull EquipList equipData, @Nullable String activeDes, @Nullable String passiveDes) {
         super(equipData.getDisplayName());
-        this.description = description;
 
         this.id.setId(Id.EQUIPMENT);
 
         this.id.setObjectId(equipData.getId());
         this.originalId = equipData.getId();
 
-        this.description = description;
+        this.activeDes = activeDes;
+        this.passiveDes = passiveDes;
         this.equipType = equipType;
     }
 
@@ -79,14 +91,14 @@ public class Equipment extends Item implements Cloneable {
             this.basicStat.putAll(equipment.basicStat);
         }
 
-        this.handleLv.set(equipment.handleLv.get());
-        this.limitLv.set(equipment.limitLv.get());
+        this.handleLv = equipment.handleLv;
+        this.limitLv = equipment.limitLv;
 
         double totalIncrease = 0;
-        double statIncrease = Config.REINFORCE_EFFICIENCY + Config.REINFORCE_EFFICIENCY_PER_HANDLE_LV * this.handleLv.get();
+        double statIncrease = Config.REINFORCE_EFFICIENCY + Config.REINFORCE_EFFICIENCY_PER_HANDLE_LV * this.handleLv;
         double newStatIncrease = statIncrease;
-        for(int i = 0; i < this.reinforceCount.get(); i++) {
-            this.limitLv.add(RandomList.REINFORCE_LV_INCREASE[this.handleLv.get() - 1][i]);
+        for(int i = 0; i < this.reinforceCount; i++) {
+            this.limitLv += RandomList.REINFORCE_LV_INCREASE[this.handleLv - 1][i];
 
             totalIncrease += newStatIncrease;
             newStatIncrease *= 1 + statIncrease;
@@ -106,32 +118,31 @@ public class Equipment extends Item implements Cloneable {
     }
 
     public double getReinforcePercent(double multiplier) {
-        if(this.reinforceCount.get() == Config.MAX_REINFORCE_COUNT) {
+        if(this.reinforceCount == Config.MAX_REINFORCE_COUNT) {
             return 0;
         }
 
-        double basicPercent = RandomList.REINFORCE_PERCENT[this.handleLv.get() - 1][this.reinforceCount.get()];
-        double floor1 = this.reinforceFloor1.get();
-        int floor2 = this.reinforceFloor2.get();
+        double basicPercent = RandomList.REINFORCE_PERCENT[this.handleLv - 1][this.reinforceCount];
+        int floor2 = this.reinforceFloor2;
 
-        if(floor1 >= 1 || floor2 >= 200) {
+        if(this.reinforceFloor1 >= 1 || floor2 >= 200) {
             return 1;
         }
 
-        return Math.min(1, basicPercent * multiplier * (1 + floor1 + 0.1 * Math.min(10, floor2)));
+        return Math.min(1, basicPercent * multiplier * (1 + this.reinforceFloor1 + 0.1 * Math.min(10, floor2)));
     }
 
     public long getReinforceItem() {
-        return ItemList.LOW_REINFORCE_STONE.getId() + this.reinforceCount.get() / 5;
+        return ItemList.LOW_REINFORCE_STONE.getId() + this.reinforceCount / 5;
     }
 
     public long getReinforceCost() {
-        return (long) ((Config.REINFORCE_BASE_COST + Config.REINFORCE_COST_PER_HANDLE_LV * this.handleLv.get()) *
-                        (1 + Config.REINFORCE_COST_MULTIPLIER * this.reinforceCount.get()));
+        return (long) ((Config.REINFORCE_BASE_COST + Config.REINFORCE_COST_PER_HANDLE_LV * this.handleLv) *
+                        (1 + Config.REINFORCE_COST_MULTIPLIER * this.reinforceCount));
     }
 
     public int getTotalLimitLv() {
-        return Math.min(Math.max(this.limitLv.get() - this.lvDown, Config.MIN_LV), Config.MAX_LV);
+        return Math.min(Math.max(this.limitLv - this.lvDown, 1), Config.MAX_LV);
     }
 
     @Deprecated
@@ -199,22 +210,39 @@ public class Equipment extends Item implements Cloneable {
     }
 
     public void successReinforce() {
-        this.reinforceFloor1.set(0D);
-        this.reinforceFloor2.set(0);
-        this.reinforceCount.add(1);
+        this.reinforceFloor1 = 0;
+        this.reinforceFloor2 = 0;
+        this.reinforceCount += 1;
 
         this.revalidateStat(false, null);
     }
 
     public void failReinforce(double percent) {
-        this.reinforceFloor1.add(percent / 10);
-        this.reinforceFloor2.add(1);
+        this.reinforceFloor1 += percent / 10;
+        this.reinforceFloor2 += 1;
     }
 
     @NonNull
     @Override
     public String getName() {
-        return super.getName() + " (+" + this.reinforceCount.get() + ")";
+        return super.getName() + " (+" + this.reinforceCount + ")";
     }
 
+    @NonNull
+    public String getRealName() {
+        return super.getName();
+    }
+
+    @Deprecated
+    @Override
+    public void setDescription(@NonNull String description) {
+        throw new RuntimeException("Deprecated");
+    }
+
+    @Deprecated
+    @NonNull
+    @Override
+    public String getDescription() {
+        throw new RuntimeException("Deprecated");
+    }
 }

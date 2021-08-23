@@ -131,8 +131,8 @@ public class MoveManager {
                 monster = Config.getData(Id.MONSTER, monsterId);
 
                 if (self.getFieldDistance(monster.getLocation()) <= Config.RECOGNIZE_DISTANCE) {
-                    double attackedPercent = Math.min(Config.ATTACKED_PERCENT + (monster.getLv().get() -
-                            self.getLv().get()) * Config.ATTACKED_PERCENT_INCREASE, Config.MAX_ATTACKED_PERCENT);
+                    double attackedPercent = Math.min(Config.ATTACKED_PERCENT + (monster.getLv() -
+                            self.getLv()) * Config.ATTACKED_PERCENT_INCREASE, Config.MAX_ATTACKED_PERCENT);
 
                     if (Math.random() < attackedPercent) {
                         FightManager.getInstance().startFight((Player) self, Config.getData(Id.MONSTER, monsterId), false);
@@ -159,10 +159,10 @@ public class MoveManager {
 
     public void setMap(@NonNull Entity self, Location location, int distance, boolean isToBase) {
         if(isToBase) {
-            this.setMap(self, location.getX().get(), location.getY().get(), 1, 1, distance,true);
+            this.setMap(self, location.getX(), location.getY(), 1, 1, distance,true);
         } else {
-            this.setMap(self, location.getX().get(), location.getY().get(),
-                    location.getFieldX().get(), location.getFieldY().get(), distance, false);
+            this.setMap(self, location.getX(), location.getY(),
+                    location.getFieldX(), location.getFieldY(), distance, false);
         }
     }
 
@@ -184,13 +184,13 @@ public class MoveManager {
 
         GameMap moveMap = Config.loadMap(x, y);
 
-        if(self.getId().getId().equals(Id.PLAYER) && self.getLv().get() < moveMap.getRequireLv().get()) {
-            throw new NumberRangeException(self.getLv().get(), moveMap.getRequireLv().get(), Config.MAX_LV);
+        if(self.getId().getId().equals(Id.PLAYER) && self.getLv() < moveMap.getRequireLv()) {
+            throw new NumberRangeException(self.getLv(), moveMap.getRequireLv(), Config.MAX_LV);
         }
 
         self.getLocation().setMap(x, y);
         if(isToBase) {
-            this.setField(self, moveMap.getLocation().getFieldX().get(), moveMap.getLocation().getFieldY().get());
+            this.setField(self, moveMap.getLocation().getFieldX(), moveMap.getLocation().getFieldY());
         } else {
             this.setField(self, fieldX, fieldY);
         }
@@ -224,7 +224,7 @@ public class MoveManager {
                 y = Integer.parseInt(split[1]);
                 location = new Location(x, y);
             } catch (NumberRangeException e) {
-                throw new WeirdCommandException("맵은 " + Config.MIN_MAP_X + "-" + Config.MIN_MAP_Y + " 부터 " +
+                throw new WeirdCommandException("맵은 0-0 부터 " +
                         Config.MAX_MAP_X + "-" + Config.MAX_MAP_Y + " 의 범위로만 이동할 수 있습니다");
             }
         }
@@ -251,14 +251,14 @@ public class MoveManager {
             } catch (NumberRangeException e) {
                 if(Objects.requireNonNull(e.getMessage()).endsWith(Integer.toString(Config.MAX_LV))) {
                     self.replyPlayer("해당 지역으로 이동하기 위한 요구 레벨이 부족합니다\n현재 레벨: " +
-                            self.getLv().get() + "\n요구 레벨: " + moveMap.getRequireLv().get());
+                            self.getLv() + "\n요구 레벨: " + moveMap.getRequireLv());
                     return;
                 } else {
                     throw e;
                 }
             }
 
-            self.replyPlayer("이동을 완료했습니다\n현재 좌표: " + self.getLocation().toString());
+            self.replyPlayer(moveMap.getName() + " (으)로 의 이동을 완료했습니다\n현재 좌표: " + self.getLocation().toString());
 
             Config.unloadMap(moveMap);
         }
@@ -279,7 +279,7 @@ public class MoveManager {
             y = Integer.parseInt(split[1]);
             location = new Location(0, 0, x, y);
         } catch (NumberRangeException e) {
-            throw new WeirdCommandException("필드는 " + Config.MIN_FIELD_X + "-" + Config.MIN_FIELD_Y + " 부터 " +
+            throw new WeirdCommandException("필드는 1-1 부터 " +
                     Config.MAX_FIELD_X + "-" + Config.MAX_FIELD_Y + " 의 범위로만 이동할 수 있습니다");
         }
 

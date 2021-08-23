@@ -3,42 +3,41 @@ package lkd.namsic.game.base;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import lkd.namsic.game.config.Config;
 import lombok.Getter;
 
 @Getter
 public class Location {
 
-    private final LimitInteger x = new LimitInteger(Config.MIN_MAP_X, Config.MIN_MAP_X, Config.MAX_MAP_X);
-    private final LimitInteger y = new LimitInteger(Config.MIN_MAP_Y, Config.MIN_MAP_Y, Config.MAX_MAP_Y);
-    private final LimitInteger fieldX = new LimitInteger(Config.MIN_FIELD_X, Config.MIN_FIELD_X, Config.MAX_FIELD_X);
-    private final LimitInteger fieldY = new LimitInteger(Config.MIN_FIELD_Y, Config.MIN_FIELD_Y, Config.MAX_FIELD_Y);
+    int x = 0;
+    int y = 0;
+    int fieldX = 1;
+    int fieldY = 1;
 
     public Location() {}
 
     public Location(int x, int y) {
-        this.x.set(x);
-        this.y.set(y);
+        this.x = x;
+        this.y = y;
     }
 
     public Location(int x, int y, int fieldX, int fieldY) {
         this(x, y);
-        this.fieldX.set(fieldX);
-        this.fieldY.set(fieldY);
+        this.fieldX = fieldX;
+        this.fieldY = fieldY;
     }
 
     public Location(@NonNull Location location) {
-        this(location.x.get(), location.y.get(), location.fieldX.get(), location.fieldY.get());
+        this(location.x, location.y, location.fieldX, location.fieldY);
     }
 
     public void setMap(int x, int y) {
-        this.x.set(x);
-        this.y.set(y);
+        this.x = x;
+        this.y = y;
     }
 
     public void setField(int fieldX, int fieldY) {
-        this.fieldX.set(fieldX);
-        this.fieldY.set(fieldY);
+        this.fieldX = fieldX;
+        this.fieldY = fieldY;
     }
 
     public void set(int x, int y, int fieldX, int fieldY) {
@@ -47,15 +46,15 @@ public class Location {
     }
 
     public void set(Location location) {
-        this.set(location.getX().get(), location.getY().get(), location.getFieldX().get(), location.getFieldY().get());
+        this.set(location.getX(), location.getY(), location.getFieldX(), location.getFieldY());
     }
 
     public boolean equalsMap(@NonNull Location location) {
-        return this.x.equals(location.x) && this.y.equals(location.y);
+        return this.x == location.x && this.y == location.y;
     }
 
     public boolean equalsField(@NonNull Location location) {
-        return this.fieldX.equals(location.fieldX) && this.fieldY.equals(location.fieldY);
+        return this.fieldX == location.fieldX && this.fieldY == location.fieldY;
     }
 
     @Override
@@ -84,9 +83,9 @@ public class Location {
     }
 
     @NonNull
-    public String toMapString() { return x.get() + "-" + y.get(); }
+    public String toMapString() { return x + "-" + y; }
 
     @NonNull
-    public String toFieldString() { return fieldX.get() + "-" + fieldY.get(); }
+    public String toFieldString() { return fieldX + "-" + fieldY; }
 
 }

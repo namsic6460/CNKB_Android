@@ -22,6 +22,8 @@ public enum EventList {
         for(EventList value : EventList.values()) {
             idMap.put(value.id, value);
         }
+
+        idMap.remove(NONE.id);
     }
 
     @Getter

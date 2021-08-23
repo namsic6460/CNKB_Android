@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
@@ -21,7 +23,9 @@ import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.enums.object.SkillList;
+import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.object.Farm;
 import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
@@ -68,8 +72,8 @@ public class DisplayManager {
                         Emoji.WORLD + " 위치: " + Config.getMapData(target.getLocation()).getName() +
                         "(" + target.getLocation().toString() + ")\n" +
                         Emoji.LV + " 레벨: " + target.getDisplayLv() + "\n" +
-                        Emoji.SP + " 스텟 포인트: " + target.getSp().get() + "\n" +
-                        Emoji.ADV + " 모험 포인트: " + target.getAdv().get() + "\n" +
+                        Emoji.SP + " 스텟 포인트: " + target.getSp() + "\n" +
+                        Emoji.ADV + " 모험 포인트: " + target.getAdv() + "\n" +
                         Emoji.HOME + " 거점: " + Config.getMapData(target.getBaseLocation()).getName() +
                         "(" + target.getBaseLocation().toString() + ")",
                 innerMsg.toString());
@@ -133,7 +137,7 @@ public class DisplayManager {
                     .append("] ")
                     .append(quest.getName());
 
-            Long npcId = quest.getClearNpcId().get();
+            Long npcId = quest.getClearNpcId();
             if(!npcId.equals(0L)) {
                 Npc npc = Config.getData(Id.NPC, npcId);
 
@@ -171,15 +175,15 @@ public class DisplayManager {
         boolean flag;
         StringBuilder builder = null;
 
-        int currentX = self.getLocation().getX().get();
-        int currentY = self.getLocation().getY().get();
+        int currentX = self.getLocation().getX();
+        int currentY = self.getLocation().getY();
 
         int distance;
         GameMap map;
 
-        int minX = Math.max(Config.MIN_MAP_X, currentX - movableDistance);
+        int minX = Math.max(0, currentX - movableDistance);
         int maxX = Math.min(Config.MAX_MAP_X, currentX + movableDistance);
-        int minY = Math.max(Config.MIN_MAP_Y, currentY - movableDistance);
+        int minY = Math.max(0, currentY - movableDistance);
         int maxY = Math.min(Config.MAX_MAP_Y, currentY + movableDistance);
 
         for(int x = minX; x <= maxX; x++) {
@@ -211,7 +215,7 @@ public class DisplayManager {
                             .append(" (")
                             .append(map.getLocation().toMapString())
                             .append(") [Lv ")
-                            .append(map.getRequireLv().get())
+                            .append(map.getRequireLv())
                             .append("] (거리: ")
                             .append(distance)
                             .append(")");
@@ -294,7 +298,7 @@ public class DisplayManager {
                 .append("\n\n")
                 .append(Config.HARD_SPLIT_BAR)
                 .append("\n\n요구 금액: ")
-                .append(quest.getNeedMoney().get())
+                .append(quest.getNeedMoney())
                 .append("\n\n---요구 아이템---");
         
         if(quest.getNeedItem().isEmpty()) {
@@ -336,15 +340,15 @@ public class DisplayManager {
         innerBuilder.append("\n\n")
                 .append(Config.HARD_SPLIT_BAR)
                 .append("\n\n클리어 제한 레벨: ")
-                .append(quest.getClearLimitLv().get())
+                .append(quest.getClearLimitLv())
                 .append("\n\n")
                 .append(Config.HARD_SPLIT_BAR)
                 .append("\n\n보상 골드: ")
-                .append(quest.getRewardMoney().get())
+                .append(quest.getRewardMoney())
                 .append("\n보상 경험치: ")
-                .append(quest.getRewardExp().get())
+                .append(quest.getRewardExp())
                 .append("\n보상 모험 스텟: ")
-                .append(quest.getRewardAdv().get())
+                .append(quest.getRewardAdv())
                 .append("\n\n---보상 아이템---");
         
         if(quest.getRewardItem().isEmpty()) {
@@ -420,7 +424,26 @@ public class DisplayManager {
         }
 
         Skill skill = Config.getData(Id.SKILL, skillId);
-        self.replyPlayer(Emoji.focus(skillName) + " " + skill.getDescription());
+
+        String innerMsg = Emoji.focus(skillName) + "의 정보\n\n[액티브] ";
+        
+        String description = skill.getActiveDes(); 
+        if(description == null) {
+            innerMsg += "액티브 효과가 없습니다";
+        } else {
+            innerMsg += description;
+        }
+
+        innerMsg += "\n\n[패시브] ";
+        
+        description = skill.getPassiveDes();
+        if(description == null) {
+            innerMsg += "패시브 효과가 없습니다";
+        } else {
+            innerMsg += description;
+        }
+
+        self.replyPlayer("스킬 정보는 전체보기로 확인해주세요", innerMsg);
     }
 
     public void displayReinforceExplanation(@NonNull Player self) {
@@ -428,6 +451,101 @@ public class DisplayManager {
                 "2. 강화에 성공할 시 모든 스텟이 균등하게 증가하지만 제한 레벨 또한 증가될 수 있습니다\n" +
                 "3. 일정 횟수 이상 강화에 실패하면 무조건 강화에 성공하는 천장 시스템이 있습니다\n" +
                 "4. 장비의 입수 난이도 및 다양한 조건에 따라 강화의 난이도 및 성장치가 변화합니다");
+    }
+
+    public void displayShopHelp(@NonNull Player self) {
+        self.replyPlayer("---상점 도움말---\n" +
+                Emoji.LIST + " (도움말/명령어/?/help/h) - 상점 도움말을 표시합니다\n" +
+                Emoji.LIST + " (종료/end/e) - 상점 이용을 종료합니다\n" +
+                Emoji.LIST + " (변경/change/c) - 구매/판매 모드를 전환합니다\n" +
+                Emoji.LIST + " ({페이지}) - 해당 페이지의 상점 물품을 표시합니다\n" +
+                Emoji.LIST + " (다음/next/n) - 다음 페이지의 상점 물품을 표시합니다\n" +
+                Emoji.LIST + " (이전/prev/p) - 이전 페이지의 상점 물품을 표시합니다\n" +
+                Emoji.LIST + " (구매/buy/b) ({아이템 이름}) [{아이템 개수}] - 아이템을 구매합니다\n" +
+                Emoji.LIST + " (판매/sell/s) ({아이템 이름}) [{아이템 개수}] - 아이템을 판매합니다\n\n" +
+                "예시: " + Emoji.focus("n 상점 구매 하급 체력 포션 1"));
+    }
+
+    public void displayShopList(@NonNull Player self) {
+        GameMap map = Config.getMapData(self.getLocation());
+
+        Set<Long> npcSet = map.getEntity(Id.NPC);
+
+        StringBuilder innerBuilder = new StringBuilder("---상점 목록---");
+
+        for(long npcId : npcSet) {
+            try {
+                Config.getData(Id.SHOP, npcId);
+            } catch (ObjectNotFoundException e) {
+                continue;
+            }
+
+            innerBuilder.append("\n")
+                    .append(Objects.requireNonNull(NpcList.findById(npcId)));
+        }
+
+        self.replyPlayer("상점 목록은 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+
+    public void displayFarmHelp(@NonNull Player self) {
+        self.replyPlayer("1. 농장은 인당 최대 1개 이고 " + Config.FARM_PRICE + "G 에 구매할 수 있습니다\n" +
+                "2. 농장에 식물을 심으면 제거하지 않는 이상 영구 지속됩니다\n" +
+                "3. 농장의 작물은 최대 5일 분량까지 수확할 수 있습니다\n" +
+                "4. 씨앗은 NPC 에게서 구매 가능합니다(시작의 마을의 경우 NPC " + Emoji.focus("엘") + " 에게서 구매 가능)\n" +
+                "5. 농장 레벨을 업그레이드하면 더 많은 씨앗을 심을 수 있습니다");
+    }
+
+    public void displayFarm(@NonNull Player self) {
+        Farm farm = Config.loadObject(Id.FARM, self.getId().getObjectId());
+
+        StringBuilder innerBuilder = new StringBuilder("---")
+                .append(self.getNickName())
+                .append(" 님의 농장 정보---\n농장 레벨: ")
+                .append(farm.getLv())
+                .append("\n작물 개수: ")
+                .append(farm.getPlanted().size())
+                .append("/")
+                .append(farm.getMaxPlantCount())
+                .append("\n\n---작물 현황---");
+
+        if(farm.getPlanted().isEmpty()) {
+            innerBuilder.append("\n작물이 심어져있지 않습니다");
+        } else {
+            long currentTime = System.currentTimeMillis();
+            long diff;
+
+            int index = 1;
+            long day, hour, minute;
+            for (Farm.Plant plant : farm.getPlanted()) {
+                diff = (currentTime - plant.getLastHarvestTime()) / 1000;
+
+                day = diff / 86400;
+                diff = diff % 86400;
+                hour = diff / 3600;
+                minute = (diff % 3600) / 60;
+
+                innerBuilder.append("\n")
+                        .append(Config.SPLIT_BAR)
+                        .append("\n")
+                        .append(index++)
+                        .append(". ")
+                        .append(ItemList.findById(plant.getId().getObjectId()))
+                        .append("\n마지막 수확: ")
+                        .append(day)
+                        .append("일 ")
+                        .append(hour)
+                        .append("시간 ")
+                        .append(minute)
+                        .append("분 전");
+            }
+
+            innerBuilder.append("\n")
+                    .append(Config.SPLIT_BAR);
+
+            Config.unloadObject(farm);
+        }
+
+        self.replyPlayer("농장 정보는 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
 }

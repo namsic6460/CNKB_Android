@@ -3,31 +3,23 @@ package lkd.namsic.game.enums;
 import androidx.annotation.NonNull;
 
 import lkd.namsic.game.exception.UnhandledEnumException;
-import lombok.Getter;
 
 public enum Id {
 
     ACHIEVE,
-    BOSS("b"),
+    BOSS,
     CHAT,
     EQUIPMENT,
+    FARM,
     ITEM,
-    MONSTER("m"),
-    NPC("n"),
-    PLAYER("p"),
+    MONSTER,
+    NPC,
+    PLANT,
+    PLAYER,
     QUEST,
     RESEARCH,
     SHOP,
     SKILL;
-
-    @Getter
-    private String value = null;
-
-    Id() {}
-
-    Id(String value) {
-        this.value = value;
-    }
 
     public static void checkEntityId(@NonNull Id id) throws UnhandledEnumException {
         if(!(id.equals(Id.BOSS) || id.equals(Id.MONSTER) || id.equals(Id.NPC) || id.equals(Id.PLAYER))) {

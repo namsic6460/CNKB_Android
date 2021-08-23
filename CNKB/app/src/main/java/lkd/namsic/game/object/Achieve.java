@@ -5,20 +5,24 @@ import androidx.annotation.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
-import lkd.namsic.game.base.LimitInteger;
-import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class Achieve extends NamedObject {
 
-    final LimitLong rewardMoney = new LimitLong(0, 0L, null);
-    final LimitInteger rewardExp = new LimitInteger(0, 0, null);
-    final LimitInteger rewardAdv = new LimitInteger(0, 0, null);
+    @Setter
+    long rewardMoney = 0;
+
+    @Setter
+    long rewardExp = 0;
+
+    @Setter
+    int rewardAdv = 0;
 
     final Map<Long, Integer> rewardCloseRate = new HashMap<>();
     final Map<Long, Integer> rewardItem = new HashMap<>();

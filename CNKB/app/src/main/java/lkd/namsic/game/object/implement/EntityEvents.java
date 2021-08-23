@@ -108,8 +108,8 @@ public class EntityEvents {
                     self.setVariable(Variable.IMP_ORIGINAL_ATK, basicAtk);
                 }
 
-                if(atk <= basicAtk * 3) {
-                    self.addBasicStat(StatType.ATK, (int) (atk * 0.15));
+                if(atk <= basicAtk * 2) {
+                    self.addBasicStat(StatType.ATK, (int) (atk * 0.1));
                 }
             }
         });

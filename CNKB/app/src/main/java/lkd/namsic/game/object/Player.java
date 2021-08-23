@@ -18,8 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.base.ConcurrentHashSet;
-import lkd.namsic.game.base.LimitInteger;
-import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
@@ -141,9 +139,14 @@ public class Player extends Entity {
 
     final Location baseLocation = new Location();
 
-    final LimitInteger sp = new LimitInteger(0, Config.MIN_SP, null);
-    final LimitInteger adv = new LimitInteger(0, 0, null);
-    final LimitLong exp = new LimitLong(0, 0L, null);
+    @Setter
+    int sp = 0;
+
+    @Setter
+    int adv = 0;
+
+    @Setter
+    long exp = 0;
 
     @Setter
     int lastYear = LocalDateTime.now().getYear();
@@ -205,7 +208,7 @@ public class Player extends Entity {
 
     @NonNull
     public String getDisplayLv() {
-        return this.lv.get() + "Lv (" + this.exp.get() + "/" + this.getNeedExp() + ")";
+        return this.lv + "Lv (" + this.exp + "/" + this.getNeedExp() + ")";
     }
 
     public void addTitle(@NonNull String title) {
@@ -320,10 +323,10 @@ public class Player extends Entity {
 
         exp *= Config.EXP_BOOST;
 
-        this.exp.add(exp);
+        this.exp += exp;
         this.addLog(LogData.TOTAL_EXP, exp);
 
-        int startLv = this.lv.get();
+        int startLv = this.lv;
         int endLv;
 
         if(startLv == Config.MAX_LV) {
@@ -333,19 +336,19 @@ public class Player extends Entity {
         long needExp, currentExp;
         while(true) {
             needExp = this.getNeedExp();
-            currentExp = this.exp.get();
+            currentExp = this.exp;
 
             if(needExp < currentExp) {
                 this.lvUp(needExp);
             } else {
-                endLv = this.lv.get();
+                endLv = this.lv;
 
                 if(startLv != endLv) {
                     this.setBasicStat(StatType.HP, this.getStat(StatType.MAXHP));
                     this.setBasicStat(StatType.MN, this.getStat(StatType.MAXMN));
                     this.replyPlayer("레벨 업!(" + startLv + "->" + endLv + ")\n" +
-                                    Emoji.EXP + " 경험치: " + this.exp.get() + "\n" +
-                                    Emoji.SP + " 스텟 포인트: " + this.sp.get(),
+                                    Emoji.EXP + " 경험치: " + this.exp + "\n" +
+                                    Emoji.SP + " 스텟 포인트: " + this.sp,
                             "레벨업을 하여 체력과 마나가 모두 회복됩니다");
                 }
 
@@ -355,7 +358,7 @@ public class Player extends Entity {
     }
 
     public long getNeedExp() {
-        return this.getNeedExp(this.lv.get());
+        return this.getNeedExp(this.lv);
     }
 
     public long getNeedExp(int lv) {
@@ -378,7 +381,7 @@ public class Player extends Entity {
     }
 
     public long getKillExp(int enemyLv) {
-        int lv = this.lv.get();
+        int lv = this.lv;
         long exp = 5000 + (long) ((this.getNeedExp(enemyLv) * 0.00001) + (this.getNeedExp() * 0.00001));
 
         int gap = lv - enemyLv;
@@ -398,12 +401,12 @@ public class Player extends Entity {
     public void lvUp(long needExp) {
         Config.PLAYER_LV_RANK.remove(this.getName());
 
-        this.lv.add(1);
-        this.sp.add(5);
-        this.exp.add(-1 * needExp);
+        this.lv += 1;
+        this.sp += 5;
+        this.exp += -1 * needExp;
 
-        if(!this.currentTitle.equals("관리자") && this.lv.get() >= Config.MIN_RANK_LV) {
-            Config.PLAYER_LV_RANK.put(this.getName(), this.lv.get());
+        if(!this.currentTitle.equals("관리자") && this.lv >= Config.MIN_RANK_LV) {
+            Config.PLAYER_LV_RANK.put(this.getName(), this.lv);
         }
     }
 
@@ -412,9 +415,9 @@ public class Player extends Entity {
         if(this.achieve.add(achieveId)) {
             Achieve achieve = Config.getData(Id.ACHIEVE, achieveId);
 
-            this.addMoney(achieve.getRewardMoney().get());
-            this.addExp(achieve.rewardExp.get());
-            this.adv.add(achieve.rewardAdv.get());
+            this.addMoney(achieve.getRewardMoney());
+            this.addExp(achieve.rewardExp);
+            this.adv += achieve.rewardAdv;
 
             StringBuilder innerMsg = new StringBuilder("---친밀도 현황---");
 
@@ -491,7 +494,7 @@ public class Player extends Entity {
 
     public boolean canAddResearch(long researchId) {
         Research research = Config.getData(Id.RESEARCH, researchId);
-        return research.getLimitLv().get() <= this.lv.get() && research.getNeedMoney().get() <= this.getMoney()
+        return research.getLimitLv() <= this.lv && research.getNeedMoney() <= this.getMoney()
                     && Config.compareMap(this.inventory, research.needItem, true, false, 0);
     }
 
@@ -499,10 +502,10 @@ public class Player extends Entity {
         if(this.research.add(researchId)) {
             Research research = Config.getData(Id.RESEARCH, researchId);
 
-            this.addMoney(-1 * research.getNeedMoney().get());
+            this.addMoney(-1 * research.getNeedMoney());
 
-            this.addExp(research.rewardExp.get());
-            this.adv.add(research.rewardAdv.get());
+            this.addExp(research.rewardExp);
+            this.adv += research.rewardAdv;
 
             StringBuilder innerMsg = new StringBuilder("---친밀도 현황---");
 
@@ -578,10 +581,10 @@ public class Player extends Entity {
     public void addQuest(long questId) {
         Quest quest = Config.getData(Id.QUEST, questId);
 
-        this.quest.put(questId, quest.getClearChatId().get());
+        this.quest.put(questId, quest.getClearChatId());
         this.addLog(LogData.QUEST_RECEIVE, 1);
 
-        long questNpcId = quest.getClearNpcId().get();
+        long questNpcId = quest.getClearNpcId();
         ConcurrentHashSet<Long> questNpcSet = this.questNpc.get(questNpcId);
 
         if(questNpcSet == null) {
@@ -637,8 +640,8 @@ public class Player extends Entity {
         if(lv == 0) {
             this.magic.remove(magicType);
         } else {
-            if(lv < Config.MIN_MAGIC_LV || lv > Config.MAX_MAGIC_LV) {
-                throw new NumberRangeException(lv, Config.MIN_MAGIC_LV, Config.MAX_MAGIC_LV);
+            if(lv < 1 || lv > Config.MAX_MAGIC_LV) {
+                throw new NumberRangeException(lv, 1, Config.MAX_MAGIC_LV);
             }
 
             this.magic.put(magicType, lv);
@@ -646,7 +649,7 @@ public class Player extends Entity {
     }
 
     public int getMagic(@NonNull MagicType magicType) {
-        return this.magic.getOrDefault(magicType, Config.MIN_MAGIC_LV);
+        return this.magic.getOrDefault(magicType,1);
     }
 
     public void addMagic(@NonNull MagicType magicType, int lv) {
@@ -657,8 +660,8 @@ public class Player extends Entity {
         if(lv == 0) {
             this.resist.remove(magicType);
         } else {
-            if(lv < Config.MIN_MAGIC_LV || lv > Config.MAX_MAGIC_LV) {
-                throw new NumberRangeException(lv, Config.MIN_MAGIC_LV, Config.MAX_MAGIC_LV);
+            if(lv < 1 || lv > Config.MAX_MAGIC_LV) {
+                throw new NumberRangeException(lv, 1, Config.MAX_MAGIC_LV);
             }
 
             this.resist.put(magicType, lv);
@@ -666,7 +669,7 @@ public class Player extends Entity {
     }
 
     public int getResist(@NonNull MagicType magicType) {
-        return this.resist.getOrDefault(magicType, Config.MIN_MAGIC_LV);
+        return this.resist.getOrDefault(magicType, 1);
     }
 
     public void addResist(@NonNull MagicType magicType, int lv) {
@@ -757,7 +760,7 @@ public class Player extends Entity {
         double dropPercent = random.nextDouble() * Config.MONEY_DROP_RANDOM + Config.MONEY_DROP_MIN;
         int dropItemCount = random.nextInt(Config.ITEM_DROP_COUNT);
 
-        long totalLoseMoney = (long) (this.getMoney() * loseMoneyPercent);
+        long totalLoseMoney = Math.max(10000, (long) (this.getMoney() * loseMoneyPercent));
         long dropMoney = (long) (totalLoseMoney * dropPercent);
         long loseMoney = totalLoseMoney - dropMoney;
 
@@ -841,7 +844,7 @@ public class Player extends Entity {
 
     @Override
     public void onKill(@NonNull Entity entity) {
-        long killExp = this.getKillExp(entity.lv.get());
+        long killExp = this.getKillExp(entity.lv);
         this.addExp(killExp);
 
         String msg = entity.getName() + "을 ";
@@ -855,7 +858,7 @@ public class Player extends Entity {
                 Emoji.LV + " 레벨: " + this.getDisplayLv();
         
         if(!entity.id.getId().equals(Id.PLAYER)) {
-            int token = Config.randomToken(ItemList.LOW_HUNTER_TOKEN.getId(), RandomList.HUNTER_TOKEN, entity.getLv().get() / 50, this);
+            int token = Config.randomToken(ItemList.LOW_HUNTER_TOKEN.getId(), RandomList.HUNTER_TOKEN, entity.getLv() / 50, this);
             
             if(token >= 0) {
                 msg += "\n\n" + Config.TIERS[token] + "급 사냥꾼의 증표 1개를 획득하였습니다";
@@ -897,7 +900,7 @@ public class Player extends Entity {
     @Override
     public boolean canFight(@NonNull Entity enemy) {
         if(enemy.id.getId().equals(Id.PLAYER)) {
-            if(enemy.getLv().get() < 10) {
+            if(enemy.getLv() < 10) {
                 return false;
             }
 
@@ -911,7 +914,7 @@ public class Player extends Entity {
     @NonNull
     @Override
     public String getName() {
-        return "[" + this.getCurrentTitle() + "] " + this.getNickName() + " (Lv." + this.getLv().get() + ")";
+        return "[" + this.getCurrentTitle() + "] " + this.getNickName() + " (Lv." + this.getLv() + ")";
     }
 
     @NonNull
@@ -923,7 +926,7 @@ public class Player extends Entity {
     @NonNull
     @Override
     public String getRealName() {
-        return this.nickName + " (Lv." + this.getLv().get() + ")";
+        return this.nickName + " (Lv." + this.getLv() + ")";
     }
 
 }

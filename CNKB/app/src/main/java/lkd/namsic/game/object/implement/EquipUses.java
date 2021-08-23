@@ -87,11 +87,11 @@ public class EquipUses {
                 Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
 
                 for(Entity entity : entitySet) {
-                    entity.addBuff(System.currentTimeMillis() + 30000L, StatType.ATS, -30);
+                    entity.addBuff(System.currentTimeMillis() + 30000L, StatType.ATS, -20);
                 }
 
-                Player.replyPlayers(playerSet, self.getName() + " 이 슬라임 바지 아이템을 사용하여 모든 적의 공격속도를 25 감소시켰습니다");
-                return "모든 적의 공격속도를 25 감소시켰습니다";
+                Player.replyPlayers(playerSet, self.getName() + " 이 슬라임 바지 아이템을 사용하여 공격속도를 30 감소시켰습니다");
+                return "모든 적의 공격속도를 30 감소시켰습니다";
             }
         });
 

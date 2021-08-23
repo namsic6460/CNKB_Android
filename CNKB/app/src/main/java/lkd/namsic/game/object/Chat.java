@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.Set;
 
 import lkd.namsic.game.enums.Variable;
-import lkd.namsic.game.base.LimitId;
-import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.WaitResponse;
+import lkd.namsic.game.enums.object.NpcList;
+import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,10 +28,17 @@ public class Chat extends GameObject {
     @Nullable
     String name;
 
-    final LimitLong delayTime = new LimitLong(Config.MIN_DELAY_TIME, Config.MIN_DELAY_TIME, Config.MAX_DELAY_TIME);
-    final LimitLong pauseTime = new LimitLong(Config.MIN_PAUSE_TIME, Config.MIN_PAUSE_TIME, Config.MAX_PAUSE_TIME);
-    final LimitId questId = new LimitId(0, Id.QUEST);
-    final LimitId noneNpcId = new LimitId(0, Id.NPC);
+    @Setter
+    long delayTime = Config.DEFAULT_DELAY_TIME;
+
+    @Setter
+    long pauseTime = Config.DEFAULT_PAUSE_TIME;
+
+    @Setter
+    long questId = QuestList.NONE.getId();
+
+    @Setter
+    long noneNpcId = NpcList.NONE.getId();
 
     @Nullable
     final Location tpLocation = null;
@@ -44,7 +51,9 @@ public class Chat extends GameObject {
     final Map<WaitResponse, Long> responseChat = new HashMap<>();
     final Map<String, Long> anyResponseChat = new HashMap<>();
 
-    final LimitLong money = new LimitLong(0, 0L, null);
+    @Setter
+    long money = 0;
+
     final Set<Long> equipment = new HashSet<>();
     final Map<Long, Integer> item = new HashMap<>();
     final Map<Variable, Integer> variable = new HashMap<>();

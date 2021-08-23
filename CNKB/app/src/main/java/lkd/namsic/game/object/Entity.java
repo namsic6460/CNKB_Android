@@ -19,8 +19,6 @@ import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.IdClass;
 import lkd.namsic.game.base.Int;
-import lkd.namsic.game.base.LimitInteger;
-import lkd.namsic.game.base.LimitLong;
 import lkd.namsic.game.base.LoNg;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
@@ -52,16 +50,16 @@ import lombok.Setter;
     Entity class can be frequently changed
 */
 
-//TODO : separate as Fightable(Npc never fight)
-
 @Getter
 public abstract class Entity extends NamedObject {
 
     @Setter
     double version = Config.VERSION;
 
-    final LimitInteger lv = new LimitInteger(Config.MIN_LV, Config.MIN_LV, Config.MAX_LV);
-    final LimitLong money = new LimitLong(0, 0L, null);
+    @Setter
+    int lv = 1;
+
+    long money = 0;
 
     @Setter
     Location location = new Location();
@@ -127,11 +125,7 @@ public abstract class Entity extends NamedObject {
         String eventName = MoneyChangeEvent.class.getName();
         MoneyChangeEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName), wrappedMoney);
 
-        this.money.set(wrappedMoney.get());
-    }
-
-    public long getMoney() {
-        return this.money.get();
+        this.money = wrappedMoney.get();
     }
 
     public void addMoney(long money) {
@@ -705,13 +699,13 @@ public abstract class Entity extends NamedObject {
     }
 
     public int getFieldDistance(@NonNull Location location) {
-        return (int) Math.sqrt(Math.pow(this.location.getFieldX().get() - location.getFieldX().get(), 2) +
-                Math.pow(this.location.getFieldY().get() - location.getFieldX().get(), 2));
+        return (int) Math.sqrt(Math.pow(this.location.getFieldX() - location.getFieldX(), 2) +
+                Math.pow(this.location.getFieldY() - location.getFieldX(), 2));
     }
 
     public int getMapDistance(@NonNull Location location) {
-        return (int) Math.sqrt(Math.pow(this.location.getX().get() - location.getX().get(), 2) +
-                Math.pow(this.location.getY().get() - location.getY().get(), 2));
+        return (int) Math.sqrt(Math.pow(this.location.getX() - location.getX(), 2) +
+                Math.pow(this.location.getY() - location.getY(), 2));
     }
 
     public Map<Id, Map<Long, Integer>> getEntityDistant() {
@@ -878,7 +872,7 @@ public abstract class Entity extends NamedObject {
     @NonNull
     @Override
     public String getName() {
-        return this.name + " (Lv." + this.getLv().get() + ")";
+        return this.name + " (Lv." + this.getLv() + ")";
     }
 
     @NonNull

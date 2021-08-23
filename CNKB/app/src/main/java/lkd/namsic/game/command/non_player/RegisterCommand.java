@@ -101,6 +101,8 @@ public class RegisterCommand extends NonPlayerCommand {
         player.replyPlayer("회원가입에 성공하였습니다!");
         Config.unloadObject(player);
 
+        Config.saveConfig();
+
         Config.loadPlayer(sender, image, room, isGroupChat, true);
         ChatManager.getInstance().startChat(player, 1L, 1L);
         Config.unloadObject(player);

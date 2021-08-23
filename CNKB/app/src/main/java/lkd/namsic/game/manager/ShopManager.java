@@ -30,19 +30,6 @@ public class ShopManager {
         return instance;
     }
 
-    public void displayHelp(@NonNull Player self) {
-        self.replyPlayer("---상점 도움말---\n" +
-                Emoji.LIST + " (도움말/명령어/?/help/h) - 상점 도움말을 표시합니다\n" +
-                Emoji.LIST + " (종료/end/e) - 상점 이용을 종료합니다\n" +
-                Emoji.LIST + " (변경/change/c) - 구매/판매 모드를 전환합니다\n" +
-                Emoji.LIST + " ({페이지}) - 해당 페이지의 상점 물품을 표시합니다\n" +
-                Emoji.LIST + " (다음/next/n) - 다음 페이지의 상점 물품을 표시합니다\n" +
-                Emoji.LIST + " (이전/prev/p) - 이전 페이지의 상점 물품을 표시합니다\n" +
-                Emoji.LIST + " (구매/buy/b) ({아이템 이름}) [{아이템 개수}] - 아이템을 구매합니다\n" +
-                Emoji.LIST + " (판매/sell/s) ({아이템 이름}) [{아이템 개수}] - 아이템을 판매합니다\n\n" +
-                "예시: " + Emoji.focus("n 상점 구매 하급 체력 포션 1"));
-    }
-
     public void startShopping(@NonNull Player self, @NonNull String npcName) {
         long npcId = NpcList.checkByName(self, npcName);
 

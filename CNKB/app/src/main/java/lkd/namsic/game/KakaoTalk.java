@@ -38,6 +38,7 @@ import lkd.namsic.game.command.player.game.ChatCommand;
 import lkd.namsic.game.command.player.game.CraftCommand;
 import lkd.namsic.game.command.player.game.EatCommand;
 import lkd.namsic.game.command.player.game.EquipCommand;
+import lkd.namsic.game.command.player.game.FarmCommand;
 import lkd.namsic.game.command.player.game.FightCommand;
 import lkd.namsic.game.command.player.game.FishCommand;
 import lkd.namsic.game.command.player.game.InfoCommand;
@@ -118,6 +119,7 @@ public class KakaoTalk {
         registerPlayerCommand(new CraftCommand(),       "제작", "craft");
         registerPlayerCommand(new EatCommand(),         "먹기", "eat");
         registerPlayerCommand(new EquipCommand(),       "장비", "equip");
+        registerPlayerCommand(new FarmCommand(),        "농사", "farm");
         registerPlayerCommand(new FightCommand(),       "전투", "fight", "f");
         registerPlayerCommand(new FishCommand(),        "낚시", "fish");
         registerPlayerCommand(new InfoCommand(),        "정보", "info", "i");

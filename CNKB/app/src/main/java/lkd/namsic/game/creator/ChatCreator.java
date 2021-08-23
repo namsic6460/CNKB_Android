@@ -73,8 +73,8 @@ public class ChatCreator implements Creatable {
                 "뭐라도 주고 가라고? 골드를 조금 넣어놨으니까 그거라도 써",
                 "아 그리고... ... ... (더 이상 들리지 않는다)"
         );
-        chat.getDelayTime().set(1500L);
-        chat.getMoney().set(1000L);
+        chat.setDelayTime(1500L);
+        chat.setMoney(1000L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 5L,
@@ -110,14 +110,14 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 10L, "고맙네! 돌을 다 구하고 다시 말을 걸어주게나");
-        chat.getQuestId().set(1L);
+        chat.setQuestId(1L);
         Config.unloadObject(chat);
 
         chat = createChat(null,11L, "그럼 어쩔 수 없지. 나중에 마음 바뀌면 다시 받아가게나");
         Config.unloadObject(chat);
 
         chat = createChat(null, 12L, "고맙네! 쓰레기를 다 수거하고 다시 말을 걸어주게나");
-        chat.getQuestId().set(2L);
+        chat.setQuestId(2L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 13L, "빨리 구해와줬군! 여기 보상이네");
@@ -163,7 +163,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 21L, "자꾸 번거롭게 해서 미안하네\n최대한 빨리 구해와주게나");
-        chat.getQuestId().set(4L);
+        chat.setQuestId(4L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 22L,
@@ -179,7 +179,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 24L, "그래도 __nickname 자네가 구해준다니 마음이 놓이는구만");
-        chat.getQuestId().set(3L);
+        chat.setQuestId(3L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 25L,
@@ -337,7 +337,7 @@ public class ChatCreator implements Creatable {
                 "좋아 좋아. 그정도 의지는 있어야지",
                 "기다리고 있겠네"
         );
-        chat.getQuestId().set(5L);
+        chat.setQuestId(5L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 54L,
@@ -376,7 +376,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 59L, "최대한 빨리 구해와라");
-        chat.getQuestId().set(QuestList.NEED_FISHING_ROD_ITEM.getId());
+        chat.setQuestId(QuestList.NEED_FISHING_ROD_ITEM.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 60L, "...... 꺼져");
@@ -396,7 +396,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 63L, "고마워! 다 구하면 다시 말 걸어줘");
-        chat.getQuestId().set(QuestList.POWER_OF_TOKEN.getId());
+        chat.setQuestId(QuestList.POWER_OF_TOKEN.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 64L, "그래? 아쉽네...");
@@ -418,7 +418,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 67L, "오 고맙군! 덕분에 선물을 만들어 줄 수 있곘군");
-        chat.getQuestId().set(QuestList.GOLD_RING_GIFT.getId());
+        chat.setQuestId(QuestList.GOLD_RING_GIFT.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 68L, "아쉽지만 별 수 없군! 다음에 또 들르게!");
@@ -444,7 +444,7 @@ public class ChatCreator implements Creatable {
                 "일단... 석탄 100개 정도면 적당할 것 같아요",
                 "다 구하시면 다시 와주세요!"
         );
-        chat.getQuestId().set(QuestList.NEED_COAL.getId());
+        chat.setQuestId(QuestList.NEED_COAL.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 72L,
@@ -475,7 +475,7 @@ public class ChatCreator implements Creatable {
                 "와아 고마워요",
                 "그럼 최대한 빨리 부탁할게요?"
         );
-        chat.getQuestId().set(QuestList.ANOTHER_PRESENT.getId());
+        chat.setQuestId(QuestList.ANOTHER_PRESENT.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 76L, "흐응.... 알겠어요");
@@ -495,7 +495,7 @@ public class ChatCreator implements Creatable {
                 "음.. 이름이 아마 스텟 머시깽이 였는데... 어쨌든...",
                 "기준이 아마 50레벨 이었을테니 50레벨을 달성하면 와서 받아가게나"
         );
-        chat.getQuestId().set(QuestList.LV50.getId());
+        chat.setQuestId(QuestList.LV50.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 79L,
@@ -510,7 +510,7 @@ public class ChatCreator implements Creatable {
                 "이번 지원은 50레벨로 끝나는게 아니라 100레벨에서도 받을 수 있다고 하네",
                 "100레벨을 달성하면 와서 그것도 받아가게나"
         );
-        chat.getQuestId().set(QuestList.LV100.getId());
+        chat.setQuestId(QuestList.LV100.getId());
         Config.unloadObject(chat);
 
         chat = createChat("너답지 않게 고민이 있어 보이네?", 81L,
@@ -524,7 +524,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 82L, "고마워. 대신 구해오면 괜찮은거 알려줄게");
-        chat.getQuestId().set(QuestList.MEMORIAL_CEREMONY.getId());
+        chat.setQuestId(QuestList.MEMORIAL_CEREMONY.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 83L,
@@ -553,7 +553,7 @@ public class ChatCreator implements Creatable {
                 "아 다행이다",
                 "그럼 다 구하고 다시 말걸어줘"
         );
-        chat.getQuestId().set(QuestList.MAGIC_OF_SPIDER_EYE.getId());
+        chat.setQuestId(QuestList.MAGIC_OF_SPIDER_EYE.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 87L, "음 직접 구해야 할려나...?");
@@ -580,7 +580,7 @@ public class ChatCreator implements Creatable {
                 "정말 고마워요!",
                 "보수는 넉넉히 챙겨 드릴게요"
         );
-        chat.getQuestId().set(QuestList.STICKY_SLIME.getId());
+        chat.setQuestId(QuestList.STICKY_SLIME.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 91L,
@@ -608,7 +608,7 @@ public class ChatCreator implements Creatable {
         chat = createChat(null, 94L,
                 "그럼 빨리 구해와주세요~"
         );
-        chat.getQuestId().set(QuestList.HERB_COLLECTING.getId());
+        chat.setQuestId(QuestList.HERB_COLLECTING.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 95L, "아쉽네요, 엘릭서 허브에 관심이 있으실 줄 알았는데...");
@@ -619,7 +619,7 @@ public class ChatCreator implements Creatable {
                 "(숲의 기운이 강하게 느껴진다)",
                 "여기 주기로 했던 엘릭서 허브예요"
         );
-        chat.getPauseTime().set(4000L);
+        chat.setPauseTime(4000L);
         Config.unloadObject(chat);
 
         chat = createChat(null, 97L, "힝...");
@@ -638,7 +638,7 @@ public class ChatCreator implements Creatable {
             Config.unloadObject(chat);
 
             chat = createChat(null, chatId + 1, "감사합니다");
-            chat.getQuestId().set(QuestList.GEM_COLLECTING_QUARTZ.getId() + i);
+            chat.setQuestId(QuestList.GEM_COLLECTING_QUARTZ.getId() + i);
             Config.unloadObject(chat);
         }
 
@@ -647,7 +647,7 @@ public class ChatCreator implements Creatable {
                 "으으........",
                 "(엘프의 치료법을 묻기 위해 " + Emoji.focus("엘") + " 에게 가보자)"
         );
-        chat.getQuestId().set(QuestList.HEALING_ELF1.getId());
+        chat.setQuestId(QuestList.HEALING_ELF1.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 129L,
@@ -656,7 +656,7 @@ public class ChatCreator implements Creatable {
                 "일단 엘릭서 허브를 그 엘프에게 주면 어느정도 회복할거예요",
                 "제가 가지고 있는 엘릭서 허브를 하나 드릴테니 가서 회복시켜주세요"
         );
-        chat.getQuestId().set(QuestList.HEALING_ELF2.getId());
+        chat.setQuestId(QuestList.HEALING_ELF2.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 130L,
@@ -692,7 +692,7 @@ public class ChatCreator implements Creatable {
                 "하하 역시 시원시원할 줄 알았어",
                 "그럼 기다릴테니 빨리 구해와라"
         );
-        chat.getQuestId().set(QuestList.LEATHER_COLLECTING1.getId());
+        chat.setQuestId(QuestList.LEATHER_COLLECTING1.getId());
         Config.unloadObject(chat);
         
         chat = createChat(null, 136L, "이런 아쉽구만");
@@ -710,7 +710,7 @@ public class ChatCreator implements Creatable {
                 "좋아 좋아. 덕분에 일이 편해지는군",
                 "이번에도 10개 정도면 될거다"
         );
-        chat.getQuestId().set(QuestList.LEATHER_COLLECTING2.getId());
+        chat.setQuestId(QuestList.LEATHER_COLLECTING2.getId());
         Config.unloadObject(chat);
 
         chat = createChat("이제 가죽은 한동안 충분하겠네요", 139L,
@@ -726,7 +726,7 @@ public class ChatCreator implements Creatable {
                 "크으 오랜만에 몸 쓸 준비를 좀 해야겠구만",
                 "기다리고 있을테니 5개 정도만 가져와"
         );
-        chat.getQuestId().set(QuestList.LEATHER_COLLECTING3.getId());
+        chat.setQuestId(QuestList.LEATHER_COLLECTING3.getId());
         Config.unloadObject(chat);
         
         chat = createChat(null, 141L,
@@ -745,7 +745,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
         
         chat = createChat(null, 143L, "감사합니다..! 꼭 보상해드릴게요");
-        chat.getQuestId().set(QuestList.INCREASING_ZOMBIE.getId());
+        chat.setQuestId(QuestList.INCREASING_ZOMBIE.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 144L, "생각보다 훨씬 차가운 분이셨네요...");
@@ -768,7 +768,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
         
         chat = createChat(null, 147L, "그래, 빨리가서 저 망할 뼈다귀들을 없애버리라고");
-        chat.getQuestId().set(QuestList.BONE_IN_THE_SEA.getId());
+        chat.setQuestId(QuestList.BONE_IN_THE_SEA.getId());
         Config.unloadObject(chat);
         
         chat = createChat(null, 148L,
@@ -793,7 +793,7 @@ public class ChatCreator implements Creatable {
                 "아이고 고맙네",
                 "싱크홀이 생각보다 깊으니 조심하게나"
         );
-        chat.getQuestId().set(QuestList.SOUND_IN_THE_SINKHOLE.getId());
+        chat.setQuestId(QuestList.SOUND_IN_THE_SINKHOLE.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 152L,
@@ -809,7 +809,7 @@ public class ChatCreator implements Creatable {
                 "아무래도 이건 내 선에서 해결되지 않을 것 같구만",
                 "일단 확인해줘서 고맙네"
         );
-        chat.getNoneNpcId().set(NpcList.ABEL.getId());
+        chat.setNoneNpcId(NpcList.ABEL.getId());
         chat.setResponseChat(WaitResponse.NONE, 154L);
         Config.unloadObject(chat);
 
@@ -821,7 +821,7 @@ public class ChatCreator implements Creatable {
                 "세번째, 넌 그 때 죽지 않았어",
                 "....."
         );
-        chat.getDelayTime().set(1000L);
+        chat.setDelayTime(1000L);
         Config.unloadObject(chat);
 
         Logger.i("ObjectMaker", "Chat making is done!");

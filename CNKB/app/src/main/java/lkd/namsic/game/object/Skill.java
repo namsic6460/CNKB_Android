@@ -16,15 +16,20 @@ import lombok.Getter;
 @Getter
 public class Skill extends NamedObject {
 
-    final String description;
+    @Nullable
+    final String activeDes;
 
-    public Skill(@NonNull SkillList skillData, @NonNull String description) {
+    @Nullable
+    final String passiveDes;
+
+    public Skill(@NonNull SkillList skillData, @Nullable String activeDes, @Nullable String passiveDes) {
         super(skillData.getDisplayName());
 
         this.id.setId(Id.SKILL);
         this.id.setObjectId(skillData.getId());
 
-        this.description = description;
+        this.activeDes = activeDes;
+        this.passiveDes = passiveDes;
     }
 
     @Nullable

@@ -29,6 +29,7 @@ public class ObjectCreator {
                 Config.IGNORE_FILE_LOG = true;
 
                 new ItemCreator().start();
+                new PlantCreator().start();
                 new EquipCreator().start();
                 new MonsterCreator().start();
                 new MapCreator().start();

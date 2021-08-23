@@ -57,6 +57,13 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " (낚시/fish) [{낚시 레벨}] : 낚시를 합니다\n\n" +
                         Emoji.LIST + " (전투/fight/f) ({플레이어 닉네임}/{번호}) : 전투를 시작합니다\n\n" +
                         Emoji.LIST + " (모험/adventure/adv) : 모험을 합니다\n\n" +
+                        Emoji.LIST + " *(농사/farm) : 농장에 대한 설명을 표시합니다\n\n" +
+                        Emoji.LIST + " (농사/farm) (구입/구매/buy) : 농장을 구매합니다\n\n" +
+                        Emoji.LIST + " (농사/farm) (심기/plant) ({씨앗 이름}) [{개수}] : 농장에 씨앗을 심습니다\n\n" +
+                        Emoji.LIST + " *(농사/farm) (확인/check) : 농장을 확인합니다\n\n" +
+                        Emoji.LIST + " (농사/farm) (제거/remove) ({씨앗 번호}) : 씨앗을 제거합니다\n\n" +
+                        Emoji.LIST + " (농사/farm) (수확/harvest) : 작물을 수확합니다\n\n" +
+                        Emoji.LIST + " (농사/farm) (업그레이드/upgrade) : 농장을 업그레이드 합니다\n\n" +
                         Emoji.LIST + " (스텟/stat) : 스텟 정보를 표시합니다\n\n" +
                         Emoji.LIST + " (스텟/stat) ({스텟 이름}) ({숫자}) : SP를 소모하여 스텟을 증가시킵니다\n\n" +
                         Emoji.LIST + " *(제작/craft) (아이템/item/장비/equip) : 제작 가능한 아이템 또는 장비 목록을 표시합니다\n\n" +
@@ -67,12 +74,14 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " (강화/제련/reinforce/r) (정보/info) : 장착중인 장비들의 강화 상태를 표시합니다\n\n" +
                         Emoji.LIST + " (강화/제련/reinforce/r) ({장비 번호}) : 장비를 강화합니다\n\n" +
                         Emoji.LIST + " *(상점/shop) (도움말/명령어/?/help/h) : 상점 도움말을 표시합니다\n\n" +
+                        Emoji.LIST + " *(상점/shop) (목록/list) : 현재 위치에서 이용 가능한 상점 목록을 표시합니다\n\n" +
                         Emoji.LIST + " (상점/shop) ({Npc 이름}) : 상점을 이용합니다\n\n" +
                         Emoji.LIST + " *(랭킹/랭크/ranking/rank) [레벨] : 레벨 랭킹을 표시합니다\n\n" +
                         Emoji.LIST + " *(설정/setting/set) (가방/인벤토리/inventory/inven) (추가/add) ({아이템 이름}) : " +
                         "아이템을 인벤토리 표시 우선순위 목록에 추가합니다\n\n" +
                         Emoji.LIST + " *(설정/setting/set) (가방/인벤토리/inventory/inven) (제거/remove) ({아이템 이름}) : " +
-                        "아이템을 인벤토리 표시 우선순위 목록에서 제거합니다\n\n"
+                        "아이템을 인벤토리 표시 우선순위 목록에서 제거합니다\n\n" +
+                        Emoji.LIST + " *(설정/setting/set) (공개/public) : 자신의 정보를 공개 또는 비공개 상태로 전환합니다"
         );
     }
 

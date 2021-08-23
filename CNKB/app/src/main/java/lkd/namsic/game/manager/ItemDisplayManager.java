@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
@@ -105,7 +106,6 @@ public class ItemDisplayManager {
         }
 
         if(sortedList.isEmpty()) {
-            //아이템의 경우, 기본으로 제공되는 제작법이 존재한다
             msg.append("\n제작법을 아는 장비가 없습니다");
             self.replyPlayer(msg.toString());
             return;
@@ -230,7 +230,7 @@ public class ItemDisplayManager {
         }
 
         Item item = Config.getData(Id.ITEM, itemId);
-        self.replyPlayer("[" + item.getName() + "]\n" + item.getDescription());
+        self.replyPlayer(Emoji.focus(item.getName()) + "\n" + item.getDescription());
     }
 
     public void displayEquipInfo(@NonNull Player self, @NonNull String equipName) {
@@ -250,7 +250,27 @@ public class ItemDisplayManager {
     public void displayEquipInfo(@NonNull Player self, long equipId) {
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
 
-        StringBuilder innerBuilder = new StringBuilder(equipment.getName() + " 의 정보\n\n장착 제한 레벨: ")
+        StringBuilder innerBuilder = new StringBuilder(equipment.getRealName() + " 의 정보\n\n장비 등급: ")
+                .append(equipment.getHandleLv())
+                .append("\n\n[액티브] ");
+        
+        String description = equipment.getActiveDes();
+        if(description == null) {
+            innerBuilder.append("액티브 효과가 없습니다");
+        } else {
+            innerBuilder.append(description);
+        }
+
+        innerBuilder.append("\n\n[패시브] ");
+
+        description = equipment.getPassiveDes();
+        if(description == null) {
+            innerBuilder.append("패시브 효과가 없습니다");
+        } else {
+            innerBuilder.append(description);
+        }
+
+        innerBuilder.append("\n\n장착 제한 레벨: ")
                 .append(equipment.getTotalLimitLv())
                 .append("\n강화 성공 확률: ")
                 .append(Config.getDisplayPercent(equipment.getReinforcePercent(self.getReinforceMultiplier())))
@@ -407,13 +427,13 @@ public class ItemDisplayManager {
 
                 innerBuilder.append(equipment.getName());
 
-                if(equipment.getReinforceCount().get() != Config.MAX_REINFORCE_COUNT) {
+                if(equipment.getReinforceCount() != Config.MAX_REINFORCE_COUNT) {
                     innerBuilder.append("\n강화 성공 확률: ")
                             .append(Config.getDisplayPercent(equipment.getReinforcePercent(multiplier)))
                             .append("(x")
                             .append(multiplier)
                             .append(")\n현재 강화 실패 횟수: ")
-                            .append(equipment.getReinforceFloor2().get())
+                            .append(equipment.getReinforceFloor2())
                             .append("회\n강화 재료: ")
                             .append(ItemList.findById(equipment.getReinforceItem()))
                             .append("\n강화 비용: ")

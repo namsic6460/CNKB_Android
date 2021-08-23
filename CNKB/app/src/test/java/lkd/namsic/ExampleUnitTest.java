@@ -2,11 +2,21 @@ package lkd.namsic;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import org.junit.Test;
 
 import java.io.File;
+import java.lang.reflect.Type;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.Location;
@@ -35,50 +45,108 @@ public class ExampleUnitTest {
 
     @Test
     public void test() {
-        Player player1 = new Player("", "", "", "");
-        player1.getId().setObjectId(1);
+        Set<String> set = new LinkedHashSet<>();
+        set.add("a");
+        set.add("c");
+        set.add("b");
+        set.add("e");
+        set.add("d");
 
-        Player player2 = new Player("", "", "", "");
-        player2.getId().setObjectId(1);
+        System.out.println(new Gson().toJson(set));
 
-        System.out.println(player1.hashCode());
-        System.out.println(player2.hashCode());
-        System.out.println(player1.equals(player2));
+        set = new HashSet<>();
+        set.add("a");
+        set.add("c");
+        set.add("b");
+        set.add("e");
+        set.add("d");
+
+        System.out.println(new Gson().toJson(set));
     }
 
     @Test
     public void loadTest() throws Exception {
-        File[] files = new File("C:\\Users\\user\\Downloads\\players").listFiles();
-        Gson gson  =new GsonBuilder()
-                .registerTypeAdapter(Npc.class, new NpcAdapter())
+        File[] files = Objects.requireNonNull(new File("C:\\Users\\user\\Downloads\\players").listFiles());
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Equipment.class, new TestEquipAdapter())
+                .registerTypeAdapter(Player.class, new TestPlayerAdapter())
                 .registerTypeAdapter(Location.class, new LocationAdapter())
-                .registerTypeAdapter(ChatLimit.class, new ChatLimitAdapter())
                 .create();
 
-        assert files != null;
-
-        String jsonString;
         for(File file : files) {
-            jsonString = FileManager.read(file);
+//        File file = new File("C:\\Users\\user\\Downloads\\CNKB\\pl\\0w0-QGiQrMIAkQJDLQQOf4-oV7b9XZP-59-jUYi0CDlOfw8Nvr1DXV+-1955777633+18829.json");
+            String jsonStr = FileManager.read(file);
 
-            try {
-                gson.fromJson(jsonString, Player.class);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println(file.getName());
-                System.out.println(jsonString);
-
-                return;
-            }
+            System.out.println(file.getAbsolutePath());
+            Player player = gson.fromJson(jsonStr, Player.class);
+//            System.out.println(gson.toJson(player));
+            FileManager.save(file.getAbsolutePath(), gson.toJson(player));
         }
+
+        System.out.println("DONE");
+    }
+
+    static class TestEquipAdapter implements JsonDeserializer<Equipment> {
+
+        @Override
+        public Equipment deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            JsonObject jsonObject = json.getAsJsonObject();
+
+            JsonObject tempObject = jsonObject.remove("handleLv").getAsJsonObject();
+            jsonObject.addProperty("handleLv", tempObject.get("value").getAsInt());
+
+            tempObject = jsonObject.remove("limitLv").getAsJsonObject();
+            jsonObject.addProperty("limitLv", tempObject.get("value").getAsInt());
+
+            tempObject = jsonObject.remove("reinforceCount").getAsJsonObject();
+            jsonObject.addProperty("reinforceCount", tempObject.get("value").getAsInt());
+
+            tempObject = jsonObject.remove("reinforceFloor1").getAsJsonObject();
+            jsonObject.addProperty("reinforceFloor1", tempObject.get("value").getAsDouble());
+
+            tempObject = jsonObject.remove("reinforceFloor2").getAsJsonObject();
+            jsonObject.addProperty("reinforceFloor2", tempObject.get("value").getAsInt());
+
+            return new Gson().fromJson(jsonObject, Equipment.class);
+        }
+
+    }
+
+    static class TestPlayerAdapter implements JsonDeserializer<Player> {
+
+        @Override
+        public Player deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            JsonObject jsonObject = json.getAsJsonObject();
+
+            JsonObject tempObject = jsonObject.remove("adv").getAsJsonObject();
+            jsonObject.addProperty("adv", tempObject.get("value").getAsInt());
+
+            tempObject = jsonObject.remove("exp").getAsJsonObject();
+            jsonObject.addProperty("exp", tempObject.get("value").getAsLong());
+
+            tempObject = jsonObject.remove("sp").getAsJsonObject();
+            jsonObject.addProperty("sp", tempObject.get("value").getAsInt());
+
+            tempObject = jsonObject.remove("lv").getAsJsonObject();
+            jsonObject.addProperty("lv", tempObject.get("value").getAsInt());
+
+            tempObject = jsonObject.remove("money").getAsJsonObject();
+            jsonObject.addProperty("money", tempObject.get("value").getAsLong());
+
+            return new GsonBuilder()
+                    .registerTypeAdapter(Location.class, new LocationAdapter())
+                    .create()
+                    .fromJson(jsonObject, Player.class);
+        }
+
     }
 
     @Test
     public void reinforceTest() {
         int total = 0;
 
-        Equipment equipment = new Equipment(EquipType.WEAPON, EquipList.HEAD_HUNTER_1, "");
-        equipment.getHandleLv().set(6);
+        Equipment equipment = new Equipment(EquipType.WEAPON, EquipList.HEAD_HUNTER_1, null, null);
+        equipment.setHandleLv(6);
 
         Random random = new Random();
         double basePercent;

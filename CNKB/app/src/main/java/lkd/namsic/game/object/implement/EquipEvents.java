@@ -74,7 +74,7 @@ public class EquipEvents {
         put(EquipList.HEAD_HUNTER_1.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
                                      @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     if(canCrit && !isCrit.get()) {
                         if(Math.random() < 0.25) {
@@ -89,7 +89,7 @@ public class EquipEvents {
         put(EquipList.GHOST_SWORD_1.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
                                      @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     int maxHp = victim.getStat(StatType.MAXHP);
                     totalDmg.add(maxHp * 0.03);
@@ -112,7 +112,7 @@ public class EquipEvents {
                 public void onDamaged(@NonNull Entity self, @NonNull Entity attacker,
                                       @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
                     if(isCrit.get()) {
-                        totalDmg.multiple(0.8);
+                        totalDmg.multiple(0.85);
                     }
                 }
             });
@@ -123,7 +123,7 @@ public class EquipEvents {
                 @Override
                 public void onDamaged(@NonNull Entity self, @NonNull Entity attacker,
                                       @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
-                    if(isCrit.get() && Math.random() < 0.2) {
+                    if(isCrit.get() && Math.random() < 0.4) {
                         totalDmg.divide(2);
                     }
                 }
@@ -133,7 +133,7 @@ public class EquipEvents {
         put(EquipList.LOW_ALLOY_SHOES.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
                                      @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     long equippedId = self.getEquipped(EquipType.WEAPON);
                     if(equippedId == EquipList.NONE.getId()) {
@@ -142,7 +142,7 @@ public class EquipEvents {
 
                     Equipment equipped = Config.getData(Id.EQUIPMENT, equippedId);
                     if(equipped.getOriginalId() == EquipList.MIX_SWORD.getId()) {
-                        totalDmg.add(5);
+                        totalDmg.add(10);
                     }
                 }
             });
@@ -151,7 +151,7 @@ public class EquipEvents {
         put(EquipList.LOW_MANA_SWORD.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
                                      @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     self.addBasicStat(StatType.MN, 1);
                 }
@@ -194,7 +194,7 @@ public class EquipEvents {
             });
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
                                      @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     boolean used = self.getObjectVariable(Variable.SLIME_CHESTPLATE_USE, false);
 
@@ -226,7 +226,7 @@ public class EquipEvents {
             });
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
                                      @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     boolean weirdLeggings = self.getObjectVariable(Variable.WEIRD_LEGGINGS, false);
 
@@ -246,7 +246,7 @@ public class EquipEvents {
             put(MineEvent.getName(), new MineEvent() {
                 @Override
                 public void onMine(@NonNull Entity self, @NonNull Item item, @NonNull Int mineCount) {
-                    if(item.getId().getObjectId() == ItemList.STONE.getId() && Math.random() < 0.25) {
+                    if(item.getId().getObjectId() == ItemList.STONE.getId() && Math.random() < 0.4) {
                         mineCount.add(1);
                     }
                 }
@@ -256,12 +256,12 @@ public class EquipEvents {
         put(EquipList.TROLL_CLUB.getId(), new HashMap<String, Event>() {{
             put(DamageEvent.getName(), new DamageEvent() {
                 @Override
-                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg, 
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
                                      @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
                     boolean trollClub = self.getObjectVariable(Variable.TROLL_CLUB, false);
 
                     if(trollClub) {
-                        if(victim.getId().getId().equals(Id.MONSTER) && self.getLv().get() > victim.getLv().get()) {
+                        if(victim.getId().getId().equals(Id.MONSTER) && self.getLv() > victim.getLv()) {
                             totalDmg.multiple(3);
                         }
 
@@ -316,7 +316,7 @@ public class EquipEvents {
 
                     if(MapType.waterList().contains(mapType) || mapType.equals(MapType.CORRUPTED_RIVER)) {
                         if(canCrit && Math.random() < 0.5) {
-                            magicDmg.multiple(1.25);
+                            magicDmg.multiple(1.4);
                         }
                     }
                 }

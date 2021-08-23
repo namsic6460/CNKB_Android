@@ -17,7 +17,7 @@ import lombok.Getter;
 @Getter
 public class ChatLimit {
 
-    final RangeInteger limitLv = new RangeInteger(Config.MIN_LV, Config.MAX_LV);
+    final RangeInteger limitLv = new RangeInteger(1, Config.MAX_LV);
     final RangeIntegerMap<Long> limitCloseRate = new RangeIntegerMap<>(
             new HashMap<>(), new HashMap<>(), Long.class
     );
@@ -38,7 +38,7 @@ public class ChatLimit {
     final RangeInteger limitHour2 = new RangeInteger(24, 24);
 
     public boolean isAvailable(@NonNull Player player) {
-        boolean flag = this.getLimitLv().isInRange(player.getLv().get()) &&
+        boolean flag = this.getLimitLv().isInRange(player.getLv()) &&
                 this.limitCloseRate.isInRange(player.getCloseRate()) &&
                 player.compareStat(this.limitStat.getMin(), true) &&
                 player.compareStat(this.limitStat.getMax(), false) &&

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lkd.namsic.game.base.LimitInteger;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
@@ -17,11 +16,13 @@ import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public abstract class AiEntity extends Entity implements Cloneable {
 
-    final LimitInteger maxIncrease = new LimitInteger(Config.MIN_AI_INCREASE, Config.MIN_AI_INCREASE, null);
+    @Setter
+    int maxIncrease = 0;
 
     @Getter(AccessLevel.NONE)
     private int currentIncrease = 0;
@@ -129,17 +130,17 @@ public abstract class AiEntity extends Entity implements Cloneable {
 
     @Override
     public void onKill(@NonNull Entity entity) {
-        long gap = this.lv.get() - entity.lv.get();
+        long gap = this.lv - entity.lv;
 
         this.revalidateBuff();
         entity.revalidateBuff();
 
-        if(gap <= 20 && currentIncrease <= maxIncrease.get()) {
-            this.lv.add(1);
+        if(gap <= 20 && currentIncrease <= maxIncrease) {
+            this.lv += 1;
             currentIncrease++;
 
-            this.setBasicStat(StatType.HP, (int) (this.getStat(StatType.MAXHP) * 0.1));
-            this.setBasicStat(StatType.MN, (int) (this.getStat(StatType.MAXMN) * 0.5));
+            this.addBasicStat(StatType.HP, (int) (this.getStat(StatType.MAXHP) * 0.1));
+            this.addBasicStat(StatType.MN, (int) (this.getStat(StatType.MAXMN) * 0.5));
 
             for(StatType statType : StatType.values()) {
                 try {

@@ -24,7 +24,6 @@ import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Item;
 import lkd.namsic.game.object.Player;
-import lkd.namsic.setting.Logger;
 
 public class ItemManager {
 
@@ -167,7 +166,7 @@ public class ItemManager {
         }
 
         self.addItem(itemId, count * -1);
-        self.replyPlayer(item.getName() + " " + count + "개를 먹었습니다", innerBuilder.toString());
+        self.replyPlayer(Emoji.focus(item.getName()) + " " + count + "개를 먹었습니다", innerBuilder.toString());
     }
 
     public void craft(@NonNull Player self, @NonNull String itemName, int count, @Nullable Integer recipeIdx) {

@@ -17,7 +17,7 @@ public class StatManager {
     }
 
     public void increaseStat(@NonNull Player self, @NonNull StatType statType, int stat) {
-        int sp = self.getSp().get();
+        int sp = self.getSp();
         int requiredSp = statType.getUseSp() * stat;
 
         if(statType.equals(StatType.AGI)) {
@@ -42,7 +42,7 @@ public class StatManager {
 
         int prevStat = self.getStat(statType);
         self.addBasicStat(statType, stat);
-        self.getSp().add(requiredSp * -1);
+        self.setSp(self.getSp() + (-1 * requiredSp));
 
         if(statType.equals(StatType.MAXHP)) {
             self.addBasicStat(StatType.HP, stat);

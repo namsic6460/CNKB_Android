@@ -232,7 +232,16 @@ public enum ItemList {
     HORN_OF_IMP("임프의 뿔", 188L),
     IMP_HEART("임프의 심장", 189L),
     HORN_OF_LOW_DEVIL("하급 악마의 뿔", 190L),
-    LOW_DEVIL_SOUL("하급 악마의 영혼", 191L);
+    LOW_DEVIL_SOUL("하급 악마의 영혼", 191L),
+
+    GOLD_FRUIT("골드 열매", 192L),
+    EXP_FRUIT("경험치 열매", 193L),
+    SMALL_GOLD_SEED("작은 골드 씨앗", 194L),
+    GOLD_SEED("골드 씨앗", 195L),
+    BIG_GOLD_SEED("큰 골드 씨앗", 196L),
+    SMALL_EXP_SEED("작은 경험치 씨앗", 197L),
+    EXP_SEED("경험치 씨앗", 198L),
+    BIG_EXP_SEED("큰 경험치 씨앗", 199L);
 
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();
@@ -242,6 +251,9 @@ public enum ItemList {
             nameMap.put(value.displayName, value);
             idMap.put(value.id, value);
         }
+
+        nameMap.remove(NONE.displayName);
+        idMap.remove(NONE.id);
     }
 
     @Getter

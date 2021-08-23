@@ -32,7 +32,7 @@ public class ItemUses {
             @NonNull
             @Override
             public String use(@NonNull Entity self, @Nullable String other) {
-                int money = Math.min(1000, new Random().nextInt(10 * self.getLv().get()) + 500);
+                int money = Math.min(1500, new Random().nextInt(10 * self.getLv()) + 500);
 
                 self.addMoney(money);
                 return "골드 주머니를 사용하여 " + money + "G 를 획득했습니다\n" + Emoji.GOLD + " 골드: " + self.getMoney();
@@ -43,7 +43,7 @@ public class ItemUses {
             @NonNull
             @Override
             public String use(@NonNull Entity self, @Nullable String other) {
-                int money = Math.min(10000, new Random().nextInt(50 * self.getLv().get()) + 3000);
+                int money = Math.min(10000, new Random().nextInt(50 * self.getLv()) + 3000);
 
                 self.addMoney(money);
                 return "골드 보따리를 사용하여 " + money + "G 를 획득했습니다\n" + Emoji.GOLD + " 골드: " + self.getMoney();
@@ -111,8 +111,8 @@ public class ItemUses {
                 if (Math.random() < 0.5) {
                     Player player = (Player) self;
 
-                    player.getSp().add(1);
-                    return "스텟 포인트를 1 획득하였습니다\n" + Emoji.SP + " 스텟 포인트: " + player.getSp().get();
+                    player.setSp(player.getSp() + 1);
+                    return "스텟 포인트를 1 획득하였습니다\n" + Emoji.SP + " 스텟 포인트: " + player.getSp();
                 } else {
                     return "스텟 포인트를 획득하는데에 실패했습니다...";
                 }
@@ -126,8 +126,8 @@ public class ItemUses {
                 if (Math.random() < 0.5) {
                     Player player = (Player) self;
 
-                    player.getAdv().add(1);
-                    return "모험 스텟을 1 획득하였습니다\n" + Emoji.ADV + " 모험: " + player.getAdv().get();
+                    player.setAdv(player.getAdv() + 1);
+                    return "모험 스텟을 1 획득하였습니다\n" + Emoji.ADV + " 모험: " + player.getAdv();
                 } else {
                     return "모험 스텟을 획득하는데에 실패했습니다...";
                 }
@@ -201,7 +201,7 @@ public class ItemUses {
             @NonNull
             @Override
             public String use(@NonNull Entity self, @Nullable String other) {
-                long exp = new Random().nextInt(500 * self.getLv().get()) + 20000;
+                long exp = Math.min(50000, new Random().nextInt(500 * self.getLv()) + 20000);
 
                 Player player = (Player) self;
                 player.addExp(exp);
@@ -213,7 +213,7 @@ public class ItemUses {
             @NonNull
             @Override
             public String use(@NonNull Entity self, @Nullable String other) {
-                long exp = new Random().nextInt(8000 * self.getLv().get()) + 150_000;
+                long exp = Math.min(1_000_000, new Random().nextInt(8000 * self.getLv()) + 150_000);
 
                 Player player = (Player) self;
                 player.addExp(exp);
@@ -225,7 +225,7 @@ public class ItemUses {
             @NonNull
             @Override
             public String use(@NonNull Entity self, @Nullable String other) {
-                long exp = new Random().nextInt(100_000 * self.getLv().get()) + 3_000_000;
+                long exp = Math.min(30_000_000, new Random().nextInt(100_000 * self.getLv()) + 3_000_000);
 
                 Player player = (Player) self;
                 player.addExp(exp);

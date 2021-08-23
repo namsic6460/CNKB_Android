@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import lkd.namsic.game.command.PlayerCommand;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.WeirdCommandException;
@@ -63,6 +64,18 @@ public class SettingCommand extends PlayerCommand {
             } else {
                 throw new WeirdCommandException();
             }
+        } else if(second.equals("공개") || second.equals("public")) {
+            boolean isPublic = !player.getObjectVariable(Variable.INFO_PUBLIC, true);
+            player.setVariable(Variable.INFO_PUBLIC, isPublic);
+
+            String msg;
+            if(isPublic) {
+                msg = "공개";
+            } else {
+                msg = "비공개";
+            }
+            
+            player.replyPlayer("이제 당신의 정보는 " + Emoji.focus(msg) + " 상태입니다");
         }
     }
 

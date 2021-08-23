@@ -55,6 +55,12 @@ public class ShopCreator implements Creatable {
         shop.addSellItem(ItemList.LOW_ELIXIR, 130L);
         shop.addSellItem(ItemList.ELIXIR, 1000L);
         shop.addSellItem(ItemList.HIGH_ELIXIR, 4000L);
+        shop.addSellItem(ItemList.SMALL_GOLD_SEED, 10000L);
+        shop.addSellItem(ItemList.GOLD_SEED, 100_000L);
+        shop.addSellItem(ItemList.BIG_GOLD_SEED, 500_000L);
+        shop.addSellItem(ItemList.SMALL_EXP_SEED, 10000L);
+        shop.addSellItem(ItemList.EXP_SEED, 100_000L);
+        shop.addSellItem(ItemList.BIG_EXP_SEED, 1_000_000L);
 
         shop.addBuyItem(ItemList.HERB, 1L);
         shop.addBuyItem(ItemList.LEAF, 1L);
@@ -78,8 +84,8 @@ public class ShopCreator implements Creatable {
 
         shop = new Shop(NpcList.PEDRO);
 
-        shop.addBuyItem(ItemList.STONE_LUMP, 12L);
-        shop.addBuyItem(ItemList.COAL, 2L);
+        shop.addBuyItem(ItemList.STONE_LUMP, 30L);
+        shop.addBuyItem(ItemList.COAL, 5L);
 
         for(ItemList gem : Config.GEMS) {
             shop.addBuyItem(gem, 1000L);

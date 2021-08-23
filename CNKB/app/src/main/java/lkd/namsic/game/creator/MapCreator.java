@@ -30,14 +30,14 @@ public class MapCreator implements Creatable {
 
         map = new GameMap(MapList.findByLocation(0, 3));
         map.setMapType(MapType.SINKHOLE);
-        map.getRequireLv().set(60);
+        map.setRequireLv(60);
         map.getLocation().set(0, 3, 1, 1);
         map.setSpawnMonster(MonsterList.IMP.getId(), 1D, 4);
         Config.unloadMap(map);
 
         map = new GameMap(MapList.findByLocation(0, 4));
         map.setMapType(MapType.CORRUPTED_RIVER);
-        map.getRequireLv().set(100);
+        map.setRequireLv(100);
         map.getLocation().set(0, 4, 1, 1);
         map.setSpawnMonster(MonsterList.LOW_DEVIL.getId(), 1D, 3);
         Config.unloadMap(map);
@@ -55,28 +55,28 @@ public class MapCreator implements Creatable {
 
         map = new GameMap(MapList.findByLocation(1, 2));
         map.setMapType(MapType.SWAMP);
-        map.getRequireLv().set(40);
+        map.setRequireLv(40);
         map.getLocation().set(1, 2, 1, 1);
         map.setSpawnMonster(MonsterList.SLIME.getId(), 1, 8);
         Config.unloadMap(map);
 
         map = new GameMap(MapList.findByLocation(2, 0));
         map.setMapType(MapType.FIELD);
-        map.getRequireLv().set(5);
+        map.setRequireLv(5);
         map.getLocation().set(2, 0, 1, 1);
         map.setSpawnMonster(MonsterList.PIG.getId(), 1D, 8);
         Config.unloadMap(map);
 
         map = new GameMap(MapList.findByLocation(2, 1));
         map.setMapType(MapType.FIELD);
-        map.getRequireLv().set(15);
+        map.setRequireLv(15);
         map.getLocation().set(2, 1, 1, 1);
         map.setSpawnMonster(MonsterList.COW.getId(), 1D, 8);
         Config.unloadMap(map);
 
         map = new GameMap(MapList.findByLocation(2, 2));
         map.setMapType(MapType.CEMETERY);
-        map.getRequireLv().set(20);
+        map.setRequireLv(20);
         map.getLocation().set(2, 2, 1, 1);
         map.setSpawnMonster(MonsterList.SKELETON.getId(), 1D, 6);
         map.setSpawnMonster(MonsterList.ZOMBIE.getId(), 1D, 3);
@@ -84,21 +84,21 @@ public class MapCreator implements Creatable {
 
         map = new GameMap(MapList.findByLocation(3, 0));
         map.setMapType(MapType.FIELD);
-        map.getRequireLv().set(50);
+        map.setRequireLv(50);
         map.getLocation().set(3, 0, 1, 1);
         map.setSpawnMonster(MonsterList.ENT.getId(), 1D, 16);
         Config.unloadMap(map);
 
         map = new GameMap(MapList.findByLocation(3, 1));
         map.setMapType(MapType.FOREST);
-        map.getRequireLv().set(60);
+        map.setRequireLv(60);
         map.getLocation().set(3, 1, 1, 1);
         map.setSpawnMonster(MonsterList.TROLL.getId(), 1D, 3);
         Config.unloadMap(map);
 
         map = new GameMap(MapList.findByLocation(3, 2));
         map.setMapType(MapType.MOUNTAIN);
-        map.getRequireLv().set(75);
+        map.setRequireLv(75);
         map.getLocation().set(3, 2, 1, 1);
         map.setSpawnMonster(MonsterList.OAK.getId(), 1D, 8);
         Config.unloadMap(map);

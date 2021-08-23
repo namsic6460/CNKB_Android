@@ -27,7 +27,12 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.LEAF, "평범한 나뭇잎이다");
         createItem(ItemList.GRASS, "평범한 잡초다");
 
-        createItem(ItemList.SMALL_GOLD_BAG, "골드가 소량 들어간 주머니다");
+        item = new Item(ItemList.SMALL_GOLD_BAG, "골드가 소량 들어간 주머니다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.GOLD_FRUIT.getId(), 3);
+        }});
+        Config.unloadObject(item);
+
         createItem(ItemList.GOLD_BAG, "골드가 들어간 주머니다");
 
         createItem(ItemList.HERB, "약의 기운이 있는 풀이다");
@@ -491,7 +496,12 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.RED_SPHERE, "어둠의 기운을 담고 있는 구체다");
         createItem(ItemList.WHITE_SPHERE, "빛의 기운을 담고 있는 구체다");
 
-        createItem(ItemList.LOW_EXP_POTION, "경험치를 소량 제공해주는 포션이다");
+        item = new Item(ItemList.LOW_EXP_POTION, "경험치를 소량 제공해주는 포션이다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.EXP_FRUIT.getId(), 10);
+        }});
+        Config.unloadObject(item);
+
         createItem(ItemList.EXP_POTION, "경험치를 제공해주는 포션이다");
         createItem(ItemList.HIGH_EXP_POTION, "경험치를 대량 제공해주는 포션이다");
 
@@ -803,6 +813,15 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.IMP_HEART, "임프의 심장이다. 마족이라 그런지 색깔이 어둡다");
         createItem(ItemList.HORN_OF_LOW_DEVIL, "하급 악마의 뿔이지만 내부에 마력이 상당하다");
         createItem(ItemList.LOW_DEVIL_SOUL, "하급 악마여도 희귀한 악마의 영혼이다");
+
+        createItem(ItemList.GOLD_FRUIT, "골드로 바꿀 수 있는 열매다");
+        createItem(ItemList.EXP_FRUIT, "경험치로 바꿀 수 있는 열매다");
+        createItem(ItemList.SMALL_GOLD_SEED, "작은 골드 씨앗이다");
+        createItem(ItemList.GOLD_SEED, "골드 씨앗이다 (씨앗 Lv.2)");
+        createItem(ItemList.BIG_GOLD_SEED, "골드 씨앗이다 (씨앗 Lv.3)");
+        createItem(ItemList.SMALL_EXP_SEED, "경험치 씨앗이다");
+        createItem(ItemList.EXP_SEED, "경험치 씨앗이다 (씨앗 Lv.2)");
+        createItem(ItemList.BIG_EXP_SEED, "경험치 씨앗이다 (씨앗 Lv.3)");
 
         Logger.i("ObjectMaker", "Item making is done!");
     }

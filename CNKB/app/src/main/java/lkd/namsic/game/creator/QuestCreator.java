@@ -1,7 +1,6 @@
 package lkd.namsic.game.creator;
 
 import lkd.namsic.game.config.Config;
-import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.NpcList;
@@ -18,21 +17,21 @@ public class QuestCreator implements Creatable {
         quest = new Quest(QuestList.WORK_OF_MINER, NpcList.NOAH.getId(), 13L);
         quest.setNeedItem(ItemList.STONE.getId(), 30);
         quest.setRewardCloseRate(NpcList.NOAH.getId(), 1);
-        quest.getRewardExp().set(35000L);
-        quest.getRewardMoney().set(250L);
+        quest.setRewardExp(35000L);
+        quest.setRewardMoney(250L);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.TRASH_COLLECTING, NpcList.NOAH.getId(), 13L);
         quest.setNeedItem(ItemList.TRASH.getId(), 1);
         quest.setRewardCloseRate(NpcList.NOAH.getId(), 1);
-        quest.getRewardExp().set(50000L);
+        quest.setRewardExp(50000L);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.NEED_FIRE, NpcList.NOAH.getId(), 19L);
         quest.setNeedItem(ItemList.RED_SPHERE.getId(), 1);
         quest.setRewardCloseRate(NpcList.NOAH.getId(), 5);
-        quest.getRewardExp().set(350000L);
-        quest.getRewardMoney().set(500L);
+        quest.setRewardExp(350000L);
+        quest.setRewardMoney(500L);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.TOO_STRONG_FIRE, NpcList.NOAH.getId(), 23L);
@@ -56,7 +55,7 @@ public class QuestCreator implements Creatable {
         quest.setNeedItem(ItemList.BRANCH.getId(), 10);
         quest.setRewardCloseRate(NpcList.KANG_TAE_GONG.getId(), 10);
         quest.setRewardItem(ItemList.SMALL_GOLD_BAG.getId(), 2);
-        quest.getRewardExp().set(250000L);
+        quest.setRewardExp(250000L);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.POWER_OF_TOKEN, NpcList.SELINA.getId(), 65L);
@@ -68,7 +67,7 @@ public class QuestCreator implements Creatable {
 
         quest = new Quest(QuestList.GOLD_RING_GIFT, NpcList.HYEONG_SEOK.getId(), 69L);
         quest.setNeedItem(ItemList.GOLD.getId(), 5);
-        quest.getNeedMoney().set(5000L);
+        quest.setNeedMoney(5000L);
         quest.setRewardCloseRate(NpcList.HYEONG_SEOK.getId(), 10);
         quest.setRewardCloseRate(NpcList.EL.getId(), 10);
         quest.setRewardItem(ItemList.LOW_AMULET.getId(), 1);
@@ -78,7 +77,7 @@ public class QuestCreator implements Creatable {
         quest.setNeedItem(ItemList.COAL.getId(), 100);
         quest.setRewardCloseRate(NpcList.PEDRO.getId(), 2);
         quest.setRewardItem(ItemList.LOW_REINFORCE_STONE.getId(), 10);
-        quest.getRewardMoney().set(2000L);
+        quest.setRewardMoney(2000L);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.ANOTHER_PRESENT, NpcList.EL.getId(), 77L);
@@ -94,12 +93,12 @@ public class QuestCreator implements Creatable {
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.LV50, NpcList.NOAH.getId(), 79L);
-        quest.getClearLimitLv().set(50);
+        quest.setClearLimitLv(50);
         quest.setRewardItem(ItemList.STAT_POINT.getId(), 50);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.LV100, NpcList.NOAH.getId(), 132L);
-        quest.getClearLimitLv().set(100);
+        quest.setClearLimitLv(100);
         quest.setRewardItem(ItemList.STAT_POINT.getId(), 150);
         Config.unloadObject(quest);
 
@@ -120,15 +119,15 @@ public class QuestCreator implements Creatable {
         quest = new Quest(QuestList.MAGIC_OF_SPIDER_EYE, NpcList.SELINA.getId(), 88L);
         quest.setNeedItem(ItemList.SPIDER_EYE.getId(), 5);
         quest.setRewardCloseRate(NpcList.SELINA.getId(), 3);
-        quest.getRewardExp().set(100000L);
+        quest.setRewardExp(100000L);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.STICKY_SLIME, NpcList.EL.getId(), 92L);
         quest.setNeedItem(ItemList.PIECE_OF_SLIME.getId(), 20);
         quest.setRewardCloseRate(NpcList.EL.getId(), 20);
         quest.setRewardCloseRate(NpcList.BOAM_E.getId(), 10);
-        quest.getRewardExp().set(500000L);
-        quest.getRewardMoney().set(10000L);
+        quest.setRewardExp(500000L);
+        quest.setRewardMoney(10000L);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.HERB_COLLECTING, NpcList.EL.getId(), 96L);
@@ -148,54 +147,54 @@ public class QuestCreator implements Creatable {
         }
 
         quest = new Quest(QuestList.HEALING_ELF1, NpcList.EL.getId(), 129L);
-        quest.getRewardExp().set(100000L);
+        quest.setRewardExp(100000L);
         quest.setRewardItem(ItemList.ELIXIR_HERB.getId(), 1);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.HEALING_ELF2, NpcList.SYLVIA.getId(), 130L);
         quest.setNeedItem(ItemList.ELIXIR_HERB.getId(), 1);
-        quest.getRewardExp().set(100000L);
+        quest.setRewardExp(100000L);
         quest.setRewardCloseRate(NpcList.SYLVIA.getId(), 10);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.LEATHER_COLLECTING1, NpcList.HYEONG_SEOK.getId(), 141L);
         quest.setNeedItem(ItemList.SHEEP_LEATHER.getId(), 10);
-        quest.getRewardMoney().set(500L);
-        quest.getRewardExp().set(100000L);
+        quest.setRewardMoney(500L);
+        quest.setRewardExp(100000L);
         quest.setRewardCloseRate(NpcList.HYEONG_SEOK.getId(), 2);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.LEATHER_COLLECTING2, NpcList.HYEONG_SEOK.getId(), 141L);
         quest.setNeedItem(ItemList.LEATHER.getId(), 10);
-        quest.getRewardMoney().set(1000L);
-        quest.getRewardExp().set(180000L);
+        quest.setRewardMoney(1000L);
+        quest.setRewardExp(180000L);
         quest.setRewardCloseRate(NpcList.HYEONG_SEOK.getId(), 3);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.LEATHER_COLLECTING3, NpcList.HYEONG_SEOK.getId(), 141L);
         quest.setNeedItem(ItemList.OAK_LEATHER.getId(), 5);
-        quest.getRewardMoney().set(3500L);
-        quest.getRewardExp().set(250000L);
+        quest.setRewardMoney(3500L);
+        quest.setRewardExp(250000L);
         quest.setRewardCloseRate(NpcList.HYEONG_SEOK.getId(), 5);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.INCREASING_ZOMBIE, NpcList.PEDRO.getId(), 145L);
         quest.setNeedItem(ItemList.ZOMBIE_HEAD.getId(), 5);
-        quest.getRewardMoney().set(2000L);
-        quest.getRewardExp().set(150000L);
+        quest.setRewardMoney(2000L);
+        quest.setRewardExp(150000L);
         quest.setRewardCloseRate(NpcList.PEDRO.getId(), 3);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.BONE_IN_THE_SEA, NpcList.KANG_TAE_GONG.getId(), 149L);
         quest.setNeedItem(ItemList.PIECE_OF_BONE.getId(), 30);
-        quest.getRewardMoney().set(3000L);
-        quest.getRewardExp().set(100000L);
+        quest.setRewardMoney(3000L);
+        quest.setRewardExp(100000L);
         quest.setRewardCloseRate(NpcList.KANG_TAE_GONG.getId(), 3);
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.SOUND_IN_THE_SINKHOLE, NpcList.NOAH.getId(), 153L);
         quest.setNeedItem(ItemList.HORN_OF_IMP.getId(), 1);
-        quest.getRewardExp().set(300000L);
+        quest.setRewardExp(300000L);
         Config.unloadObject(quest);
 
         Logger.i("ObjectMaker", "Quest making is done!");

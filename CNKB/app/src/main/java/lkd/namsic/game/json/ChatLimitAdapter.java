@@ -23,7 +23,7 @@ public class ChatLimitAdapter implements JsonSerializer<ChatLimit> {
         JsonObject tempObject;
         JsonArray tempArray;
 
-        if(chatLimit.getLimitLv().getMin() != Config.MIN_LV || chatLimit.getLimitLv().getMax() != Config.MAX_LV) {
+        if(chatLimit.getLimitLv().getMin() != 1 || chatLimit.getLimitLv().getMax() != Config.MAX_LV) {
             tempObject = gson.toJsonTree(chatLimit.getLimitLv() ).getAsJsonObject();
             jsonObject.add("limitLv", tempObject);
         }

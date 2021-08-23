@@ -194,6 +194,7 @@ public class FishManager {
             if (response.equals(FishWaitType.NONE)) {
                 if (i == 0) {
                     self.addItem(itemId, 1, false);
+                    self.addExp(50 * (itemTier + 1));
                     self.setDoing(Doing.NONE);
 
                     StringBuilder innerBuilder = new StringBuilder();

@@ -46,7 +46,7 @@ public class AdventureManager {
         self.setDoing(Doing.ADVENTURE);
         self.addLog(LogData.ADVENTURE, 1);
 
-        int adv = self.getAdv().get();
+        int adv = self.getAdv();
         int skipPercent = (int) (Math.random() * 10) + Math.min(adv * 4 / 10, 40);
 
         this.startAdventure(self, adv, skipPercent, mapType);

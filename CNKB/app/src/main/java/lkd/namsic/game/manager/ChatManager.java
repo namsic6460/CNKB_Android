@@ -97,13 +97,13 @@ public class ChatManager {
         self.addChatCount(npcId, 1);
 
         try {
-            Thread.sleep(chat.getDelayTime().get());
+            Thread.sleep(chat.getDelayTime());
         } catch (InterruptedException e) {
             Logger.e("ChatManager", e);
             return;
         }
 
-        long pauseTime = chat.getPauseTime().get();
+        long pauseTime = chat.getPauseTime();
         String preString = npc.getName() + " -> " + self.getNickName() + "\n";
 
         List<String> texts = chat.getText();
@@ -111,7 +111,7 @@ public class ChatManager {
         for (int i = 0; i <= size; i++) {
             KakaoTalk.reply(session, preString + texts.get(i)
                     .replaceAll("__nickname", self.getNickName())
-                    .replaceAll("__lv", self.getLv().get().toString()));
+                    .replaceAll("__lv", self.getLv() + ""));
 
             try {
                 if (i != size) {
@@ -123,7 +123,7 @@ public class ChatManager {
             }
         }
 
-        self.addMoney(chat.getMoney().get());
+        self.addMoney(chat.getMoney());
 
         for (Map.Entry<Long, Integer> entry : chat.getItem().entrySet()) {
             self.addItem(entry.getKey(), entry.getValue(), false);
@@ -137,9 +137,9 @@ public class ChatManager {
             self.addVariable(entry.getKey(), entry.getValue());
         }
 
-        long questId = chat.getQuestId().get();
+        long questId = chat.getQuestId();
         if (questId != 0) {
-            self.addQuest(chat.getQuestId().get());
+            self.addQuest(chat.getQuestId());
             self.replyPlayer("퀘스트 \"" + QuestList.findById(questId) + "\" (을/를) 수락하였습니다");
         }
 
@@ -190,7 +190,7 @@ public class ChatManager {
                         throw new InvalidNumberException(noneChatId);
                     }
 
-                    long noneNpcId = chat.getNoneNpcId().get();
+                    long noneNpcId = chat.getNoneNpcId();
                     if(noneNpcId == NpcList.NONE.getId()) {
                         noneNpcId = npcId;
                     }

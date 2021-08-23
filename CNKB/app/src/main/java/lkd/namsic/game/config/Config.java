@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import java.io.File;
 import java.util.AbstractMap;
@@ -41,6 +42,7 @@ import lkd.namsic.game.object.Boss;
 import lkd.namsic.game.object.Chat;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.Farm;
 import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.GameObject;
 import lkd.namsic.game.object.Item;
@@ -56,7 +58,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 2.12;
+    public static final double VERSION = 2.21;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -81,9 +83,9 @@ public class Config {
     public static final Map<String, Long> MAP_COUNT = new ConcurrentHashMap<>();
 
     private static final String REGEX = "[^A-Za-z-_0-9ㄱ-ㅎㅏ-ㅣ가-힣\\s]|[\n]|[\r]";
-    public static final List<String> FORBIDDEN_NICKNAME = Arrays.asList("아이템", "item", "장비", "equip", "시발", "애미", "애비",
-            "느금", "느금마", "지랄", "염병", "옘병", "tlqkf", "ㄴㄱㅁ", "앰이", "보지", "자지", "섹스", "발기", "왕고추", "느금",
-            "유미없음", "창년", "창녀", "창남", "몸팔이", "니애미", "니애비", "씨발", "fuck", "씨빨", "좆", "개새");
+    public static final List<String> FORBIDDEN_NICKNAME = Arrays.asList("아이템", "item", "장비", "equip", "스킬", "skill", "시발",
+            "애미", "애비", "느금", "느금마", "지랄", "염병", "옘병", "tlqkf", "ㄴㄱㅁ", "앰이", "보지", "자지", "섹스", "발기", "왕고추",
+            "느금", "유미없음", "창년", "창녀", "창남", "몸팔이", "니애미", "니애비", "씨발", "fuck", "씨빨", "좆", "개새");
     public static final Map<String, Long> PLAYER_ID = new ConcurrentHashMap<>();
     public static final Map<Long, String[]> PLAYER_LIST = new ConcurrentHashMap<>();
     public static final Map<String, Integer> PLAYER_LV_RANK = new ConcurrentHashMap<>();
@@ -95,30 +97,18 @@ public class Config {
 
     public static final int MAX_COUNT_PER_PAGE = 30;
 
-    public static final int MIN_MAP_X = 0;
+    public static final int MAX_LV = 999;
+
     public static final int MAX_MAP_X = 10;
-    public static final int MIN_MAP_Y = 0;
     public static final int MAX_MAP_Y = 10;
-    public static final int MIN_FIELD_X = 1;
     public static final int MAX_FIELD_X = 64;
-    public static final int MIN_FIELD_Y = 1;
     public static final int MAX_FIELD_Y = 64;
 
-    public static final int MIN_HANDLE_LV = 1;
-    public static final int MAX_HANDLE_LV = 13;
     public static final int MAX_REINFORCE_COUNT = 15;
-    public static final int MIN_LV = 1;
-    public static final int MAX_LV = 999;
     public static final int MIN_RANK_LV = 10;
-    public static final int MIN_AI_INCREASE = 0;
-    public static final int MIN_SP = 0;
-    public static final int MIN_MAGIC_LV = 1;
     public static final int MAX_MAGIC_LV = 10;
-    public static final long MIN_DELAY_TIME = 500;
-    public static final long MAX_DELAY_TIME = 5000;
-    public static final long MIN_PAUSE_TIME = 2000;
-    public static final long MAX_PAUSE_TIME = 5000;
-    public static final int MAX_SPAWN_COUNT = 16;
+    public static final long DEFAULT_DELAY_TIME = 500;
+    public static final long DEFAULT_PAUSE_TIME = 2000;
 
     public static final double REINFORCE_EFFICIENCY = 0.18;
     public static final double REINFORCE_EFFICIENCY_PER_HANDLE_LV = 0.01;
@@ -135,7 +125,8 @@ public class Config {
     public static final int MAX_ITEM_DROP_COUNT = 5;
     public static final double ITEM_DROP_LOSE_PERCENT = 0.95;
 
-    public static final long PREVENT_FIGHT_TIME = 30000L;
+    public static final long PREVENT_RUN_FIGHT_TIME = 30000L;
+    public static final long PREVENT_PVP_FIGHT_TIME = 1800000L;
     public static final int RECOGNIZE_DISTANCE = 16;
     public static final double ATTACKED_PERCENT = 0.3;
     public static final double ATTACKED_PERCENT_INCREASE = 0.025;
@@ -156,6 +147,9 @@ public class Config {
     public static final int APPRAISE_LIMIT = 999;
     public static final long SHOPPING_WAIT_TIME = 120000;
     public static final long REST_TIME = 600000;
+    public static final long FARM_PRICE = 5000L;
+    public static final int MAX_FARM_LV = 5;
+    public static final long MAX_HARVEST_DAY = 5;
 
     public static final String SPLIT_BAR = "------------------------------------------";
     public static final String HARD_SPLIT_BAR = "==========================================";
@@ -170,9 +164,11 @@ public class Config {
         ID_CLASS.put(Id.BOSS, Boss.class);
         ID_CLASS.put(Id.CHAT, Chat.class);
         ID_CLASS.put(Id.EQUIPMENT, Equipment.class);
+        ID_CLASS.put(Id.FARM, Farm.class);
         ID_CLASS.put(Id.ITEM, Item.class);
         ID_CLASS.put(Id.MONSTER, Monster.class);
         ID_CLASS.put(Id.NPC, Npc.class);
+        ID_CLASS.put(Id.PLANT, Farm.Plant.class);
         ID_CLASS.put(Id.PLAYER, Player.class);
         ID_CLASS.put(Id.QUEST, Quest.class);
         ID_CLASS.put(Id.RESEARCH, Research.class);
@@ -209,8 +205,8 @@ public class Config {
                 PLAYER_ID.put(player.getNickName(), objectId);
                 PLAYER_LIST.put(objectId, new String[] {player.getSender(), player.getImage()});
 
-                if(!player.getCurrentTitle().equals("관리자") && player.getLv().get() >= MIN_RANK_LV) {
-                    PLAYER_LV_RANK.put(player.getName(), player.getLv().get());
+                if(!player.getCurrentTitle().equals("관리자") && player.getLv() >= MIN_RANK_LV) {
+                    PLAYER_LV_RANK.put(player.getName(), player.getLv());
                 }
             } catch (Exception e) {
                 Logger.e("Config.init(" + file.getName() + ")", e);
@@ -242,10 +238,16 @@ public class Config {
         JsonObject idObject = jsonObject.getAsJsonObject("id");
 
         String idName;
+        JsonPrimitive jsonPrimitive;
         for(Id id : Id.values()) {
             idName = id.toString();
+            jsonPrimitive = idObject.getAsJsonPrimitive(idName);
 
-            ID_COUNT.put(id, idObject.getAsJsonPrimitive(idName).getAsLong());
+            if(jsonPrimitive != null) {
+                ID_COUNT.put(id, jsonPrimitive.getAsLong());
+            } else {
+                ID_COUNT.put(id, 1L);
+            }
         }
 
         JsonArray selectableChatArray = jsonObject.getAsJsonArray("selectableChat");
@@ -268,8 +270,6 @@ public class Config {
                     unloadMap(map);
                 }
             }
-
-            saveConfig();
         } catch (Exception e) {
             Logger.e("onTerminate", e);
         }
@@ -394,6 +394,7 @@ public class Config {
                     }
 
                     Logger.i("FileManager", "New object unloaded - [" + id + ", " + objectId + "]");
+                    Config.saveConfig();
                 }
 
                 FileManager.save(path, jsonString);
@@ -585,7 +586,7 @@ public class Config {
 
     @NonNull
     public synchronized static GameMap loadMap(Location location) {
-        return loadMap(location.getX().get(), location.getY().get());
+        return loadMap(location.getX(), location.getY());
     }
 
     @NonNull
@@ -597,7 +598,7 @@ public class Config {
     }
 
     public synchronized static GameMap getMapData(Location location) {
-        return getMapData(location.getX().get(), location.getY().get());
+        return getMapData(location.getX(), location.getY());
     }
 
     @NonNull
@@ -671,7 +672,7 @@ public class Config {
     public static String getMapFileName(int x, int y) {
         String path = x + "-" + y + ".json";
 
-        if(x >= MIN_MAP_X && x <= MAX_MAP_X && y >= MIN_MAP_X && y <= MAX_MAP_Y) {
+        if(x >= 0 && x <= MAX_MAP_X && y >= 0 && y <= MAX_MAP_Y) {
             return path;
         }
 
@@ -680,7 +681,7 @@ public class Config {
 
     @NonNull
     public static String getMapFileName(GameMap map) {
-        return getMapFileName(map.getLocation().getX().get(), map.getLocation().getY().get());
+        return getMapFileName(map.getLocation().getX(), map.getLocation().getY());
     }
 
     @NonNull
@@ -821,19 +822,9 @@ public class Config {
         if(entity.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) entity;
 
-            if(player.getVersion() < 2.12) {
-                player.addMoney(50000L);
-
-                long objectId = player.getId().getObjectId();
-                if(objectId == 4 || objectId == 8 || objectId == 25 || objectId == 49 || objectId == 6) {
-                    player.addMoney(100000L);
-
-                    if(objectId == 8) {
-                        player.addMoney(100000L);
-                    } else if(objectId == 6) {
-                        player.addItem(ItemList.STAT_POINT.getId(), 40);
-                    }
-                }
+            if(player.getVersion() < 2.21) {
+                player.getItemRecipe().add(ItemList.SMALL_GOLD_BAG.getId());
+                player.getItemRecipe().add(ItemList.LOW_EXP_POTION.getId());
             }
 
             if (unavailable) {

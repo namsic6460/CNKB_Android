@@ -35,11 +35,11 @@ public class QuestManager {
 
         Quest quest = Config.getData(Id.QUEST, questId);
 
-        return self.getMoney() >= quest.getNeedMoney().get() &&
+        return self.getMoney() >= quest.getNeedMoney() &&
                 Config.compareMap(self.getInventory(), quest.getNeedItem(), true, false, 0) &&
                 self.compareStat(quest.getNeedStat()) &&
                 Config.compareMap(self.getCloseRate(), quest.getNeedCloseRate(), true, false, 0) &&
-                self.getLv().get() >= quest.getClearLimitLv().get();
+                self.getLv() >= quest.getClearLimitLv();
     }
 
     public void clearQuest(@NonNull Player self, long questId, long npcId) {
@@ -59,8 +59,8 @@ public class QuestManager {
         //Remove Need Things
         Quest quest = Config.getData(Id.QUEST, questId);
 
-        self.addMoney(quest.getNeedMoney().get() * -1);
-        totalMoney -= quest.getNeedMoney().get();
+        self.addMoney(quest.getNeedMoney() * -1);
+        totalMoney -= quest.getNeedMoney();
 
         long longKey;
         int value;
@@ -90,14 +90,14 @@ public class QuestManager {
         }
 
         //Add Reward Things
-        self.addMoney(quest.getRewardMoney().get());
-        totalMoney += quest.getRewardMoney().get();
+        self.addMoney(quest.getRewardMoney());
+        totalMoney += quest.getRewardMoney();
 
-        self.addExp(quest.getRewardExp().get());
-        totalExp = quest.getRewardExp().get();
+        self.addExp(quest.getRewardExp());
+        totalExp = quest.getRewardExp();
 
-        self.getAdv().add(quest.getRewardAdv().get());
-        totalAdv = quest.getRewardAdv().get();
+        self.setAdv(self.getAdv() + quest.getRewardAdv());
+        totalAdv = quest.getRewardAdv();
 
         for(Map.Entry<Long, Integer> entry : quest.getRewardItem().entrySet()) {
             longKey = entry.getKey();

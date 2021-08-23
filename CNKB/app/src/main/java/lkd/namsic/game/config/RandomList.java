@@ -70,6 +70,10 @@ public class RandomList {
             Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 5)
     );
 
+    public static final List<Long> FARM_UPGRADE_PRICE = Arrays.asList(
+            100_000L, 500_000L, 3_000_000L, 10_000_000L
+    );
+
     public static final Map<Integer, Map<Long, Integer>> ADVENTURE_LIST = new HashMap<Integer, Map<Long, Integer>>() {{
         put(1, new HashMap<Long, Integer>() {{
             put(ItemList.STONE.getId(), 150000);
