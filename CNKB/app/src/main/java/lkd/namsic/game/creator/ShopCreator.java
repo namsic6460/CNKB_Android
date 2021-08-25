@@ -37,6 +37,9 @@ public class ShopCreator implements Creatable {
         shop.addBuyItem(ItemList.IMP_HEART, 300L);
         shop.addBuyItem(ItemList.HORN_OF_LOW_DEVIL, 250L);
         shop.addBuyItem(ItemList.LOW_DEVIL_SOUL, 1500L);
+        shop.addBuyItem(ItemList.HARPY_WING, 200L);
+        shop.addBuyItem(ItemList.HARPY_NAIL, 200L);
+        shop.addBuyItem(ItemList.GOLEM_CORE, 500L);
 
         Config.unloadObject(shop);
 

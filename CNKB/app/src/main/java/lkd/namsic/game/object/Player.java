@@ -27,6 +27,7 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.SkillList;
@@ -37,6 +38,8 @@ import lombok.Setter;
 
 @Getter
 public class Player extends Entity {
+
+    public static final String DEATH_MSG = "당신은 사망했습니다...";
 
     public static void replyPlayers(@NonNull Set<Player> players, @Nullable String msg) {
         replyPlayers(players, msg, null);
@@ -184,8 +187,12 @@ public class Player extends Entity {
     @Setter
     double reinforceMultiplier = 1;
 
+    @NonNull
     @Setter
-    boolean isLastCrit = false;
+    String deathMsg = "";
+
+    @Setter
+    boolean printDeathMsg = true;
 
     public Player(@NonNull String sender, @NonNull String nickName, @NonNull String image, @NonNull String recentRoom) {
         super(sender);
@@ -703,7 +710,6 @@ public class Player extends Entity {
         }
 
         this.log.put(LogData.LOG_COUNT, this.getLog(LogData.LOG_COUNT) + 1);
-//        Logger.i("LogData", this.getName() + " {" + logData.toString() + " : " + count + "}");
     }
 
     public long getLog(@NonNull LogData logData) {
@@ -712,6 +718,83 @@ public class Player extends Entity {
 
     public void addLog(@NonNull LogData logData, long count) {
         this.setLog(logData, this.getLog(logData) + count);
+    }
+
+    @NonNull
+    public String getDeathMsg() {
+        String deathMsg = this.deathMsg;
+
+        this.printDeathMsg = true;
+        this.deathMsg = "";
+
+        return deathMsg;
+    }
+
+    public void printDamageMsg(@NonNull Entity target) {
+        this.printDamageMsg(target, this.lastDamage, this.lastDrain, this.isLastCrit);
+    }
+
+    public void printDamageMsg(@NonNull Entity target, int totalDmg, int totalDra, boolean isCrit) {
+        String msg = "공격에 성공했습니다\n적 체력: " + target.getDisplayHp();
+        if (isCrit) {
+            msg = "[치명타!] " + msg;
+        }
+
+        this.replyPlayer(msg, "총 데미지: " + totalDmg + "\n총 흡수량: " + totalDra + "\n남은 체력: " + this.getDisplayHp());
+    }
+    
+    public void printDamageMsg(@NonNull List<Entity> targets, int totalDmg, int totalDra, int critCount) {
+        if(targets.size() == 1) {
+            this.printDamageMsg(targets.get(0), totalDmg, totalDra, critCount != 0);
+            return;
+        }
+
+        String msg = "적 " + targets.size() + " 개체를 향한 공격이 ";
+
+        if(totalDmg > 0) {
+            StringBuilder innerBuilder = new StringBuilder();
+
+            if(critCount != 0) {
+                innerBuilder.append("[치명타 * ")
+                        .append(critCount)
+                        .append("] ");
+            }
+
+            innerBuilder.append("총 데미지: ")
+                    .append(totalDmg)
+                    .append("\n총 흡수량: ")
+                    .append(totalDra)
+                    .append("\n\n---적 체력---");
+
+            for(Entity target : targets) {
+                innerBuilder.append("\n")
+                        .append(target.getFightName())
+                        .append(": ")
+                        .append(target.getDisplayHp());
+            }
+
+            this.replyPlayer( msg + "성공했습니다", innerBuilder.toString());
+        } else {
+            this.replyPlayer(msg +"효과가 없었습니다...");
+        }
+    }
+
+    public void printDamagedMsg(@NonNull Entity attacker) {
+        this.printDamagedMsg(attacker, attacker.lastDamage, attacker.lastDrain, attacker.isLastCrit, this.lastHeal);
+    }
+
+    public void printDamagedMsg(@NonNull Entity attacker, int totalDmg, int totalDra, boolean isCrit, int heal) {
+        String msg = attacker.getName() + " 에게 공격당했습니다!\n남은 체력: " + this.getDisplayHp();
+
+        if (isCrit) {
+            msg = "[치명타!] " + msg;
+        }
+
+        if (this.getObjectVariable(Variable.IS_DEFENCING, false)) {
+            msg += "\n방어로 인해 회복한 체력: " + heal;
+        }
+
+        this.replyPlayer(msg, "총 데미지: " + totalDmg + "\n총 흡수량: " + totalDra + "\n적 체력: " + attacker.getDisplayHp());
     }
 
     @Override
@@ -756,11 +839,11 @@ public class Player extends Entity {
         this.getBuffStat().clear();
 
         Random random = new Random();
-        double loseMoneyPercent = random.nextDouble() * Config.TOTAL_MONEY_LOSE_RANDOM + Config.TOTAL_MONEY_LOSE_MIN;
-        double dropPercent = random.nextDouble() * Config.MONEY_DROP_RANDOM + Config.MONEY_DROP_MIN;
-        int dropItemCount = random.nextInt(Config.ITEM_DROP_COUNT);
+        double loseMoneyPercent = random.nextDouble() * Config.TOTAL_MONEY_LOSE_RANDOM + Config.TOTAL_MONEY_LOSE_MIN;   //10~15%
+        double dropPercent = random.nextDouble() * Config.MONEY_DROP_RANDOM + Config.MONEY_DROP_MIN;                    //50~70%
+        int dropItemCount = random.nextInt(Config.ITEM_DROP_COUNT);                                                     //0~3
 
-        long totalLoseMoney = Math.max(10000, (long) (this.getMoney() * loseMoneyPercent));
+        long totalLoseMoney = Math.min(10000, (long) (this.getMoney() * loseMoneyPercent));
         long dropMoney = (long) (totalLoseMoney * dropPercent);
         long loseMoney = totalLoseMoney - dropMoney;
 
@@ -838,8 +921,13 @@ public class Player extends Entity {
 
         String innerMsg = "떨어트린 돈 : " + dropMoney + "G\n잃어버린 돈 : " + loseMoney
                 + dropItemBuilder.toString() + loseItemBuilder.toString();
-        this.replyPlayer("당신은 사망했습니다...", innerMsg);
         this.addLog(LogData.DEATH, 1);
+
+        if(this.printDeathMsg) {
+            this.replyPlayer("당신은 사망했습니다...", innerMsg);
+        } else {
+            this.deathMsg = innerMsg;
+        }
     }
 
     @Override

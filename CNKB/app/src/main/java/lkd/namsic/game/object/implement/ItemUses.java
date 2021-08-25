@@ -192,7 +192,7 @@ public class ItemUses {
                 long equipId = RandomList.highRecipeEquips.get(random.nextInt(RandomList.highRecipeEquips.size()));
 
                 player.getEquipRecipe().add(equipId);
-                return ItemList.findById(equipId) + " 의 제작법을 획득했습니다";
+                return EquipList.findById(equipId) + " 의 제작법을 획득했습니다";
             }
             }
         });
@@ -450,6 +450,42 @@ public class ItemUses {
             @Override
             public String use(@NonNull Entity self, @Nullable String other) {
                 self.addSkill(SkillList.LASER.getId());
+                return SKILL_BOOK;
+            }
+        });
+
+        put(ItemList.SKILL_BOOK_SCAR.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+
+                if(self.getSkill().contains(SkillList.SCAR.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.SCAR.getId());
+                return SKILL_BOOK;
+            }
+        });
+
+        put(ItemList.SKILL_BOOK_CHARM.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+
+                if(self.getSkill().contains(SkillList.CHARM.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.CHARM.getId());
                 return SKILL_BOOK;
             }
         });

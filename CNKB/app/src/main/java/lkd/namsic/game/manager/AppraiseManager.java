@@ -52,7 +52,7 @@ public class AppraiseManager {
             try {
                 for (int i = 0; i < count; i++) {
                     synchronized (self) {
-                        self.wait(6000);
+                        self.wait(5999);
                     }
                     
                     isAppraiseStopped = self.getObjectVariable(Variable.IS_APPRAISE_STOP, false);

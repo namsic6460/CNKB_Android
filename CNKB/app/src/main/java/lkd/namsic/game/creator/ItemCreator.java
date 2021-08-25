@@ -8,6 +8,7 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.object.Item;
 import lkd.namsic.setting.Logger;
 
@@ -801,11 +802,11 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.OAK_TOOTH, "생각보단 깨끗한 오크의 이빨이다");
         createItem(ItemList.OAK_LEATHER, "상당히 질긴 고품질의 가죽이다");
         
-        createItem(ItemList.SKILL_BOOK_MAGIC_BALL, "스킬 " + Emoji.focus("매직 볼") +
+        createItem(ItemList.SKILL_BOOK_MAGIC_BALL, "스킬 " + Emoji.focus(SkillList.MAGIC_BALL.getDisplayName()) +
                 " 을 배울 수 있게 해주는 스킬 북이다");
-        createItem(ItemList.SKILL_BOOK_SMITE, "스킬 " + Emoji.focus("강타") +
+        createItem(ItemList.SKILL_BOOK_SMITE, "스킬 " + Emoji.focus(SkillList.SMITE.getDisplayName()) +
                 " 를 배울 수 있게 해주는 스킬 북이다");
-        createItem(ItemList.SKILL_BOOK_LASER, "스킬 " + Emoji.focus("레이저") +
+        createItem(ItemList.SKILL_BOOK_LASER, "스킬 " + Emoji.focus(SkillList.LASER.getDisplayName()) +
                 " 를 배울 수 있게 해주는 스킬 북이다");
 
         createItem(ItemList.PIECE_OF_BONE, "많이 부서진 뼛조각이다");
@@ -816,12 +817,22 @@ public class ItemCreator implements Creatable {
 
         createItem(ItemList.GOLD_FRUIT, "골드로 바꿀 수 있는 열매다");
         createItem(ItemList.EXP_FRUIT, "경험치로 바꿀 수 있는 열매다");
-        createItem(ItemList.SMALL_GOLD_SEED, "작은 골드 씨앗이다");
-        createItem(ItemList.GOLD_SEED, "골드 씨앗이다 (씨앗 Lv.2)");
-        createItem(ItemList.BIG_GOLD_SEED, "골드 씨앗이다 (씨앗 Lv.3)");
-        createItem(ItemList.SMALL_EXP_SEED, "경험치 씨앗이다");
-        createItem(ItemList.EXP_SEED, "경험치 씨앗이다 (씨앗 Lv.2)");
-        createItem(ItemList.BIG_EXP_SEED, "경험치 씨앗이다 (씨앗 Lv.3)");
+        createItem(ItemList.SMALL_GOLD_SEED, "작은 골드 씨앗이다\n[수확]: 1 골드 열매/120분");
+        createItem(ItemList.GOLD_SEED, "골드 씨앗이다 (씨앗 Lv.2)\n[수확]: 2 골드 열매/90분");
+        createItem(ItemList.BIG_GOLD_SEED, "골드 씨앗이다 (씨앗 Lv.3)\n[수확]: 3 골드 열매/60분");
+        createItem(ItemList.SMALL_EXP_SEED, "경험치 씨앗이다\n[수확]: 1 경험치 열매/120분");
+        createItem(ItemList.EXP_SEED, "경험치 씨앗이다 (씨앗 Lv.2)\n[수확]: 2 경험치 열매/90분");
+        createItem(ItemList.BIG_EXP_SEED, "경험치 씨앗이다 (씨앗 Lv.3)\n[수확]: 3 경험치 열매/60분");
+        
+        createItem(ItemList.HARPY_WING, "하피의 날개다. 날개치곤 상당히 단단하다");
+        createItem(ItemList.HARPY_NAIL, "부서졌음에도 여전히 날카롭다");
+        
+        createItem(ItemList.GOLEM_CORE, "여전히 빛나고 있다. 언젠간 쓰일 것 같다");
+
+        createItem(ItemList.SKILL_BOOK_SCAR, "스킬 " + Emoji.focus(SkillList.SCAR.getDisplayName()) +
+                " 를 배울 수 있게 해주는 스킬 북이다");
+        createItem(ItemList.SKILL_BOOK_CHARM, "스킬 " + Emoji.focus(SkillList.CHARM.getDisplayName()) +
+                " 를 배울 수 있게 해주는 스킬 북이다");
 
         Logger.i("ObjectMaker", "Item making is done!");
     }

@@ -250,20 +250,23 @@ public class ItemDisplayManager {
     public void displayEquipInfo(@NonNull Player self, long equipId) {
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
 
-        StringBuilder innerBuilder = new StringBuilder(equipment.getRealName() + " 의 정보\n\n장비 등급: ")
+        StringBuilder innerBuilder = new StringBuilder(equipment.getRealName() + " 의 정보\n\n장비 종류: ")
+                .append(equipment.getEquipType().getDisplayNames().get(0))
+                .append("\n장비 등급: ")
                 .append(equipment.getHandleLv())
                 .append("\n\n[액티브] ");
-        
-        String description = equipment.getActiveDes();
+
+        Equipment originalEquip = Config.getData(Id.EQUIPMENT, equipment.getOriginalId());
+        String description = originalEquip.getActiveDes();
         if(description == null) {
-            innerBuilder.append("액티브 효과가 없습니다");
+            innerBuilder.append("\n액티브 효과가 없습니다");
         } else {
             innerBuilder.append(description);
         }
 
-        innerBuilder.append("\n\n[패시브] ");
+        innerBuilder.append("\n\n[패시브]\n");
 
-        description = equipment.getPassiveDes();
+        description = originalEquip.getPassiveDes();
         if(description == null) {
             innerBuilder.append("패시브 효과가 없습니다");
         } else {

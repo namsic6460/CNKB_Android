@@ -43,7 +43,7 @@ public class DisplayManager {
     public void displayInfo(@NonNull Player self, @NonNull Player target) {
         StringBuilder innerMsg = new StringBuilder();
 
-        if(self.equals(target)) {
+        if (self.equals(target)) {
             if (target.getDoing().equals(Doing.WAIT_RESPONSE)) {
                 innerMsg.append(this.getDisplayResponse(target))
                         .append("\n\n");
@@ -82,17 +82,17 @@ public class DisplayManager {
     public String getDisplayResponse(@NonNull Player self) {
         StringBuilder builder = new StringBuilder("---대기중인 대답---\n");
 
-        for(WaitResponse waitResponse : self.getResponseChat().keySet()) {
+        for (WaitResponse waitResponse : self.getResponseChat().keySet()) {
             builder.append(waitResponse.getDisplay())
                     .append("\n");
         }
 
-        if(!self.getAnyResponseChat().isEmpty()) {
+        if (!self.getAnyResponseChat().isEmpty()) {
             builder.append("\n(다른 메세지 목록)");
 
             String waitResponse;
-            for(String response : self.getAnyResponseChat().keySet()) {
-                if(response.startsWith("__")) {
+            for (String response : self.getAnyResponseChat().keySet()) {
+                if (response.startsWith("__")) {
                     waitResponse = response.replace("__", "(ㅜ/n) ");
                 } else {
                     waitResponse = response;
@@ -110,7 +110,7 @@ public class DisplayManager {
         self.revalidateBuff();
 
         StringBuilder builder = new StringBuilder("---스텟---");
-        for(StatType statType : StatType.values()) {
+        for (StatType statType : StatType.values()) {
             builder.append("\n")
                     .append(statType.getDisplayName())
                     .append(": ")
@@ -123,13 +123,13 @@ public class DisplayManager {
     public String getDisplayQuest(@NonNull Player self) {
         StringBuilder builder = new StringBuilder("---퀘스트 목록---");
 
-        if(self.getQuest().isEmpty()) {
+        if (self.getQuest().isEmpty()) {
             return builder.toString() + "\n현재 진행중인 퀘스트 없음";
         }
 
         List<Long> list = new ArrayList<>(self.getQuest().keySet());
         Collections.sort(list);
-        for(long questId : list) {
+        for (long questId : list) {
             Quest quest = Config.getData(Id.QUEST, questId);
 
             builder.append("\n[")
@@ -138,7 +138,7 @@ public class DisplayManager {
                     .append(quest.getName());
 
             Long npcId = quest.getClearNpcId();
-            if(!npcId.equals(0L)) {
+            if (!npcId.equals(0L)) {
                 Npc npc = Config.getData(Id.NPC, npcId);
 
                 builder.append(" (NPC: ")
@@ -153,7 +153,7 @@ public class DisplayManager {
     public String getDisplayMagic(@NonNull Player self) {
         StringBuilder builder = new StringBuilder("---마법 정보---");
 
-        for(MagicType magicType : MagicType.values()) {
+        for (MagicType magicType : MagicType.values()) {
             builder.append("\n")
                     .append(magicType.toString())
                     .append(": ")
@@ -186,15 +186,15 @@ public class DisplayManager {
         int minY = Math.max(0, currentY - movableDistance);
         int maxY = Math.min(Config.MAX_MAP_Y, currentY + movableDistance);
 
-        for(int x = minX; x <= maxX; x++) {
-            for(int y = minY; y <= maxY; y++) {
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
                 flag = false;
 
-                if(x == currentX && y == currentY) {
+                if (x == currentX && y == currentY) {
                     continue;
                 }
 
-                if(x >= currentX - 1 && x <= currentX + 1 && y >= currentY - 1 && y <= currentY + 1) {
+                if (x >= currentX - 1 && x <= currentX + 1 && y >= currentY - 1 && y <= currentY + 1) {
                     builder = msg;
                     distance = 1;
                     flag = true;
@@ -207,7 +207,7 @@ public class DisplayManager {
                     }
                 }
 
-                if(flag) {
+                if (flag) {
                     map = Config.getMapData(x, y);
 
                     builder.append("\n")
@@ -269,7 +269,7 @@ public class DisplayManager {
         StringBuilder innerBuilder = new StringBuilder(Config.SPLIT_BAR);
 
         int rank = 1;
-        for(String name : sortedList) {
+        for (String name : sortedList) {
             innerBuilder.append("\n")
                     .append(rank++)
                     .append(". ")
@@ -283,25 +283,25 @@ public class DisplayManager {
 
     public void displayQuestInfo(@NonNull Player self, @NonNull String questName) {
         Long questId = QuestList.findByName(questName);
-        if(questId == null) {
+        if (questId == null) {
             throw new WeirdCommandException("알 수 없는 퀘스트입니다");
         }
 
-        if(!(self.getQuest().containsKey(questId) || self.getClearedQuest().containsKey(questId))) {
+        if (!(self.getQuest().containsKey(questId) || self.getClearedQuest().containsKey(questId))) {
             throw new WeirdCommandException("받아본 적 없는 퀘스트의 정보는 확인할 수 없습니다");
         }
-        
+
         StringBuilder innerBuilder = new StringBuilder("퀘스트 이름: ");
         Quest quest = Config.getData(Id.QUEST, questId);
-        
+
         innerBuilder.append(quest.getName())
                 .append("\n\n")
                 .append(Config.HARD_SPLIT_BAR)
                 .append("\n\n요구 금액: ")
                 .append(quest.getNeedMoney())
                 .append("\n\n---요구 아이템---");
-        
-        if(quest.getNeedItem().isEmpty()) {
+
+        if (quest.getNeedItem().isEmpty()) {
             innerBuilder.append("\n요구 아이템이 없습니다");
         } else {
             for (Map.Entry<Long, Integer> entry : quest.getNeedItem().entrySet()) {
@@ -312,9 +312,9 @@ public class DisplayManager {
                         .append("개");
             }
         }
-        
+
         innerBuilder.append("\n\n---요구 스텟---");
-        if(quest.getNeedStat().isEmpty()) {
+        if (quest.getNeedStat().isEmpty()) {
             innerBuilder.append("\n요구 스텟이 없습니다");
         } else {
             for (Map.Entry<StatType, Integer> entry : quest.getNeedStat().entrySet()) {
@@ -324,19 +324,19 @@ public class DisplayManager {
                         .append(entry.getValue());
             }
         }
-        
+
         innerBuilder.append("\n\n---요구 친밀도---");
-        if(quest.getNeedCloseRate().isEmpty()) {
+        if (quest.getNeedCloseRate().isEmpty()) {
             innerBuilder.append("\n요구 친밀도가 없습니다");
         } else {
-            for(Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
+            for (Map.Entry<Long, Integer> entry : quest.getNeedCloseRate().entrySet()) {
                 innerBuilder.append("\n")
                         .append(NpcList.findById(entry.getKey()))
                         .append(": ")
                         .append(entry.getValue());
             }
         }
-        
+
         innerBuilder.append("\n\n")
                 .append(Config.HARD_SPLIT_BAR)
                 .append("\n\n클리어 제한 레벨: ")
@@ -350,11 +350,11 @@ public class DisplayManager {
                 .append("\n보상 모험 스텟: ")
                 .append(quest.getRewardAdv())
                 .append("\n\n---보상 아이템---");
-        
-        if(quest.getRewardItem().isEmpty()) {
+
+        if (quest.getRewardItem().isEmpty()) {
             innerBuilder.append("\n보상 아이템이 없습니다");
         } else {
-            for(Map.Entry<Long, Integer> entry : quest.getRewardItem().entrySet()) {
+            for (Map.Entry<Long, Integer> entry : quest.getRewardItem().entrySet()) {
                 innerBuilder.append("\n")
                         .append(ItemList.findById(entry.getKey()))
                         .append(": ")
@@ -364,7 +364,7 @@ public class DisplayManager {
         }
 
         innerBuilder.append("\n\n---보상 스텟---");
-        if(quest.getRewardStat().isEmpty()) {
+        if (quest.getRewardStat().isEmpty()) {
             innerBuilder.append("\n보상 스텟이 없습니다");
         } else {
             for (Map.Entry<StatType, Integer> entry : quest.getRewardStat().entrySet()) {
@@ -376,10 +376,10 @@ public class DisplayManager {
         }
 
         innerBuilder.append("\n\n---보상 친밀도---");
-        if(quest.getRewardCloseRate().isEmpty()) {
+        if (quest.getRewardCloseRate().isEmpty()) {
             innerBuilder.append("\n보상 친밀도가 없습니다");
         } else {
-            for(Map.Entry<Long, Integer> entry : quest.getRewardCloseRate().entrySet()) {
+            for (Map.Entry<Long, Integer> entry : quest.getRewardCloseRate().entrySet()) {
                 innerBuilder.append("\n")
                         .append(NpcList.findById(entry.getKey()))
                         .append(": ")
@@ -388,10 +388,10 @@ public class DisplayManager {
         }
 
         innerBuilder.append("\n\n---보상 아이템 제작법---");
-        if(quest.getRewardItemRecipe().isEmpty()) {
+        if (quest.getRewardItemRecipe().isEmpty()) {
             innerBuilder.append("\n보상 아이템 제작법이 없습니다");
         } else {
-            for(long itemId : quest.getRewardItemRecipe()) {
+            for (long itemId : quest.getRewardItemRecipe()) {
                 innerBuilder.append("\n")
                         .append(Emoji.LIST)
                         .append(" ")
@@ -400,10 +400,10 @@ public class DisplayManager {
         }
 
         innerBuilder.append("\n\n---보상 장비 제작법---");
-        if(quest.getRewardEquipRecipe().isEmpty()) {
+        if (quest.getRewardEquipRecipe().isEmpty()) {
             innerBuilder.append("\n보상 장비 제작법이 없습니다");
         } else {
-            for(long equipId : quest.getRewardEquipRecipe()) {
+            for (long equipId : quest.getRewardEquipRecipe()) {
                 innerBuilder.append("\n")
                         .append(Emoji.LIST)
                         .append(" ")
@@ -413,31 +413,31 @@ public class DisplayManager {
 
         innerBuilder.append("\n\n")
                 .append(Config.HARD_SPLIT_BAR);
-        
+
         self.replyPlayer("퀘스트 정보는 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
     public void displaySkillInfo(@NonNull Player self, @NonNull String skillName) {
         Long skillId = SkillList.findByName(skillName);
-        if(skillId == null) {
+        if (skillId == null) {
             throw new WeirdCommandException("알 수 없는 스킬입니다");
         }
 
         Skill skill = Config.getData(Id.SKILL, skillId);
 
         String innerMsg = Emoji.focus(skillName) + "의 정보\n\n[액티브] ";
-        
-        String description = skill.getActiveDes(); 
-        if(description == null) {
-            innerMsg += "액티브 효과가 없습니다";
+
+        String description = skill.getActiveDes();
+        if (description == null) {
+            innerMsg += "\n액티브 효과가 없습니다";
         } else {
             innerMsg += description;
         }
 
-        innerMsg += "\n\n[패시브] ";
-        
+        innerMsg += "\n\n[패시브]\n";
+
         description = skill.getPassiveDes();
-        if(description == null) {
+        if (description == null) {
             innerMsg += "패시브 효과가 없습니다";
         } else {
             innerMsg += description;
@@ -447,10 +447,12 @@ public class DisplayManager {
     }
 
     public void displayReinforceExplanation(@NonNull Player self) {
-        self.replyPlayer("1. 장비는 최대 " + Config.MAX_REINFORCE_COUNT + "강 까지 강화할 수 있습니다\n" +
-                "2. 강화에 성공할 시 모든 스텟이 균등하게 증가하지만 제한 레벨 또한 증가될 수 있습니다\n" +
-                "3. 일정 횟수 이상 강화에 실패하면 무조건 강화에 성공하는 천장 시스템이 있습니다\n" +
-                "4. 장비의 입수 난이도 및 다양한 조건에 따라 강화의 난이도 및 성장치가 변화합니다");
+        self.replyPlayer(
+                "1. 장비는 최대 " + Config.MAX_REINFORCE_COUNT + "강 까지 강화할 수 있습니다\n" +
+                        "2. 강화에 성공할 시 모든 스텟이 균등하게 증가하지만 제한 레벨 또한 증가될 수 있습니다\n" +
+                        "3. 일정 횟수 이상 강화에 실패하면 무조건 강화에 성공하는 천장 시스템이 있습니다\n" +
+                        "4. 장비의 입수 난이도 및 다양한 조건에 따라 강화의 난이도 및 성장치가 변화합니다"
+        );
     }
 
     public void displayShopHelp(@NonNull Player self) {
@@ -474,7 +476,7 @@ public class DisplayManager {
         StringBuilder innerBuilder = new StringBuilder("---상점 목록---");
 
         boolean exist = false;
-        for(long npcId : npcSet) {
+        for (long npcId : npcSet) {
             try {
                 Config.getData(Id.SHOP, npcId);
             } catch (ObjectNotFoundException e) {
@@ -486,7 +488,7 @@ public class DisplayManager {
                     .append(Objects.requireNonNull(NpcList.findById(npcId)));
         }
 
-        if(!exist) {
+        if (!exist) {
             innerBuilder.append("\n현재 맵에서 이용 가능한 상점이 없습니다");
         }
 
@@ -494,11 +496,14 @@ public class DisplayManager {
     }
 
     public void displayFarmHelp(@NonNull Player self) {
-        self.replyPlayer("1. 농장은 인당 최대 1개 이고 " + Config.FARM_PRICE + "G 에 구매할 수 있습니다\n" +
-                "2. 농장에 식물을 심으면 제거하지 않는 이상 영구 지속됩니다\n" +
-                "3. 농장의 작물은 최대 5일 분량까지 수확할 수 있습니다\n" +
-                "4. 씨앗은 NPC 에게서 구매 가능합니다(시작의 마을의 경우 NPC " + Emoji.focus("엘") + " 에게서 구매 가능)\n" +
-                "5. 농장 레벨을 업그레이드하면 더 많은 씨앗을 심을 수 있습니다");
+        self.replyPlayer(
+                "1. 농장은 인당 최대 1개 이고 " + Config.FARM_PRICE + "G 에 구매할 수 있습니다\n" +
+                        "2. 농장에 식물을 심으면 제거하지 않는 이상 영구 지속됩니다\n" +
+                        "3. 농장의 작물은 최대 5일 분량까지 수확할 수 있습니다\n" +
+                        "4. 씨앗은 NPC 에게서 구매 가능합니다(시작의 마을의 경우 NPC " +
+                        Emoji.focus(NpcList.EL.getDisplayName()) + " 에게서 구매 가능)\n" +
+                        "5. 농장 레벨을 업그레이드하면 더 많은 씨앗을 심을 수 있습니다"
+        );
     }
 
     public void displayFarm(@NonNull Player self) {
@@ -514,7 +519,7 @@ public class DisplayManager {
                 .append(farm.getMaxPlantCount())
                 .append("\n\n---작물 현황---");
 
-        if(farm.getPlanted().isEmpty()) {
+        if (farm.getPlanted().isEmpty()) {
             innerBuilder.append("\n작물이 심어져있지 않습니다");
         } else {
             long currentTime = System.currentTimeMillis();
@@ -552,6 +557,26 @@ public class DisplayManager {
         }
 
         self.replyPlayer("농장 정보는 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+
+    public void displaySkillHelp(@NonNull Player self) {
+        self.replyPlayer(
+                "1. 스킬은 전투중에만 사용이 가능합니다\n" +
+                        "2. 대부분의 스킬의 액티브는 대상이 필요합니다\n" +
+                        "3. 스킬은 NPC 상점에서 스킬 북을 구매하여 사용하면 배울 수 있습니다(시작의 마을의 경우 " +
+                        Emoji.focus(NpcList.SELINA.getDisplayName()) + ")\n"
+        );
+    }
+
+    public void displaySkillList(@NonNull Player self) {
+        StringBuilder innerBuilder = new StringBuilder("---보유 스킬 목록---");
+        
+        for(long skillId : self.getSkill()) {
+            innerBuilder.append("\n- ")
+                    .append(SkillList.findById(skillId));
+        }
+        
+        self.replyPlayer("스킬 목록은 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
 }

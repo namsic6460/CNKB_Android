@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.Objects;
+import java.util.Set;
 
 import lkd.namsic.game.base.SkillUse;
 import lkd.namsic.game.config.Config;
@@ -23,6 +24,8 @@ public class SkillManager {
     public static SkillManager getInstance() {
         return instance;
     }
+
+    private static final String RESIST = "대상이 스킬 저항에 성공했습니다";
 
     public long checkUse(@NonNull Entity self, @NonNull String objectName, @Nullable String other) {
         Long skillId = SkillList.findByName(objectName);
@@ -47,9 +50,16 @@ public class SkillManager {
     }
 
     @NonNull
-    public String use(@NonNull Entity self, long skillId, @Nullable String other) {
+    public String use(@NonNull Entity self, long skillId, @Nullable String other, @NonNull Set<Player> playerSet) {
         Skill skill = Config.getData(Id.SKILL, skillId);
         String skillName = skill.getName();
+
+        String msg = self.getFightName() + " (이/가) " + skillName + " (을/를) 사용했습니다";
+        if(self.getId().getId().equals(Id.PLAYER)) {
+            Player.replyPlayersExcept(playerSet, msg, (Player) self);
+        } else {
+            Player.replyPlayers(playerSet, msg);
+        }
 
         SkillUse use = Objects.requireNonNull(skill.getSkillUse());
         String result = use.tryUse(self, other);
@@ -57,20 +67,24 @@ public class SkillManager {
         if(self.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) self;
 
-            String msg;
             if(use.getWaitTurn() == 0) {
                 msg = result + " 에게 " + skillName + " (을/를) 사용했습니다";
             } else {
-                self.setVariable(Variable.FIGHT_CASTING_SKILL, skillId);
-                self.setVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN, use.getWaitTurn());
+                player.setVariable(Variable.FIGHT_CASTING_SKILL, skillId);
+                player.setVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN, use.getWaitTurn());
                 msg = result + " 에게 " + skillName + " 캐스팅을 시작했습니다";
             }
 
             player.addLog(LogData.TOTAL_SKILL_USE, 1);
             player.replyPlayer(msg);
+
+            if(player.getObjectVariable(Variable.SKILL_RESIST, false)) {
+                player.removeVariable(Variable.SKILL_RESIST);
+                player.replyPlayer(RESIST);
+            }
         }
 
-        return skillName;
+        return "";
     }
 
 }

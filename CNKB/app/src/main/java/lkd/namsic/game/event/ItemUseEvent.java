@@ -10,7 +10,6 @@ import java.util.Set;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.exception.EventRemoveException;
-import lkd.namsic.game.exception.EventSkipException;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
 import lkd.namsic.game.object.Item;
@@ -29,19 +28,19 @@ public abstract class ItemUseEvent implements Event {
         Item item = Config.getData(Id.ITEM, itemId);
 
         if (events != null) {
-            List<Long> removeList = new ArrayList<>();
-
-            for (long eventId : events) {
+            for (long eventId : new ArrayList<>(events)) {
                 ItemUseEvent itemUseEvent = EntityEvents.getEvent(eventId);
 
                 try {
                     itemUseEvent.onUse(self, item, other, count);
                 } catch (EventRemoveException e) {
-                    removeList.add(eventId);
-                } catch (EventSkipException ignore) {}
+                    if(events.size() == 1) {
+                        self.getEvent().remove(getName());
+                    } else {
+                        events.remove(eventId);
+                    }
+                }
             }
-
-            events.removeAll(removeList);
         }
 
         for(long equipId : eventEquipSet) {
@@ -52,7 +51,7 @@ public abstract class ItemUseEvent implements Event {
             } catch (EventRemoveException e) {
                 Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
                 self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
-            } catch (EventSkipException ignore) {}
+            }
         }
     }
 

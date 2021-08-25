@@ -438,7 +438,7 @@ public class EquipCreator implements Creatable {
         equipment.setHandleLv(6);
         equipment.setLimitLv(70);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.TITANIUM.getId(), 30);
+            put(ItemList.TITANIUM.getId(), 20);
             put(ItemList.HARD_COAL.getId(), 10);
             put(ItemList.IMP_HEART.getId(), 10);
         }});
@@ -454,7 +454,7 @@ public class EquipCreator implements Creatable {
         equipment.setLimitLv(70);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_DEVIL_SOUL.getId(), 1);
-            put(ItemList.LIQUID_STONE.getId(), 30);
+            put(ItemList.LIQUID_STONE.getId(), 20);
             put(ItemList.HARD_COAL.getId(), 10);
         }});
         equipment.addBasicStat(StatType.ATS, 100);

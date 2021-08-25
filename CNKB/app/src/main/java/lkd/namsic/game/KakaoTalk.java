@@ -52,6 +52,7 @@ import lkd.namsic.game.command.player.game.ReinforceCommand;
 import lkd.namsic.game.command.player.game.RestCommand;
 import lkd.namsic.game.command.player.game.SettingCommand;
 import lkd.namsic.game.command.player.game.ShopCommand;
+import lkd.namsic.game.command.player.game.SkillCommand;
 import lkd.namsic.game.command.player.game.StatCommand;
 import lkd.namsic.game.command.player.game.UseCommand;
 import lkd.namsic.game.command.player.register.PlayerRegisterCommand;
@@ -119,7 +120,7 @@ public class KakaoTalk {
         registerPlayerCommand(new CraftCommand(),       "제작", "craft");
         registerPlayerCommand(new EatCommand(),         "먹기", "eat");
         registerPlayerCommand(new EquipCommand(),       "장비", "equip");
-        registerPlayerCommand(new FarmCommand(),        "농사", "farm");
+        registerPlayerCommand(new FarmCommand(),        "농사", "농장", "farm");
         registerPlayerCommand(new FightCommand(),       "전투", "fight", "f");
         registerPlayerCommand(new FishCommand(),        "낚시", "fish");
         registerPlayerCommand(new InfoCommand(),        "정보", "info", "i");
@@ -132,6 +133,7 @@ public class KakaoTalk {
         registerPlayerCommand(new ReinforceCommand(),   "강화", "제련", "reinforce", "r");
         registerPlayerCommand(new RestCommand(),        "휴식", "rest");
         registerPlayerCommand(new SettingCommand(),     "설정", "setting", "set");
+        registerPlayerCommand(new SkillCommand(),       "스킬", "skill");
         registerPlayerCommand(new ShopCommand(),        "상점", "shop");
         registerPlayerCommand(new StatCommand(),        "스텟", "stat");
         registerPlayerCommand(new UseCommand(),         "사용", "use");

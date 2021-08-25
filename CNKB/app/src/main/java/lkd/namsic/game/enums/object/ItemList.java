@@ -241,7 +241,15 @@ public enum ItemList {
     BIG_GOLD_SEED("큰 골드 씨앗", 196L),
     SMALL_EXP_SEED("작은 경험치 씨앗", 197L),
     EXP_SEED("경험치 씨앗", 198L),
-    BIG_EXP_SEED("큰 경험치 씨앗", 199L);
+    BIG_EXP_SEED("큰 경험치 씨앗", 199L),
+
+    HARPY_WING("하피의 날개", 200L),
+    HARPY_NAIL("하피의 손톱", 201L),
+
+    GOLEM_CORE("골렘 코어", 202L),
+
+    SKILL_BOOK_SCAR("스킬 북 - 할퀴기", 203L),
+    SKILL_BOOK_CHARM("스킬 북 - 매혹", 204L);
 
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();

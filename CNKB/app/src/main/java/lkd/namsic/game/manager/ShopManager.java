@@ -153,7 +153,8 @@ public class ShopManager {
                             continue;
                         }
 
-                        self.addMoney(price * -1);
+                        price *= -1;
+                        self.addMoney(price);
                         self.addItem(itemId, count, false);
                         self.addLog(LogData.BUY, count);
 
@@ -173,7 +174,7 @@ public class ShopManager {
                         msg += "판매했습니다\n" + "남은";
                     }
                     
-                    self.replyPlayer(msg + " 개수: " + self.getItem(itemId) + "개");
+                    self.replyPlayer(msg + " 개수: " + self.getItem(itemId) + "개 (" + Config.getIncrease(price) + "G)");
                 }
             }
         }
@@ -235,8 +236,8 @@ public class ShopManager {
                 throw new WeirdCommandException("알 수 없는 아이템입니다\n아이템의 이름을 다시 확인해주세요");
             }
             
-            if(count < 1 || count > 999) {
-                throw new WeirdCommandException("아이템의 개수는 1 ~ 999개 사이로 입력해주세요");
+            if(count < 1) {
+                throw new WeirdCommandException("아이템의 개수는 1개 이상으로 입력해주세요");
             }
 
             self.setVariable(Variable.SHOP_ITEM_ID, itemId);

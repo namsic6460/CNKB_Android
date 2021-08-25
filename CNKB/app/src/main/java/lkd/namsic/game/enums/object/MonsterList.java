@@ -23,7 +23,9 @@ public enum MonsterList {
     OAK("오크", 9L),
     SKELETON("해골", 10L),
     IMP("임프", 11L),
-    LOW_DEVIL("하급 악마", 12L);
+    LOW_DEVIL("하급 악마", 12L),
+    HARPY("하피", 13L),
+    GOLEM("골렘", 14L);
 
     public static final Map<String, MonsterList> nameMap = new HashMap<>();
     public static final Map<Long, MonsterList> idMap = new HashMap<>();

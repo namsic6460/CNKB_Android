@@ -89,7 +89,11 @@ public abstract class Entity extends NamedObject {
     final Map<Long, Integer> lastDropItem = new HashMap<>();
     final Set<Long> lastDropEquip = new HashSet<>();
     boolean lastAttackSuccess = false;
+
     int lastDamage = 0;
+    int lastDrain = 0;
+    boolean isLastCrit = false;
+    int lastHeal = 0;
 
     @Setter
     @Nullable
@@ -106,12 +110,13 @@ public abstract class Entity extends NamedObject {
 
     @NonNull
     public String getDisplayHp() {
-        return this.getDisplayHp(this.getStat(StatType.HP));
-    }
+        int maxHp = this.getStat(StatType.MAXHP);
 
-    @NonNull
-    public String getDisplayHp(int hp) {
-        return Config.getBar(hp, this.getStat(StatType.MAXHP));
+        if(this.getKiller() == null) {
+            return Config.getBar(Math.max(this.getStat(StatType.HP), 0), maxHp);
+        } else {
+            return Config.getBar(0, maxHp);
+        }
     }
 
     @NonNull
@@ -517,6 +522,10 @@ public abstract class Entity extends NamedObject {
     }
 
     public void addEvent(@NonNull EventList eventData) {
+        this.addEvent(eventData, false);
+    }
+
+    public void addEvent(@NonNull EventList eventData, boolean ignore) {
         long eventId = eventData.getId();
         Event event = EntityEvents.getEvent(eventId);
         String eventName = event.getClassName();
@@ -527,7 +536,9 @@ public abstract class Entity extends NamedObject {
             eventList.add(eventId);
             this.event.put(eventName, eventList);
         } else {
-            eventList.add(eventId);
+            if(ignore || !eventList.contains(eventId)) {
+                eventList.add(eventId);
+            }
         }
     }
 
@@ -558,33 +569,33 @@ public abstract class Entity extends NamedObject {
         return fightableList.contains(this.doing) && fightableList.contains(enemy.doing);
     }
 
-    public boolean attack(@NonNull Entity entity, boolean print) {
-        return this.damage(entity, new Int(this.getStat(StatType.ATK)), new Int(), new Int(), true, true, print);
+    public void attack(@NonNull Entity entity, boolean print) {
+        this.damage(entity, new Int(this.getStat(StatType.ATK)), new Int(), new Int(), true, true, print);
     }
 
-    public boolean damage(@NonNull Entity entity, double physicDmg, double magicDmg, double staticDmg,
+    public void damage(@NonNull Entity entity, double physicDmg, double magicDmg, double staticDmg,
                           boolean canEvade, boolean canCrit, boolean print) {
-        return damage(entity, (int) physicDmg, (int) magicDmg, (int) staticDmg, canEvade, canCrit, print);
+        damage(entity, (int) physicDmg, (int) magicDmg, (int) staticDmg, canEvade, canCrit, print);
     }
 
-    public boolean damage(@NonNull Entity entity, int physicDmg, int magicDmg, int staticDmg,
+    public void damage(@NonNull Entity entity, int physicDmg, int magicDmg, int staticDmg,
                           boolean canEvade, boolean canCrit, boolean print) {
-        return damage(entity, new Int(physicDmg), new Int(magicDmg), new Int(staticDmg), canEvade, canCrit, print);
+        damage(entity, new Int(physicDmg), new Int(magicDmg), new Int(staticDmg), canEvade, canCrit, print);
     }
 
-    public boolean damage(@NonNull Entity entity, @NonNull Int physicDmg, @NonNull Int magicDmg, @NonNull Int staticDmg,
+    public void damage(@NonNull Entity target, @NonNull Int physicDmg, @NonNull Int magicDmg, @NonNull Int staticDmg,
                           boolean canEvade, boolean canCrit, boolean print) {
         Random random = new Random();
 
         this.revalidateBuff();
 
-        if(entity instanceof Monster && this.id.getId().equals(Id.PLAYER)) {
-            ((Monster) entity).getAngryPlayers().add(this.id.getObjectId());
+        if(target instanceof Monster && this.id.getId().equals(Id.PLAYER)) {
+            ((Monster) target).getAngryPlayers().add(this.id.getObjectId());
         }
 
         boolean evade = false;
         if(canEvade) {
-            evade = random.nextInt(100) < Math.min(entity.getStat(StatType.EVA) - this.getStat(StatType.ACC), Config.MAX_EVADE);
+            evade = random.nextInt(100) < Math.min(target.getStat(StatType.EVA) - this.getStat(StatType.ACC), Config.MAX_EVADE);
         }
 
         if(!evade) {
@@ -592,22 +603,22 @@ public abstract class Entity extends NamedObject {
 
             String eventName = PreDamageEvent.getName();
             PreDamageEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName),
-                    entity, physicDmg, magicDmg, staticDmg, canCrit);
+                    target, physicDmg, magicDmg, staticDmg, canCrit);
 
-            int def = Math.max(entity.getStat(StatType.DEF) - this.getStat(StatType.BRE), 0);
-            int mdef = Math.max(entity.getStat(StatType.MDEF) - this.getStat(StatType.MBRE), 0);
+            int def = Math.max(target.getStat(StatType.DEF) - this.getStat(StatType.BRE), 0);
+            int mdef = Math.max(target.getStat(StatType.MDEF) - this.getStat(StatType.MBRE), 0);
 
             physicDmg.set(Math.max(physicDmg.get() - def, 0));
             magicDmg.set(Math.max(magicDmg.get() - mdef, 0));
 
             int heal = 0;
-            boolean isDefencing = entity.getObjectVariable(Variable.IS_DEFENCING, false);
+            boolean isDefencing = target.getObjectVariable(Variable.IS_DEFENCING, false);
             if(isDefencing) {
                 heal = (int) (physicDmg.get() * (new Random().nextInt(41) + 30) / 100D);
                 physicDmg.set(0);
 
-                entity.addBasicStat(StatType.HP, heal);
-                entity.setVariable(Variable.IS_DEFENCING, false);
+                target.addBasicStat(StatType.HP, heal);
+                target.setVariable(Variable.IS_DEFENCING, false);
             }
 
             Int dra = new Int(physicDmg.get() * Math.min(this.getStat(StatType.DRA), 100) / 100);
@@ -627,60 +638,32 @@ public abstract class Entity extends NamedObject {
 
             eventName = DamageEvent.getName();
             DamageEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName),
-                    entity, totalDmg, totalDra, isCrit, canCrit);
+                    target, totalDmg, totalDra, isCrit, canCrit);
 
             eventName = DamagedEvent.getName();
-            DamagedEvent.handleEvent(entity, entity.event.get(eventName), entity.getEquipEvents(eventName),
+            DamagedEvent.handleEvent(target, target.event.get(eventName), target.getEquipEvents(eventName),
                     this, totalDmg, totalDra, isCrit);
 
-            if(this.id.getId().equals(Id.PLAYER)) {
-                ((Player) this).setLastCrit(isCrit.get());
-            }
-
-            boolean isDeath = entity.addBasicStat(StatType.HP, -1 * Math.max(totalDmg.get(), 1));
+            boolean isDeath = target.addBasicStat(StatType.HP, -1 * Math.max(totalDmg.get(), 1));
             this.addBasicStat(StatType.HP, totalDra.get());
 
-            String hp;
-            if (isDeath) {
-                entity.setKiller(this.id);
-                hp = entity.getDisplayHp(0);
-            } else {
-                hp = entity.getDisplayHp();
-            }
-
-            if (!isDeath) {
-                String selfHp = this.getDisplayHp();
-                String innerMsg = "총 데미지: " + totalDmg + "\n총 흡수량: " + totalDra + "\n";
-
-                this.lastDamage = totalDmg.get();
-
-                if (print && this.id.getId().equals(Id.PLAYER)) {
-                    String msg = "공격에 성공했습니다\n적 체력: " + hp;
-                    if (isCrit.get()) {
-                        msg = "[치명타!] " + msg;
-                    }
-
-                    ((Player) this).replyPlayer(msg, innerMsg + "남은 체력: " + selfHp);
-                }
-
-                //Used instanceof because of warning
-                if (entity instanceof Player) {
-                    String msg = this.getName() + " 에게 공격당했습니다!\n남은 체력: " + hp;
-                    if (isCrit.get()) {
-                        msg = "[치명타!] " + msg;
-                    }
-
-                    if (isDefencing) {
-                        msg += "\n방어로 인해 회복한 체력: " + heal;
-                    }
-
-                    ((Player) entity).replyPlayer(msg, innerMsg + "적 체력: " + selfHp);
-                }
-            }
+            this.lastDamage = totalDmg.get();
+            this.lastDrain = totalDra.get();
+            this.isLastCrit = isCrit.get();
+            target.lastHeal = heal;
 
             if (isDeath) {
-                this.onKill(entity);
-                return true;
+                target.setKiller(this.id);
+                this.onKill(target);
+            } else if(print) {
+                if(this.id.getId().equals(Id.PLAYER)) {
+                    ((Player) this).printDamageMsg(target);
+                }
+
+                //Change to instanceof because of warning
+                if(target instanceof Player) {
+                    ((Player) target).printDamagedMsg(this);
+                }
             }
         } else {
             lastAttackSuccess = false;
@@ -690,12 +673,10 @@ public abstract class Entity extends NamedObject {
             }
 
             //Used instanceof because of warning
-            if (entity instanceof Player) {
-                ((Player) entity).replyPlayer(this.getName() + " 의 공격을 피했습니다");
+            if (target instanceof Player) {
+                ((Player) target).replyPlayer(this.getName() + " 의 공격을 피했습니다");
             }
         }
-
-        return false;
     }
 
     public int getFieldDistance(@NonNull Location location) {

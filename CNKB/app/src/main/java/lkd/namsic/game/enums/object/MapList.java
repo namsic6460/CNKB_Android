@@ -12,6 +12,7 @@ import lombok.Getter;
 
 public enum MapList {
 
+    INCOMPLETE(Config.INCOMPLETE, -1, -1),
     START_VILLAGE("시작의 마을", 0, 0),
     QUITE_SEASHORE("조용한 바닷가", 0, 1),
     DARK_CAVE("어두운 동굴", 0, 2),
@@ -23,9 +24,11 @@ public enum MapList {
     FERTILE_FARM("비옥한 농장", 2, 0),
     BLUE_FIELD("푸른 초원", 2, 1),
     VILLAGE_CEMETERY("마을 공동묘지", 2, 2),
+    STONE_MOUNTAIN("돌 산", 2, 3),
     GLOOMY_FIELD("스산한 평야", 3, 0),
     OVERGROWN_FOREST("우거진 숲", 3, 1),
-    OAK_MOUNTAIN("오크 산", 3, 2);
+    OAK_MOUNTAIN("오크 산", 3, 2),
+    SKY_HILL("하늘 언덕", 3, 3);
 
     public static final Map<String, MapList> nameMap = new HashMap<>();
     public static final Map<Location, MapList> locationMap = new HashMap<>();
@@ -35,6 +38,9 @@ public enum MapList {
             nameMap.put(value.displayName, value);
             locationMap.put(value.location, value);
         }
+
+        nameMap.remove(INCOMPLETE.displayName);
+        locationMap.remove(INCOMPLETE.location);
     }
 
     @Getter

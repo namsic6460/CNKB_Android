@@ -53,7 +53,7 @@ public class RandomList {
             Arrays.asList(0D, 0.5D, 5.5D, 12D, 40D, 20D, 0D, 0D, 0D),
             Arrays.asList(0D, 0D, 0.5D, 7.6D, 10D, 30D, 25D, 0D, 0D),
             Arrays.asList(0D, 0D, 0D, 0.4D, 4.98D, 15D, 25D, 20D, 0D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0.019D, 4.8D, 15D, 32.5D, 30.5D),
+            Arrays.asList(0D, 0D, 0D, 0D, 0.019D, 4.85D, 15D, 32.5D, 30.5D),
             Arrays.asList(0D, 0D, 0D, 0D, 0.001D, 0.149D, 4.79D, 17.5D, 30.3D),
             Arrays.asList(0D, 0D, 0D, 0D, 0D, 0.001D, 0.2095D, 4.99D, 19.042D),
             Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0.0005D, 0.009D, 0.1577D),

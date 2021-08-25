@@ -10,6 +10,7 @@ import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.EventList;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.MonsterList;
+import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.object.Monster;
 import lkd.namsic.setting.Logger;
 
@@ -21,7 +22,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.SHEEP);
         monster.setLv(2);
-        monster.setLocation(null);
         monster.setType(MonsterType.MIDDLE);
 
         monster.setBasicStat(StatType.MAXHP, 20);
@@ -38,7 +38,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.PIG);
         monster.setLv(8);
-        monster.setLocation(null);
         monster.setType(MonsterType.MIDDLE);
 
         monster.setBasicStat(StatType.MAXHP, 60);
@@ -55,7 +54,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.COW);
         monster.setLv(20);
-        monster.setLocation(null);
         monster.setType(MonsterType.MIDDLE);
 
         monster.setBasicStat(StatType.MAXHP, 100);
@@ -73,7 +71,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.SKELETON);
         monster.setLv(25);
-        monster.setLocation(null);
         monster.setType(MonsterType.BAD);
 
         monster.setBasicStat(StatType.MAXHP, 150);
@@ -89,7 +86,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.ZOMBIE);
         monster.setLv(30);
-        monster.setLocation(null);
 
         monster.setBasicStat(StatType.MAXHP, 300);
         monster.setBasicStat(StatType.HP, 300);
@@ -106,7 +102,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.SLIME);
         monster.setLv(45);
-        monster.setLocation(null);
 
         monster.setBasicStat(StatType.MAXHP, 400);
         monster.setBasicStat(StatType.HP, 400);
@@ -123,7 +118,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.SPIDER);
         monster.setLv(50);
-        monster.setLocation(null);
 
         monster.setBasicStat(StatType.MAXHP, 75);
         monster.setBasicStat(StatType.HP, 75);
@@ -142,7 +136,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.TROLL);
         monster.setLv(70);
-        monster.setLocation(null);
 
         monster.setBasicStat(StatType.MAXHP, 550);
         monster.setBasicStat(StatType.HP, 550);
@@ -160,7 +153,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.ENT);
         monster.setLv(60);
-        monster.setLocation(null);
 
         monster.setBasicStat(StatType.MAXHP, 150);
         monster.setBasicStat(StatType.HP, 150);
@@ -178,7 +170,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.IMP);
         monster.setLv(70);
-        monster.setLocation(null);
 
         monster.setBasicStat(StatType.MAXHP, 250);
         monster.setBasicStat(StatType.HP, 250);
@@ -201,7 +192,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.OAK);
         monster.setLv(90);
-        monster.setLocation(null);
 
         monster.setBasicStat(StatType.MAXHP, 400);
         monster.setBasicStat(StatType.HP, 400);
@@ -223,7 +213,6 @@ public class MonsterCreator implements Creatable {
 
         monster = new Monster(MonsterList.LOW_DEVIL);
         monster.setLv(110);
-        monster.setLocation(null);
         monster.setType(MonsterType.MIDDLE);
 
         monster.setBasicStat(StatType.MAXHP, 450);
@@ -232,7 +221,7 @@ public class MonsterCreator implements Creatable {
         monster.setBasicStat(StatType.ATS, 150);
         monster.setBasicStat(StatType.BRE, 15);
         monster.setBasicStat(StatType.DEF, 20);
-        monster.setBasicStat(StatType.MDEF, 20);
+        monster.setBasicStat(StatType.MDEF, 10);
         monster.setBasicStat(StatType.DRA, 40);
         monster.setBasicStat(StatType.ACC, 50);
         monster.setBasicStat(StatType.EVA, 30);
@@ -247,7 +236,55 @@ public class MonsterCreator implements Creatable {
         Config.unloadObject(monster);
 
 
-        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 13L));
+        monster = new Monster(MonsterList.HARPY);
+        monster.setLv(125);
+
+        monster.setBasicStat(StatType.MAXHP, 550);
+        monster.setBasicStat(StatType.HP, 550);
+        monster.setBasicStat(StatType.MAXMN, 50);
+        monster.setBasicStat(StatType.MN, 50);
+        monster.setBasicStat(StatType.ATK, 100);
+        monster.setBasicStat(StatType.MATK, 80);
+        monster.setBasicStat(StatType.ATS, 160);
+        monster.setBasicStat(StatType.DEF, 20);
+        monster.setBasicStat(StatType.MDEF, 40);
+        monster.setBasicStat(StatType.AGI, 100);
+        monster.setBasicStat(StatType.ACC, 50);
+        monster.setBasicStat(StatType.EVA, 100);
+
+        monster.setItemDrop(ItemList.HARPY_WING.getId(), 0.2D, 1, 1);
+        monster.setItemDrop(ItemList.HARPY_NAIL.getId(), 0.2D, 1, 1);
+        monster.setItemDrop(ItemList.MAGIC_STONE.getId(), 1D, 2, 2);
+        monster.setItemDrop(ItemList.SKILL_BOOK_SCAR.getId(), 0.005D, 1, 1);
+        monster.setItemDrop(ItemList.SKILL_BOOK_CHARM.getId(), 0.002D, 1, 1);
+
+        monster.addSkill(SkillList.SCAR.getId());
+        monster.setSkillPercent(SkillList.SCAR.getId(), 0.25D);
+        monster.addSkill(SkillList.CHARM.getId());
+        monster.setSkillPercent(SkillList.CHARM.getId(), 0.1D);
+
+        Config.unloadObject(monster);
+
+
+        monster = new Monster(MonsterList.GOLEM);
+        monster.setLv(140);
+
+        monster.setBasicStat(StatType.MAXHP, 900);
+        monster.setBasicStat(StatType.HP, 900);
+        monster.setBasicStat(StatType.ATK, 100);
+        monster.setBasicStat(StatType.ATS, 60);
+        monster.setBasicStat(StatType.DEF, 100);
+        monster.setBasicStat(StatType.ACC, 100);
+
+        monster.setItemDrop(ItemList.STONE.getId(), 1D, 1, 10);
+        monster.setItemDrop(ItemList.GOLEM_CORE.getId(), 0.1D, 1, 1);
+
+        monster.addEvent(EventList.GOLEM_ATTACKED);
+
+        Config.unloadObject(monster);
+
+
+        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 15L));
         Logger.i("ObjectMaker", "Monster making is done!");
     }
 

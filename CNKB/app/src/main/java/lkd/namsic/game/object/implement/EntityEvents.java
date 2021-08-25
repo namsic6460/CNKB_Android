@@ -9,17 +9,23 @@ import java.util.Objects;
 import lkd.namsic.game.base.Bool;
 import lkd.namsic.game.base.IdClass;
 import lkd.namsic.game.base.Int;
+import lkd.namsic.game.base.WrappedObject;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EventList;
+import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.event.DamageEvent;
 import lkd.namsic.game.event.DamagedEvent;
 import lkd.namsic.game.event.Event;
+import lkd.namsic.game.event.FightEndEvent;
 import lkd.namsic.game.event.PreDamageEvent;
+import lkd.namsic.game.event.SelfTurnEvent;
 import lkd.namsic.game.event.StartFightEvent;
+import lkd.namsic.game.event.TurnEvent;
 import lkd.namsic.game.exception.EventRemoveException;
 import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Entity;
@@ -110,6 +116,110 @@ public class EntityEvents {
 
                 if(atk <= basicAtk * 2) {
                     self.addBasicStat(StatType.ATK, (int) (atk * 0.1));
+                }
+            }
+        });
+
+        put(EventList.SCAR_BLOOD.getId(), new TurnEvent() {
+            @Override
+            public void onTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> wrappedAttacker) {
+                int scarBlood = self.getVariable(Variable.SCAR_BLOOD);
+                int scarBloodDmg = self.getVariable(Variable.SCAR_BLOOD_DAMAGE);
+
+                if(scarBlood > 0) {
+                    Entity attacker = Objects.requireNonNull(self.getObjectVariable(Variable.SCAR_ENTITY));
+                    attacker.damage(self, scarBloodDmg, 0, 0, false, false, false);
+
+                    scarBlood--;
+                    if(scarBlood == 0) {
+                        throw new EventRemoveException();
+                    } else {
+                        self.setVariable(Variable.SCAR_BLOOD, scarBlood);
+                    }
+                } else {
+                    throw new EventRemoveException();
+                }
+            }
+        });
+
+        put(EventList.SCAR_END.getId(), new FightEndEvent() {
+            @Override
+            public void onFightEnd(@NonNull Entity self) {
+                self.removeVariable(Variable.SCAR_ENTITY);
+                self.removeVariable(Variable.SCAR_BLOOD);
+                self.removeVariable(Variable.SCAR_BLOOD_DAMAGE);
+
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.CHARM.getId(), new SelfTurnEvent() {
+            @Override
+            public void onSelfTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> wrappedAttacker) {
+                Entity attacker = self.getObjectVariable(Variable.CHARM_ENTITY);
+                if(attacker != null) {
+                    wrappedAttacker.set(attacker);
+
+                    self.setVariable(Variable.CHARM_SUCCESS, true);
+                    self.addEvent(EventList.CHARM_ATTACK);
+                    self.addEvent(EventList.CHARM_REMOVE);
+                    
+                    if(attacker.getId().getId().equals(Id.PLAYER)) {
+                        ((Player) attacker).replyPlayer(Emoji.focus(SkillList.CHARM.getDisplayName()) +
+                                " 스킬로 턴을 빼앗았습니다\n이번 턴의 공격이 강화됩니다");
+                    }
+                }
+
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.CHARM_END.getId(), new FightEndEvent() {
+            @Override
+            public void onFightEnd(@NonNull Entity self) {
+                self.removeVariable(Variable.CHARM_ENTITY);
+                self.removeVariable(Variable.CHARM_SUCCESS);
+
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.CHARM_ATTACK.getId(), new DamageEvent() {
+            @Override
+            public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
+                                 @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
+                Entity entity = self.getObjectVariable(Variable.CHARM_ENTITY);
+
+                if(entity != null && entity.getObjectVariable(Variable.CHARM_SUCCESS, false)) {
+                    if (canCrit && !isCrit.get()) {
+                        isCrit.set(true);
+                        totalDmg.multiple(3);
+                    }
+                }
+
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.CHARM_REMOVE.getId(), new TurnEvent() {
+            @Override
+            public void onTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> attacker) {
+                if(self.getObjectVariable(Variable.CHARM_SUCCESS, false)) {
+                    self.removeVariable(Variable.CHARM_SUCCESS);
+                }
+
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.GOLEM_ATTACKED.getId(), new DamagedEvent() {
+            @Override
+            public void onDamaged(@NonNull Entity self, @NonNull Entity attacker, @NonNull Int totalDmg,
+                                  @NonNull Int totalDra, @NonNull Bool isCrit) {
+                int def = self.getStat(StatType.DEF);
+
+                if(def > 0) {
+                    self.addBasicStat(StatType.DEF, Math.max(-1 * def, -10));
                 }
             }
         });

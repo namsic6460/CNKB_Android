@@ -14,7 +14,14 @@ public enum EventList {
     ENT_DAMAGED(1L),
     OAK_START_FIGHT(2L),
     SKILL_SMITE(3L),
-    IMP_ATTACK(4L);
+    IMP_ATTACK(4L),
+    SCAR_BLOOD(5L),
+    SCAR_END(6L),
+    CHARM(7L),
+    CHARM_END(8L),
+    CHARM_ATTACK(9L),
+    CHARM_REMOVE(10L),
+    GOLEM_ATTACKED(11L);
 
     public static final Map<Long, EventList> idMap = new HashMap<>();
 

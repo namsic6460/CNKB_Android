@@ -2,16 +2,26 @@ package lkd.namsic.game.object;
 
 import androidx.annotation.NonNull;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
 import lkd.namsic.game.base.ConcurrentHashSet;
+import lkd.namsic.game.base.SkillUse;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.FightWaitType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MonsterType;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.MonsterList;
+import lkd.namsic.game.exception.InvalidNumberException;
+import lkd.namsic.game.exception.NumberRangeException;
+import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.manager.FightManager;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,6 +39,8 @@ public class Monster extends AiEntity {
 
     final Set<Long> angryPlayers = new ConcurrentHashSet<>();
 
+    final Map<Long, Double> skillPercent = new HashMap<>();
+
     protected Monster(@NonNull String name, long originalId) {
         super(name);
 
@@ -42,6 +54,8 @@ public class Monster extends AiEntity {
 
         this.id.setObjectId(monsterData.getId());
         this.originalId = monsterData.getId();
+
+        this.location = null;
     }
 
     public void randomLevel() {
@@ -66,11 +80,28 @@ public class Monster extends AiEntity {
         this.setBasicStat(StatType.MN, this.getStat(StatType.MAXMN));
     }
 
-    public Object[] onTurn(Set<Player> players) {
+    public void setSkillPercent(long skillId, double percent) {
+        if(percent < 0 || percent > 1) {
+            throw new NumberRangeException(percent, 0, 1);
+        }
+
+        if(!this.skill.contains(skillId)) {
+            throw new InvalidNumberException(skillId);
+        }
+
+        this.skillPercent.put(skillId, percent);
+    }
+
+    public double getSkillPercent(long skillId) {
+        return this.skillPercent.getOrDefault(skillId, 0D);
+    }
+
+    public Object[] onTurn(Set<Player> players, Set<Player> exceptSet) {
         Object[] output = new Object[2];
 
         Object[] playerArray;
         Random random = new Random();
+
         if(type.equals(MonsterType.BAD)) {
             output[0] = FightWaitType.ATTACK;
 
@@ -93,6 +124,54 @@ public class Monster extends AiEntity {
             }
         } else {
             output[0] = FightWaitType.WAIT;
+        }
+
+        if(output[0].equals(FightWaitType.ATTACK)) {
+            for(long skillId : this.skill) {
+                if(this.getSkillPercent(skillId) >= random.nextDouble()) {
+                    Skill skill = Config.getData(Id.SKILL, skillId);
+                    SkillUse use = Objects.requireNonNull(skill.getSkillUse());
+
+                    long fightId = FightManager.getInstance().getFightId(this.id);
+                    Map<Integer, Entity> targetMap = FightManager.getInstance().getTargetMap(fightId);
+
+                    int playerCount = targetMap.size();
+                    if(playerCount < use.getMinTargetCount()) {
+                        continue;
+                    }
+
+                    int count = 1;
+                    int otherCount = random.nextInt(Math.min(use.getMaxTargetCount(), playerCount)) + 1;
+
+                    StringBuilder otherBuilder = new StringBuilder();
+                    for(Map.Entry<Integer, Entity> entry : targetMap.entrySet()) {
+                        exceptSet.add((Player) entry.getValue());
+                        otherBuilder.append(entry.getKey())
+                                .append(",");
+
+                        if(count++ == otherCount) {
+                            break;
+                        }
+                    }
+
+                    String other = otherBuilder.toString();
+                    other = other.substring(0, other.length() - 1);
+
+                    this.setVariable(Variable.FIGHT_TARGET_MAX_INDEX, playerCount);
+
+                    try {
+                        use.checkUse(this, other);
+                    } catch (WeirdCommandException e) {
+                        continue;
+                    }
+
+                    output[0] = FightWaitType.SKILL;
+                    this.setVariable(Variable.FIGHT_OBJECT_ID, skillId);
+                    this.setVariable(Variable.FIGHT_OTHER, other);
+
+                    break;
+                }
+            }
         }
 
         return output;

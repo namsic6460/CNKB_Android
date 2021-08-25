@@ -57,14 +57,16 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " (낚시/fish) [{낚시 레벨}] : 낚시를 합니다\n\n" +
                         Emoji.LIST + " (전투/fight/f) ({플레이어 닉네임}/{번호}) : 전투를 시작합니다\n\n" +
                         Emoji.LIST + " (모험/adventure/adv) : 모험을 합니다\n\n" +
-                        Emoji.LIST + " *(농사/farm) : 농장에 대한 설명을 표시합니다\n\n" +
-                        Emoji.LIST + " (농사/farm) (구입/구매/buy) : 농장을 구매합니다\n\n" +
-                        Emoji.LIST + " (농사/farm) (심기/plant) ({씨앗 이름}) [{개수}] : 농장에 씨앗을 심습니다\n\n" +
-                        Emoji.LIST + " *(농사/farm) (확인/check) : 농장을 확인합니다\n\n" +
-                        Emoji.LIST + " (농사/farm) (제거/remove) ({씨앗 번호}) : 씨앗을 제거합니다\n\n" +
-                        Emoji.LIST + " (농사/farm) (수확/harvest) : 작물을 수확합니다\n\n" +
-                        Emoji.LIST + " (농사/farm) (업그레이드/upgrade) : 농장을 업그레이드 합니다\n\n" +
-                        Emoji.LIST + " (스텟/stat) : 스텟 정보를 표시합니다\n\n" +
+                        Emoji.LIST + " *(농사/농장/farm) : 농장에 대한 설명을 표시합니다\n\n" +
+                        Emoji.LIST + " (농사/농장/farm) (구입/구매/buy) : 농장을 구매합니다\n\n" +
+                        Emoji.LIST + " (농사/농장/farm) (심기/plant) ({씨앗 이름}) [{개수}] : 농장에 씨앗을 심습니다\n\n" +
+                        Emoji.LIST + " *(농사/농장/farm) (확인/check) : 농장을 확인합니다\n\n" +
+                        Emoji.LIST + " (농사/농장/farm) (제거/remove) ({씨앗 번호}) : 씨앗을 제거합니다\n\n" +
+                        Emoji.LIST + " (농사/농장/farm) (수확/harvest) : 작물을 수확합니다\n\n" +
+                        Emoji.LIST + " (농사/농장/farm) (업그레이드/upgrade) : 농장을 업그레이드 합니다\n\n" +
+                        Emoji.LIST + " *(스킬/skill) : 스킬에 대한 설명을 표시합니다\n\n" +
+                        Emoji.LIST + " *(스킬/skill) (목록/list) : 보유하고 있는 스킬 목록을 표시합니다\n\n" +
+                        Emoji.LIST + " *(스텟/stat) : 스텟 정보를 표시합니다\n\n" +
                         Emoji.LIST + " (스텟/stat) ({스텟 이름}) ({숫자}) : SP를 소모하여 스텟을 증가시킵니다\n\n" +
                         Emoji.LIST + " *(제작/craft) (아이템/item/장비/equip) : 제작 가능한 아이템 또는 장비 목록을 표시합니다\n\n" +
                         Emoji.LIST + " *(제작/craft) (확인/check) ({아이템 또는 장비 이름}) : 아이템 또는 장비의 제작법을 표시합니다\n\n" +

@@ -12,7 +12,6 @@ import lkd.namsic.game.base.Int;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.exception.EventRemoveException;
-import lkd.namsic.game.exception.EventSkipException;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
 import lkd.namsic.game.object.implement.EntityEvents;
@@ -29,19 +28,19 @@ public abstract class DamageEvent implements Event {
                                    @NonNull Entity victim, @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit,
                                    boolean canCrit) {
         if (events != null) {
-            List<Long> removeList = new ArrayList<>();
-
-            for (long eventId : events) {
+            for (long eventId : new ArrayList<>(events)) {
                 DamageEvent damageEvent = EntityEvents.getEvent(eventId);
 
                 try {
                     damageEvent.onDamage(self, victim, totalDmg, totalDra, isCrit, canCrit);
                 } catch (EventRemoveException e) {
-                    removeList.add(eventId);
-                } catch (EventSkipException ignore) {}
+                    if(events.size() == 1) {
+                        self.getEvent().remove(getName());
+                    } else {
+                        events.remove(eventId);
+                    }
+                }
             }
-
-            events.removeAll(removeList);
         }
 
         for(long equipId : eventEquipSet) {
@@ -52,7 +51,7 @@ public abstract class DamageEvent implements Event {
             } catch (EventRemoveException e) {
                 Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
                 self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
-            } catch (EventSkipException ignore) {}
+            }
         }
     }
 

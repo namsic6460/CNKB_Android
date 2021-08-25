@@ -10,6 +10,7 @@ import java.util.List;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.game.manager.DisplayManager;
@@ -39,6 +40,10 @@ public class InfoCommand extends PlayerCommand {
             }
 
             Player target = Config.getData(Id.PLAYER, playerId);
+            if(!target.getObjectVariable(Variable.INFO_PUBLIC, true)) {
+                throw new WeirdCommandException("해당 유저의 정보는 비공개되어 있습니다");
+            }
+
             DisplayManager.getInstance().displayInfo(player, target);
         }
     }

@@ -7,33 +7,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import lkd.namsic.game.base.Int;
+import lkd.namsic.game.base.WrappedObject;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.exception.EventRemoveException;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
-import lkd.namsic.game.object.Item;
 import lkd.namsic.game.object.implement.EntityEvents;
 import lkd.namsic.game.object.implement.EquipEvents;
 
-public abstract class MineEvent implements Event {
+public abstract class TurnEvent implements Event {
 
     @NonNull
     public static String getName() {
-        return "MineEvent";
+        return "TurnEvent";
     }
 
     public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events,
-                                   @NonNull Set<Long> eventEquipSet, long itemId, @NonNull Int mineCount) {
-        Item item = Config.getData(Id.ITEM, itemId);
-
+                                   @NonNull Set<Long> eventEquipSet, @NonNull WrappedObject<Entity> attacker) {
         if (events != null) {
             for (long eventId : new ArrayList<>(events)) {
-                MineEvent mineEvent = EntityEvents.getEvent(eventId);
+                TurnEvent turnEvent = EntityEvents.getEvent(eventId);
 
                 try {
-                    mineEvent.onMine(self, item, mineCount);
+                    turnEvent.onTurn(self, attacker);
                 } catch (EventRemoveException e) {
                     if(events.size() == 1) {
                         self.getEvent().remove(getName());
@@ -45,10 +42,10 @@ public abstract class MineEvent implements Event {
         }
 
         for(long equipId : eventEquipSet) {
-            MineEvent mineEvent = EquipEvents.getEvent(equipId, getName());
+            TurnEvent turnEvent = EquipEvents.getEvent(equipId, getName());
 
             try {
-                mineEvent.onMine(self, item, mineCount);
+                turnEvent.onTurn(self, attacker);
             } catch (EventRemoveException e) {
                 Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
                 self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
@@ -56,7 +53,7 @@ public abstract class MineEvent implements Event {
         }
     }
 
-    public abstract void onMine(@NonNull Entity self, @NonNull Item item, @NonNull Int mineCount);
+    public abstract void onTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> attacker);
 
     @NonNull
     @Override

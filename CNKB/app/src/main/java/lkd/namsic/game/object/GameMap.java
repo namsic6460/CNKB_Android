@@ -20,6 +20,7 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
+import lkd.namsic.game.enums.object.MapList;
 import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
@@ -46,7 +47,7 @@ public class GameMap {
     @Setter
     int requireLv = 1;
 
-    final Location location = new Location();
+    final Location location;
 
     final Set<Long> spawnMonster = new ConcurrentHashSet<>();
     final Map<Long, Integer> spawnMaxCount = new ConcurrentHashMap<>();
@@ -59,8 +60,9 @@ public class GameMap {
     final Map<Location, Set<Long>> equip = new ConcurrentHashMap<>();
     final Map<Id, Set<Long>> entity = new ConcurrentHashMap<>();
 
-    public GameMap(@NonNull String name) {
-        this.name = name;
+    public GameMap(@NonNull MapList mapData) {
+        this.name = mapData.getDisplayName();
+        this.location = new Location(mapData.getLocation());
 
         this.entity.put(Id.PLAYER, new ConcurrentHashSet<>());
         this.entity.put(Id.MONSTER, new ConcurrentHashSet<>());

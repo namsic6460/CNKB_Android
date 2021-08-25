@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.RandomList;
@@ -143,6 +142,8 @@ public class FarmManager {
                     self.addItem(itemId, itemCount, false);
                     harvested.put(itemId, harvested.getOrDefault(itemId, 0) + itemCount);
                 }
+
+                plant.setLastHarvestTime(currentTime);
             }
 
             if(harvested.isEmpty()) {

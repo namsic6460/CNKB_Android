@@ -13,7 +13,9 @@ public enum SkillList {
     NONE("NONE", 0L),
     MAGIC_BALL("매직 볼", 1L),
     SMITE("강타", 2L, EventList.SKILL_SMITE),
-    LASER("레이저", 3L);
+    LASER("레이저", 3L),
+    SCAR("할퀴기", 4L),
+    CHARM("매혹", 5L);
 
     public static final Map<String, SkillList> nameMap = new HashMap<>();
     public static final Map<Long, SkillList> idMap = new HashMap<>();
