@@ -53,16 +53,6 @@ public class ChatLimitAdapter implements JsonSerializer<ChatLimit> {
             jsonObject.add("notRunningQuest", tempArray);
         }
 
-        if(!chatLimit.getClearedQuest().isEmpty()) {
-            tempObject = gson.toJsonTree(chatLimit.getClearedQuest()).getAsJsonObject();
-            jsonObject.add("clearedQuest", tempObject);
-        }
-
-        if(!chatLimit.getNotClearedQuest().isEmpty()) {
-            tempArray = gson.toJsonTree(chatLimit.getNotClearedQuest()).getAsJsonArray();
-            jsonObject.add("notClearedQuest", tempArray);
-        }
-
         if(chatLimit.getLimitHour1().getMin() != 0 || chatLimit.getLimitHour1().getMax() != 23) {
             tempObject = gson.toJsonTree(chatLimit.getLimitHour1()).getAsJsonObject();
             jsonObject.add("limitHour1", tempObject);

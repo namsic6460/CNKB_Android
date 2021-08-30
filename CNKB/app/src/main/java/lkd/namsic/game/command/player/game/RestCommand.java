@@ -34,6 +34,8 @@ public class RestCommand extends PlayerCommand {
             Logger.e("Rest", Config.errorString(e));
         }
 
+        player.removeVariable(Variable.REST);
+        player.setDoing(Doing.NONE);
         player.replyPlayer("휴식으로 체력과 마나가 모두 체워졌습니다!");
     }
 

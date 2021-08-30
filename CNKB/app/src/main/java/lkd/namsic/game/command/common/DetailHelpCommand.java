@@ -37,6 +37,7 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " (장비/equip) ({장비 번호}) : 장비를 착용 또는 착용 해제합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) (정보/info) ({장비 번호}) : 보유중인 장비의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " (장비/equip) (사용/use) ({장비 부위[.{대상}]}) : 장비를 사용합니다\n\n" +
+                        Emoji.LIST + " (장비/equip) (분해/dcp) ({장비 번호}) ({강화 제외 장비 이름}) : 5강 이상의 장비를 분해합니다\n\n" +
                         Emoji.LIST + " (대화/chat) ({Npc 이름}) : Npc 와 대화합니다\n\n" +
                         Emoji.LIST + " *(맵/map) : 현재 위치의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(맵/map) (목록/list) : 이동 가능한 맵 목록을 표시합니다\n\n" +
@@ -59,11 +60,11 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " (모험/adventure/adv) : 모험을 합니다\n\n" +
                         Emoji.LIST + " *(농사/농장/farm) : 농장에 대한 설명을 표시합니다\n\n" +
                         Emoji.LIST + " (농사/농장/farm) (구입/구매/buy) : 농장을 구매합니다\n\n" +
-                        Emoji.LIST + " (농사/농장/farm) (심기/plant) ({씨앗 이름}) [{개수}] : 농장에 씨앗을 심습니다\n\n" +
-                        Emoji.LIST + " *(농사/농장/farm) (확인/check) : 농장을 확인합니다\n\n" +
-                        Emoji.LIST + " (농사/농장/farm) (제거/remove) ({씨앗 번호}) : 씨앗을 제거합니다\n\n" +
-                        Emoji.LIST + " (농사/농장/farm) (수확/harvest) : 작물을 수확합니다\n\n" +
-                        Emoji.LIST + " (농사/농장/farm) (업그레이드/upgrade) : 농장을 업그레이드 합니다\n\n" +
+                        Emoji.LIST + " (농사/농장/farm) (심기/plant/p) ({씨앗 이름}) [{개수}] : 농장에 씨앗을 심습니다\n\n" +
+                        Emoji.LIST + " *(농사/농장/farm) (확인/check/c) : 농장을 확인합니다\n\n" +
+                        Emoji.LIST + " (농사/농장/farm) (제거/remove/r) ({씨앗 번호}) : 씨앗을 제거합니다\n\n" +
+                        Emoji.LIST + " (농사/농장/farm) (수확/harvest/h) : 작물을 수확합니다\n\n" +
+                        Emoji.LIST + " (농사/농장/farm) (업그레이드/upgrade/u) : 농장을 업그레이드 합니다\n\n" +
                         Emoji.LIST + " *(스킬/skill) : 스킬에 대한 설명을 표시합니다\n\n" +
                         Emoji.LIST + " *(스킬/skill) (목록/list) : 보유하고 있는 스킬 목록을 표시합니다\n\n" +
                         Emoji.LIST + " *(스텟/stat) : 스텟 정보를 표시합니다\n\n" +

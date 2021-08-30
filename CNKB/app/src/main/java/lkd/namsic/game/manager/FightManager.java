@@ -204,7 +204,7 @@ public class FightManager {
 
             String eventName;
 
-            for(Entity entity : entitySet) {
+            for(Entity entity : new HashSet<>(entitySet)) {
                 eventName = TurnEvent.getName();
                 TurnEvent.handleEvent(entity, entity.getEvent().get(eventName), entity.getEquipEvents(eventName), wrappedAttacker);
             }
@@ -213,6 +213,10 @@ public class FightManager {
             SelfTurnEvent.handleEvent(attacker, attacker.getEvent().get(eventName), attacker.getEquipEvents(eventName), wrappedAttacker);
 
             if(!attacker.equals(wrappedAttacker.get())) {
+                if(attacker.getId().getId().equals(Id.PLAYER)) {
+                    ((Player) attacker).replyPlayer("턴을 빼앗겼습니다");
+                }
+                
                 attacker = wrappedAttacker.get();
                 SelfTurnEvent.handleEvent(attacker, attacker.getEvent().get(eventName),
                         attacker.getEquipEvents(eventName), wrappedAttacker);
@@ -220,6 +224,7 @@ public class FightManager {
                 casting = this.castingMap.containsKey(attacker);
 
                 targets = new HashMap<>();
+                this.targetMap.put(fightId, targets);
                 this.checkTarget(self, entitySet, targets, casting);
             }
 

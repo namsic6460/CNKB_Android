@@ -127,9 +127,12 @@ public class FarmManager {
             int harvestCount, itemCount;
 
             Map<Long, Integer> harvested = new HashMap<>();
+
+            long growTime;
             for(Farm.Plant plant : farm.getPlanted()) {
+                growTime = plant.getGrowTime();
                 gap = Math.min(currentTime - plant.getLastHarvestTime(), Config.MAX_HARVEST_DAY * 86_400_000);
-                harvestCount = (int) (gap / plant.getGrowTime());
+                harvestCount = (int) (gap / growTime);
 
                 if(harvestCount == 0) {
                     continue;
@@ -143,7 +146,7 @@ public class FarmManager {
                     harvested.put(itemId, harvested.getOrDefault(itemId, 0) + itemCount);
                 }
 
-                plant.setLastHarvestTime(currentTime);
+                plant.setLastHarvestTime(plant.getLastHarvestTime() + (growTime * harvestCount));
             }
 
             if(harvested.isEmpty()) {

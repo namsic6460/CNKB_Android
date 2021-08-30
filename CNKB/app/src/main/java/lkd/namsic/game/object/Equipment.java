@@ -137,8 +137,12 @@ public class Equipment extends Item implements Cloneable {
     }
 
     public long getReinforceCost() {
+        return this.getReinforceCost(this.reinforceCount);
+    }
+
+    public long getReinforceCost(int reinforceCount) {
         return (long) ((Config.REINFORCE_BASE_COST + Config.REINFORCE_COST_PER_HANDLE_LV * this.handleLv) *
-                        (1 + Config.REINFORCE_COST_MULTIPLIER * this.reinforceCount));
+                (1 + Config.REINFORCE_COST_MULTIPLIER * reinforceCount));
     }
 
     public int getTotalLimitLv() {

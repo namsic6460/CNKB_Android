@@ -29,7 +29,12 @@ public enum NpcList {
     PEDRO("페드로", 9L),
     MOO_MYEONG("무명", 10L),
     SELINA("셀리나", 11L),
-    SYLVIA("실비아", 12L);
+    SYLVIA("실비아", 12L),
+    ELWOOD("엘우드", 13L),
+    LONGSILVER("롱실버", 14L),
+    FREY("프레이", 15L),       //북유럽신화 풍요/작물/평화/번영의 신
+    HIBIS("하이비스", 16L),    //무궁화 - 꽃말: 섬세한 아름다움
+    SHADOW_BACK("셰도우백", 17L);
 
     public static final Map<String, NpcList> nameMap = new HashMap<>();
     public static final Map<Long, NpcList> idMap = new HashMap<>();

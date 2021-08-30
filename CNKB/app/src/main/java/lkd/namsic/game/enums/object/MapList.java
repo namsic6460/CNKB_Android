@@ -28,7 +28,8 @@ public enum MapList {
     GLOOMY_FIELD("스산한 평야", 3, 0),
     OVERGROWN_FOREST("우거진 숲", 3, 1),
     OAK_MOUNTAIN("오크 산", 3, 2),
-    SKY_HILL("하늘 언덕", 3, 3);
+    SKY_HILL("하늘 언덕", 3, 3),
+    ELF_FOREST("엘프의 숲", 4, 3);
 
     public static final Map<String, MapList> nameMap = new HashMap<>();
     public static final Map<Location, MapList> locationMap = new HashMap<>();

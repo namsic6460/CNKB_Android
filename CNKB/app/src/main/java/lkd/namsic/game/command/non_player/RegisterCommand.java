@@ -100,7 +100,7 @@ public class RegisterCommand extends NonPlayerCommand {
         map.addEntity(player);
         Config.unloadMap(map);
 
-        player.replyPlayer("회원가입에 성공하였습니다!");
+        player.replyPlayer("회원가입에 성공하였습니다!\n※ 튜토리얼을 끝낸 후 게임을 플레이 할 수 있습니다 ※");
         Config.unloadObject(player);
 
         Config.saveConfig();

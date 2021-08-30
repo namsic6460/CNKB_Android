@@ -50,6 +50,15 @@ public class EquipCommand extends PlayerCommand {
             }
 
             ItemDisplayManager.getInstance().displayEquipInfo(player, Integer.parseInt(third));
+        } else if(second.equals("분해") || second.equals("dcp")) {
+            if(fourth == null) {
+                throw new WeirdCommandException();
+            }
+
+            int equipIndex = Integer.parseInt(third);
+            String equipName = command.replace(second, "").replace(third, "");
+
+            EquipManager.getInstance().decompose(player, equipIndex, equipName);
         } else {
             KakaoTalk.checkDoing(player);
             EquipManager.getInstance().equip(player, Integer.parseInt(second));

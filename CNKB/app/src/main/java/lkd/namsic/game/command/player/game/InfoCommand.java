@@ -40,7 +40,7 @@ public class InfoCommand extends PlayerCommand {
             }
 
             Player target = Config.getData(Id.PLAYER, playerId);
-            if(!target.getObjectVariable(Variable.INFO_PUBLIC, true)) {
+            if(!target.getObjectVariable(Variable.INFO_PUBLIC, true) && !player.getCurrentTitle().equals("관리자")) {
                 throw new WeirdCommandException("해당 유저의 정보는 비공개되어 있습니다");
             }
 

@@ -51,27 +51,27 @@ public class NpcCreator implements Creatable {
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.NEED_FIRE.getId());
-        chatLimit.getClearedQuest().put(QuestList.WORK_OF_MINER.getId(), 5);
-        chatLimit.getClearedQuest().put(QuestList.TRASH_COLLECTING.getId(), 5);
-        chatLimit.getNotClearedQuest().add(QuestList.NEED_FIRE.getId());
+        chatLimit.getLimitQuest().addMax(QuestList.NEED_FIRE.getId(), 0);
+        chatLimit.getLimitQuest().addMin(QuestList.WORK_OF_MINER.getId(), 5);
+        chatLimit.getLimitQuest().addMin(QuestList.TRASH_COLLECTING.getId(), 5);
         npc.setChat(chatLimit, 17L);
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.TOO_STRONG_FIRE.getId());
-        chatLimit.getClearedQuest().put(QuestList.NEED_FIRE.getId(), 1);
-        chatLimit.getNotClearedQuest().add(QuestList.TOO_STRONG_FIRE.getId());
+        chatLimit.getLimitQuest().addMax(QuestList.TOO_STRONG_FIRE.getId(), 1);
+        chatLimit.getLimitQuest().addMin(QuestList.NEED_FIRE.getId(), 1);
         npc.setChat(chatLimit, 20L);
 
         chatLimit = new ChatLimit();
-        chatLimit.getNotClearedQuest().add(QuestList.LV50.getId());
         chatLimit.getNotRunningQuest().add(QuestList.LV50.getId());
+        chatLimit.getLimitQuest().addMax(QuestList.LV50.getId(), 0);
         chatLimit.getLimitQuest().addMin(QuestList.WORK_OF_MINER.getId(), 3);
         chatLimit.getLimitQuest().addMin(QuestList.TRASH_COLLECTING.getId(), 3);
         npc.setChat(chatLimit, 78L);
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.SOUND_IN_THE_SINKHOLE.getId());
-        chatLimit.getNotClearedQuest().add(QuestList.SOUND_IN_THE_SINKHOLE.getId());
+        chatLimit.getLimitQuest().addMax(QuestList.SOUND_IN_THE_SINKHOLE.getId(), 0);
         chatLimit.getLimitLv().setMin(70);
         npc.setChat(chatLimit, 150L);
 
@@ -92,7 +92,7 @@ public class NpcCreator implements Creatable {
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.GOLD_RING_GIFT.getId());
-        chatLimit.getNotClearedQuest().add(QuestList.GOLD_RING_GIFT.getId());
+        chatLimit.getLimitQuest().addMax(QuestList.GOLD_RING_GIFT.getId(), 0);
         chatLimit.getLimitQuest().addMin(QuestList.WORK_OF_MINER.getId(), 7);
         npc.setChat(chatLimit, 66L);
 
@@ -107,6 +107,7 @@ public class NpcCreator implements Creatable {
         chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING1.getId());
         chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING2.getId());
         chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING3.getId());
+        chatLimit.getLimitQuest().addMin(QuestList.LEATHER_COLLECTING1.getId(), 1);
         chatLimit.getLimitQuest().addMax(QuestList.LEATHER_COLLECTING2.getId(), 10);
         chatLimit.getLimitLv().setMin(25);
         npc.setChat(chatLimit, 137L);
@@ -115,7 +116,7 @@ public class NpcCreator implements Creatable {
         chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING1.getId());
         chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING2.getId());
         chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING3.getId());
-        chatLimit.getLimitQuest().addMin(QuestList.LEATHER_COLLECTING2.getId(), 5);
+        chatLimit.getLimitQuest().addMin(QuestList.LEATHER_COLLECTING2.getId(), 1);
         chatLimit.getLimitLv().setMin(80);
         npc.setChat(chatLimit, 139L);
 
@@ -133,9 +134,9 @@ public class NpcCreator implements Creatable {
 
         for (int i = 0; i < Config.GEMS.length; i++) {
             chatLimit = new ChatLimit();
-            chatLimit.getLimitQuest().addMin(QuestList.STICKY_SLIME.getId(), 1);
             chatLimit.getNotRunningQuest().add(QuestList.GEM_COLLECTING_QUARTZ.getId() + i);
-            chatLimit.getNotClearedQuest().add(QuestList.GEM_COLLECTING_QUARTZ.getId() + i);
+            chatLimit.getLimitQuest().addMax(QuestList.GEM_COLLECTING_QUARTZ.getId() + i, 0);
+            chatLimit.getLimitQuest().addMin(QuestList.STICKY_SLIME.getId(), 1);
             npc.setChat(chatLimit, 98 + (i * 2));
         }
 
@@ -153,19 +154,19 @@ public class NpcCreator implements Creatable {
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.ANOTHER_PRESENT.getId());
-        chatLimit.getNotClearedQuest().add(QuestList.ANOTHER_PRESENT.getId());
-        chatLimit.getClearedQuest().put(QuestList.GOLD_RING_GIFT.getId(), 1);
+        chatLimit.getLimitQuest().addMax(QuestList.ANOTHER_PRESENT.getId(), 0);
+        chatLimit.getLimitQuest().addMin(QuestList.GOLD_RING_GIFT.getId(), 1);
         npc.setChat(chatLimit, 74L);
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.STICKY_SLIME.getId());
-        chatLimit.getNotClearedQuest().add(QuestList.STICKY_SLIME.getId());
-        chatLimit.getClearedQuest().put(QuestList.ANOTHER_PRESENT.getId(), 1);
+        chatLimit.getLimitQuest().addMax(QuestList.STICKY_SLIME.getId(), 0);
+        chatLimit.getLimitQuest().addMin(QuestList.ANOTHER_PRESENT.getId(), 1);
         npc.setChat(chatLimit, 89L);
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.HERB_COLLECTING.getId());
-        chatLimit.getClearedQuest().put(QuestList.ANOTHER_PRESENT.getId(), 1);
+        chatLimit.getLimitQuest().addMin(QuestList.ANOTHER_PRESENT.getId(), 1);
         npc.setChat(chatLimit, 93L);
 
         Config.unloadObject(npc);
@@ -193,9 +194,9 @@ public class NpcCreator implements Creatable {
         npc.setChat(chatLimit, 131L);
 
         chatLimit = new ChatLimit();
-        chatLimit.getLimitQuest().addMin(QuestList.NEED_FISHING_ROD_ITEM.getId(), 1);
-        chatLimit.getNotClearedQuest().add(QuestList.MEMORIAL_CEREMONY.getId());
         chatLimit.getNotRunningQuest().add(QuestList.MEMORIAL_CEREMONY.getId());
+        chatLimit.getLimitQuest().addMax(QuestList.MEMORIAL_CEREMONY.getId(), 0);
+        chatLimit.getLimitQuest().addMin(QuestList.NEED_FISHING_ROD_ITEM.getId(), 1);
         npc.setChat(chatLimit, 81L);
 
         Config.unloadObject(npc);
@@ -210,13 +211,13 @@ public class NpcCreator implements Creatable {
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.NEED_FISHING_ROD_ITEM.getId());
-        chatLimit.getNotClearedQuest().add(QuestList.NEED_FISHING_ROD_ITEM.getId());
+        chatLimit.getLimitQuest().addMax(QuestList.NEED_FISHING_ROD_ITEM.getId(), 0);
         chatLimit.getLimitQuest().addMin(QuestList.TRASH_COLLECTING.getId(), 3);
         npc.setChat(chatLimit, 58L);
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.BONE_IN_THE_SEA.getId());
-        chatLimit.getClearedQuest().put(QuestList.NEED_FISHING_ROD_ITEM.getId(), 1);
+        chatLimit.getLimitQuest().addMin(QuestList.NEED_FISHING_ROD_ITEM.getId(), 1);
         npc.setChat(chatLimit, 146L);
 
         Config.unloadObject(npc);
@@ -252,8 +253,8 @@ public class NpcCreator implements Creatable {
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitLv().set(11, Config.MAX_LV);
-        chatLimit.getNotClearedQuest().add(QuestList.PROVE_EXPERIENCE.getId());
         chatLimit.getNotRunningQuest().add(QuestList.PROVE_EXPERIENCE.getId());
+        chatLimit.getLimitQuest().addMin(QuestList.PROVE_EXPERIENCE.getId(), 0);
         npc.setChat(chatLimit, 52L);
 
         chatLimit = new ChatLimit();
@@ -297,6 +298,66 @@ public class NpcCreator implements Creatable {
 
         npc = new Npc(NpcList.SYLVIA, 128L);
         npc.getLocation().set(3, 1, 16, 16);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitQuest().addMin(QuestList.HEALING_ELF2.getId(), 1);
+        npc.setBaseChat(chatLimit, 156L);
+
+        npc.setChat(chatLimit, 157L);
+
+        Config.unloadObject(npc);
+
+
+        npc = new Npc(NpcList.ELWOOD, 155L);
+        npc.getLocation().set(4, 3, 1, 1);
+
+        Config.unloadObject(npc);
+
+
+        npc = new Npc(NpcList.LONGSILVER, 158L);
+        npc.getLocation().set(4, 3, 64, 1);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitCloseRate().addMax(NpcList.LONGSILVER.getId(), 10);
+        npc.setBaseChat(chatLimit, 162L);
+
+        npc.setChat(chatLimit, 163L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitCloseRate().addMin(NpcList.LONGSILVER.getId(), 11);
+        npc.setBaseChat(chatLimit, 164L);
+
+        npc.setChat(chatLimit, 165L);
+
+        Config.unloadObject(npc);
+
+
+        npc = new Npc(NpcList.FREY, 159L);
+        npc.getLocation().set(4, 3, 16, 16);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitCloseRate().addMax(NpcList.FREY.getId(), 10);
+        npc.setBaseChat(chatLimit, 166L);
+
+        npc.setChat(chatLimit, 167L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitCloseRate().addMin(NpcList.FREY.getId(), 11);
+        npc.setBaseChat(chatLimit, 168L);
+
+        npc.setChat(chatLimit, 169L);
+
+        Config.unloadObject(npc);
+
+
+        npc = new Npc(NpcList.HIBIS, 160L);
+        npc.getLocation().set(4, 3, 32, 28);
+
+        Config.unloadObject(npc);
+
+
+        npc = new Npc(NpcList.SHADOW_BACK, 161L);
+        npc.getLocation().set(4, 3, 1, 64);
 
         Config.unloadObject(npc);
 

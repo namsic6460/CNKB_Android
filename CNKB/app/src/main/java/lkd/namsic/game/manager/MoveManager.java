@@ -3,7 +3,6 @@ package lkd.namsic.game.manager;
 import androidx.annotation.NonNull;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import lkd.namsic.game.base.Location;
@@ -18,8 +17,8 @@ import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
-import lkd.namsic.game.object.Item;
 import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Item;
 import lkd.namsic.game.object.Monster;
 import lkd.namsic.game.object.Player;
 
@@ -184,10 +183,6 @@ public class MoveManager {
 
         GameMap moveMap = Config.loadMap(x, y);
 
-        if(self.getId().getId().equals(Id.PLAYER) && self.getLv() < moveMap.getRequireLv()) {
-            throw new NumberRangeException(self.getLv(), moveMap.getRequireLv(), Config.MAX_LV);
-        }
-
         self.getLocation().setMap(x, y);
         if(isToBase) {
             this.setField(self, moveMap.getLocation().getFieldX(), moveMap.getLocation().getFieldY());
@@ -246,18 +241,16 @@ public class MoveManager {
                 throw new WeirdCommandException("미완성 맵으로는 이동할 수 없습니다");
             }
 
-            try {
-                this.setMap(self, location, true);
-            } catch (NumberRangeException e) {
-                if(Objects.requireNonNull(e.getMessage()).endsWith(Integer.toString(Config.MAX_LV))) {
-                    self.replyPlayer("해당 지역으로 이동하기 위한 요구 레벨이 부족합니다\n현재 레벨: " +
-                            self.getLv() + "\n요구 레벨: " + moveMap.getRequireLv());
-                    return;
-                } else {
-                    throw e;
-                }
+            if(self.getId().getId().equals(Id.PLAYER) && self.getLv() < moveMap.getRequireLv()) {
+                throw new WeirdCommandException("해당 맵으로 이동하기 위한 요구 레벨이 부족합니다\n현재 레벨: " +
+                        self.getLv() + "\n요구 레벨: " + moveMap.getRequireLv());
             }
 
+            if(!Config.compareMap(self.getInventory(), moveMap.getClearedQuest(), true, false, 0)) {
+                throw new WeirdCommandException("해당 맵으로 이동하기 위한 요구 퀘스트가 부족합니다");
+            }
+
+            this.setMap(self, location, true);
             self.replyPlayer(moveMap.getName() + " (으)로 의 이동을 완료했습니다\n현재 좌표: " + self.getLocation().toString());
 
             Config.unloadMap(moveMap);

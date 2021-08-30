@@ -47,12 +47,14 @@ public class GameMap {
     @Setter
     int requireLv = 1;
 
+    final Map<Long, Integer> clearedQuest = new HashMap<>();
+
     final Location location;
 
-    final Set<Long> spawnMonster = new ConcurrentHashSet<>();
-    final Map<Long, Integer> spawnMaxCount = new ConcurrentHashMap<>();
-    final Set<Long> spawnBoss = new ConcurrentHashSet<>();
-    final Map<Id, Map<Long, Double>> spawnPercent = new ConcurrentHashMap<>();
+    final Set<Long> spawnMonster = new HashSet<>();
+    final Map<Long, Integer> spawnMaxCount = new HashMap<>();
+    final Set<Long> spawnBoss = new HashSet<>();
+    final Map<Id, Map<Long, Double>> spawnPercent = new HashMap<>();
 
     //This part can be frequently changed
     final Map<Location, Long> money = new ConcurrentHashMap<>();

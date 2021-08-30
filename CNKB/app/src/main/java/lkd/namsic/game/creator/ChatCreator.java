@@ -337,7 +337,7 @@ public class ChatCreator implements Creatable {
                 "좋아 좋아. 그정도 의지는 있어야지",
                 "기다리고 있겠네"
         );
-        chat.setQuestId(5L);
+        chat.setQuestId(QuestList.PROVE_EXPERIENCE.getId());
         Config.unloadObject(chat);
 
         chat = createChat(null, 54L,
@@ -822,6 +822,86 @@ public class ChatCreator implements Creatable {
                 "....."
         );
         chat.setDelayTime(1000L);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 155L, 
+                "흠.. 오랜만에 보는 방문자로군",
+                "이곳의 엘프의 마을일세. 나는 이곳의 장로를 맡고 있는 엘우드라고 하네",
+                "원래 외지인은 잘 들이지 않지만.. 셀리나를 도와줬으니 보답이라면 보답으로 치지",
+                "그래 뭐... 혹시나 필요한 게 있으면 말하게"
+        );
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 156L, "무슨 일이신가요?");
+        Config.unloadObject(chat);
+
+        chat = createChat("몸은 좀 회복 되셨나요?", 157L,
+                "네 덕분에 완전히 회복된 것 같아요",
+                "음... 제가 딱히 드릴건 없어서 일단 마을에 연락을 해 뒀는데...",
+                "모험가라고 하시니 저희 마을에 한번쯤 방문해보세요"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 158L,
+                "장로님께 말씀은 들었다",
+                "우리 동족을 도와준 것도 있으니 해를 가하지는 않겠지만...",
+                "혹시라도 허튼 수작이 보이면 이 은색 검이 네 목을 벨것이다"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 159L,
+                "음... 장로님이 말하신 그 여행자분이신가 보네요",
+                "뭐... 그렇게 나쁜분 같지는 않네요",
+                "잘 부탁드려요"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 160L,
+                "와! 모험가는 처음보네요",
+                "뭐... 마을에선 크게 환영받지 못해도 저랑은 친하게 지내자구요"
+        );
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 161L,
+                ".....",
+                "네가 여기서 하는 모든 행동이 네 목숨을 앗아갈 수도 있다는 것을 명심해라",
+                "언제나 그림자속에서 도를 겨누고 있을테니"
+        );
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 162L, "용건만 빠르게 전해라");
+        Config.unloadObject(chat);
+
+        chat = createChat("왜 당신들은 저를 경계하는 건가요?", 163L,
+                "흠... 풋내기 모험가였군",
+                "인간들은 우리를 내쫓았다",
+                "그런 우리가 너희 인간들을 기꺼워 할거라 생각하나?"
+        );
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 164L, "그래 무슨 일이지 모험가");
+        Config.unloadObject(chat);
+        
+        chat = createChat("당신 이름의 뜻을 알려줄 수 있나요?", 165L,
+                "우리가 마지막으로 싸웠던 적의 종이 흡혈귀였다",
+                "그 때 나는 지휘관이었고, 흡혈귀와 싸우기로 맹세한 순간 내 이름을 버렸다",
+                "그리고 그들을 죽이기 위한 이 이름을 정헀다"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 166L, "무슨 일로 오셨나요?");
+        Config.unloadObject(chat);
+
+        chat = createChat("아 그냥 지나가다 들렀습니다", 167L, "네네 안녕히 가세요");
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 168L, "음 무슨 일이세요?");
+        Config.unloadObject(chat);
+        
+        chat = createChat("엘프들은 과일만 먹고 사는건가요?", 169L,
+                "음 꼭 그런건 아니예요",
+                "하지만 자연이 저희의 일부인 만큼 최대한 검소하게 사는거라고 보시면 될 것 같네요"
+        );
         Config.unloadObject(chat);
 
         Logger.i("ObjectMaker", "Chat making is done!");

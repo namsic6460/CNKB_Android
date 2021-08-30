@@ -427,7 +427,6 @@ public abstract class Entity extends NamedObject {
     }
 
     public void setItem(long itemId, int count) {
-
         if(count < 0) {
             throw new NumberRangeException(count, 0);
         }
@@ -489,11 +488,9 @@ public abstract class Entity extends NamedObject {
             return;
         }
 
-        for(Map.Entry<EquipType, Long> entry : this.equipped.entrySet()) {
-            if(entry.getValue().equals(equipId)) {
-                EquipManager.getInstance().unEquip(this, entry.getKey());
-                break;
-            }
+        Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+        if(this.getEquipped(equipment.getEquipType()) == equipId) {
+            return;
         }
 
         this.equipInventory.remove(equipId);

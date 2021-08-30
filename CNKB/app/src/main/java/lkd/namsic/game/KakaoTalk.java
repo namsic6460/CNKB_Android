@@ -232,7 +232,9 @@ public class KakaoTalk {
                     } else {
                         try {
                             if (player != null && (listener = KakaoTalk.playerCommands.get(first)) != null) {
-                                Config.RUNNING_COMMAND.put(player, command);
+                                if(!Config.RUNNING_COMMAND.containsKey(player)) {
+                                    Config.RUNNING_COMMAND.put(player, command);
+                                }
 
                                 player.checkNewDay();
                                 listener.execute(player, cmd, commands, second, third, fourth, session);

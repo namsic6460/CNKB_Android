@@ -299,16 +299,24 @@ public class Config {
     }
 
     public static void deleteAiEntity(@NonNull AiEntity entity) {
-        Id id = entity.getId().getId();
-        long objectId = entity.getId().getObjectId();
+        deleteGameObject(entity);
+    }
+
+    public static void deleteEquipment(@NonNull Equipment equipment) {
+        deleteGameObject(equipment);
+    }
+
+    private static void deleteGameObject(@NonNull GameObject object) {
+        Id id = object.getId().getId();
+        long objectId = object.getId().getObjectId();
 
         long count = OBJECT_COUNT.get(id).getOrDefault(objectId, 0L);
         if(count == 0) {
             FileManager.delete(getPath(id, objectId));
-            Logger.w("deleteAiEntity", id + "-" + objectId + " has 0 count");
+            Logger.w("deleteGameObject", id + "-" + objectId + " deleted");
         } else {
-            Logger.i("deleteAiEntity", id + "-" + objectId + " added");
-            DELETE_LIST.get(entity.getId().getId()).add(entity.getId().getObjectId());
+            Logger.i("deleteGameObject", id + "-" + objectId + " added");
+            Objects.requireNonNull(DELETE_LIST.get(id)).add(objectId);
         }
     }
 

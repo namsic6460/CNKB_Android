@@ -239,11 +239,11 @@ public class MonsterCreator implements Creatable {
         monster = new Monster(MonsterList.HARPY);
         monster.setLv(125);
 
-        monster.setBasicStat(StatType.MAXHP, 550);
-        monster.setBasicStat(StatType.HP, 550);
+        monster.setBasicStat(StatType.MAXHP, 500);
+        monster.setBasicStat(StatType.HP, 500);
         monster.setBasicStat(StatType.MAXMN, 50);
         monster.setBasicStat(StatType.MN, 50);
-        monster.setBasicStat(StatType.ATK, 100);
+        monster.setBasicStat(StatType.ATK, 90);
         monster.setBasicStat(StatType.MATK, 80);
         monster.setBasicStat(StatType.ATS, 160);
         monster.setBasicStat(StatType.DEF, 20);
@@ -269,11 +269,11 @@ public class MonsterCreator implements Creatable {
         monster = new Monster(MonsterList.GOLEM);
         monster.setLv(140);
 
-        monster.setBasicStat(StatType.MAXHP, 900);
-        monster.setBasicStat(StatType.HP, 900);
-        monster.setBasicStat(StatType.ATK, 100);
+        monster.setBasicStat(StatType.MAXHP, 1000);
+        monster.setBasicStat(StatType.HP, 1000);
+        monster.setBasicStat(StatType.ATK, 160);
         monster.setBasicStat(StatType.ATS, 60);
-        monster.setBasicStat(StatType.DEF, 100);
+        monster.setBasicStat(StatType.DEF, 110);
         monster.setBasicStat(StatType.ACC, 100);
 
         monster.setItemDrop(ItemList.STONE.getId(), 1D, 1, 10);

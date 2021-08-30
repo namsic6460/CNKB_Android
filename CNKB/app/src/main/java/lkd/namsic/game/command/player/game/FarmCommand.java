@@ -27,7 +27,7 @@ public class FarmCommand extends PlayerCommand {
         } else if (Arrays.asList("구입", "구매", "buy").contains(second)) {
             KakaoTalk.checkDoing(player);
             FarmManager.getInstance().buyFarm(player);
-        } else if (second.equals("심기") || second.equals("plant")) {
+        } else if (Arrays.asList("심기", "plant", "p").contains(second)) {
             KakaoTalk.checkDoing(player);
 
             if (third == null) {
@@ -47,9 +47,9 @@ public class FarmCommand extends PlayerCommand {
             }
 
             FarmManager.getInstance().plant(player, seedName.trim(), seedCount);
-        } else if (second.equals("확인") || second.equals("check")) {
+        } else if (Arrays.asList("확인", "check", "c").contains(second)) {
             DisplayManager.getInstance().displayFarm(player);
-        } else if (second.equals("제거") || second.equals("remove")) {
+        } else if (Arrays.asList("제거", "remove", "r").contains(second)) {
             KakaoTalk.checkDoing(player);
 
             if (third == null) {
@@ -57,10 +57,10 @@ public class FarmCommand extends PlayerCommand {
             }
 
             FarmManager.getInstance().removePlant(player, Integer.parseInt(third));
-        } else if (second.equals("수확") || second.equals("harvest")) {
+        } else if (Arrays.asList("수확", "harvest", "h").contains(second)) {
             KakaoTalk.checkDoing(player);
             FarmManager.getInstance().harvest(player);
-        } else if (second.equals("업그레이드") || second.equals("upgrade")) {
+        } else if (Arrays.asList("업그레이드", "upgrade", "u").contains(second)) {
             KakaoTalk.checkDoing(player);
             FarmManager.getInstance().upgrade(player);
         } else {

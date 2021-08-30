@@ -101,6 +101,9 @@ public class MapCreator implements Creatable {
         map.setSpawnMonster(MonsterList.HARPY.getId(), 1D, 4);
         Config.unloadMap(map);
 
+        map = new GameMap(MapList.ELF_FOREST);
+        Config.unloadMap(map);
+
         for (int x = 0; x <= 10; x++) {
             for (int y = 0; y <= 10; y++) {
                 if (!MapList.findByLocation(x, y).equals(Config.INCOMPLETE)) {

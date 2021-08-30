@@ -27,12 +27,6 @@ public class QuestManager {
     }
 
     public boolean canClearQuest(@NonNull Player self,  long questId) {
-        Long chatId = self.getQuest().get(questId);
-
-        if(chatId == null) {
-            throw new ObjectNotFoundException(Id.QUEST, questId);
-        }
-
         Quest quest = Config.getData(Id.QUEST, questId);
 
         return self.getMoney() >= quest.getNeedMoney() &&

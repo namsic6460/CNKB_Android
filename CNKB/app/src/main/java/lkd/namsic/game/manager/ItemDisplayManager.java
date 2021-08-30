@@ -250,7 +250,7 @@ public class ItemDisplayManager {
     public void displayEquipInfo(@NonNull Player self, long equipId) {
         Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
 
-        StringBuilder innerBuilder = new StringBuilder(equipment.getRealName() + " 의 정보\n\n장비 종류: ")
+        StringBuilder innerBuilder = new StringBuilder(equipment.getName() + " 의 정보\n\n장비 종류: ")
                 .append(equipment.getEquipType().getDisplayNames().get(0))
                 .append("\n장비 등급: ")
                 .append(equipment.getHandleLv())
