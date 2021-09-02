@@ -36,11 +36,11 @@ import lkd.namsic.game.event.DeathEvent;
 import lkd.namsic.game.event.Event;
 import lkd.namsic.game.event.MoneyChangeEvent;
 import lkd.namsic.game.event.PreDamageEvent;
+import lkd.namsic.game.event.PreDamagedEvent;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.manager.EquipManager;
 import lkd.namsic.game.object.implement.EntityEvents;
 import lombok.Getter;
 import lombok.Setter;
@@ -157,9 +157,11 @@ public abstract class Entity extends NamedObject {
         SkillList skillData = Objects.requireNonNull(SkillList.idMap.get(skillId));
         this.skill.add(skillData.getId());
 
-        long eventId = skillData.getEventId();
-        if(eventId != EventList.NONE.getId()) {
-            this.addEvent(EventList.findById(eventId));
+        List<Long> eventList = skillData.getEventList();
+        if(!eventList.isEmpty()) {
+            for(long eventId : eventList) {
+                this.addEvent(EventList.findById(eventId));
+            }
         }
     }
 
@@ -173,11 +175,16 @@ public abstract class Entity extends NamedObject {
             if(stat > maxHp) {
                 stat = maxHp;
             } else if(stat <= 0) {
-                isDeath = true;
+                Int afterDeathHp = new Int(stat);
 
                 String eventName = DeathEvent.class.getName();
                 DeathEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName),
-                        this.getStat(StatType.HP), stat);
+                        this.getStat(StatType.HP), afterDeathHp);
+
+                stat = afterDeathHp.get();
+                if(stat <= 0) {
+                    isDeath = true;
+                }
             }
         } else if(statType.equals(StatType.MN)) {
             int maxMn = this.getStat(StatType.MAXMN);
@@ -196,10 +203,6 @@ public abstract class Entity extends NamedObject {
         }
 
         this.basicStat.put(statType, stat);
-
-        if(isDeath) {
-            this.onDeath();
-        }
 
         return isDeath;
     }
@@ -539,6 +542,23 @@ public abstract class Entity extends NamedObject {
         }
     }
 
+    public void removeEvent(@NonNull EventList eventData) {
+        this.removeEvent(eventData, false);
+    }
+
+    public void removeEvent(@NonNull EventList eventData, boolean removeAll) {
+        String eventName = EntityEvents.getEvent(eventData.getId()).getClassName();
+
+        List<Long> events = this.event.get(eventName);
+        long eventId = eventData.getId();
+
+        if(removeAll) {
+            while(events.remove(eventData.getId())) {}
+        } else {
+            events.remove(eventId);
+        }
+    }
+
     @NonNull
     public Set<String> getRemovedEquipEvent(@NonNull EquipType equipType) {
         return Objects.requireNonNull(this.removedEquipEvent.get(equipType));
@@ -602,6 +622,10 @@ public abstract class Entity extends NamedObject {
             PreDamageEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName),
                     target, physicDmg, magicDmg, staticDmg, canCrit);
 
+            eventName = PreDamagedEvent.getName();
+            PreDamagedEvent.handleEvent(target, target.event.get(eventName), target.getEquipEvents(eventName),
+                    this, physicDmg, magicDmg, staticDmg, canCrit);
+
             int def = Math.max(target.getStat(StatType.DEF) - this.getStat(StatType.BRE), 0);
             int mdef = Math.max(target.getStat(StatType.MDEF) - this.getStat(StatType.MBRE), 0);
 
@@ -651,6 +675,7 @@ public abstract class Entity extends NamedObject {
 
             if (isDeath) {
                 target.setKiller(this.id);
+                target.onDeath();
                 this.onKill(target);
             } else if(print) {
                 if(this.id.getId().equals(Id.PLAYER)) {

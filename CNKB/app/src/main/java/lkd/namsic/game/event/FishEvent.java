@@ -17,11 +17,11 @@ import lkd.namsic.game.object.Item;
 import lkd.namsic.game.object.implement.EntityEvents;
 import lkd.namsic.game.object.implement.EquipEvents;
 
-public abstract class MineEvent implements Event {
+public abstract class FishEvent implements Event {
 
     @NonNull
     public static String getName() {
-        return "MineEvent";
+        return "FishEvent";
     }
 
     public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events,
@@ -30,10 +30,10 @@ public abstract class MineEvent implements Event {
 
         if (events != null) {
             for (long eventId : new ArrayList<>(events)) {
-                MineEvent mineEvent = EntityEvents.getEvent(eventId);
+                FishEvent fishEvent = EntityEvents.getEvent(eventId);
 
                 try {
-                    mineEvent.onMine(self, item, itemCount);
+                    fishEvent.onFish(self, item, itemCount);
                 } catch (EventRemoveException e) {
                     if(events.size() == 1) {
                         self.getEvent().remove(getName());
@@ -45,10 +45,10 @@ public abstract class MineEvent implements Event {
         }
 
         for(long equipId : eventEquipSet) {
-            MineEvent mineEvent = EquipEvents.getEvent(equipId, getName());
+            FishEvent fishEvent = EquipEvents.getEvent(equipId, getName());
 
             try {
-                mineEvent.onMine(self, item, itemCount);
+                fishEvent.onFish(self, item, itemCount);
             } catch (EventRemoveException e) {
                 Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
                 self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
@@ -56,7 +56,7 @@ public abstract class MineEvent implements Event {
         }
     }
 
-    public abstract void onMine(@NonNull Entity self, @NonNull Item item, @NonNull Int itemCount);
+    public abstract void onFish(@NonNull Entity self, @NonNull Item item, @NonNull Int itemCount);
 
     @NonNull
     @Override

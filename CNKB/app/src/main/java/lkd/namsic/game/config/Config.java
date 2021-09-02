@@ -58,7 +58,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 2.31;
+    public static final double VERSION = 2.4;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -149,6 +149,7 @@ public class Config {
     public static final long REST_TIME = 600000;
     public static final long FARM_PRICE = 5000L;
     public static final int MAX_FARM_LV = 5;
+    public static final int MAX_FARM_PLANT_COUNT = 30;
     public static final long MAX_HARVEST_DAY = 5;
 
     public static final String SPLIT_BAR = "------------------------------------------";

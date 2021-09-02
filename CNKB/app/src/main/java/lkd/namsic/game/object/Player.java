@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.base.ConcurrentHashSet;
+import lkd.namsic.game.base.LoNg;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
@@ -31,6 +32,7 @@ import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.SkillList;
+import lkd.namsic.game.event.AddExpEvent;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lombok.Getter;
@@ -264,30 +266,38 @@ public class Player extends Entity {
         rewardList.add(new Object[] {ItemList.LOW_MP_POTION, 5});
         rewardList.add(new Object[] {ItemList.LOW_ELIXIR, 5});
 
-        if(count == 7) {
-            rewardList.add(new Object[] {ItemList.STAT_POINT, 7});
+        if(count % 5 == 0) {
+            rewardList.add(new Object[] {ItemList.STAT_POINT, 10});
             rewardList.add(new Object[] {ItemList.LOW_RECIPE, 3});
             rewardList.add(new Object[] {ItemList.EMPTY_SPHERE, 5});
             rewardList.add(new Object[] {ItemList.LOW_EXP_POTION, 3});
             rewardList.add(new Object[] {ItemList.LOW_REINFORCE_STONE, 3});
         }
 
-        if(count % 30 == 0) {
+        if(count % 10 == 0) {
             rewardList.add(new Object[] {ItemList.PIECE_OF_GEM, 5});
-            rewardList.add(new Object[] {ItemList.EQUIP_SAFENER, 5});
-            rewardList.add(new Object[] {ItemList.HP_POTION, 30});
-            rewardList.add(new Object[] {ItemList.MP_POTION, 30});
+            rewardList.add(new Object[] {ItemList.EQUIP_SAFENER, 10});
+            rewardList.add(new Object[] {ItemList.HP_POTION, 10});
+            rewardList.add(new Object[] {ItemList.MP_POTION, 10});
             rewardList.add(new Object[] {ItemList.ELIXIR, 5});
-            rewardList.add(new Object[] {ItemList.STAT_POINT, 30});
+            rewardList.add(new Object[] {ItemList.STAT_POINT, 20});
             rewardList.add(new Object[] {ItemList.MAGIC_STONE, 10});
         }
 
-        if(count % 100 == 0) {
+        if(count % 30 == 0) {
             rewardList.add(new Object[] {ItemList.GOLD_BAG, 3});
             rewardList.add(new Object[] {ItemList.STAT_POINT, 50});
-            rewardList.add(new Object[] {ItemList.HIGH_HP_POTION, 50});
-            rewardList.add(new Object[] {ItemList.HIGH_MP_POTION, 50});
-            rewardList.add(new Object[] {ItemList.HIGH_ELIXIR, 50});
+            rewardList.add(new Object[] {ItemList.HIGH_HP_POTION, 15});
+            rewardList.add(new Object[] {ItemList.HIGH_MP_POTION, 15});
+            rewardList.add(new Object[] {ItemList.HIGH_ELIXIR, 15});
+        }
+
+        if(count % 100 == 0) {
+            rewardList.add(new Object[] {ItemList.GOLD_BAG, 10});
+            rewardList.add(new Object[] {ItemList.STAT_POINT, 100});
+            rewardList.add(new Object[] {ItemList.HIGH_HP_POTION, 30});
+            rewardList.add(new Object[] {ItemList.HIGH_MP_POTION, 30});
+            rewardList.add(new Object[] {ItemList.HIGH_ELIXIR, 30});
         }
 
         StringBuilder innerBuilder = new StringBuilder("---출석 보상---");
@@ -329,6 +339,12 @@ public class Player extends Entity {
         }
 
         exp *= Config.EXP_BOOST;
+
+        LoNg wrappedExp = new LoNg(exp);
+        String eventName = AddExpEvent.getName();
+        AddExpEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName), wrappedExp);
+
+        exp = wrappedExp.get();
 
         this.exp += exp;
         this.addLog(LogData.TOTAL_EXP, exp);

@@ -12,26 +12,20 @@ import org.junit.Test;
 
 import java.io.File;
 import java.lang.reflect.Type;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 
-import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.object.EquipList;
-import lkd.namsic.game.json.ChatLimitAdapter;
 import lkd.namsic.game.json.LocationAdapter;
-import lkd.namsic.game.json.NpcAdapter;
 import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Equipment;
-import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.FileManager;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class ExampleUnitTest {
 
     @Test
@@ -45,23 +39,13 @@ public class ExampleUnitTest {
 
     @Test
     public void test() {
-        Set<String> set = new LinkedHashSet<>();
-        set.add("a");
-        set.add("c");
-        set.add("b");
-        set.add("e");
-        set.add("d");
+        int maxHp = 700;
+        int hp = 150;
 
-        System.out.println(new Gson().toJson(set));
+        double lostHpPercent = (maxHp - hp) / (double) maxHp;
+        int heal = (int) ((lostHpPercent / 0.02) * (maxHp * 0.0015));
 
-        set = new HashSet<>();
-        set.add("a");
-        set.add("c");
-        set.add("b");
-        set.add("e");
-        set.add("d");
-
-        System.out.println(new Gson().toJson(set));
+        System.out.println(heal);
     }
 
     @Test

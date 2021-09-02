@@ -21,6 +21,8 @@ public enum MapList {
     ADVENTURE_FIELD("모험의 평원", 1, 0),
     PEACEFUL_RIVER("평화로운 강", 1, 1),
     SLIME_SWAMP("슬라임 늪지", 1, 2),
+    STEEP_CLIFF("가파른 절벽", 1, 3),
+    DIRTY_RIVER_DOWNSTREAM("더러운 강 하류", 1, 4),
     FERTILE_FARM("비옥한 농장", 2, 0),
     BLUE_FIELD("푸른 초원", 2, 1),
     VILLAGE_CEMETERY("마을 공동묘지", 2, 2),
@@ -29,7 +31,7 @@ public enum MapList {
     OVERGROWN_FOREST("우거진 숲", 3, 1),
     OAK_MOUNTAIN("오크 산", 3, 2),
     SKY_HILL("하늘 언덕", 3, 3),
-    ELF_FOREST("엘프의 숲", 4, 3);
+    ELF_FOREST("엘프의 숲", 4, 1);
 
     public static final Map<String, MapList> nameMap = new HashMap<>();
     public static final Map<Location, MapList> locationMap = new HashMap<>();

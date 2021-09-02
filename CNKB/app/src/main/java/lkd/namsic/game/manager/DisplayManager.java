@@ -210,6 +210,10 @@ public class DisplayManager {
                 if (flag) {
                     map = Config.getMapData(x, y);
 
+                    if(map.getName().equals(Config.INCOMPLETE)) {
+                        continue;
+                    }
+
                     builder.append("\n")
                             .append(map.getName())
                             .append(" (")
@@ -570,7 +574,12 @@ public class DisplayManager {
 
     public void displaySkillList(@NonNull Player self) {
         StringBuilder innerBuilder = new StringBuilder("---보유 스킬 목록---");
-        
+
+        if(self.getSkill().isEmpty()) {
+            self.replyPlayer("보유중인 스킬이 없습니다");
+            return;
+        }
+
         for(long skillId : self.getSkill()) {
             innerBuilder.append("\n- ")
                     .append(SkillList.findById(skillId));

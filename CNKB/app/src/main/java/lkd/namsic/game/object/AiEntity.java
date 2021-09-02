@@ -12,6 +12,8 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.Variable;
+import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lombok.AccessLevel;
@@ -92,13 +94,24 @@ public abstract class AiEntity extends Entity implements Cloneable {
         double dropPercent;
         Random random = new Random();
 
+        double dropMultiplier = 1.0;
+        Entity killer = Config.getData(this.getKiller().getId(), this.getKiller().getObjectId());
+
+        long earringId = killer.getEquipped(EquipType.EARRINGS);
+        if(earringId != EquipList.NONE.getId()) {
+            Equipment earring = Config.getData(Id.EQUIPMENT, earringId);
+            if(earring.getOriginalId() == EquipList.EMERALD_EARRING.getId()) {
+                dropMultiplier = 1.15;
+            }
+        }
+
         long itemId;
         int minCount, count;
         for(Map.Entry<Long, Integer> entry : new HashMap<>(this.inventory).entrySet()) {
             itemId = entry.getKey();
             count = entry.getValue();
 
-            dropPercent = this.getItemDropPercent(itemId);
+            dropPercent = this.getItemDropPercent(itemId) * dropMultiplier;
 
             if(random.nextDouble() < dropPercent) {
                 minCount = this.getItemDropMinCount(itemId);

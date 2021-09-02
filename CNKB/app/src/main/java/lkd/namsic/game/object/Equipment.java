@@ -91,6 +91,7 @@ public class Equipment extends Item implements Cloneable {
             this.basicStat.putAll(equipment.basicStat);
         }
 
+        this.name = equipment.getName();
         this.handleLv = equipment.handleLv;
         this.limitLv = equipment.limitLv;
 
@@ -114,6 +115,7 @@ public class Equipment extends Item implements Cloneable {
         }
 
         Config.unloadObject(equipment);
+
         return available;
     }
 

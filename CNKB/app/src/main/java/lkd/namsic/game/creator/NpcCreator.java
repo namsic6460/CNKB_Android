@@ -353,11 +353,31 @@ public class NpcCreator implements Creatable {
         npc = new Npc(NpcList.HIBIS, 160L);
         npc.getLocation().set(4, 3, 32, 28);
 
+        npc.setBaseChat(new ChatLimit(), 170L);
+
+        npc.setChat(new ChatLimit(), 171L);
+        npc.setChat(new ChatLimit(), 172L);
+        npc.setChat(new ChatLimit(), 173L);
+        npc.setChat(new ChatLimit(), 174L);
+        npc.setChat(new ChatLimit(), 175L);
+
         Config.unloadObject(npc);
 
 
         npc = new Npc(NpcList.SHADOW_BACK, 161L);
         npc.getLocation().set(4, 3, 1, 64);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitCloseRate().addMax(NpcList.SHADOW_BACK.getId(), 10);
+        npc.setBaseChat(chatLimit, 176L);
+
+        npc.setChat(chatLimit, 177L);
+
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitCloseRate().addMin(NpcList.SHADOW_BACK.getId(), 11);
+        npc.setBaseChat(chatLimit, 178L);
+
+        npc.setChat(chatLimit, 179L);
 
         Config.unloadObject(npc);
 

@@ -12,7 +12,7 @@ public enum StatType {
 
     MAXHP("최대 체력", 1),
     HP("현재 체력", 0),
-    MAXMN("최대 마나", 10),
+    MAXMN("최대 마나", 5),
     MN("현재 마나", 0),
     ATK("공격력", 5),
     MATK("마법 공격력", 5),

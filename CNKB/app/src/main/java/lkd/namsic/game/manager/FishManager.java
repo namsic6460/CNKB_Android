@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import lkd.namsic.game.base.Int;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.config.RandomList;
@@ -16,6 +17,8 @@ import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.event.FishEvent;
+import lkd.namsic.game.event.MineEvent;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.GameMap;
@@ -193,8 +196,12 @@ public class FishManager {
             FishWaitType response = self.getObjectVariable(Variable.FISH_WAIT_TYPE, FishWaitType.NONE);
             if (response.equals(FishWaitType.NONE)) {
                 if (i == 0) {
-                    self.addItem(itemId, 1, false);
-                    self.addExp(50 * (itemTier + 1));
+                    Int itemCount = new Int(1);
+                    String eventName = MineEvent.getName();
+                    FishEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), itemId, itemCount);
+
+                    self.addItem(itemId, itemCount.get(), false);
+                    self.addExp(50 * (itemTier + 1) * itemCount.get());
                     self.setDoing(Doing.NONE);
 
                     StringBuilder innerBuilder = new StringBuilder();

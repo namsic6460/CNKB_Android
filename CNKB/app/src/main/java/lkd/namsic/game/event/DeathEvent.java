@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import lkd.namsic.game.base.Int;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.exception.EventRemoveException;
@@ -23,7 +24,7 @@ public abstract class DeathEvent implements Event {
     }
 
     public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events, @NonNull Set<Long> eventEquipSet,
-                                   final int beforeDeathHp, final int afterDeathHp) {
+                                   final int beforeDeathHp, final Int afterDeathHp) {
         if (events != null) {
             for (long eventId : new ArrayList<>(events)) {
                 DeathEvent deathEvent = EntityEvents.getEvent(eventId);
@@ -52,7 +53,7 @@ public abstract class DeathEvent implements Event {
         }
     }
 
-    public abstract void onDeath(@NonNull Entity self, final int beforeDeathHp, final int afterDeathHp);
+    public abstract void onDeath(@NonNull Entity self, final int beforeDeathHp, final Int afterDeathHp);
 
     @NonNull
     @Override

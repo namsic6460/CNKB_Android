@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Entity;
@@ -48,10 +47,6 @@ public abstract class SkillUse extends LimitUse {
     @Nullable
     @Override
     public String checkOther(@NonNull Entity self, @NonNull String...other) {
-        if(!Doing.fightList().contains(self.getDoing())) {
-            throw new RuntimeException("Skill can only be casted in fight");
-        }
-
         try {
             int maxIndex = self.getVariable(Variable.FIGHT_TARGET_MAX_INDEX);
             int index;

@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import lkd.namsic.game.base.LoNg;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.event.HarvestEvent;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Farm;
@@ -128,11 +130,14 @@ public class FarmManager {
 
             Map<Long, Integer> harvested = new HashMap<>();
 
-            long growTime;
+            LoNg growTime;
             for(Farm.Plant plant : farm.getPlanted()) {
-                growTime = plant.getGrowTime();
+                growTime = new LoNg(plant.getGrowTime());
+                String eventName = HarvestEvent.getName();
+                HarvestEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), growTime);
+
                 gap = Math.min(currentTime - plant.getLastHarvestTime(), Config.MAX_HARVEST_DAY * 86_400_000);
-                harvestCount = (int) (gap / growTime);
+                harvestCount = (int) (gap / growTime.get());
 
                 if(harvestCount == 0) {
                     continue;
@@ -146,7 +151,7 @@ public class FarmManager {
                     harvested.put(itemId, harvested.getOrDefault(itemId, 0) + itemCount);
                 }
 
-                plant.setLastHarvestTime(plant.getLastHarvestTime() + (growTime * harvestCount));
+                plant.setLastHarvestTime(plant.getLastHarvestTime() + (growTime.get() * harvestCount));
             }
 
             if(harvested.isEmpty()) {

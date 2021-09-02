@@ -534,7 +534,7 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.GEM_ABRASIVE_MATERIAL, "보석을 연마할 수 있는 아이템이다");
         createItem(ItemList.GLOW_GEM_ABRASIVE_MATERIAL, "중심 보석을 연마할 수 있는 아이템이다");
 
-        createItem(ItemList.EQUIP_SAFENER, "무기의 제한 레벨을 낮출 수 있는 아이템이다\n명령어 대상 : 장비 번호");
+        createItem(ItemList.EQUIP_SAFENER, "무기의 제한 레벨을 5 낮출 수 있는 아이템이다\n명령어 대상 : 장비 번호");
 
         createItem(ItemList.LOW_MINER_TOKEN, "간단한 광질을 완수했다는 증표이다");
         createItem(ItemList.MINER_TOKEN, "광질을 완수했다는 증표이다");
@@ -622,7 +622,7 @@ public class ItemCreator implements Creatable {
             put(ItemList.TITANIUM.getId(), 30);
             put(ItemList.LIQUID_STONE.getId(), 30);
             put(ItemList.DIAMOND.getId(), 10);
-            put(ItemList.ORICHALCON.getId(), 10);
+            put(ItemList.ORICHALCON.getId(), 50);
             put(ItemList.LANDIUM.getId(), 2);
             put(ItemList.AITUME.getId(), 2);
             put(ItemList.EMPTY_SPHERE.getId(), 50);
@@ -787,7 +787,15 @@ public class ItemCreator implements Creatable {
         item.setCanEat(true);
         Config.unloadObject(item);
 
-        createItem(ItemList.MAGIC_STONE, "어둠의 힘이 담긴 돌이다");
+        item = new Item(ItemList.MAGIC_STONE, "어둠의 힘이 담긴 돌이다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.NONE.getId(), 5);
+
+            put(ItemList.CORRUPTED_MAGIC_STONE.getId(), 1);
+            put(ItemList.PURIFYING_FRUIT.getId(), 1);
+        }});
+        Config.unloadObject(item);
+
         createItem(ItemList.FLOWER, "아름다운 꽃이다");
         
         item = new Item(ItemList.STONE_LUMP, "돌 10개다");
@@ -817,7 +825,7 @@ public class ItemCreator implements Creatable {
 
         createItem(ItemList.GOLD_FRUIT, "골드로 바꿀 수 있는 열매다");
         createItem(ItemList.EXP_FRUIT, "경험치로 바꿀 수 있는 열매다");
-        createItem(ItemList.SMALL_GOLD_SEED, "작은 골드 씨앗이다\n[수확]: 1 골드 열매/120분");
+        createItem(ItemList.SMALL_GOLD_SEED, "골드 씨앗이다\n[수확]: 1 골드 열매/120분");
         createItem(ItemList.GOLD_SEED, "골드 씨앗이다 (씨앗 Lv.2)\n[수확]: 2 골드 열매/90분");
         createItem(ItemList.BIG_GOLD_SEED, "골드 씨앗이다 (씨앗 Lv.3)\n[수확]: 3 골드 열매/60분");
         createItem(ItemList.SMALL_EXP_SEED, "경험치 씨앗이다\n[수확]: 1 경험치 열매/120분");
@@ -833,6 +841,91 @@ public class ItemCreator implements Creatable {
                 " 를 배울 수 있게 해주는 스킬 북이다");
         createItem(ItemList.SKILL_BOOK_CHARM, "스킬 " + Emoji.focus(SkillList.CHARM.getDisplayName()) +
                 " 를 배울 수 있게 해주는 스킬 북이다");
+        createItem(ItemList.SKILL_BOOK_STRINGS_OF_LIFE, "스킬 " + Emoji.focus(SkillList.STRINGS_OF_LIFE.getDisplayName()) +
+                " 를 배울 수 있게 해주는 스킬 북이다");
+        createItem(ItemList.SKILL_BOOK_RESIST, "스킬 " + Emoji.focus(SkillList.RESIST.getDisplayName()) +
+                " 를 배울 수 있게 해주는 스킬 북이다");
+        
+        createItem(ItemList.PIECE_OF_MAGIC, "마법 그 자체를 담은 특이한 조각이다");
+        
+        item = new Item(ItemList.CONFIRMED_LOW_RECIPE, "하급 아이템 또는 하급 장비의 제작법을 1개 지정하여 확정적으로 획득할 수 있다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.LOW_RECIPE.getId(), 5);
+        }});
+        Config.unloadObject(item);
+
+        item = new Item(ItemList.CONFIRMED_RECIPE, "중급 아이템 또는 중급 장비의 제작법을 1개 지정하여 확정적으로 획득할 수 있다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.RECIPE.getId(), 6);
+        }});
+        Config.unloadObject(item);
+
+        item = new Item(ItemList.CONFIRMED_HIGH_RECIPE,
+                "상급 아이템 또는 상급 장비의 제작법을 1개 지정하여 확정적으로 획득할 수 있다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.HIGH_RECIPE.getId(), 8);
+        }});
+        Config.unloadObject(item);
+
+        createItem(ItemList.OWLBEAR_LEATHER, "곰인지 부엉인지 모를 아울베어의 가죽이다");
+
+        createItem(ItemList.SKILL_BOOK_RUSH, "스킬 " + Emoji.focus(SkillList.RUSH.getDisplayName()) +
+                " 를 배울 수 있게 해주는 스킬 북이다");
+        createItem(ItemList.SKILL_BOOK_ROAR, "스킬 " + Emoji.focus(SkillList.ROAR.getDisplayName()) +
+                " 를 배울 수 있게 해주는 스킬 북이다");
+
+        createItem(ItemList.CORRUPTED_MAGIC_STONE, "심각하게 오염된 마정석이다\n일반인들은 접촉도 할 수 없을 것 같다");
+
+        createItem(ItemList.PURIFYING_FRUIT, "정화의 힘이 담긴 열매다");
+        createItem(ItemList.SMALL_PURIFYING_SEED, "정화의 씨앗이다\n[수확]: 1 정화의 열매/20분");
+        createItem(ItemList.SMALL_PURIFYING_SEED, "정화의 씨앗이다(씨앗 Lv.2)\n[수확]: 1 정화의 열매/10분");
+        createItem(ItemList.SMALL_PURIFYING_SEED, "정화의 씨앗이다(씨앗 Lv.4)\n[수확]: 2 정화의 열매/8분");
+        
+        item = new Item(ItemList.HARDENED_SLIME, "적당히 탱탱해진 슬라임이다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.PIECE_OF_SLIME.getId(), 10);
+            put(ItemList.PURIFYING_FRUIT.getId(), 1);
+        }});
+        Config.unloadObject(item);
+        
+        createItem(ItemList.OWLBEAR_HEAD, "부엉이의 형태를 지닌 아울베어의 머리다");
+
+        createItem(ItemList.FARM_EXPAND_DEED, "농장을 1칸 확장시킬 수 있게 하는 문서다(최대 "
+                + Config.MAX_FARM_PLANT_COUNT + "칸)");
+
+        item = new Item(ItemList.TITANIUM_STEEL, "티타늄에 합금을 더해 강도를 끌어올린 강철이다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.TITANIUM.getId(), 10);
+            put(ItemList.ALLOY.getId(), 10);
+        }});
+        Config.unloadObject(item);
+
+        item = new Item(ItemList.TRACE_OF_SKY, "하늘, 봄, 동쪽, 인(仁) 을 뜻한다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.HARPY_WING.getId(), 10);
+        }});
+        Config.unloadObject(item);
+
+        item = new Item(ItemList.TRACE_OF_EARTH, "땅, 여름, 서쪽, 의(義) 를 뜻한다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.HARD_IRON.getId(), 3);
+            put(ItemList.ALLOY.getId(), 3);
+        }});
+        Config.unloadObject(item);
+
+        item = new Item(ItemList.TRACE_OF_WATER, "달, 겨울, 북쪽, 지(智) 를 뜻한다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.LAPIS.getId(), 30);
+            put(ItemList.BLUE_SPHERE.getId(), 5);
+        }});
+        Config.unloadObject(item);
+
+        item = new Item(ItemList.TRACE_OF_FIRE, "해, 가을, 남쪽, 예(禮) 를 뜻한다");
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.RED_STONE.getId(), 30);
+            put(ItemList.RED_SPHERE.getId(), 5);
+        }});
+        Config.unloadObject(item);
 
         Logger.i("ObjectMaker", "Item making is done!");
     }

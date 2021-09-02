@@ -3,12 +3,12 @@ package lkd.namsic.game.enums;
 public enum MagicType {
 
     /**
-     * 도트 데미지 - 일정 시간 후 자동 해제
+     * 도트 데미지(마법)
      */
     FIRE,
 
     /**
-     * 도트 데미지 - 기본적으로 영구 지속
+     * 도트 데미지(고정)
      */
     POISON,
 

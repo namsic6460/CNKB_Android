@@ -44,7 +44,7 @@ public abstract class LimitUse extends BasicUse {
     public abstract String getUseName();
 
     @Override
-    public final void checkUse(@NonNull Entity self, @Nullable String other) {
+    public void checkUse(@NonNull Entity self, @Nullable String other) {
         super.checkUse(self, other);
 
         int hp = self.getStat(StatType.HP);

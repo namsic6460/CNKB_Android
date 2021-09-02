@@ -904,6 +904,57 @@ public class ChatCreator implements Creatable {
         );
         Config.unloadObject(chat);
 
+        chat = createChat(null, 170L, "안녕하세요! 뭐 궁금한거 있으세요?");
+        Config.unloadObject(chat);
+
+        chat = createChat("혹시 나이가 어떻게 되니?", 171L,
+                "음... 올해로 딱 100살이예요!",
+                "아아 그렇다고 갑자기 존댓말 쓰지는 말구요...",
+                "엘프 기준으로는 어린거라구요"
+        );
+        Config.unloadObject(chat);
+        
+        chat = createChat("남자 엘프들은 다 어디갔어?", 172L,
+                "네?? 아.. 인간 기준으로는 그럴 수도 있곘네요",
+                "순수 엘프는 여자밖에 없어요",
+                "새로운 생명은 자연에서 태어나구요"
+        );
+        Config.unloadObject(chat);
+        
+        chat = createChat("혹시 엘 이라는 엘프 아니?", 173L,
+                "음... 잘 모르겠긴 한데...",
+                "엘 이라는 이름은 은퇴한 장로들이 쓰는 이름이예요"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat("엘프 장로를 뽑는 기준이 뭐야?", 174L,
+                "장로님들은 2000년 마다 바뀌어요",
+                "그리고 바뀔 때 가장 나이가 많은 다른 엘프가 장로직을 맡게 되죠"
+        );
+        Config.unloadObject(chat);
+        
+        chat = createChat("엘프들은 자연속에서만 생활하는거야?", 175L,
+                "기본적으로는 그렇긴 해요",
+                "근데 장로직을 완수하고 나면 자유가 주어져요",
+                "대신 숲 밖으로 나가면 수명이 50년만 남게 되지만요"
+        );
+        Config.unloadObject(chat);
+
+        chat = createChat(null, 176L, "찾아온 이유가 뭐지");
+        Config.unloadObject(chat);
+        
+        chat = createChat("아하하... 그냥 지나가다 들른건데... 이 칼좀 치워주실래요", 177L,
+                "시덥잖은 농담할 시간 없다",
+                "빨리 이 마을을 나가라"
+        );
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 178L, "왜 왔지");
+        Config.unloadObject(chat);
+        
+        chat = createChat("당신은 암살자인건가요?", 179L, "호기심이 고양이를 죽이기도 하지");
+        Config.unloadObject(chat);
+
         Logger.i("ObjectMaker", "Chat making is done!");
     }
 

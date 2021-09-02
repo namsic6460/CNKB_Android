@@ -20,9 +20,12 @@ import lkd.namsic.game.enums.object.EventList;
 import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.event.DamageEvent;
 import lkd.namsic.game.event.DamagedEvent;
+import lkd.namsic.game.event.DeathEvent;
 import lkd.namsic.game.event.Event;
-import lkd.namsic.game.event.FightEndEvent;
+import lkd.namsic.game.event.EndFightEvent;
+import lkd.namsic.game.event.InjectFightEvent;
 import lkd.namsic.game.event.PreDamageEvent;
+import lkd.namsic.game.event.PreDamagedEvent;
 import lkd.namsic.game.event.SelfTurnEvent;
 import lkd.namsic.game.event.StartFightEvent;
 import lkd.namsic.game.event.TurnEvent;
@@ -61,7 +64,7 @@ public class EntityEvents {
             }
         });
 
-        put(EventList.OAK_START_FIGHT.getId(), new StartFightEvent() {
+        put(EventList.OAK_START.getId(), new StartFightEvent() {
             @Override
             public void onStartFight(@NonNull Entity self, @NonNull Entity enemy, boolean isOwner) {
                 Object[] nearestEntity = self.getNearestEntity(Id.MONSTER);
@@ -86,13 +89,12 @@ public class EntityEvents {
 
                 if(enemy.getId().getId().equals(Id.PLAYER)) {
                     Player player = (Player) enemy;
-
                     player.replyPlayer("주변에 있던 다른 오크가 분노하여 달려듭니다!");
                 }
             }
         });
 
-        put(EventList.SKILL_SMITE.getId(), new PreDamageEvent() {
+        put(EventList.SKILL_SMITE_PRE_DAMAGE.getId(), new PreDamageEvent() {
             @Override
             public void onPreDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
                                     @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
@@ -102,7 +104,7 @@ public class EntityEvents {
             }
         });
 
-        put(EventList.IMP_ATTACK.getId(), new DamageEvent() {
+        put(EventList.IMP_DAMAGE.getId(), new DamageEvent() {
             @Override
             public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
                                  @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
@@ -120,7 +122,7 @@ public class EntityEvents {
             }
         });
 
-        put(EventList.SCAR_BLOOD.getId(), new TurnEvent() {
+        put(EventList.SCAR_TURN.getId(), new TurnEvent() {
             @Override
             public void onTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> wrappedAttacker) {
                 int scarBlood = self.getVariable(Variable.SCAR_BLOOD);
@@ -142,9 +144,9 @@ public class EntityEvents {
             }
         });
 
-        put(EventList.SCAR_END.getId(), new FightEndEvent() {
+        put(EventList.SCAR_END.getId(), new EndFightEvent() {
             @Override
-            public void onFightEnd(@NonNull Entity self) {
+            public void onEndFight(@NonNull Entity self) {
                 self.removeVariable(Variable.SCAR_ENTITY);
                 self.removeVariable(Variable.SCAR_BLOOD);
                 self.removeVariable(Variable.SCAR_BLOOD_DAMAGE);
@@ -153,7 +155,7 @@ public class EntityEvents {
             }
         });
 
-        put(EventList.CHARM.getId(), new SelfTurnEvent() {
+        put(EventList.CHARM_SELF_TURN.getId(), new SelfTurnEvent() {
             @Override
             public void onSelfTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> wrappedAttacker) {
                 Entity attacker = self.getObjectVariable(Variable.CHARM_ENTITY);
@@ -161,8 +163,8 @@ public class EntityEvents {
                     wrappedAttacker.set(attacker);
 
                     self.setVariable(Variable.CHARM_SUCCESS, true);
-                    self.addEvent(EventList.CHARM_ATTACK);
-                    self.addEvent(EventList.CHARM_REMOVE);
+                    self.addEvent(EventList.CHARM_DAMAGE);
+                    self.addEvent(EventList.CHARM_TURN);
                     
                     if(attacker.getId().getId().equals(Id.PLAYER)) {
                         ((Player) attacker).replyPlayer(Emoji.focus(SkillList.CHARM.getDisplayName()) +
@@ -174,9 +176,9 @@ public class EntityEvents {
             }
         });
 
-        put(EventList.CHARM_END.getId(), new FightEndEvent() {
+        put(EventList.CHARM_END.getId(), new EndFightEvent() {
             @Override
-            public void onFightEnd(@NonNull Entity self) {
+            public void onEndFight(@NonNull Entity self) {
                 self.removeVariable(Variable.CHARM_ENTITY);
                 self.removeVariable(Variable.CHARM_SUCCESS);
 
@@ -184,7 +186,7 @@ public class EntityEvents {
             }
         });
 
-        put(EventList.CHARM_ATTACK.getId(), new DamageEvent() {
+        put(EventList.CHARM_DAMAGE.getId(), new DamageEvent() {
             @Override
             public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
                                  @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
@@ -201,7 +203,7 @@ public class EntityEvents {
             }
         });
 
-        put(EventList.CHARM_REMOVE.getId(), new TurnEvent() {
+        put(EventList.CHARM_TURN.getId(), new TurnEvent() {
             @Override
             public void onTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> attacker) {
                 if(self.getObjectVariable(Variable.CHARM_SUCCESS, false)) {
@@ -212,7 +214,7 @@ public class EntityEvents {
             }
         });
 
-        put(EventList.GOLEM_ATTACKED.getId(), new DamagedEvent() {
+        put(EventList.GOLEM_DAMAGED.getId(), new DamagedEvent() {
             @Override
             public void onDamaged(@NonNull Entity self, @NonNull Entity attacker, @NonNull Int totalDmg,
                                   @NonNull Int totalDra, @NonNull Bool isCrit) {
@@ -221,6 +223,216 @@ public class EntityEvents {
                 if(def > 0) {
                     self.addBasicStat(StatType.DEF, Math.max(-1 * def, -10));
                 }
+            }
+        });
+
+        put(EventList.SKILL_STRINGS_OF_LIFE_START.getId(), new StartFightEvent() {
+            @Override
+            public void onStartFight(@NonNull Entity self, @NonNull Entity enemy, boolean isOwner) {
+                self.addEvent(EventList.STRINGS_OF_LIFE_DEATH);
+                self.addEvent(EventList.STRINGS_OF_LIFE_END);
+            }
+        });
+
+        put(EventList.SKILL_STRINGS_OF_LIFE_INJECT.getId(), new InjectFightEvent() {
+            @Override
+            public void onInjectFight(@NonNull Entity self, @NonNull Entity enemy) {
+                self.addEvent(EventList.STRINGS_OF_LIFE_DEATH);
+                self.addEvent(EventList.STRINGS_OF_LIFE_END);
+            }
+        });
+
+        put(EventList.STRINGS_OF_LIFE_DEATH.getId(), new DeathEvent() {
+            @Override
+            public void onDeath(@NonNull Entity self, int beforeDeathHp, Int afterDeathHp) {
+                afterDeathHp.set(1);
+                self.removeEvent(EventList.STRINGS_OF_LIFE_END);
+
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.STRINGS_OF_LIFE_END.getId(), new EndFightEvent() {
+            @Override
+            public void onEndFight(@NonNull Entity self) {
+                self.removeEvent(EventList.STRINGS_OF_LIFE_DEATH);
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.RESIST_PRE_DAMAGED.getId(), new PreDamagedEvent() {
+            @Override
+            public void onPreDamaged(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+                                     @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
+                physicDmg.multiple(0.4);
+            }
+        });
+
+        put(EventList.RESIST_TURN.getId(), new TurnEvent() {
+            @Override
+            public void onTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> attacker) {
+                int resist = self.getVariable(Variable.RESIST);
+
+                if(resist == 1) {
+                    self.removeVariable(Variable.RESIST);
+                    self.removeEvent(EventList.RESIST_PRE_DAMAGED);
+                    self.removeEvent(EventList.RESIST_END);
+
+                    throw new EventRemoveException();
+                } else {
+                    self.setVariable(Variable.RESIST, resist - 1);
+                }
+            }
+        });
+
+        put(EventList.RESIST_END.getId(), new EndFightEvent() {
+            @Override
+            public void onEndFight(@NonNull Entity self) {
+                self.removeVariable(Variable.RESIST);
+                self.removeEvent(EventList.RESIST_PRE_DAMAGED);
+                self.removeEvent(EventList.RESIST_TURN);
+
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.SILVER_SWORD_DAMAGE.getId(), new DamageEvent() {
+            @Override
+            public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
+                                 @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
+                totalDra.multiple(0.2);
+
+                self.removeEvent(EventList.SILVER_SWORD_END);
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.SILVER_SWORD_END.getId(), new EndFightEvent() {
+            @Override
+            public void onEndFight(@NonNull Entity self) {
+                self.removeEvent(EventList.SILVER_SWORD_DAMAGE);
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.SILVER_SET_DAMAGE.getId(), new DamageEvent() {
+            @Override
+            public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
+                                 @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
+                totalDra.multiple(0.5);
+
+                self.removeEvent(EventList.SILVER_SET_END);
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.SILVER_SET_END.getId(), new EndFightEvent() {
+            @Override
+            public void onEndFight(@NonNull Entity self) {
+                self.removeEvent(EventList.SILVER_SET_DAMAGE);
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.SILVER_CHESTPLATE_PRE_DAMAGED.getId(), new PreDamagedEvent() {
+            @Override
+            public void onPreDamaged(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+                                     @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
+                if(magicDmg.get() != 0) {
+                    self.damage(victim, physicDmg.get() * 0.3, magicDmg.get() * 0.3,
+                            0, true, false, false);
+                    magicDmg.divide(2);
+                }
+
+                self.removeEvent(EventList.SILVER_CHESTPLATE_END);
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.SILVER_CHESTPLATE_END.getId(), new EndFightEvent() {
+            @Override
+            public void onEndFight(@NonNull Entity self) {
+                self.removeEvent(EventList.SILVER_CHESTPLATE_PRE_DAMAGED);
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.ELEMENT_HEART_GEM_ATS_TURN.getId(), new TurnEvent() {
+            @Override
+            public void onTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> attacker) {
+                int ats = self.getVariable(Variable.ELEMENT_HEART_GEM_ATS);
+                self.addBasicStat(StatType.ATS, ats);
+
+                self.removeVariable(Variable.ELEMENT_HEART_GEM_ATS);
+                self.removeEvent(EventList.ELEMENT_HEART_GEM_ATS_END);
+
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.ELEMENT_HEART_GEM_ATS_END.getId(), new EndFightEvent() {
+            @Override
+            public void onEndFight(@NonNull Entity self) {
+                int ats = self.getVariable(Variable.ELEMENT_HEART_GEM_ATS);
+                self.addBasicStat(StatType.ATS, ats);
+
+                self.removeVariable(Variable.ELEMENT_HEART_GEM_ATS);
+                self.removeEvent(EventList.ELEMENT_HEART_GEM_ATS_TURN);
+
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.ELEMENT_HEART_GEM_FIRE_TURN.getId(), new TurnEvent() {
+            @Override
+            public void onTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> attacker) {
+                int turn = self.getVariable(Variable.ELEMENT_HEART_GEM_FIRE);
+                int damage = self.getVariable(Variable.ELEMENT_HEART_GEM_FIRE_DAMAGE);
+                Entity entity = Objects.requireNonNull(self.getObjectVariable(Variable.ELEMENT_HEART_GEM_FIRE_ENTITY));
+
+                entity.damage(self, 0, damage, 0, false, false, false);
+
+                if(turn == 1) {
+                    self.removeVariable(Variable.ELEMENT_HEART_GEM_FIRE);
+                    self.removeVariable(Variable.ELEMENT_HEART_GEM_FIRE_DAMAGE);
+                    self.removeVariable(Variable.ELEMENT_HEART_GEM_FIRE_ENTITY);
+
+                    self.removeEvent(EventList.ELEMENT_HEART_GEM_FIRE_END);
+                    throw new EventRemoveException();
+                } else {
+                    self.setVariable(Variable.ELEMENT_HEART_GEM_FIRE, turn - 1);
+                }
+            }
+        });
+
+        put(EventList.ELEMENT_HEART_GEM_FIRE_END.getId(), new EndFightEvent() {
+            @Override
+            public void onEndFight(@NonNull Entity self) {
+                self.removeVariable(Variable.ELEMENT_HEART_GEM_FIRE);
+                self.removeVariable(Variable.ELEMENT_HEART_GEM_FIRE_DAMAGE);
+                self.removeVariable(Variable.ELEMENT_HEART_GEM_FIRE_ENTITY);
+
+                self.removeEvent(EventList.ELEMENT_HEART_GEM_FIRE_TURN);
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.RUBY_EARRING_DAMAGE.getId(), new DamageEvent() {
+            @Override
+            public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
+                                 @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
+                totalDra.multiple(3);
+
+                self.removeEvent(EventList.RUBY_EARRING_END);
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.RUBY_EARRING_END.getId(), new EndFightEvent() {
+            @Override
+            public void onEndFight(@NonNull Entity self) {
+                self.removeEvent(EventList.RUBY_EARRING_DAMAGE);
+                throw new EventRemoveException();
             }
         });
     }};

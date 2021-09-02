@@ -13,27 +13,25 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.exception.EventRemoveException;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
-import lkd.namsic.game.object.Item;
 import lkd.namsic.game.object.implement.EntityEvents;
 import lkd.namsic.game.object.implement.EquipEvents;
 
-public abstract class MineEvent implements Event {
+public abstract class PreDamagedEvent implements Event {
 
     @NonNull
     public static String getName() {
-        return "MineEvent";
+        return "PreDamagedEvent";
     }
 
-    public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events,
-                                   @NonNull Set<Long> eventEquipSet, long itemId, @NonNull Int itemCount) {
-        Item item = Config.getData(Id.ITEM, itemId);
-
+    public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events, @NonNull Set<Long> eventEquipSet,
+                                   @NonNull Entity attacker, @NonNull Int physicDmg, @NonNull Int magicDmg, @NonNull Int staticDmg,
+                                   boolean canCrit) {
         if (events != null) {
             for (long eventId : new ArrayList<>(events)) {
-                MineEvent mineEvent = EntityEvents.getEvent(eventId);
+                PreDamagedEvent preDamagedEvent = EntityEvents.getEvent(eventId);
 
                 try {
-                    mineEvent.onMine(self, item, itemCount);
+                    preDamagedEvent.onPreDamaged(self, attacker, physicDmg, magicDmg, staticDmg, canCrit);
                 } catch (EventRemoveException e) {
                     if(events.size() == 1) {
                         self.getEvent().remove(getName());
@@ -45,10 +43,10 @@ public abstract class MineEvent implements Event {
         }
 
         for(long equipId : eventEquipSet) {
-            MineEvent mineEvent = EquipEvents.getEvent(equipId, getName());
+            PreDamagedEvent preDamagedEvent = EquipEvents.getEvent(equipId, getName());
 
             try {
-                mineEvent.onMine(self, item, itemCount);
+                preDamagedEvent.onPreDamaged(self, attacker, physicDmg, magicDmg, staticDmg, canCrit);
             } catch (EventRemoveException e) {
                 Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
                 self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
@@ -56,7 +54,8 @@ public abstract class MineEvent implements Event {
         }
     }
 
-    public abstract void onMine(@NonNull Entity self, @NonNull Item item, @NonNull Int itemCount);
+    public abstract void onPreDamaged(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+                                     @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit);
 
     @NonNull
     @Override

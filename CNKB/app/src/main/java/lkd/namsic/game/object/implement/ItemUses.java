@@ -18,12 +18,14 @@ import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.manager.FarmManager;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.Farm;
 import lkd.namsic.game.object.Player;
 
 public class ItemUses {
-    
+
     private final static String SKILL_BOOK = "스킬 북을 사용했습니다";
     private final static String SKILL_ALREADY_EXIST = "이미 해당 스킬을 보유하고 있습니다";
 
@@ -183,17 +185,17 @@ public class ItemUses {
                 Random random = new Random();
                 Player player = (Player) self;
 
-            if(random.nextBoolean()) {
-                long itemId = RandomList.highRecipeItems.get(random.nextInt(RandomList.highRecipeItems.size()));
+                if (random.nextBoolean()) {
+                    long itemId = RandomList.highRecipeItems.get(random.nextInt(RandomList.highRecipeItems.size()));
 
-                player.getItemRecipe().add(itemId);
-                return ItemList.findById(itemId) + " 의 제작법을 획득했습니다";
-            } else {
-                long equipId = RandomList.highRecipeEquips.get(random.nextInt(RandomList.highRecipeEquips.size()));
+                    player.getItemRecipe().add(itemId);
+                    return ItemList.findById(itemId) + " 의 제작법을 획득했습니다";
+                } else {
+                    long equipId = RandomList.highRecipeEquips.get(random.nextInt(RandomList.highRecipeEquips.size()));
 
-                player.getEquipRecipe().add(equipId);
-                return EquipList.findById(equipId) + " 의 제작법을 획득했습니다";
-            }
+                    player.getEquipRecipe().add(equipId);
+                    return EquipList.findById(equipId) + " 의 제작법을 획득했습니다";
+                }
             }
         });
 
@@ -330,7 +332,7 @@ public class ItemUses {
 
             @Nullable
             @Override
-            public String checkOther(@NonNull Entity self, @NonNull String...other) {
+            public String checkOther(@NonNull Entity self, @NonNull String... other) {
                 String indexStr = Objects.requireNonNull(other[0]);
 
                 try {
@@ -341,14 +343,14 @@ public class ItemUses {
                 } catch (WeirdCommandException e) {
                     return e.getMessage();
                 }
-                
+
                 return null;
             }
 
             @NonNull
             @Override
             public String use(@NonNull Entity self, @Nullable String other) {
-                if(other == null) {
+                if (other == null) {
                     throw new NullPointerException();
                 }
 
@@ -404,8 +406,8 @@ public class ItemUses {
             @Override
             public void checkUse(@NonNull Entity self, @Nullable String other) {
                 super.checkUse(self, other);
-                
-                if(self.getSkill().contains(SkillList.MAGIC_BALL.getId())) {
+
+                if (self.getSkill().contains(SkillList.MAGIC_BALL.getId())) {
                     throw new WeirdCommandException(SKILL_ALREADY_EXIST);
                 }
             }
@@ -423,7 +425,7 @@ public class ItemUses {
             public void checkUse(@NonNull Entity self, @Nullable String other) {
                 super.checkUse(self, other);
 
-                if(self.getSkill().contains(SkillList.SMITE.getId())) {
+                if (self.getSkill().contains(SkillList.SMITE.getId())) {
                     throw new WeirdCommandException(SKILL_ALREADY_EXIST);
                 }
             }
@@ -441,7 +443,7 @@ public class ItemUses {
             public void checkUse(@NonNull Entity self, @Nullable String other) {
                 super.checkUse(self, other);
 
-                if(self.getSkill().contains(SkillList.LASER.getId())) {
+                if (self.getSkill().contains(SkillList.LASER.getId())) {
                     throw new WeirdCommandException(SKILL_ALREADY_EXIST);
                 }
             }
@@ -459,7 +461,7 @@ public class ItemUses {
             public void checkUse(@NonNull Entity self, @Nullable String other) {
                 super.checkUse(self, other);
 
-                if(self.getSkill().contains(SkillList.SCAR.getId())) {
+                if (self.getSkill().contains(SkillList.SCAR.getId())) {
                     throw new WeirdCommandException(SKILL_ALREADY_EXIST);
                 }
             }
@@ -477,7 +479,7 @@ public class ItemUses {
             public void checkUse(@NonNull Entity self, @Nullable String other) {
                 super.checkUse(self, other);
 
-                if(self.getSkill().contains(SkillList.CHARM.getId())) {
+                if (self.getSkill().contains(SkillList.CHARM.getId())) {
                     throw new WeirdCommandException(SKILL_ALREADY_EXIST);
                 }
             }
@@ -487,6 +489,329 @@ public class ItemUses {
             public String use(@NonNull Entity self, @Nullable String other) {
                 self.addSkill(SkillList.CHARM.getId());
                 return SKILL_BOOK;
+            }
+        });
+
+        put(ItemList.SKILL_BOOK_STRINGS_OF_LIFE.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+
+                if (self.getSkill().contains(SkillList.STRINGS_OF_LIFE.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.STRINGS_OF_LIFE.getId());
+                return SKILL_BOOK;
+            }
+        });
+
+        put(ItemList.SKILL_BOOK_RESIST.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+
+                if (self.getSkill().contains(SkillList.RESIST.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.RESIST.getId());
+                return SKILL_BOOK;
+            }
+        });
+
+        put(ItemList.CONFIRMED_LOW_RECIPE.getId(), new Use() {
+            @Override
+            public int getMinTargetCount() {
+                return 1;
+            }
+
+            @Override
+            public int getMaxTargetCount() {
+                return 1;
+            }
+
+            @Nullable
+            @Override
+            public String checkOther(@NonNull Entity self, @NonNull String... other) {
+                String objectName = other[0];
+
+                boolean isItem = true;
+                Long objectId = ItemList.findByName(objectName);
+
+                if (objectId == null) {
+                    objectId = EquipList.findByName(objectName);
+
+                    if (objectId == null) {
+                        return "알 수 없는 아이템 또는 장비입니다\n이름을 다시 한번 확인해주세요";
+                    }
+
+                    isItem = false;
+                }
+
+                Player player = (Player) self;
+
+                if (isItem) {
+                    if (player.getItemRecipe().contains(objectId)) {
+                        return "해당 아이템의 제작법은 이미 알고 있습니다";
+                    }
+                    
+                    if(!RandomList.lowRecipeItems.contains(objectId)) {
+                        return "해당 아이템은 하급 제작법에 포함되지 않습니다";
+                    }
+                } else {
+                    if(player.getEquipRecipe().contains(objectId)) {
+                        return "해당 장비의 제작법은 이미 알고 있습니다";
+                    }
+
+                    if(!RandomList.lowRecipeEquips.contains(objectId)) {
+                        return "해당 장비는 하급 제작법에 포함되지 않습니다";
+                    }
+                }
+
+                return null;
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                boolean isItem = true;
+                Long objectId = ItemList.findByName(Objects.requireNonNull(other));
+
+                if (objectId == null) {
+                    isItem = false;
+                    objectId = Objects.requireNonNull(EquipList.findByName(other));
+                }
+
+                Player player = (Player) self;
+                if(isItem) {
+                    player.getItemRecipe().add(objectId);
+                } else {
+                    player.getEquipRecipe().add(objectId);
+                }
+
+                return other + " 의 제작법을 획득했습니다";
+            }
+        });
+
+        put(ItemList.CONFIRMED_RECIPE.getId(), new Use() {
+            @Override
+            public int getMinTargetCount() {
+                return 1;
+            }
+
+            @Override
+            public int getMaxTargetCount() {
+                return 1;
+            }
+
+            @Nullable
+            @Override
+            public String checkOther(@NonNull Entity self, @NonNull String... other) {
+                String objectName = other[0];
+
+                boolean isItem = true;
+                Long objectId = ItemList.findByName(objectName);
+
+                if (objectId == null) {
+                    objectId = EquipList.findByName(objectName);
+
+                    if (objectId == null) {
+                        return "알 수 없는 아이템 또는 장비입니다\n이름을 다시 한번 확인해주세요";
+                    }
+
+                    isItem = false;
+                }
+
+                Player player = (Player) self;
+
+                if (isItem) {
+                    if (player.getItemRecipe().contains(objectId)) {
+                        return "해당 아이템의 제작법은 이미 알고 있습니다";
+                    }
+
+                    if(!RandomList.middleRecipeItems.contains(objectId)) {
+                        return "해당 아이템은 중급 제작법에 포함되지 않습니다";
+                    }
+                } else {
+                    if(player.getEquipRecipe().contains(objectId)) {
+                        return "해당 장비의 제작법은 이미 알고 있습니다";
+                    }
+
+                    if(!RandomList.middleRecipeEquips.contains(objectId)) {
+                        return "해당 장비는 중급 제작법에 포함되지 않습니다";
+                    }
+                }
+
+                return null;
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                boolean isItem = true;
+                Long objectId = ItemList.findByName(Objects.requireNonNull(other));
+
+                if (objectId == null) {
+                    isItem = false;
+                    objectId = Objects.requireNonNull(EquipList.findByName(other));
+                }
+
+                Player player = (Player) self;
+                if(isItem) {
+                    player.getItemRecipe().add(objectId);
+                } else {
+                    player.getEquipRecipe().add(objectId);
+                }
+
+                return other + " 의 제작법을 획득했습니다";
+            }
+        });
+
+        put(ItemList.CONFIRMED_HIGH_RECIPE.getId(), new Use() {
+            @Override
+            public int getMinTargetCount() {
+                return 1;
+            }
+
+            @Override
+            public int getMaxTargetCount() {
+                return 1;
+            }
+
+            @Nullable
+            @Override
+            public String checkOther(@NonNull Entity self, @NonNull String... other) {
+                String objectName = other[0];
+
+                boolean isItem = true;
+                Long objectId = ItemList.findByName(objectName);
+
+                if (objectId == null) {
+                    objectId = EquipList.findByName(objectName);
+
+                    if (objectId == null) {
+                        return "알 수 없는 아이템 또는 장비입니다\n이름을 다시 한번 확인해주세요";
+                    }
+
+                    isItem = false;
+                }
+
+                Player player = (Player) self;
+
+                if (isItem) {
+                    if (player.getItemRecipe().contains(objectId)) {
+                        return "해당 아이템의 제작법은 이미 알고 있습니다";
+                    }
+
+                    if(!RandomList.highRecipeItems.contains(objectId)) {
+                        return "해당 아이템은 상급 제작법에 포함되지 않습니다";
+                    }
+                } else {
+                    if(player.getEquipRecipe().contains(objectId)) {
+                        return "해당 장비의 제작법은 이미 알고 있습니다";
+                    }
+
+                    if(!RandomList.highRecipeEquips.contains(objectId)) {
+                        return "해당 장비는 상급 제작법에 포함되지 않습니다";
+                    }
+                }
+
+                return null;
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                boolean isItem = true;
+                Long objectId = ItemList.findByName(Objects.requireNonNull(other));
+
+                if (objectId == null) {
+                    isItem = false;
+                    objectId = Objects.requireNonNull(EquipList.findByName(other));
+                }
+
+                Player player = (Player) self;
+                if(isItem) {
+                    player.getItemRecipe().add(objectId);
+                } else {
+                    player.getEquipRecipe().add(objectId);
+                }
+
+                return other + " 의 제작법을 획득했습니다";
+            }
+        });
+
+        put(ItemList.SKILL_BOOK_RUSH.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+
+                if (self.getSkill().contains(SkillList.RUSH.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.RUSH.getId());
+                return SKILL_BOOK;
+            }
+        });
+
+        put(ItemList.SKILL_BOOK_ROAR.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+
+                if (self.getSkill().contains(SkillList.ROAR.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.ROAR.getId());
+                return SKILL_BOOK;
+            }
+        });
+
+        put(ItemList.FARM_EXPAND_DEED.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+
+                Player player = (Player) self;
+
+                FarmManager.getInstance().checkFarm(player);
+                Farm farm = Config.getData(Id.FARM, self.getId().getObjectId());
+
+                if(farm.getMaxPlantCount() == Config.MAX_FARM_PLANT_COUNT) {
+                    throw new WeirdCommandException("이미 농장이 최대 크기입니다(" + Config.MAX_FARM_PLANT_COUNT + "칸)");
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                Farm farm = Config.loadObject(Id.FARM, self.getId().getObjectId());
+
+                int maxPlantCount = farm.getMaxPlantCount();
+                farm.setMaxPlantCount(maxPlantCount + 1);
+
+                Config.unloadObject(farm);
+
+                return "농장이 1칸 확장되었습니다\n" + maxPlantCount + "칸 -> " + (maxPlantCount + 1) + "칸";
             }
         });
     }};

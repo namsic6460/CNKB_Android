@@ -16,6 +16,7 @@ public enum MapType {
     RIVER("강"),
     CEMETERY("공동묘지"),
     CAVE("동굴"),
+    CLIFF("절벽"),
     SWAMP("늪지대"),
     HILL("언덕"),
     FOG("안개 지역"),

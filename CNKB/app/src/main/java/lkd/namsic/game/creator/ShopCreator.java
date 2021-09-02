@@ -33,19 +33,13 @@ public class ShopCreator implements Creatable {
         shop.addBuyItem(ItemList.OAK_TOOTH, 200L);
         shop.addBuyItem(ItemList.OAK_LEATHER, 175L);
         shop.addBuyItem(ItemList.PIECE_OF_BONE, 30L);
-        shop.addBuyItem(ItemList.HORN_OF_IMP, 150L);
-        shop.addBuyItem(ItemList.IMP_HEART, 300L);
-        shop.addBuyItem(ItemList.HORN_OF_LOW_DEVIL, 250L);
-        shop.addBuyItem(ItemList.LOW_DEVIL_SOUL, 1500L);
-        shop.addBuyItem(ItemList.HARPY_WING, 200L);
-        shop.addBuyItem(ItemList.HARPY_NAIL, 200L);
-        shop.addBuyItem(ItemList.GOLEM_CORE, 500L);
 
         Config.unloadObject(shop);
 
 
         shop = new Shop(NpcList.EL);
 
+        shop.addSellItem(ItemList.FLOWER, 10L);
         shop.addSellItem(ItemList.HERB, 3L);
         shop.addSellItem(ItemList.LEAF, 3L);
         shop.addSellItem(ItemList.LOW_HP_POTION, 50L);
@@ -68,7 +62,6 @@ public class ShopCreator implements Creatable {
         shop.addBuyItem(ItemList.HERB, 1L);
         shop.addBuyItem(ItemList.LEAF, 1L);
         shop.addBuyItem(ItemList.ELIXIR_HERB, 15L);
-        shop.addBuyItem(ItemList.FLOWER, 10L);
 
         Config.unloadObject(shop);
 
@@ -86,6 +79,8 @@ public class ShopCreator implements Creatable {
 
 
         shop = new Shop(NpcList.PEDRO);
+
+        shop.addSellItem(ItemList.PIECE_OF_GEM, 20000L);
 
         shop.addBuyItem(ItemList.STONE_LUMP, 30L);
         shop.addBuyItem(ItemList.COAL, 5L);
@@ -133,6 +128,9 @@ public class ShopCreator implements Creatable {
         shop = new Shop(NpcList.SELINA);
 
         shop.addSellItem(ItemList.EMPTY_SPHERE, 1000L);
+        shop.addSellItem(ItemList.PIECE_OF_LOW_AMULET, 1000L);
+        shop.addSellItem(ItemList.PIECE_OF_AMULET, 9000L);
+        shop.addSellItem(ItemList.PIECE_OF_HIGH_AMULET, 85000L);
         shop.addSellItem(ItemList.SKILL_BOOK_MAGIC_BALL, 1000L);
         shop.addSellItem(ItemList.SKILL_BOOK_SMITE, 3000L);
         shop.addSellItem(ItemList.SKILL_BOOK_LASER, 10000L);
@@ -140,6 +138,41 @@ public class ShopCreator implements Creatable {
         for(long itemId = ItemList.RED_SPHERE.getId(); itemId <= ItemList.WHITE_SPHERE.getId(); itemId++) {
             shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 90L);
         }
+
+        Config.unloadObject(shop);
+
+
+        shop = new Shop(NpcList.ELWOOD);
+
+        shop.addSellItem(ItemList.LOW_RECIPE, 750L);
+
+        shop.addBuyItem(ItemList.MAGIC_STONE, 120L);
+        shop.addBuyItem(ItemList.HORN_OF_IMP, 150L);
+        shop.addBuyItem(ItemList.IMP_HEART, 300L);
+        shop.addBuyItem(ItemList.HORN_OF_LOW_DEVIL, 250L);
+        shop.addBuyItem(ItemList.LOW_DEVIL_SOUL, 1500L);
+        shop.addBuyItem(ItemList.HARPY_WING, 200L);
+        shop.addBuyItem(ItemList.HARPY_NAIL, 200L);
+        shop.addBuyItem(ItemList.GOLEM_CORE, 500L);
+        shop.addBuyItem(ItemList.PIECE_OF_MAGIC, 150L);
+        shop.addBuyItem(ItemList.OWLBEAR_LEATHER, 400L);
+        shop.addBuyItem(ItemList.OWLBEAR_HEAD, 800L);
+        shop.addBuyItem(ItemList.HARDENED_SLIME, 500L);
+
+        Config.unloadObject(shop);
+
+
+        shop = new Shop(NpcList.FREY);
+
+        shop.addBuyItem(ItemList.HERB, 1L);
+        shop.addBuyItem(ItemList.LEAF, 1L);
+        shop.addBuyItem(ItemList.ELIXIR_HERB, 15L);
+
+        shop.addSellItem(ItemList.ELIXIR_HERB, 22L);
+        shop.addSellItem(ItemList.SMALL_EXP_SEED, 10000L);
+        shop.addSellItem(ItemList.EXP_SEED, 100_000L);
+        shop.addSellItem(ItemList.BIG_EXP_SEED, 1_500_000L);
+        shop.addSellItem(ItemList.FARM_EXPAND_DEED, 50000L);
 
         Config.unloadObject(shop);
 

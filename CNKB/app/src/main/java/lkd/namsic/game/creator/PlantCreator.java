@@ -37,6 +37,16 @@ public class PlantCreator implements Creatable {
             put(ItemList.EXP_FRUIT.getId(), 3);
         }});
 
+        createPlant(ItemList.SMALL_PURIFYING_SEED, 1, 20, new HashMap<Long, Integer>() {{
+            put(ItemList.PURIFYING_FRUIT.getId(), 1);
+        }});
+        createPlant(ItemList.PURIFYING_SEED, 2, 10, new HashMap<Long, Integer>() {{
+            put(ItemList.PURIFYING_FRUIT.getId(), 1);
+        }});
+        createPlant(ItemList.BIG_PURIFYING_SEED, 4, 8, new HashMap<Long, Integer>() {{
+            put(ItemList.PURIFYING_FRUIT.getId(), 2);
+        }});
+
         Logger.i("ObjectMaker", "Plant making is done!");
     }
 

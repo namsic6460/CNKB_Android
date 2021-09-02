@@ -148,6 +148,8 @@ public enum ItemList {
     PIECE_OF_HIGH_AMULET("상급 부적 파편", 124L),
 
     PIECE_OF_GEM("보석 조각", 125L),
+
+    //TODO
     GEM_ABRASIVE_MATERIAL("보석 연마제", 126L),
     GLOW_GEM_ABRASIVE_MATERIAL("빛나는 보석 연마제", 127L),
 
@@ -172,11 +174,11 @@ public enum ItemList {
     HIGH_AMULET("상급 부적", 143L),
 
     LAMB("양고기", 144L),
-    SHEEP_LEATHER("양가죽", 145L),
+    SHEEP_LEATHER("양 가죽", 145L),
     WOOL("양털", 146L),
 
     PORK("돼지고기", 147L),
-    PIG_HEAD("돼지머리", 148L),
+    PIG_HEAD("돼지 머리", 148L),
 
     BEEF("소고기", 149L),
     LEATHER("가죽", 150L),
@@ -249,7 +251,39 @@ public enum ItemList {
     GOLEM_CORE("골렘 코어", 202L),
 
     SKILL_BOOK_SCAR("스킬 북 - 할퀴기", 203L),
-    SKILL_BOOK_CHARM("스킬 북 - 매혹", 204L);
+    SKILL_BOOK_CHARM("스킬 북 - 매혹", 204L),
+    SKILL_BOOK_STRINGS_OF_LIFE("스킬 북 - 생명의 끈", 205L),
+    SKILL_BOOK_RESIST("스킬 북 - 저항", 206L),
+    
+    PIECE_OF_MAGIC("마법 파편", 207L),
+
+    CONFIRMED_LOW_RECIPE("확정 하급 제작법", 208L),
+    CONFIRMED_RECIPE("확정 중급 제작법", 209L),
+    CONFIRMED_HIGH_RECIPE("확정 상급 제작법", 210L),
+
+    OWLBEAR_LEATHER("곰 가죽", 211L),
+
+    SKILL_BOOK_RUSH("스킬 북 - 돌진", 212L),
+    SKILL_BOOK_ROAR("스킬 북 - 포효", 213L),
+
+    CORRUPTED_MAGIC_STONE("오염된 마정석", 214L),
+
+    PURIFYING_FRUIT("정화의 열매", 215L),
+    SMALL_PURIFYING_SEED("작은 정화의 씨앗", 216L),
+    PURIFYING_SEED("정화의 씨앗", 217L),
+    BIG_PURIFYING_SEED("큰 정화의 씨앗", 218L),
+
+    HARDENED_SLIME("굳은 슬라임", 219L),
+    OWLBEAR_HEAD("아울베어 머리", 220L),
+
+    FARM_EXPAND_DEED("농장 확장 증서", 221L),
+
+    TITANIUM_STEEL("티타늄 강", 222L),
+
+    TRACE_OF_SKY("건의 흔적", 223L),
+    TRACE_OF_EARTH("곤의 흔적", 224L),
+    TRACE_OF_WATER("감의 흔적", 225L),
+    TRACE_OF_FIRE("리의 흔적", 226L);
 
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();

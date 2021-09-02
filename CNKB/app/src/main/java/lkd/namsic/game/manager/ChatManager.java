@@ -70,7 +70,12 @@ public class ChatManager {
         if(questSet != null) {
             for (long questId : questSet) {
                 if (questManager.canClearQuest(self, questId)) {
-                    this.startChat(self, self.getQuest().get(questId), npcId);
+                    Long chatId = self.getQuest().get(questId);
+                    if(chatId == null) {
+                        return;
+                    }
+
+                    this.startChat(self, chatId, npcId);
                     questManager.clearQuest(self, questId, npcId);
                     return;
                 }

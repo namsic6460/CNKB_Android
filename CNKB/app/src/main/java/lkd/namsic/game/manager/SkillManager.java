@@ -78,8 +78,8 @@ public class SkillManager {
             player.addLog(LogData.TOTAL_SKILL_USE, 1);
             player.replyPlayer(msg);
 
-            if(player.getObjectVariable(Variable.SKILL_RESIST, false)) {
-                player.removeVariable(Variable.SKILL_RESIST);
+            if(player.getObjectVariable(Variable.RESISTED_SKILL, false)) {
+                player.removeVariable(Variable.RESISTED_SKILL);
                 player.replyPlayer(RESIST);
             }
         }

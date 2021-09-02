@@ -11,7 +11,11 @@ import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Doing;
+import lkd.namsic.game.enums.EquipType;
+import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.Variable;
+import lkd.namsic.game.enums.object.EquipList;
+import lkd.namsic.game.object.Equipment;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
 
@@ -28,8 +32,18 @@ public class RestCommand extends PlayerCommand {
 
         player.replyPlayer("휴식을 시작합니다");
 
+        long restTime = Config.REST_TIME;
+
+        long earringId = player.getEquipped(EquipType.EARRINGS);
+        if(earringId != EquipList.NONE.getId()) {
+            Equipment earring = Config.getData(Id.EQUIPMENT, earringId);
+            if(earring.getOriginalId() == EquipList.AQUAMARINE_EARRING.getId()) {
+                restTime /= 2;
+            }
+        }
+
         try {
-            Thread.sleep(Config.REST_TIME);
+            Thread.sleep(restTime);
         } catch (InterruptedException e) {
             Logger.e("Rest", Config.errorString(e));
         }

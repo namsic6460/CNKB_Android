@@ -30,7 +30,8 @@ import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.SkillList;
-import lkd.namsic.game.event.FightEndEvent;
+import lkd.namsic.game.event.EndFightEvent;
+import lkd.namsic.game.event.InjectFightEvent;
 import lkd.namsic.game.event.SelfTurnEvent;
 import lkd.namsic.game.event.StartFightEvent;
 import lkd.namsic.game.event.TurnEvent;
@@ -133,6 +134,10 @@ public class FightManager {
             Id id = Id.MONSTER;
             int index = Integer.parseInt(targetStr);
 
+            if(index < 1) {
+                throw new WeirdCommandException("1 이상의 번호를 입력해주세요");
+            }
+
             Set<Long> set = map.getEntity(Id.MONSTER);
             int size = set.size();
             if (size < index || index < 0) {
@@ -169,6 +174,9 @@ public class FightManager {
         this.setPrevDoing(self);
         this.setDoing(self, isFightOne);
 
+        String eventName;
+
+
         if (this.checkInject(self, enemy, isFightOne)) {
             return;
         }
@@ -201,8 +209,6 @@ public class FightManager {
             this.targetMap.put(fightId, targets);
 
             WrappedObject<Entity> wrappedAttacker = new WrappedObject<>(attacker);
-
-            String eventName;
 
             for(Entity entity : new HashSet<>(entitySet)) {
                 eventName = TurnEvent.getName();
@@ -663,6 +669,9 @@ public class FightManager {
             entitySet.add(self);
             playerSet.add(self);
 
+            String eventName = InjectFightEvent.getName();
+            InjectFightEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), enemy);
+
             self.replyPlayer("전투에 난입했습니다\n적 목록은 전체보기로 확인해주세요", innerBuilder.toString());
             Player.replyPlayers(playerSet, self.getName() + " (이/가) 전투에 난입했습니다!");
 
@@ -803,8 +812,8 @@ public class FightManager {
     }
 
     private void endFight(@NonNull Entity self) {
-        String eventName = FightEndEvent.getName();
-        FightEndEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName));
+        String eventName = EndFightEvent.getName();
+        EndFightEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName));
 
         long fightId = this.getFightId(self.getId());
         Set<Entity> entitySet = this.getEntitySet(fightId);

@@ -113,14 +113,13 @@ public class MineManager {
             throw new RuntimeException(e.getMessage());
         }
 
-        Int mineCount = new Int(1);
-
+        Int itemCount = new Int(1);
         String eventName = MineEvent.getName();
-        MineEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), itemId, mineCount);
+        MineEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), itemId, itemCount);
 
         int count = self.getItem(itemId);
-        self.addItem(itemId, mineCount.get(), false);
-        self.addExp(15 * (itemTier + 1));
+        self.addItem(itemId, itemCount.get(), false);
+        self.addExp(15 * (itemTier + 1) * itemCount.get());
 
         StringBuilder builder = new StringBuilder();
 
@@ -128,7 +127,7 @@ public class MineManager {
         builder.append(item.getName())
                 .append("을 캤습니다!\n아이템 개수 : ")
                 .append(count).append(" -> ")
-                .append(count + mineCount.get())
+                .append(count + itemCount.get())
                 .append("\n");
 
         int token = Config.randomToken(ItemList.LOW_MINER_TOKEN.getId(), RandomList.MINE_TOKEN, itemTier, self);

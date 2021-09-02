@@ -4,6 +4,7 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.object.MapList;
 import lkd.namsic.game.enums.object.MonsterList;
+import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
@@ -49,7 +50,19 @@ public class MapCreator implements Creatable {
         map = new GameMap(MapList.SLIME_SWAMP);
         map.setMapType(MapType.SWAMP);
         map.setRequireLv(40);
-        map.setSpawnMonster(MonsterList.SLIME.getId(), 1, 8);
+        map.setSpawnMonster(MonsterList.SLIME.getId(), 1D, 8);
+        Config.unloadMap(map);
+
+        map = new GameMap(MapList.STEEP_CLIFF);
+        map.setMapType(MapType.CLIFF);
+        map.setRequireLv(130);
+        map.setSpawnMonster(MonsterList.GARGOYLE.getId(), 1D, 12);
+        Config.unloadMap(map);
+
+        map = new GameMap(MapList.DIRTY_RIVER_DOWNSTREAM);
+        map.setMapType(MapType.RIVER);
+        map.setRequireLv(145);
+        map.setSpawnMonster(MonsterList.OWLBEAR.getId(), 1D, 4);
         Config.unloadMap(map);
 
         map = new GameMap(MapList.FERTILE_FARM);
@@ -102,6 +115,7 @@ public class MapCreator implements Creatable {
         Config.unloadMap(map);
 
         map = new GameMap(MapList.ELF_FOREST);
+        map.getClearedQuest().put(QuestList.HEALING_ELF2.getId(), 1);
         Config.unloadMap(map);
 
         for (int x = 0; x <= 10; x++) {

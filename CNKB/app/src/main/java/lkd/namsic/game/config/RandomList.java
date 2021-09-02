@@ -2,7 +2,6 @@ package lkd.namsic.game.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -463,7 +462,9 @@ public class RandomList {
             ItemList.LOW_AMULET.getId(),
             ItemList.HARD_IRON.getId(),
             ItemList.LOW_ELIXIR.getId(),
-            ItemList.REINFORCE_STONE.getId()
+            ItemList.REINFORCE_STONE.getId(),
+            ItemList.HARDENED_SLIME.getId(),
+            ItemList.CONFIRMED_LOW_RECIPE.getId()
     );
 
     public static final List<Long> middleRecipeItems = Arrays.asList(
@@ -473,7 +474,14 @@ public class RandomList {
             ItemList.ALLOY.getId(),
             ItemList.AMULET.getId(),
             ItemList.ELIXIR.getId(),
-            ItemList.HIGH_REINFORCE_STONE.getId()
+            ItemList.HIGH_REINFORCE_STONE.getId(),
+            ItemList.MAGIC_STONE.getId(),
+            ItemList.CONFIRMED_RECIPE.getId(),
+            ItemList.TITANIUM_STEEL.getId(),
+            ItemList.TRACE_OF_SKY.getId(),
+            ItemList.TRACE_OF_EARTH.getId(),
+            ItemList.TRACE_OF_WATER.getId(),
+            ItemList.TRACE_OF_FIRE.getId()
     );
 
     public static final List<Long> highRecipeItems = Arrays.asList(
@@ -484,13 +492,14 @@ public class RandomList {
             ItemList.AITUME.getId(),
             ItemList.HIGH_ALLOY.getId(),
             ItemList.HIGH_AMULET.getId(),
-            ItemList.HIGH_ELIXIR.getId()
+            ItemList.HIGH_ELIXIR.getId(),
+            ItemList.CONFIRMED_HIGH_RECIPE.getId()
     );
 
     public static final List<Long> lowRecipeEquips = Arrays.asList(
             EquipList.WOODEN_SWORD.getId(),
             EquipList.IRON_SWORD.getId(),
-            EquipList.MIX_SWORD.getId(),
+            EquipList.MIX_SWORD_1.getId(),
             EquipList.LEATHER_HELMET.getId(),
             EquipList.LEATHER_CHESTPLATE.getId(),
             EquipList.LEATHER_LEGGINGS.getId(),
@@ -508,7 +517,20 @@ public class RandomList {
             EquipList.BONE_HELMET.getId(),
             EquipList.BONE_CHESTPLATE.getId(),
             EquipList.BONE_LEGGINGS.getId(),
-            EquipList.BONE_SHOES.getId()
+            EquipList.BONE_SHOES.getId(),
+            EquipList.YIN_YANG_SWORD_1.getId(),
+            EquipList.GARNET_EARRING.getId(),
+            EquipList.AMETHYST_EARRING.getId(),
+            EquipList.AQUAMARINE_EARRING.getId(),
+            EquipList.DIAMOND_EARRING.getId(),
+            EquipList.EMERALD_EARRING.getId(),
+            EquipList.PEARL_EARRING.getId(),
+            EquipList.RUBY_EARRING.getId(),
+            EquipList.PERIDOT_EARRING.getId(),
+            EquipList.SAPPHIRE_EARRING.getId(),
+            EquipList.OPAL_EARRING.getId(),
+            EquipList.TOPAZ_EARRING.getId(),
+            EquipList.TURQUOISE_EARRING.getId()
     );
 
     public static final List<Long> middleRecipeEquips = Arrays.asList(
@@ -527,18 +549,59 @@ public class RandomList {
             EquipList.DEMON_BONE_HELMET.getId(),
             EquipList.DEMON_BONE_CHESTPLATE.getId(),
             EquipList.DEMON_BONE_LEGGINGS.getId(),
-            EquipList.DEMON_BONE_SHOES.getId()
+            EquipList.DEMON_BONE_SHOES.getId(),
+            EquipList.SILVER_SWORD.getId(),
+            EquipList.SILVER_HELMET.getId(),
+            EquipList.SILVER_CHESTPLATE.getId(),
+            EquipList.SILVER_LEGGINGS.getId(),
+            EquipList.SILVER_SHOES.getId(),
+            EquipList.MIX_SWORD_2.getId(),
+            EquipList.ALLOY_HELMET.getId(),
+            EquipList.ALLOY_CHESTPLATE.getId(),
+            EquipList.ALLOY_LEGGINGS.getId(),
+            EquipList.ALLOY_SHOES.getId(),
+            EquipList.TITANIUM_HELMET.getId(),
+            EquipList.TITANIUM_CHESTPLATE.getId(),
+            EquipList.TITANIUM_LEGGINGS.getId(),
+            EquipList.TITANIUM_SHOES.getId(),
+            EquipList.HARPY_NAIL_GAUNTLETS.getId(),
+            EquipList.HARDENED_SLIME_HELMET.getId(),
+            EquipList.HARDENED_SLIME_CHESTPLATE.getId(),
+            EquipList.HARDENED_SLIME_LEGGINGS.getId(),
+            EquipList.HARDENED_SLIME_SHOES.getId(),
+            EquipList.SILVER_RING.getId(),
+            EquipList.HARPY_NAIL_NECKLACE.getId()
     );
 
     public static final List<Long> highRecipeEquips = Arrays.asList(
             EquipList.HEART_BREAKER_2.getId(),
-            EquipList.GHOST_SWORD_2.getId()
+            EquipList.GHOST_SWORD_2.getId(),
+            EquipList.HEAD_HUNTER_2.getId(),
+            EquipList.YIN_YANG_SWORD_2.getId(),
+            EquipList.OWLBEAR_LEATHER_HELMET.getId(),
+            EquipList.OWLBEAR_LEATHER_CHESTPLATE.getId(),
+            EquipList.OWLBEAR_LEATHER_LEGGINGS.getId(),
+            EquipList.OWLBEAR_LEATHER_SHOES.getId(),
+            EquipList.ELEMENT_HEART_GEM.getId(),
+            EquipList.GOLEM_HEART_GEM.getId()
     );
 
-    public static final List<Long> lowAmulets = Collections.singletonList(EquipList.HEALTH_AMULET.getId());
+    public static final List<Long> lowAmulets = Arrays.asList(
+            EquipList.HEALTH_AMULET.getId(),
+            EquipList.REGENERATION_AMULET.getId(),
+            EquipList.STRENGTH_AMULET.getId(),
+            EquipList.PROTECTION_AMULET.getId()
+    );
 
-    public static final List<Long> middleAmulets = Collections.singletonList(EquipList.BLOOD_AMULET.getId());
+    public static final List<Long> middleAmulets = Arrays.asList(
+            EquipList.BLOOD_AMULET.getId(),
+            EquipList.NATURE_AMULET.getId(),
+            EquipList.DEVIL_AMULET.getId()
+    );
 
-    public static final List<Long> highAmulets = Collections.singletonList(EquipList.DRAGON_AMULET.getId());
+    public static final List<Long> highAmulets = Arrays.asList(
+            EquipList.DRAGON_AMULET.getId(),
+            EquipList.DEVIL_AMULET.getId()
+    );
 
 }
