@@ -32,6 +32,7 @@ import lkd.namsic.game.command.player.debug.DoingCommand;
 import lkd.namsic.game.command.player.debug.EvalCommand;
 import lkd.namsic.game.command.player.debug.GiveCommand;
 import lkd.namsic.game.command.player.debug.SaveCommand;
+import lkd.namsic.game.command.player.debug.SetStatCommand;
 import lkd.namsic.game.command.player.game.AdventureCommand;
 import lkd.namsic.game.command.player.game.AppraiseCommand;
 import lkd.namsic.game.command.player.game.ChatCommand;
@@ -109,6 +110,7 @@ public class KakaoTalk {
         registerPlayerCommand(new SaveCommand(),    "save");
         registerPlayerCommand(new EvalCommand(),    "eval");
         registerPlayerCommand(new CleanCommand(),   "clean");
+        registerPlayerCommand(new SetStatCommand(), "set_stat");
 
         //Register
         registerPlayerCommand(new PlayerRegisterCommand(), "회원가입", "가입", "register");
@@ -237,7 +239,16 @@ public class KakaoTalk {
                                 }
 
                                 player.checkNewDay();
-                                listener.execute(player, cmd, commands, second, third, fourth, session);
+
+                                try {
+                                    listener.execute(player, cmd, commands, second, third, fourth, session);
+                                } catch (Exception e) {
+                                    if(listener.getClass().getPackage().getName().equals("lkd.namsic.game.command.player.debug")) {
+                                        KakaoTalk.reply(session, Config.errorString(e));
+                                    } else {
+                                        throw e;
+                                    }
+                                }
                             } else if (player == null) {
                                 listener = KakaoTalk.nonPlayerCommands.get(first);
 

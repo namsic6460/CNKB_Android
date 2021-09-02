@@ -1028,7 +1028,7 @@ public class EquipCreator implements Creatable {
         equipment.setBasicStat(StatType.ATS, 10);
         Config.unloadObject(equipment);
 
-        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 231L));
+        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 232L));
         Logger.i("ObjectMaker", "Equipment making is done!");
     }
 

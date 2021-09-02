@@ -47,15 +47,18 @@ public enum SkillList {
     private final List<Long> eventList = new ArrayList<>();
 
     SkillList(@NonNull String displayName, long id) {
-        this(displayName, id, EventList.NONE);
+        this.displayName = displayName;
+        this.id = id;
     }
 
-    SkillList(@NonNull String displayName, long id, @NonNull EventList...eventDataList) {
+    SkillList(@NonNull String displayName, long id, @Nullable EventList...eventDataList) {
         this.displayName = displayName;
         this.id = id;
 
-        for(EventList eventData : eventDataList) {
-            this.eventList.add(eventData.getId());
+        if(eventDataList != null) {
+            for (EventList eventData : eventDataList) {
+                this.eventList.add(eventData.getId());
+            }
         }
     }
 

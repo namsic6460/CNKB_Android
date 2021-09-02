@@ -173,7 +173,7 @@ public class SkillUses {
                     self.setVariable(Variable.RESISTED_SKILL, true);
 
                     if (target.getId().getId().equals(Id.PLAYER)) {
-                        ((Player) target).replyPlayer(Emoji.focus(SkillList.CHARM.getDisplayName()) + " 스킬 저항에 성공했습니다");
+                        ((Player) target).replyPlayer("스킬 저항에 성공했습니다");
                     }
                 }
             }
@@ -271,7 +271,7 @@ public class SkillUses {
                         continue;
                     }
 
-                    stat = (int) (levelGap / 100D * entity.getStat(StatType.ATS));
+                    stat = (int) (levelGap / 150D * entity.getStat(StatType.ATS));
                     entity.addBuff(System.currentTimeMillis() + 30000, StatType.ATS, -1 * stat);
                     
                     if(entity.getId().getId().equals(Id.PLAYER)) {

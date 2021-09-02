@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import lkd.namsic.game.base.Location;
+import lkd.namsic.game.command.player.debug.SetStatCommand;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.object.EquipList;
@@ -39,13 +40,7 @@ public class ExampleUnitTest {
 
     @Test
     public void test() {
-        int maxHp = 700;
-        int hp = 150;
-
-        double lostHpPercent = (maxHp - hp) / (double) maxHp;
-        int heal = (int) ((lostHpPercent / 0.02) * (maxHp * 0.0015));
-
-        System.out.println(heal);
+        System.out.println(SetStatCommand.class.getPackage().getName());
     }
 
     @Test

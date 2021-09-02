@@ -89,6 +89,9 @@ public class RegisterCommand extends NonPlayerCommand {
         player.getItemRecipe().add(ItemList.GLASS_BOTTLE.getId());
         player.getItemRecipe().add(ItemList.RECIPE.getId());
         player.getItemRecipe().add(ItemList.HIGH_RECIPE.getId());
+        player.getItemRecipe().add(ItemList.CONFIRMED_LOW_RECIPE.getId());
+        player.getItemRecipe().add(ItemList.CONFIRMED_RECIPE.getId());
+        player.getItemRecipe().add(ItemList.CONFIRMED_HIGH_RECIPE.getId());
         player.getItemRecipe().add(ItemList.STONE_LUMP.getId());
         player.getItemRecipe().add(ItemList.LOW_EXP_POTION.getId());
         player.getItemRecipe().add(ItemList.SMALL_GOLD_BAG.getId());

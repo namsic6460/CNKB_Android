@@ -158,20 +158,20 @@ public class EntityEvents {
         put(EventList.CHARM_SELF_TURN.getId(), new SelfTurnEvent() {
             @Override
             public void onSelfTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> wrappedAttacker) {
-                Entity attacker = self.getObjectVariable(Variable.CHARM_ENTITY);
-                if(attacker != null) {
-                    wrappedAttacker.set(attacker);
+                Entity entity = self.getObjectVariable(Variable.CHARM_ENTITY);
+                if(entity != null) {
+                    wrappedAttacker.set(entity);
 
-                    self.setVariable(Variable.CHARM_SUCCESS, true);
-                    self.addEvent(EventList.CHARM_DAMAGE);
-                    self.addEvent(EventList.CHARM_TURN);
+                    entity.addEvent(EventList.CHARM_DAMAGE);
+                    entity.addEvent(EventList.CHARM_TURN);
                     
-                    if(attacker.getId().getId().equals(Id.PLAYER)) {
-                        ((Player) attacker).replyPlayer(Emoji.focus(SkillList.CHARM.getDisplayName()) +
+                    if(entity.getId().getId().equals(Id.PLAYER)) {
+                        ((Player) entity).replyPlayer(Emoji.focus(SkillList.CHARM.getDisplayName()) +
                                 " 스킬로 턴을 빼앗았습니다\n이번 턴의 공격이 강화됩니다");
                     }
                 }
 
+                self.removeEvent(EventList.CHARM_END);
                 throw new EventRemoveException();
             }
         });
@@ -180,8 +180,8 @@ public class EntityEvents {
             @Override
             public void onEndFight(@NonNull Entity self) {
                 self.removeVariable(Variable.CHARM_ENTITY);
-                self.removeVariable(Variable.CHARM_SUCCESS);
 
+                self.removeEvent(EventList.CHARM_SELF_TURN);
                 throw new EventRemoveException();
             }
         });
@@ -190,15 +190,12 @@ public class EntityEvents {
             @Override
             public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
                                  @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
-                Entity entity = self.getObjectVariable(Variable.CHARM_ENTITY);
-
-                if(entity != null && entity.getObjectVariable(Variable.CHARM_SUCCESS, false)) {
-                    if (canCrit && !isCrit.get()) {
-                        isCrit.set(true);
-                        totalDmg.multiple(3);
-                    }
+                if (canCrit && !isCrit.get()) {
+                    isCrit.set(true);
+                    totalDmg.multiple(3);
                 }
 
+                self.removeEvent(EventList.CHARM_TURN);
                 throw new EventRemoveException();
             }
         });
@@ -206,10 +203,7 @@ public class EntityEvents {
         put(EventList.CHARM_TURN.getId(), new TurnEvent() {
             @Override
             public void onTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> attacker) {
-                if(self.getObjectVariable(Variable.CHARM_SUCCESS, false)) {
-                    self.removeVariable(Variable.CHARM_SUCCESS);
-                }
-
+                self.removeEvent(EventList.CHARM_DAMAGE);
                 throw new EventRemoveException();
             }
         });
@@ -244,10 +238,14 @@ public class EntityEvents {
 
         put(EventList.STRINGS_OF_LIFE_DEATH.getId(), new DeathEvent() {
             @Override
-            public void onDeath(@NonNull Entity self, int beforeDeathHp, Int afterDeathHp) {
-                afterDeathHp.set(1);
-                self.removeEvent(EventList.STRINGS_OF_LIFE_END);
+            public void onDeath(@NonNull Entity self, int beforeHp, Int afterHp) {
+                afterHp.set(1);
+                
+                if(self.getId().getId().equals(Id.PLAYER)) {
+                    ((Player) self).replyPlayer(SkillList.STRINGS_OF_LIFE.getDisplayName() + " 의 효과로 버텼습니다");
+                }
 
+                self.removeEvent(EventList.STRINGS_OF_LIFE_END);
                 throw new EventRemoveException();
             }
         });

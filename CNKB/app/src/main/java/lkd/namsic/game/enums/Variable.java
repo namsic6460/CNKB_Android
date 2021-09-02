@@ -43,7 +43,6 @@ public enum Variable {
     SCAR_BLOOD,
     SCAR_BLOOD_DAMAGE,
     CHARM_ENTITY,
-    CHARM_SUCCESS,
     RESIST,
     SILVER_HELMET,
     SILVER_SHOES,

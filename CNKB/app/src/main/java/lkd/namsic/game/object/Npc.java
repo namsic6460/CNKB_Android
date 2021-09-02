@@ -44,7 +44,7 @@ public class Npc extends Entity {
         if(chat.getQuestId() != 0) {
             throw new InvalidNumberException(0);
         } else if(!chat.isBaseMsg()) {
-            throw new RuntimeException("common chat must be base msg");
+            throw new RuntimeException("Base chat must be base msg");
         }
 
         Set<Long> chatSet = this.baseChat.get(chatLimit);

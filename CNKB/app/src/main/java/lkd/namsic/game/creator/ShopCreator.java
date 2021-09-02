@@ -144,7 +144,7 @@ public class ShopCreator implements Creatable {
 
         shop = new Shop(NpcList.ELWOOD);
 
-        shop.addSellItem(ItemList.LOW_RECIPE, 750L);
+        shop.addSellItem(ItemList.CONFIRMED_LOW_RECIPE, 750L);
 
         shop.addBuyItem(ItemList.MAGIC_STONE, 120L);
         shop.addBuyItem(ItemList.HORN_OF_IMP, 150L);
@@ -169,9 +169,9 @@ public class ShopCreator implements Creatable {
         shop.addBuyItem(ItemList.ELIXIR_HERB, 15L);
 
         shop.addSellItem(ItemList.ELIXIR_HERB, 22L);
-        shop.addSellItem(ItemList.SMALL_EXP_SEED, 10000L);
-        shop.addSellItem(ItemList.EXP_SEED, 100_000L);
-        shop.addSellItem(ItemList.BIG_EXP_SEED, 1_500_000L);
+        shop.addSellItem(ItemList.SMALL_PURIFYING_SEED, 10000L);
+        shop.addSellItem(ItemList.PURIFYING_SEED, 100_000L);
+        shop.addSellItem(ItemList.BIG_PURIFYING_SEED, 1_500_000L);
         shop.addSellItem(ItemList.FARM_EXPAND_DEED, 50000L);
 
         Config.unloadObject(shop);

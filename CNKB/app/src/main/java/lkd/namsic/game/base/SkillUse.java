@@ -95,7 +95,7 @@ public abstract class SkillUse extends LimitUse {
                 output = targetList.toString();
             }
         } else {
-            output = self.getName();
+            output = "";
         }
 
         if(this.getWaitTurn() == 0) {

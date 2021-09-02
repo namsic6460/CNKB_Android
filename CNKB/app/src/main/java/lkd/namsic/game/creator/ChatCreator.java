@@ -833,6 +833,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
         
         chat = createChat(null, 156L, "무슨 일이신가요?");
+        chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
         chat = createChat("몸은 좀 회복 되셨나요?", 157L,
@@ -870,6 +871,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
         
         chat = createChat(null, 162L, "용건만 빠르게 전해라");
+        chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
         chat = createChat("왜 당신들은 저를 경계하는 건가요?", 163L,
@@ -880,6 +882,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
         
         chat = createChat(null, 164L, "그래 무슨 일이지 모험가");
+        chat.setBaseMsg(true);
         Config.unloadObject(chat);
         
         chat = createChat("당신 이름의 뜻을 알려줄 수 있나요?", 165L,
@@ -890,12 +893,14 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 166L, "무슨 일로 오셨나요?");
+        chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
         chat = createChat("아 그냥 지나가다 들렀습니다", 167L, "네네 안녕히 가세요");
         Config.unloadObject(chat);
         
         chat = createChat(null, 168L, "음 무슨 일이세요?");
+        chat.setBaseMsg(true);
         Config.unloadObject(chat);
         
         chat = createChat("엘프들은 과일만 먹고 사는건가요?", 169L,
@@ -905,6 +910,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 170L, "안녕하세요! 뭐 궁금한거 있으세요?");
+        chat.setBaseMsg(true);
         Config.unloadObject(chat);
 
         chat = createChat("혹시 나이가 어떻게 되니?", 171L,
@@ -941,6 +947,7 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
 
         chat = createChat(null, 176L, "찾아온 이유가 뭐지");
+        chat.setBaseMsg(true);
         Config.unloadObject(chat);
         
         chat = createChat("아하하... 그냥 지나가다 들른건데... 이 칼좀 치워주실래요", 177L,
@@ -950,10 +957,13 @@ public class ChatCreator implements Creatable {
         Config.unloadObject(chat);
         
         chat = createChat(null, 178L, "왜 왔지");
+        chat.setBaseMsg(true);
         Config.unloadObject(chat);
         
-        chat = createChat("당신은 암살자인건가요?", 179L, "호기심이 고양이를 죽이기도 하지");
+        chat = createChat("엘프에 암살자라..?", 179L, "호기심이 고양이를 죽이기도 한다더군");
         Config.unloadObject(chat);
+
+
 
         Logger.i("ObjectMaker", "Chat making is done!");
     }

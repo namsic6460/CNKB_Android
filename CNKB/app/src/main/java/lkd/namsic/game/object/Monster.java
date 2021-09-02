@@ -140,24 +140,27 @@ public class Monster extends AiEntity {
                         continue;
                     }
 
-                    int count = 1;
-                    int otherCount = random.nextInt(Math.min(use.getMaxTargetCount(), playerCount)) + 1;
-
                     StringBuilder otherBuilder = new StringBuilder();
 
-                    Entity value;
-                    for(Map.Entry<Integer, Entity> entry : targetMap.entrySet()) {
-                        value = entry.getValue();
+                    int useMaxTargetCount = use.getMaxTargetCount();
+                    if(useMaxTargetCount > 0) {
+                        int count = 1;
+                        int otherCount = random.nextInt(Math.min(useMaxTargetCount, playerCount)) + 1;
 
-                        if(value.getId().getId().equals(Id.PLAYER)) {
-                            exceptSet.add((Player) entry.getValue());
-                        }
+                        Entity value;
+                        for (Map.Entry<Integer, Entity> entry : targetMap.entrySet()) {
+                            value = entry.getValue();
 
-                        otherBuilder.append(entry.getKey())
-                                .append(",");
+                            if (value.getId().getId().equals(Id.PLAYER)) {
+                                exceptSet.add((Player) entry.getValue());
+                            }
 
-                        if(count++ == otherCount) {
-                            break;
+                            otherBuilder.append(entry.getKey())
+                                    .append(",");
+
+                            if (count++ == otherCount) {
+                                break;
+                            }
                         }
                     }
 

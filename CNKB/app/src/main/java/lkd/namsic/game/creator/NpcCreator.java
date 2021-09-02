@@ -309,13 +309,13 @@ public class NpcCreator implements Creatable {
 
 
         npc = new Npc(NpcList.ELWOOD, 155L);
-        npc.getLocation().set(4, 3, 1, 1);
+        npc.getLocation().set(4, 1, 1, 1);
 
         Config.unloadObject(npc);
 
 
         npc = new Npc(NpcList.LONGSILVER, 158L);
-        npc.getLocation().set(4, 3, 64, 1);
+        npc.getLocation().set(4, 1, 64, 1);
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitCloseRate().addMax(NpcList.LONGSILVER.getId(), 10);
@@ -333,7 +333,7 @@ public class NpcCreator implements Creatable {
 
 
         npc = new Npc(NpcList.FREY, 159L);
-        npc.getLocation().set(4, 3, 16, 16);
+        npc.getLocation().set(4, 1, 16, 16);
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitCloseRate().addMax(NpcList.FREY.getId(), 10);
@@ -351,7 +351,7 @@ public class NpcCreator implements Creatable {
 
 
         npc = new Npc(NpcList.HIBIS, 160L);
-        npc.getLocation().set(4, 3, 32, 28);
+        npc.getLocation().set(4, 1, 32, 28);
 
         npc.setBaseChat(new ChatLimit(), 170L);
 
@@ -365,7 +365,7 @@ public class NpcCreator implements Creatable {
 
 
         npc = new Npc(NpcList.SHADOW_BACK, 161L);
-        npc.getLocation().set(4, 3, 1, 64);
+        npc.getLocation().set(4, 1, 1, 64);
 
         chatLimit = new ChatLimit();
         chatLimit.getLimitCloseRate().addMax(NpcList.SHADOW_BACK.getId(), 10);

@@ -175,13 +175,13 @@ public abstract class Entity extends NamedObject {
             if(stat > maxHp) {
                 stat = maxHp;
             } else if(stat <= 0) {
-                Int afterDeathHp = new Int(stat);
+                Int afterHp = new Int(stat);
 
-                String eventName = DeathEvent.class.getName();
+                String eventName = DeathEvent.getName();
                 DeathEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName),
-                        this.getStat(StatType.HP), afterDeathHp);
+                        this.getStat(StatType.HP), afterHp);
 
-                stat = afterDeathHp.get();
+                stat = afterHp.get();
                 if(stat <= 0) {
                     isDeath = true;
                 }
@@ -673,11 +673,7 @@ public abstract class Entity extends NamedObject {
             this.isLastCrit = isCrit.get();
             target.lastHeal = heal;
 
-            if (isDeath) {
-                target.setKiller(this.id);
-                target.onDeath();
-                this.onKill(target);
-            } else if(print) {
+            if(print) {
                 if(this.id.getId().equals(Id.PLAYER)) {
                     ((Player) this).printDamageMsg(target);
                 }
@@ -686,6 +682,12 @@ public abstract class Entity extends NamedObject {
                 if(target instanceof Player) {
                     ((Player) target).printDamagedMsg(this);
                 }
+            }
+
+            if (isDeath) {
+                target.setKiller(this.id);
+                target.onDeath();
+                this.onKill(target);
             }
         } else {
             lastAttackSuccess = false;

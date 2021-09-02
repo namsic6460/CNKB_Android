@@ -56,7 +56,7 @@ public class EquipCommand extends PlayerCommand {
             }
 
             int equipIndex = Integer.parseInt(third);
-            String equipName = command.replace(second, "").replace(third, "");
+            String equipName = command.replace(second, "").replace(third, "").trim();
 
             EquipManager.getInstance().decompose(player, equipIndex, equipName);
         } else {

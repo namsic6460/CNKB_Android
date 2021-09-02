@@ -10,31 +10,24 @@ import java.util.Objects;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
-import lkd.namsic.game.enums.object.ItemList;
-import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.enums.Doing;
+import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.object.Player;
 
-public class GiveCommand extends PlayerCommand {
+public class SetStatCommand extends PlayerCommand {
 
     @Override
     public void executeCommand(@NonNull Player player, @NonNull String command, @NonNull List<String> commands,
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if(player.getId().getObjectId() == 1) {
-            if(second == null) {
-                throw new WeirdCommandException();
-            }
+            StatType statType = Objects.requireNonNull(StatType.findByName(second.toUpperCase()));
+            int stat = Integer.parseInt(third);
 
-            String countStr = commands.get(commands.size() - 1);
-            String itemName = command;
+            player.setBasicStat(statType, stat);
 
-            int count = 1;
-            try {
-                count = Integer.parseInt(countStr);
-                itemName = itemName.replace(countStr, "").trim();
-            } catch (NumberFormatException ignore) {}
-
-            player.addItem(Objects.requireNonNull(ItemList.findByName(itemName)), count, false);
             KakaoTalk.reply(session, "Success");
         }
     }

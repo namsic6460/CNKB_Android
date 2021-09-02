@@ -291,8 +291,8 @@ public class MonsterCreator implements Creatable {
         monster.setBasicStat(StatType.HP, 900);
         monster.setBasicStat(StatType.MAXMN, 40);
         monster.setBasicStat(StatType.MN, 40);
-        monster.setBasicStat(StatType.ATK, 150);
-        monster.setBasicStat(StatType.MATK, 150);
+        monster.setBasicStat(StatType.ATK, 130);
+        monster.setBasicStat(StatType.MATK, 130);
         monster.setBasicStat(StatType.ATS, 200);
         monster.setBasicStat(StatType.DEF, 150);
         monster.setBasicStat(StatType.MDEF, 150);
@@ -310,7 +310,7 @@ public class MonsterCreator implements Creatable {
 
         monster.addSkill(SkillList.STRINGS_OF_LIFE.getId());
         monster.addSkill(SkillList.RESIST.getId());
-        monster.setSkillPercent(SkillList.RESIST.getId(), 0.25D);
+        monster.setSkillPercent(SkillList.RESIST.getId(), 0.25);
 
         Config.unloadObject(monster);
 
@@ -322,11 +322,11 @@ public class MonsterCreator implements Creatable {
         monster.setBasicStat(StatType.HP, 1200);
         monster.setBasicStat(StatType.MAXMN, 30);
         monster.setBasicStat(StatType.MN, 30);
-        monster.setBasicStat(StatType.ATK, 300);
+        monster.setBasicStat(StatType.ATK, 250);
         monster.setBasicStat(StatType.MATK, 100);
         monster.setBasicStat(StatType.ATS, 200);
         monster.setBasicStat(StatType.AGI, 80);
-        monster.setBasicStat(StatType.DEF, 120);
+        monster.setBasicStat(StatType.DEF, 90);
         monster.setBasicStat(StatType.MDEF, 50);
         monster.setBasicStat(StatType.ACC, 80);
         monster.setBasicStat(StatType.EVA, 50);
@@ -338,7 +338,7 @@ public class MonsterCreator implements Creatable {
         monster.setItemDrop(ItemList.SKILL_BOOK_ROAR.getId(), 0.005, 1, 1);
 
         monster.addSkill(SkillList.SCAR.getId());
-        monster.setSkillPercent(SkillList.SCAR.getId(), 2);
+        monster.setSkillPercent(SkillList.SCAR.getId(), 0.2);
         monster.addSkill(SkillList.RUSH.getId());
         monster.setSkillPercent(SkillList.RUSH.getId(), 0.15);
         monster.addSkill(SkillList.ROAR.getId());

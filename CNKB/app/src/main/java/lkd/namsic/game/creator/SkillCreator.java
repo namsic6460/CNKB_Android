@@ -40,7 +40,8 @@ public class SkillCreator implements Creatable {
         createSkill(SkillList.RUSH, "[5 마나] [치명타 불가]\n" +
                         "대상의 위치까지 필드를 이동하고 이동한 거리와 공격력에 비례하여 데미지를 가한다", null);
 
-        createSkill(SkillList.ROAR, "[2 마나]\n모든 적의 공격속도를 레벨 차이에 비례하여 30초간 감소시킨다", null);
+        createSkill(SkillList.ROAR, "[2 마나]\n모든 적의 공격속도를 레벨 차이에 비례하여 30초간 감소시킨다\n" +
+                "(1.5레벨 차이당 1%) (최대 30%)", null);
 
         Logger.i("ObjectMaker", "Skill making is done!");
     }

@@ -463,8 +463,7 @@ public class RandomList {
             ItemList.HARD_IRON.getId(),
             ItemList.LOW_ELIXIR.getId(),
             ItemList.REINFORCE_STONE.getId(),
-            ItemList.HARDENED_SLIME.getId(),
-            ItemList.CONFIRMED_LOW_RECIPE.getId()
+            ItemList.HARDENED_SLIME.getId()
     );
 
     public static final List<Long> middleRecipeItems = Arrays.asList(
@@ -476,7 +475,6 @@ public class RandomList {
             ItemList.ELIXIR.getId(),
             ItemList.HIGH_REINFORCE_STONE.getId(),
             ItemList.MAGIC_STONE.getId(),
-            ItemList.CONFIRMED_RECIPE.getId(),
             ItemList.TITANIUM_STEEL.getId(),
             ItemList.TRACE_OF_SKY.getId(),
             ItemList.TRACE_OF_EARTH.getId(),
@@ -492,8 +490,7 @@ public class RandomList {
             ItemList.AITUME.getId(),
             ItemList.HIGH_ALLOY.getId(),
             ItemList.HIGH_AMULET.getId(),
-            ItemList.HIGH_ELIXIR.getId(),
-            ItemList.CONFIRMED_HIGH_RECIPE.getId()
+            ItemList.HIGH_ELIXIR.getId()
     );
 
     public static final List<Long> lowRecipeEquips = Arrays.asList(

@@ -246,7 +246,7 @@ public class MoveManager {
                         self.getLv() + "\n요구 레벨: " + moveMap.getRequireLv());
             }
 
-            if(!Config.compareMap(self.getInventory(), moveMap.getClearedQuest(), true, false, 0)) {
+            if(!Config.compareMap(self.getClearedQuest(), moveMap.getLimitQuest(), true, false, 0)) {
                 throw new WeirdCommandException("해당 맵으로 이동하기 위한 요구 퀘스트가 부족합니다");
             }
 

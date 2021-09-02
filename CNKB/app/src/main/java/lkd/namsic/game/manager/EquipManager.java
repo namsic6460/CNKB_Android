@@ -212,6 +212,8 @@ public class EquipManager {
             money += equipment.getReinforceCost(reinforceCount);
         }
 
+        money *= 1.2;
+
         self.addMoney(money);
         innerBuilder.append(Config.getIncrease(money))
                 .append("\n\n---아이템 현황---");

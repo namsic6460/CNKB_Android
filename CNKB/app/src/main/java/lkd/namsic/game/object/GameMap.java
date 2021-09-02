@@ -47,7 +47,7 @@ public class GameMap {
     @Setter
     int requireLv = 1;
 
-    final Map<Long, Integer> clearedQuest = new HashMap<>();
+    final Map<Long, Integer> limitQuest = new HashMap<>();
 
     final Location location;
 
