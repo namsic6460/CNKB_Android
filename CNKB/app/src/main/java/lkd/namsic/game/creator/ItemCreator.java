@@ -476,11 +476,17 @@ public class ItemCreator implements Creatable {
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LOW_RECIPE.getId(), 6);
         }});
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.CONFIRMED_LOW_RECIPE.getId(), 2);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_RECIPE, "상급 아이템 또는 상급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.RECIPE.getId(), 10);
+        }});
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.CONFIRMED_RECIPE.getId(), 2);
         }});
         Config.unloadObject(item);
 
@@ -858,12 +864,18 @@ public class ItemCreator implements Creatable {
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.RECIPE.getId(), 6);
         }});
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.CONFIRMED_LOW_RECIPE.getId(), 10);
+        }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.CONFIRMED_HIGH_RECIPE,
                 "상급 아이템 또는 상급 장비의 제작법을 1개 지정하여 확정적으로 획득할 수 있다");
         item.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.HIGH_RECIPE.getId(), 8);
+        }});
+        item.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.CONFIRMED_RECIPE.getId(), 10);
         }});
         Config.unloadObject(item);
 
@@ -878,8 +890,8 @@ public class ItemCreator implements Creatable {
 
         createItem(ItemList.PURIFYING_FRUIT, "정화의 힘이 담긴 열매다");
         createItem(ItemList.SMALL_PURIFYING_SEED, "정화의 씨앗이다\n[수확]: 1 정화의 열매/20분");
-        createItem(ItemList.SMALL_PURIFYING_SEED, "정화의 씨앗이다(씨앗 Lv.2)\n[수확]: 1 정화의 열매/10분");
-        createItem(ItemList.SMALL_PURIFYING_SEED, "정화의 씨앗이다(씨앗 Lv.4)\n[수확]: 2 정화의 열매/8분");
+        createItem(ItemList.PURIFYING_SEED, "정화의 씨앗이다(씨앗 Lv.2)\n[수확]: 1 정화의 열매/10분");
+        createItem(ItemList.BIG_PURIFYING_SEED, "정화의 씨앗이다(씨앗 Lv.4)\n[수확]: 2 정화의 열매/8분");
         
         item = new Item(ItemList.HARDENED_SLIME, "적당히 탱탱해진 슬라임이다");
         item.addRecipe(new HashMap<Long, Integer>() {{

@@ -12,11 +12,13 @@ import org.junit.Test;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
 import lkd.namsic.game.base.Location;
-import lkd.namsic.game.command.player.debug.SetStatCommand;
+import lkd.namsic.game.base.RangeIntegerMap;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.object.EquipList;
@@ -40,7 +42,17 @@ public class ExampleUnitTest {
 
     @Test
     public void test() {
-        System.out.println(SetStatCommand.class.getPackage().getName());
+        RangeIntegerMap<Long> rangeMap = new RangeIntegerMap<>(
+                new HashMap<>(), new HashMap<>(), Long.class
+        );
+        rangeMap.addMax(1L, 0);
+
+        Map<Long, Integer> map = new HashMap<>();
+
+        System.out.println(rangeMap.isInRange(map));
+
+        map.put(1L, 1);
+        System.out.println(rangeMap.isInRange(map));
     }
 
     @Test

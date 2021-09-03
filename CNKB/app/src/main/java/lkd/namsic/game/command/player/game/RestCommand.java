@@ -13,6 +13,7 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.object.Equipment;
@@ -48,9 +49,16 @@ public class RestCommand extends PlayerCommand {
             Logger.e("Rest", Config.errorString(e));
         }
 
-        player.removeVariable(Variable.REST);
+        endRest(player);
+        player.replyPlayer("휴식으로 체력과 마나가 모두 채워졌습니다!");
+    }
+
+    public static void endRest(@NonNull Player player) {
         player.setDoing(Doing.NONE);
-        player.replyPlayer("휴식으로 체력과 마나가 모두 체워졌습니다!");
+        player.setBasicStat(StatType.HP, player.getStat(StatType.MAXHP));
+        player.setBasicStat(StatType.MN, player.getStat(StatType.MAXMN));
+
+        player.removeVariable(Variable.REST);
     }
 
 }

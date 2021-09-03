@@ -38,7 +38,6 @@ public class QuestManager {
 
     public void clearQuest(@NonNull Player self, long questId, long npcId) {
         Long chatId = self.getQuest().get(questId);
-
         if(chatId == null) {
             throw new ObjectNotFoundException(Id.QUEST, questId);
         }

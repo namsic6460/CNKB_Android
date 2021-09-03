@@ -75,8 +75,8 @@ public class ChatManager {
                         return;
                     }
 
-                    this.startChat(self, chatId, npcId);
                     questManager.clearQuest(self, questId, npcId);
+                    this.startChat(self, chatId, npcId);
                     return;
                 }
             }

@@ -140,10 +140,12 @@ public class Monster extends AiEntity {
                         continue;
                     }
 
-                    StringBuilder otherBuilder = new StringBuilder();
+                    StringBuilder otherBuilder;
 
                     int useMaxTargetCount = use.getMaxTargetCount();
                     if(useMaxTargetCount > 0) {
+                        otherBuilder = new StringBuilder();
+
                         int count = 1;
                         int otherCount = random.nextInt(Math.min(useMaxTargetCount, playerCount)) + 1;
 
@@ -162,6 +164,8 @@ public class Monster extends AiEntity {
                                 break;
                             }
                         }
+                    } else {
+                        otherBuilder = new StringBuilder(",");
                     }
 
                     String other = otherBuilder.toString();

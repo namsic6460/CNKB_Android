@@ -305,11 +305,7 @@ public class KakaoTalk {
 
         if(!doing.equals(Doing.NONE)) {
             if(doing.equals(Doing.REST) && player.getVariable(Variable.REST, 0L) <= System.currentTimeMillis()) {
-                player.setDoing(Doing.NONE);
-                player.setBasicStat(StatType.HP, player.getStat(StatType.MAXHP));
-                player.setBasicStat(StatType.MN, player.getStat(StatType.MAXMN));
-
-                player.removeVariable(Variable.REST);
+                RestCommand.endRest(player);
             } else {
                 throw new DoingFilterException(player.getDoing());
             }
