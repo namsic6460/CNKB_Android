@@ -58,7 +58,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 2.44;
+    public static final double VERSION = 2.47;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -830,6 +830,35 @@ public class Config {
 
         if(entity.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) entity;
+
+            if(player.getVersion() < 2.46) {
+                player.addMoney(100_000);
+
+                long objectId = player.getId().getObjectId();
+
+                if(objectId == 8) {
+                    player.addTitle("결투가");
+                    player.setCurrentTitle("결투가");
+                }
+
+                if(objectId == 8 || objectId == 6 || objectId == 25 || objectId == 9 || objectId == 58) {
+                    player.addItem(ItemList.LOW_RECIPE.getId(), 100, false);
+                    player.addItem(ItemList.REINFORCE_MULTIPLIER.getId(), 10, false);
+                    player.addItem(ItemList.LOW_REINFORCE_STONE.getId(), 20, false);
+                    player.addItem(ItemList.REINFORCE_STONE.getId(), 5, false);
+                    player.addItem(ItemList.HIGH_ELIXIR.getId(), 10, false);
+
+                    if (objectId == 8) {
+                        player.addMoney(150_000);
+                    } else if(objectId == 6) {
+                        player.addMoney(100_000);
+                    } else if(objectId == 25) {
+                        player.addMoney(80_000);
+                    } else if(objectId == 9) {
+                        player.addMoney(50_000);
+                    }
+                }
+            }
 
             if (unavailable) {
                 StringBuilder innerBuilder = new StringBuilder("---장비 업데이트 경고---\n(장착 해제할 경우 재장착이 불가능한 장비 목록)");

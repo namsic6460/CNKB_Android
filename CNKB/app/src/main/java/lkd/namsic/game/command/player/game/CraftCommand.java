@@ -30,6 +30,12 @@ public class CraftCommand extends PlayerCommand {
             ItemDisplayManager.getInstance().displayRecipes(player, second.equals("아이템") || second.equals("item"));
         } else if(second.equals("확인") || second.equals("check")) {
             ItemDisplayManager.getInstance().displayRecipe(player, command.replace(second, "").trim());
+        } else if(third == null && (second.equals("하급") || second.equals("low"))) {
+            ItemDisplayManager.getInstance().displayLowRecipe(player);
+        } else if(third == null && (second.equals("중급") || second.equals("middle"))) {
+            ItemDisplayManager.getInstance().displayMiddleRecipe(player);
+        } else if(third == null && (second.equals("상급") || second.equals("high"))) {
+            ItemDisplayManager.getInstance().displayHighRecipe(player);
         } else {
             KakaoTalk.checkDoing(player);
 

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
+import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
@@ -448,6 +449,60 @@ public class ItemDisplayManager {
         }
 
         self.replyPlayer("장비 강화 현황은 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+
+    public void displayLowRecipe(@NonNull Player self) {
+        StringBuilder innerBuilder = new StringBuilder("---아이템 제작법 목록---");
+
+        for(long itemId : RandomList.lowRecipeItems) {
+            innerBuilder.append("\n- ")
+                    .append(ItemList.findById(itemId));
+        }
+
+        innerBuilder.append("\n\n---장비 제작법 목록---");
+
+        for(long equipId : RandomList.lowRecipeEquips) {
+            innerBuilder.append("\n- ")
+                    .append(EquipList.findById(equipId));
+        }
+
+        self.replyPlayer("하급 제작법으로 획득 가능한 제작법은 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+
+    public void displayMiddleRecipe(@NonNull Player self) {
+        StringBuilder innerBuilder = new StringBuilder("---아이템 제작법 목록---");
+
+        for(long itemId : RandomList.middleRecipeItems) {
+            innerBuilder.append("\n- ")
+                    .append(ItemList.findById(itemId));
+        }
+
+        innerBuilder.append("\n\n---장비 제작법 목록---");
+
+        for(long equipId : RandomList.middleRecipeEquips) {
+            innerBuilder.append("\n- ")
+                    .append(EquipList.findById(equipId));
+        }
+
+        self.replyPlayer("중급 제작법으로 획득 가능한 제작법은 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+
+    public void displayHighRecipe(@NonNull Player self) {
+        StringBuilder innerBuilder = new StringBuilder("---아이템 제작법 목록---");
+
+        for(long itemId : RandomList.highRecipeItems) {
+            innerBuilder.append("\n- ")
+                    .append(ItemList.findById(itemId));
+        }
+
+        innerBuilder.append("\n\n---장비 제작법 목록---");
+
+        for(long equipId : RandomList.highRecipeEquips) {
+            innerBuilder.append("\n- ")
+                    .append(EquipList.findById(equipId));
+        }
+
+        self.replyPlayer("상급 제작법으로 획득 가능한 제작법은 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
 }

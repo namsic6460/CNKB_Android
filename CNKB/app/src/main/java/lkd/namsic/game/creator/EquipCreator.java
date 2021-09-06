@@ -291,7 +291,6 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.SHOES, EquipList.MINER_SHOES,
                 null, "광질 시 돌을 채광하면 40% 확률로 돌을 추가로 1개 더 채광한다");
         equipment.setHandleLv(1);
-        equipment.setHandleLv(1);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.STONE.getId(), 1000);
             put(ItemList.COAL.getId(), 1000);
@@ -542,7 +541,7 @@ public class EquipCreator implements Creatable {
                 "[5 마나]\n대상에게 마법 공격력만큼의 마법 데미지를 가하고, 다음 대상의 공격으로 인한 회복량을 80% 감소시킨다",
                 "은 보호구 및 은 반지를 모두 착용할 시 상대방의 공격으로 인한 회복량을 50% 감소시킨다");
         equipment.setHandleLv(4);
-        equipment.setHandleLv(35);
+        equipment.setLimitLv(35);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.SILVER.getId(), 50);
         }});
@@ -555,7 +554,7 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.HELMET, EquipList.SILVER_HELMET,
                 null, "피격 전 해당 전투에서의 마법 저항력을 10씩 증가시킨다(최대 50)");
         equipment.setHandleLv(4);
-        equipment.setHandleLv(35);
+        equipment.setLimitLv(35);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.SILVER.getId(), 30);
         }});
@@ -569,7 +568,7 @@ public class EquipCreator implements Creatable {
                 "[3 마나] [치명타 불가]\n다음 피격 시 마법 데미지가 포함되어 있다면 물리 데미지와 마법 데미지의 30%를 반사하고 " +
                         "마법 데미지를 50% 감소시킨다", null);
         equipment.setHandleLv(4);
-        equipment.setHandleLv(35);
+        equipment.setLimitLv(35);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.SILVER.getId(), 50);
         }});
@@ -578,7 +577,7 @@ public class EquipCreator implements Creatable {
 
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.SILVER_LEGGINGS, null, null);
         equipment.setHandleLv(4);
-        equipment.setHandleLv(35);
+        equipment.setLimitLv(35);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.SILVER.getId(), 40);
         }});
@@ -589,7 +588,7 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.SHOES, EquipList.SILVER_SHOES,
                 null, "피격 전 해당 전투에서의 민첩을 10씩 증가시킨다(최대 50)");
         equipment.setHandleLv(4);
-        equipment.setHandleLv(35);
+        equipment.setLimitLv(35);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.SILVER.getId(), 30);
         }});
@@ -875,7 +874,7 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.RINGS, EquipList.SILVER_RING,
                 null, "피격 시 20% 확률로 마법 데미지의 20% 를 반사한다");
         equipment.setHandleLv(4);
-        equipment.setHandleLv(30);
+        equipment.setLimitLv(30);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.SILVER.getId(), 20);
         }});

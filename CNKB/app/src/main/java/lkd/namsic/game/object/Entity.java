@@ -286,6 +286,8 @@ public abstract class Entity extends NamedObject {
                 this.setBasicStat(StatType.MN, maxMn);
                 value = maxMn;
             }
+        } else if(statType.equals(StatType.AGI)) {
+            value = Math.min(Config.MAX_AGI, value);
         }
 
         return value;

@@ -2,33 +2,27 @@ package lkd.namsic;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 
 import org.junit.Test;
 
 import java.io.File;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
+import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.Location;
-import lkd.namsic.game.base.RangeIntegerMap;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.object.EquipList;
+import lkd.namsic.game.json.ChatLimitAdapter;
 import lkd.namsic.game.json.LocationAdapter;
+import lkd.namsic.game.json.NpcAdapter;
 import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.FileManager;
 
-@SuppressWarnings("SpellCheckingInspection")
 public class ExampleUnitTest {
 
     @Test
@@ -42,94 +36,48 @@ public class ExampleUnitTest {
 
     @Test
     public void test() {
-        RangeIntegerMap<Long> rangeMap = new RangeIntegerMap<>(
-                new HashMap<>(), new HashMap<>(), Long.class
-        );
-        rangeMap.addMax(1L, 0);
+        for(int i = 0; i < 100; i++) {
+            int lv = 201;
+            long exp = Math.min(30_000_000, new Random().nextInt(100_000 * lv) + 3_000_000);
 
-        Map<Long, Integer> map = new HashMap<>();
+            if(lv <= 200) {
+                exp *= 0.1;
+            } else {
+                exp *= Math.min(0.1 + ((lv - 200) / 100d), 1);
+            }
 
-        System.out.println(rangeMap.isInRange(map));
+            exp = Math.max(500_000, exp);
 
-        map.put(1L, 1);
-        System.out.println(rangeMap.isInRange(map));
+            System.out.println(exp + ", " + (Math.min(1_000_000, new Random().nextInt(8000 * lv) + 150_000)));
+        }
     }
 
     @Test
     public void loadTest() throws Exception {
-        File[] files = Objects.requireNonNull(new File("C:\\Users\\user\\Downloads\\players").listFiles());
+        String path = "C:\\Users\\user\\Downloads\\cnkb\\";
+        File[] files = Objects.requireNonNull(new File(path + "players").listFiles());
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Equipment.class, new TestEquipAdapter())
-                .registerTypeAdapter(Player.class, new TestPlayerAdapter())
+                .registerTypeAdapter(Npc.class, new NpcAdapter())
                 .registerTypeAdapter(Location.class, new LocationAdapter())
+                .registerTypeAdapter(ChatLimit.class, new ChatLimitAdapter())
                 .create();
 
         for(File file : files) {
-//        File file = new File("C:\\Users\\user\\Downloads\\CNKB\\pl\\0w0-QGiQrMIAkQJDLQQOf4-oV7b9XZP-59-jUYi0CDlOfw8Nvr1DXV+-1955777633+18829.json");
             String jsonStr = FileManager.read(file);
 
-            System.out.println(file.getAbsolutePath());
             Player player = gson.fromJson(jsonStr, Player.class);
-//            System.out.println(gson.toJson(player));
-            FileManager.save(file.getAbsolutePath(), gson.toJson(player));
+            for(long equipId : player.getEquipInventory()) {
+                Equipment equipment = gson.fromJson(FileManager.read(new File(path + "EQUIPMENT\\" + equipId + ".json")), Equipment.class);
+
+                if(equipment.getOriginalId() == EquipList.SILVER_HELMET.getId()) {
+                    System.out.println("Helmet: " + equipId + "(" + player.getName() + ")");
+                } else if(equipment.getOriginalId() == EquipList.SILVER_SHOES.getId()) {
+                    System.out.println("Shoes: " + equipId + "(" + player.getName() + ")");
+                }
+            }
         }
 
         System.out.println("DONE");
-    }
-
-    static class TestEquipAdapter implements JsonDeserializer<Equipment> {
-
-        @Override
-        public Equipment deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            JsonObject jsonObject = json.getAsJsonObject();
-
-            JsonObject tempObject = jsonObject.remove("handleLv").getAsJsonObject();
-            jsonObject.addProperty("handleLv", tempObject.get("value").getAsInt());
-
-            tempObject = jsonObject.remove("limitLv").getAsJsonObject();
-            jsonObject.addProperty("limitLv", tempObject.get("value").getAsInt());
-
-            tempObject = jsonObject.remove("reinforceCount").getAsJsonObject();
-            jsonObject.addProperty("reinforceCount", tempObject.get("value").getAsInt());
-
-            tempObject = jsonObject.remove("reinforceFloor1").getAsJsonObject();
-            jsonObject.addProperty("reinforceFloor1", tempObject.get("value").getAsDouble());
-
-            tempObject = jsonObject.remove("reinforceFloor2").getAsJsonObject();
-            jsonObject.addProperty("reinforceFloor2", tempObject.get("value").getAsInt());
-
-            return new Gson().fromJson(jsonObject, Equipment.class);
-        }
-
-    }
-
-    static class TestPlayerAdapter implements JsonDeserializer<Player> {
-
-        @Override
-        public Player deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            JsonObject jsonObject = json.getAsJsonObject();
-
-            JsonObject tempObject = jsonObject.remove("adv").getAsJsonObject();
-            jsonObject.addProperty("adv", tempObject.get("value").getAsInt());
-
-            tempObject = jsonObject.remove("exp").getAsJsonObject();
-            jsonObject.addProperty("exp", tempObject.get("value").getAsLong());
-
-            tempObject = jsonObject.remove("sp").getAsJsonObject();
-            jsonObject.addProperty("sp", tempObject.get("value").getAsInt());
-
-            tempObject = jsonObject.remove("lv").getAsJsonObject();
-            jsonObject.addProperty("lv", tempObject.get("value").getAsInt());
-
-            tempObject = jsonObject.remove("money").getAsJsonObject();
-            jsonObject.addProperty("money", tempObject.get("value").getAsLong());
-
-            return new GsonBuilder()
-                    .registerTypeAdapter(Location.class, new LocationAdapter())
-                    .create()
-                    .fromJson(jsonObject, Player.class);
-        }
-
     }
 
     @Test

@@ -227,7 +227,16 @@ public class ItemUses {
             @NonNull
             @Override
             public String use(@NonNull Entity self, @Nullable String other) {
-                long exp = Math.min(30_000_000, new Random().nextInt(100_000 * self.getLv()) + 3_000_000);
+                int lv = self.getLv();
+                long exp = Math.min(30_000_000, new Random().nextInt(100_000 * lv) + 3_000_000);
+
+                if (lv <= 200) {
+                    exp *= 0.2;
+                } else {
+                    exp *= Math.min(0.2 - (lv - 200 / 100d), 1);
+                }
+
+                exp = Math.min(500_000, exp);
 
                 Player player = (Player) self;
                 player.addExp(exp);
@@ -357,16 +366,10 @@ public class ItemUses {
                 long equipId = self.getEquipIdByIndex(Integer.parseInt(other));
                 Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
 
-                try {
-                    if (equipment.getLvDown() >= 100) {
-                        return "더이상 이 장비의 제한 레벨을 완화제로 낮출 수 없습니다";
-                    }
+                equipment.addLvDown(5);
+                Config.unloadObject(equipment);
 
-                    equipment.addLvDown(5);
-                    return equipment.getName() + " 의 장착 제한 레벨을 5 낮췄습니다\n장착 제한 레벨: " + equipment.getTotalLimitLv();
-                } finally {
-                    Config.unloadObject(equipment);
-                }
+                return equipment.getName() + " 의 장착 제한 레벨을 5 낮췄습니다\n장착 제한 레벨: " + equipment.getTotalLimitLv();
             }
         });
 
@@ -563,16 +566,16 @@ public class ItemUses {
                     if (player.getItemRecipe().contains(objectId)) {
                         return "해당 아이템의 제작법은 이미 알고 있습니다";
                     }
-                    
-                    if(!RandomList.lowRecipeItems.contains(objectId)) {
+
+                    if (!RandomList.lowRecipeItems.contains(objectId)) {
                         return "해당 아이템은 하급 제작법에 포함되지 않습니다";
                     }
                 } else {
-                    if(player.getEquipRecipe().contains(objectId)) {
+                    if (player.getEquipRecipe().contains(objectId)) {
                         return "해당 장비의 제작법은 이미 알고 있습니다";
                     }
 
-                    if(!RandomList.lowRecipeEquips.contains(objectId)) {
+                    if (!RandomList.lowRecipeEquips.contains(objectId)) {
                         return "해당 장비는 하급 제작법에 포함되지 않습니다";
                     }
                 }
@@ -592,7 +595,7 @@ public class ItemUses {
                 }
 
                 Player player = (Player) self;
-                if(isItem) {
+                if (isItem) {
                     player.getItemRecipe().add(objectId);
                 } else {
                     player.getEquipRecipe().add(objectId);
@@ -638,15 +641,15 @@ public class ItemUses {
                         return "해당 아이템의 제작법은 이미 알고 있습니다";
                     }
 
-                    if(!RandomList.middleRecipeItems.contains(objectId)) {
+                    if (!RandomList.middleRecipeItems.contains(objectId)) {
                         return "해당 아이템은 중급 제작법에 포함되지 않습니다";
                     }
                 } else {
-                    if(player.getEquipRecipe().contains(objectId)) {
+                    if (player.getEquipRecipe().contains(objectId)) {
                         return "해당 장비의 제작법은 이미 알고 있습니다";
                     }
 
-                    if(!RandomList.middleRecipeEquips.contains(objectId)) {
+                    if (!RandomList.middleRecipeEquips.contains(objectId)) {
                         return "해당 장비는 중급 제작법에 포함되지 않습니다";
                     }
                 }
@@ -666,7 +669,7 @@ public class ItemUses {
                 }
 
                 Player player = (Player) self;
-                if(isItem) {
+                if (isItem) {
                     player.getItemRecipe().add(objectId);
                 } else {
                     player.getEquipRecipe().add(objectId);
@@ -712,15 +715,15 @@ public class ItemUses {
                         return "해당 아이템의 제작법은 이미 알고 있습니다";
                     }
 
-                    if(!RandomList.highRecipeItems.contains(objectId)) {
+                    if (!RandomList.highRecipeItems.contains(objectId)) {
                         return "해당 아이템은 상급 제작법에 포함되지 않습니다";
                     }
                 } else {
-                    if(player.getEquipRecipe().contains(objectId)) {
+                    if (player.getEquipRecipe().contains(objectId)) {
                         return "해당 장비의 제작법은 이미 알고 있습니다";
                     }
 
-                    if(!RandomList.highRecipeEquips.contains(objectId)) {
+                    if (!RandomList.highRecipeEquips.contains(objectId)) {
                         return "해당 장비는 상급 제작법에 포함되지 않습니다";
                     }
                 }
@@ -740,7 +743,7 @@ public class ItemUses {
                 }
 
                 Player player = (Player) self;
-                if(isItem) {
+                if (isItem) {
                     player.getItemRecipe().add(objectId);
                 } else {
                     player.getEquipRecipe().add(objectId);
@@ -796,7 +799,7 @@ public class ItemUses {
                 FarmManager.getInstance().checkFarm(player);
                 Farm farm = Config.getData(Id.FARM, self.getId().getObjectId());
 
-                if(farm.getMaxPlantCount() == Config.MAX_FARM_PLANT_COUNT) {
+                if (farm.getMaxPlantCount() == Config.MAX_FARM_PLANT_COUNT) {
                     throw new WeirdCommandException("이미 농장이 최대 크기입니다(" + Config.MAX_FARM_PLANT_COUNT + "칸)");
                 }
             }

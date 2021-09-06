@@ -71,6 +71,9 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " (스텟/stat) ({스텟 이름}) ({숫자}) : SP를 소모하여 스텟을 증가시킵니다\n\n" +
                         Emoji.LIST + " *(제작/craft) (아이템/item/장비/equip) : 제작 가능한 아이템 또는 장비 목록을 표시합니다\n\n" +
                         Emoji.LIST + " *(제작/craft) (확인/check) ({아이템 또는 장비 이름}) : 아이템 또는 장비의 제작법을 표시합니다\n\n" +
+                        Emoji.LIST + " *(제작/craft) (하급/low) : 하급 제작법으로 획득 가능한 제작법 목록을 표시합니다\n\n" +
+                        Emoji.LIST + " *(제작/craft) (중급/middle) : 중급 제작법으로 획득 가능한 제작법 목록을 표시합니다\n\n" +
+                        Emoji.LIST + " *(제작/craft) (상급/high) : 상급 제작법으로 획득 가능한 제작법 목록을 표시합니다\n\n" +
                         Emoji.LIST + " (제작/craft) ({아이템 또는 장비 이름}) [{아이템 개수}] [{레시피 번호}] :" +
                         "아이템 또는 장비를 제작합니다\n\n" +
                         Emoji.LIST + " (강화/제련/reinforce/r) : 강화에 대한 설명을 표시합니다\n\n" +

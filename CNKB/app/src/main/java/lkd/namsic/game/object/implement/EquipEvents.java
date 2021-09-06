@@ -474,7 +474,7 @@ public class EquipEvents {
                                          @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
                     int mdefIncreased = self.getVariable(Variable.SILVER_HELMET);
                     if(mdefIncreased < 50) {
-                        self.setVariable(Variable.SILVER_HELMET, mdefIncreased);
+                        self.setVariable(Variable.SILVER_HELMET, mdefIncreased + 10);
                         self.addBasicStat(StatType.MDEF, 10);
                     }
                 }
@@ -499,7 +499,7 @@ public class EquipEvents {
                                          @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
                     int agiIncreased = self.getVariable(Variable.SILVER_SHOES);
                     if(agiIncreased < 50) {
-                        self.setVariable(Variable.SILVER_SHOES, agiIncreased);
+                        self.setVariable(Variable.SILVER_SHOES, agiIncreased + 10);
                         self.addBasicStat(StatType.AGI, 10);
                     }
                 }
