@@ -217,7 +217,19 @@ public class Player extends Entity {
 
     @NonNull
     public String getDisplayLv() {
-        return this.lv + "Lv (" + this.exp + "/" + this.getNeedExp() + ")";
+        return Config.getExpStr(this.lv, this.exp, this.getNeedExp());
+    }
+
+    @NonNull
+    public String getDisplayMineLv() {
+        int mineLv = this.getVariable(Variable.MINE);
+        return Config.getExpStr(mineLv, this.getLog(LogData.MINED), RandomList.MINE_LV_REQUIREMENT.get(mineLv));
+    }
+
+    @NonNull
+    public String getDisplayFishLv() {
+        int fishLv = this.getVariable(Variable.FISH);
+        return Config.getExpStr(fishLv, this.getVariable(Variable.FISH_SKILL), RandomList.FISH_LV_REQUIREMENT.get(fishLv));
     }
 
     public void addTitle(@NonNull String title) {
@@ -335,7 +347,7 @@ public class Player extends Entity {
 
     public void addExp(long exp) {
         if(exp < 0) {
-            throw new NumberRangeException(0, 0);
+            throw new NumberRangeException(exp, 0);
         }
 
         exp *= Config.EXP_BOOST;

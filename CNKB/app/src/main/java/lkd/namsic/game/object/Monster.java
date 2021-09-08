@@ -64,10 +64,10 @@ public class Monster extends AiEntity {
         }
 
         int prevLv = this.lv;
-        int newLv = Math.max(prevLv + (new Random().nextInt(17) - 8), 1);
+        int newLv = Math.max(prevLv + (new Random().nextInt(21) - 10), 1);
         this.lv = newLv;
 
-        double statIncrease = 0.1 * (newLv - prevLv);
+        double statIncrease = 0.075 * (newLv - prevLv);
         if(statIncrease < 0) {
             statIncrease /= 2;
         }

@@ -117,6 +117,7 @@ public class NpcCreator implements Creatable {
         chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING2.getId());
         chatLimit.getNotRunningQuest().add(QuestList.LEATHER_COLLECTING3.getId());
         chatLimit.getLimitQuest().addMin(QuestList.LEATHER_COLLECTING2.getId(), 1);
+        chatLimit.getLimitQuest().addMax(QuestList.LEATHER_COLLECTING3.getId(), 10);
         chatLimit.getLimitLv().setMin(80);
         npc.setChat(chatLimit, 139L);
 

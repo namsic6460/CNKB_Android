@@ -2,7 +2,6 @@ package lkd.namsic.game.manager;
 
 import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -43,11 +42,7 @@ public class FishManager {
         self.addLog(LogData.FISH, 1);
 
         double randomPercent = Math.random() * 100;
-
-        List<Integer> percents = new ArrayList<>();
-        for(List<Integer> fishPercent : RandomList.FISH_PERCENT) {
-            percents.add(fishPercent.get(fishLv));
-        }
+        List<Integer> percents = RandomList.FISH_PERCENT.get(fishLv);
 
         Random random = new Random();
 
@@ -307,43 +302,11 @@ public class FishManager {
 
     public boolean checkFishLevel(@NonNull Player self) {
         int fishLv = self.getVariable(Variable.FISH);
-        int fishSkill = self.getVariable(Variable.FISH_SKILL);
-        int requireSkill;
-
-        if(fishLv == 8) {
+        if(fishLv == Config.MAX_FISH_LV) {
             return false;
         }
 
-        switch (fishLv) {
-            case 0:
-                requireSkill = 10;
-                break;
-            case 1:
-                requireSkill = 30;
-                break;
-            case 2:
-                requireSkill = 80;
-                break;
-            case 3:
-                requireSkill = 250;
-                break;
-            case 4:
-                requireSkill = 1_000;
-                break;
-            case 5:
-                requireSkill = 3_000;
-                break;
-            case 6:
-                requireSkill = 8_000;
-                break;
-            case 7:
-                requireSkill = 20_000;
-                break;
-            default:
-                throw new NumberRangeException(fishLv, 0, 7);
-        }
-
-        return fishSkill >= requireSkill;
+        return self.getVariable(Variable.FISH_SKILL) >= RandomList.FISH_LV_REQUIREMENT.get(fishLv);
     }
 
 }

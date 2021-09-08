@@ -346,6 +346,20 @@ public class MonsterCreator implements Creatable {
 
         Config.unloadObject(monster);
 
+        //TODO
+//        monster = new Monster(MonsterList.LYCANTHROPE);
+//        monster.setLv(185);
+//
+//        monster.setBasicStat(StatType.MAXHP, 1000);
+//        monster.setBasicStat(StatType.HP, 1000);
+//        monster.setBasicStat(StatType.MAXMN, 10);
+//        monster.setBasicStat(StatType.MN, 10);
+//        monster.setBasicStat(StatType.ATK, 280);
+//        monster.setBasicStat(StatType.ATS, 200);
+//        monster.setBasicStat(StatType.DEF, 140);
+//        monster.setBasicStat(StatType.ACC, 100);
+//        monster.setBasicStat(StatType.EVA, 30);
+
 
         Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 17L));
         Logger.i("ObjectMaker", "Monster making is done!");

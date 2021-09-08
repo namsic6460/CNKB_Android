@@ -3,6 +3,7 @@ package lkd.namsic.game.manager;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -12,21 +13,24 @@ import java.util.Set;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
+import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MagicType;
 import lkd.namsic.game.enums.StatType;
-import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.WaitResponse;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.enums.object.MonsterList;
 import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.exception.ObjectNotFoundException;
+import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Farm;
 import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Monster;
 import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.game.object.Quest;
@@ -51,9 +55,9 @@ public class DisplayManager {
         }
 
         innerMsg.append("광질 레벨: ")
-                .append(target.getVariable(Variable.MINE, 1))
+                .append(target.getDisplayMineLv())
                 .append("\n낚시 레벨: ")
-                .append(target.getVariable(Variable.FISH, 1))
+                .append(target.getDisplayFishLv())
                 .append("\n\n")
                 .append(this.getDisplayStat(target))
                 .append("\n\n")
@@ -586,6 +590,166 @@ public class DisplayManager {
         }
         
         self.replyPlayer("스킬 목록은 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+
+    public void displayMinePercent(@NonNull Player self) {
+        StringBuilder innerBuilder = new StringBuilder("===광질 확률표===");
+
+        for(int mineLv = 0; mineLv <= Config.MAX_MINE_LV; mineLv++) {
+            innerBuilder.append("\n\n---")
+                    .append(mineLv)
+                    .append(" 레벨 확률표---");
+
+            List<Double> minePercent = RandomList.MINE_PERCENT.get(mineLv);
+
+            double percent;
+            StringBuilder tempBuilder;
+            for(int index = 0; index < minePercent.size(); index++) {
+                percent = minePercent.get(index);
+
+                if(percent == 0) {
+                    continue;
+                }
+
+                innerBuilder.append("\n[");
+
+                tempBuilder = new StringBuilder();
+                for(long itemId : RandomList.MINE_OUTPUT.get(index)) {
+                    tempBuilder.append(ItemList.findById(itemId))
+                            .append(", ");
+                }
+
+                innerBuilder.append(tempBuilder.substring(0, tempBuilder.length() - 2))
+                        .append("]: ")
+                        .append(Config.getDisplayPercent(percent / 100, 4));
+            }
+        }
+
+        self.replyPlayer("광질 레벨: " + self.getDisplayMineLv() +
+                "\n\n광질 확률표는 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+
+    public void displayFishPercent(@NonNull Player self) {
+        StringBuilder innerBuilder = new StringBuilder("===낚시 확률표===");
+
+        for(int fishLv = 0; fishLv <= Config.MAX_FISH_LV; fishLv++) {
+            innerBuilder.append("\n\n---")
+                    .append(fishLv)
+                    .append(" 레벨 확률---");
+
+            List<Integer> fishPercent = RandomList.FISH_PERCENT.get(fishLv);
+            List<String> outputStr = Arrays.asList(
+                    "돌/나뭇가지/쓰레기/물풀",
+                    "일반 물고기",
+                    "희귀 물고기",
+                    "특별 물고기",
+                    "유일 물고기",
+                    "전설 물고기",
+                    "신화 물고기"
+            );
+
+            int percent;
+            for(int index = 0; index < fishPercent.size(); index++) {
+                percent = fishPercent.get(index);
+
+                if(percent == 0) {
+                    continue;
+                }
+
+                innerBuilder.append("\n")
+                        .append(outputStr.get(index))
+                        .append(": ")
+                        .append(percent)
+                        .append("%");
+            }
+        }
+
+        self.replyPlayer("낚시 레벨: " + self.getDisplayFishLv() +
+                        "\n\n낚시 확률표는 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+    
+    public void displayAdvPercent(@NonNull Player self) {
+        StringBuilder innerBuilder = new StringBuilder("===모험 보상 확률표===");
+
+        for(Map.Entry<Integer, Map<Long, Integer>> entry : RandomList.ADVENTURE_LIST.entrySet()) {
+            innerBuilder.append("\n\n---")
+                    .append(entry.getKey())
+                    .append(" 등급 보상---");
+
+            for(Map.Entry<Long, Integer> percentEntry : entry.getValue().entrySet()) {
+                innerBuilder.append("\n")
+                        .append(ItemList.findById(percentEntry.getKey()))
+                        .append(": ")
+                        .append(Config.getDisplayPercent(percentEntry.getValue() / 1_000_000D, 4));
+            }
+        }
+
+        self.replyPlayer("모험 스텟: " + self.getAdv() +
+                "\n\n모험 보상 확률표는 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+    
+    public void displayMonsterInfo(@NonNull Player self, @NonNull String monsterName) {
+        Long monsterId = MonsterList.findByName(monsterName);
+        if(monsterId == null) {
+            throw new WeirdCommandException("알 수 없는 몬스터입니다");
+        }
+
+        Monster monster = Config.getData(Id.MONSTER, monsterId);
+        GameMap map = Config.getMapData(GameMap.MONSTER_SPAWN_MAP.get(monsterId));
+
+        StringBuilder innerBuilder = new StringBuilder("===")
+                .append(monsterName)
+                .append("의 정보===\n\n")
+                .append("기준 레벨: ")
+                .append(monster.getLv())
+                .append("\n서식지: ")
+                .append(map.getName())
+                .append("(")
+                .append(map.getLocation().toMapString())
+                .append(")")
+                .append("\n\n---기본 스텟---");
+
+        for(StatType statType : StatType.values()) {
+            try {
+                Config.checkStatType(statType);
+            } catch (UnhandledEnumException e) {
+                continue;
+            }
+
+            innerBuilder.append("\n")
+                    .append(statType.getDisplayName())
+                    .append(": ")
+                    .append(monster.getStat(statType));
+        }
+
+        innerBuilder.append("\n\n---드롭 아이템 목록---");
+
+        long itemId;
+        for(Map.Entry<Long, Double> entry : monster.getItemDropPercent().entrySet()) {
+            itemId = entry.getKey();
+
+            innerBuilder.append("\n")
+                    .append(ItemList.findById(itemId))
+                    .append("(")
+                    .append(Config.getDisplayPercent(entry.getValue()))
+                    .append(")(")
+                    .append(monster.getItemDropMinCount(itemId))
+                    .append(" ~ ")
+                    .append(monster.getItem(itemId))
+                    .append("개)");
+        }
+
+        innerBuilder.append("\n\n--사용 스킬 목록---");
+
+        for(Map.Entry<Long, Double> entry : monster.getSkillPercent().entrySet()) {
+            innerBuilder.append("\n")
+                    .append(SkillList.findById(entry.getKey()))
+                    .append("(")
+                    .append(Config.getDisplayPercent(entry.getValue(), 0))
+                    .append(")");
+        }
+        
+        self.replyPlayer("몬스터 정보는 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
 }

@@ -58,7 +58,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 2.47;
+    public static final double VERSION = 2.48;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -135,7 +135,9 @@ public class Config {
     public static final int MAX_AGI = 400;
     public static final double CRIT_PER_AGI = 0.0025;
     public static final int MAX_EVADE = 80;
-    
+
+    public static final int MAX_MINE_LV = 8;
+    public static final int MAX_FISH_LV = 8;
     public static final int FISH_DELAY_TIME = 3000;
     public static final long FISH_DELAY_TIME_OFFSET = 3000;
     public static final long FISH_WAIT_TIME = 5000;
@@ -308,8 +310,12 @@ public class Config {
     }
 
     private static void deleteGameObject(@NonNull GameObject object) {
-        Id id = object.getId().getId();
-        long objectId = object.getId().getObjectId();
+        deleteGameObject(object.getId());
+    }
+
+    public static void deleteGameObject(@NonNull IdClass idClass) {
+        Id id = idClass.getId();
+        long objectId = idClass.getObjectId();
 
         long count = OBJECT_COUNT.get(id).getOrDefault(objectId, 0L);
         if(count == 0) {
@@ -659,7 +665,16 @@ public class Config {
     }
 
     public static String getDisplayPercent(double percent) {
-        return (Math.floor(percent * 10000) / 100) + "%";
+        return getDisplayPercent(percent, 2);
+    }
+
+    public static String getDisplayPercent(double percent, int under) {
+        if(under < 0) {
+             throw new NumberRangeException(under, 0);
+        }
+
+        int multiple = (int) Math.pow(10, under);
+        return (Math.floor(percent * multiple * 100) / multiple) + "%";
     }
 
     @NonNull
@@ -770,6 +785,11 @@ public class Config {
         }
 
         return -1;
+    }
+
+    @NonNull
+    public static String getExpStr(int lv, long exp, long needExp) {
+        return lv + "Lv (" + exp + "/" + needExp + ")";
     }
 
     @NonNull

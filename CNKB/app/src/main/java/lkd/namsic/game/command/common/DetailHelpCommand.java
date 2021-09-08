@@ -31,6 +31,7 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " *(정보/info/i) (장비/equip) ({장비 이름}) : 장비의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(정보/info/i) (퀘스트/quest) ({퀘스트 이름}) : 퀘스트의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(정보/info/i) (스킬/skill) ({스킬 이름}) : 스킬의 정보를 표시합니다\n\n" +
+                        Emoji.LIST + " *(정보/info/i) (몬스터/monster) ({몬스터 이름}) : 몬스터의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(가방/인벤토리/인벤/inventory/inven) [{페이지}] : 인벤토리를 표시합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) : 착용된 장비를 표시합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) (인벤토리/인벤/inventory/inven) [{페이지}] : 장비 인벤토리를 표시합니다\n\n" +
@@ -57,6 +58,7 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " (감정/appraise/apr) (중지/정지/stop) : 감정을 중지합니다(보상의 50%만 적용됩니다)\n\n" +
                         Emoji.LIST + " (낚시/fish) [{낚시 레벨}] : 낚시를 합니다\n\n" +
                         Emoji.LIST + " (전투/fight/f) ({플레이어 닉네임}/{번호}) : 전투를 시작합니다\n\n" +
+                        Emoji.LIST + " (리스폰/respawn) : 10초 후 현재 맵의 몬스터를 리스폰시킵니다\n\n" +
                         Emoji.LIST + " (모험/adventure/adv) : 모험을 합니다\n\n" +
                         Emoji.LIST + " *(농사/농장/farm) : 농장에 대한 설명을 표시합니다\n\n" +
                         Emoji.LIST + " (농사/농장/farm) (구입/구매/buy) : 농장을 구매합니다\n\n" +
@@ -83,6 +85,9 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " *(상점/shop) (목록/list) : 현재 위치에서 이용 가능한 상점 목록을 표시합니다\n\n" +
                         Emoji.LIST + " (상점/shop) ({Npc 이름}) : 상점을 이용합니다\n\n" +
                         Emoji.LIST + " *(랭킹/랭크/ranking/rank) [레벨] : 레벨 랭킹을 표시합니다\n\n" +
+                        Emoji.LIST + " *(확률/percent) (광질/mine) : 광질 확률을 표시합니다\n\n" +
+                        Emoji.LIST + " *(확률/percent) (낚시/fish) : 낚시 확률을 표시합니다\n\n" +
+                        Emoji.LIST + " *(확률/percent) (모험/adventure/adv) : 모험 보상 확률을 표시합니다\n\n" +
                         Emoji.LIST + " *(설정/setting/set) (가방/인벤토리/inventory/inven) (추가/add) ({아이템 이름}) : " +
                         "아이템을 인벤토리 표시 우선순위 목록에 추가합니다\n\n" +
                         Emoji.LIST + " *(설정/setting/set) (가방/인벤토리/inventory/inven) (제거/remove) ({아이템 이름}) : " +

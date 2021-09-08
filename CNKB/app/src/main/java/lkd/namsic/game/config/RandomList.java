@@ -2,6 +2,7 @@ package lkd.namsic.game.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,28 +46,50 @@ public class RandomList {
     };
 
     public static final List<List<Double>> MINE_PERCENT = Arrays.asList(
-            Arrays.asList(50D, 45D, 40D, 35D, 30D, 30D, 30D, 25D, 20D),
-            Arrays.asList(35D, 35D, 20D, 10D, 0D, 0D, 0D, 0D, 0D),
-            Arrays.asList(14D, 15D, 20D, 15D, 0D, 0D, 0D, 0D, 0D),
-            Arrays.asList(1D, 4.5D, 14D, 20D, 15D, 0D, 0D, 0D, 0D),
-            Arrays.asList(0D, 0.5D, 5.5D, 12D, 40D, 20D, 0D, 0D, 0D),
-            Arrays.asList(0D, 0D, 0.5D, 7.6D, 10D, 30D, 25D, 0D, 0D),
-            Arrays.asList(0D, 0D, 0D, 0.4D, 4.98D, 15D, 25D, 20D, 0D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0.019D, 4.85D, 15D, 32.5D, 30.5D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0.001D, 0.149D, 4.79D, 17.5D, 30.3D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0.001D, 0.2095D, 4.99D, 19.042D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0.0005D, 0.009D, 0.1577D),
-            Arrays.asList(0D, 0D, 0D, 0D, 0D, 0D, 0D, 0.001D, 0.0003D)
+            Arrays.asList(50D, 35D, 14D, 1D, 0D, 0D, 0D, 0D, 0D, 0D, 0D, 0D),
+            Arrays.asList(45D, 35D, 15D, 4.5D, 0.5D, 0D, 0D, 0D, 0D, 0D, 0D, 0D),
+            Arrays.asList(40D, 20D, 20D, 14D, 5.5D, 0.5D, 0D, 0D, 0D, 0D, 0D, 0D),
+            Arrays.asList(35D, 10D, 15D, 20D, 12D, 7.6D, 0.4D, 0D, 0D, 0D, 0D, 0D),
+            Arrays.asList(30D, 0D, 0D, 15D, 40D, 10D, 4.98D, 0.019D, 0.001D, 0D, 0D, 0D),
+            Arrays.asList(30D, 0D, 0D, 0D, 20D, 30D, 15D, 4.85D, 0.149D, 0.001D, 0D, 0D),
+            Arrays.asList(30D, 0D, 0D, 0D, 0D, 25D, 25D, 15D, 4.79D, 0.2095D, 0.0005D, 0D),
+            Arrays.asList(25D, 0D, 0D, 0D, 0D, 0D, 20D, 32.5D, 17.5D, 4.99D, 0.009D, 0.001D),
+            Arrays.asList(20D, 0D, 0D, 0D, 0D, 0D, 0D, 30.5D, 30.3D, 19.042D, 0.1577D, 0.0003D)
+    );
+
+    public static final List<List<Long>> MINE_OUTPUT = Arrays.asList(
+            Collections.singletonList(ItemList.STONE.getId()),
+            Collections.singletonList(ItemList.COAL.getId()),
+            Arrays.asList(ItemList.COPPER.getId(), ItemList.LEAD.getId(), ItemList.TIN.getId(), ItemList.NICKEL.getId()),
+            Arrays.asList(ItemList.IRON.getId(), ItemList.LITHIUM.getId()),
+            Arrays.asList(ItemList.LAPIS.getId(), ItemList.RED_STONE.getId()),
+            Collections.singletonList(ItemList.SILVER.getId()),
+            Collections.singletonList(ItemList.GLOW_STONE.getId()),
+            Arrays.asList(ItemList.FIRE_QUARTZ.getId(), ItemList.DARK_QUARTZ.getId()),
+            Arrays.asList(ItemList.GLOW_LAPIS.getId(), ItemList.GLOW_RED_STONE.getId()),
+            Arrays.asList(ItemList.HARD_COAL.getId(), ItemList.TITANIUM.getId()),
+            Collections.singletonList(ItemList.ORICHALCON.getId()),
+            Arrays.asList(ItemList.LAPIS_RED_STONE.getId(), ItemList.LANDIUM.getId(), ItemList.AITUME.getId())
+    );
+
+    public static final List<Integer> MINE_LV_REQUIREMENT = Arrays.asList(
+            30, 100, 300, 800, 2000, 5000, 15000, 50000
     );
 
     public static final List<List<Integer>> FISH_PERCENT = Arrays.asList(
-            Arrays.asList(70, 50, 10, 0, 0, 0, 0, 0, 0),
-            Arrays.asList(30, 40, 50, 30, 10, 0, 0, 0, 0),
-            Arrays.asList(0, 10, 35, 50, 45, 20, 10, 5, 0),
-            Arrays.asList(0, 0, 5, 20, 40, 50, 40, 20, 15),
-            Arrays.asList(0, 0, 0, 0, 5, 30, 45, 65, 65),
-            Arrays.asList(0, 0, 0, 0, 0, 0, 5, 10, 15),
-            Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 5)
+            Arrays.asList(70, 30, 0, 0, 0, 0, 0),
+            Arrays.asList(50, 40, 10, 0, 0, 0, 0),
+            Arrays.asList(10, 50, 35, 5, 0, 0, 0),
+            Arrays.asList(0, 30, 50, 20, 0, 0, 0),
+            Arrays.asList(0, 10, 45, 40, 5, 0, 0),
+            Arrays.asList(0, 0, 20, 50, 30, 0, 0),
+            Arrays.asList(0, 0, 10, 40, 45, 5, 0),
+            Arrays.asList(0, 0, 5, 20, 65, 10, 0),
+            Arrays.asList(0, 0, 0, 15, 65, 15, 5)
+    );
+
+    public static final List<Integer> FISH_LV_REQUIREMENT = Arrays.asList(
+            10, 30, 50, 100, 300, 800, 1000, 2000
     );
 
     public static final List<Long> FARM_UPGRADE_PRICE = Arrays.asList(
@@ -382,56 +405,56 @@ public class RandomList {
         }});
     }};
 
-    public static final double[][] HUNTER_TOKEN = new double[][] {
-            { 0.1, 0, 0 },
-            { 0.15, 0.05, 0 },
-            { 0.1, 0.1, 0 },
-            { 0.05, 0.1, 0 },
-            { 0, 0.15, 0 },
-            { 0, 0.2, 0 },
-            { 0, 0.2, 0.05 },
-            { 0, 0.15, 0.05 },
-            { 0, 0.1, 0.05 },
-            { 0, 0.05, 0.1 },
-            { 0, 0.05, 0.1 },
-            { 0, 0, 0.1 },
-            { 0, 0, 0.1 },
-            { 0, 0, 0.1 },
-            { 0, 0, 0.1 },
-            { 0, 0, 0.1 },
-            { 0, 0, 0.1 },
-            { 0, 0, 0.1 },
-            { 0, 0, 0.1 },
-            { 0, 0, 0.1 },
+    public static final double[][] HUNTER_TOKEN = new double[][]{
+            {0.1, 0, 0},
+            {0.15, 0.05, 0},
+            {0.1, 0.1, 0},
+            {0.05, 0.1, 0},
+            {0, 0.15, 0},
+            {0, 0.2, 0},
+            {0, 0.2, 0.05},
+            {0, 0.15, 0.05},
+            {0, 0.1, 0.05},
+            {0, 0.05, 0.1},
+            {0, 0.05, 0.1},
+            {0, 0, 0.1},
+            {0, 0, 0.1},
+            {0, 0, 0.1},
+            {0, 0, 0.1},
+            {0, 0, 0.1},
+            {0, 0, 0.1},
+            {0, 0, 0.1},
+            {0, 0, 0.1},
+            {0, 0, 0.1},
     };
 
-    public static final double[][] FISH_TOKEN = new double[][] {
+    public static final double[][] FISH_TOKEN = new double[][]{
             {}, //Empty
-            { 0.1, 0, 0 },
-            { 0.15, 0.05, 0 },
-            { 0.1, 0.05, 0 },
-            { 0.05, 0.1, 0.02 },
-            { 0, 0.15, 0.05 },
-            { 0, 0.1, 0.1 }
+            {0.1, 0, 0},
+            {0.15, 0.05, 0},
+            {0.1, 0.05, 0},
+            {0.05, 0.1, 0.02},
+            {0, 0.15, 0.05},
+            {0, 0.1, 0.1}
     };
 
-    public static final double[][] MINE_TOKEN = new double[][] {
-            { 0.02, 0, 0},
-            { 0.05, 0, 0},
-            { 0.08, 0, 0},
-            { 0.11, 0, 0},
-            { 0.15, 0.02, 0},
-            { 0.15, 0.05, 0},
-            { 0.13, 0.08, 0},
-            { 0.1, 0.1, 0},
-            { 0.05, 0.15, 0},
-            { 0.03, 0.15, 0},
-            { 0, 0.15, 0.03},
-            { 0, 0.12, 0.07}
+    public static final double[][] MINE_TOKEN = new double[][]{
+            {0.02, 0, 0},
+            {0.05, 0, 0},
+            {0.08, 0, 0},
+            {0.11, 0, 0},
+            {0.15, 0.02, 0},
+            {0.15, 0.05, 0},
+            {0.13, 0.08, 0},
+            {0.1, 0.1, 0},
+            {0.05, 0.15, 0},
+            {0.03, 0.15, 0},
+            {0, 0.15, 0.03},
+            {0, 0.12, 0.07}
     };
 
     public static final List<Long> jewelries = new ArrayList<Long>() {{
-        for(int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++) {
             this.add(ItemList.QUARTZ.getId());
         }
 
@@ -439,13 +462,13 @@ public class RandomList {
             this.add(ItemList.GOLD.getId());
         }
 
-        for(int i = 0; i < 20; i++) {
+        for (int i = 0; i < 20; i++) {
             this.add(ItemList.WHITE_GOLD.getId());
         }
 
         this.add(ItemList.DIAMOND.getId());
         this.add(ItemList.ORICHALCON.getId());
-        for(long itemId = ItemList.GARNET.getId(); itemId <= ItemList.TURQUOISE.getId(); itemId++) {
+        for (long itemId = ItemList.GARNET.getId(); itemId <= ItemList.TURQUOISE.getId(); itemId++) {
             this.add(itemId);
         }
     }};

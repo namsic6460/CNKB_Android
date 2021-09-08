@@ -5,7 +5,10 @@ import androidx.annotation.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import lkd.namsic.game.base.Int;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.Doing;
@@ -41,44 +44,44 @@ public class AppraiseManager {
         self.replyPlayer("감정을 시작합니다...\n소요 시간: " + (totalTime / 60) + "분 " + (totalTime % 60) + "초");
 
         boolean stopped = false;
-
-        int usedStone = 0;
+        Int usedStone = new Int();
         Map<Long, Integer> successCount = new HashMap<>();
 
-        synchronized (self) {
-            Random random = new Random();
-            boolean isAppraiseStopped;
-            
-            try {
-                for (int i = 0; i < count; i++) {
-                    synchronized (self) {
-                        self.wait(5999);
-                    }
-                    
-                    isAppraiseStopped = self.getObjectVariable(Variable.IS_APPRAISE_STOP, false);
-                    if(isAppraiseStopped) {
-                        self.notifyAll();
+        Random random = new Random();
 
-                        self.removeVariable(Variable.IS_APPRAISE_STOP);
-                        stopped = true;
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                usedStone.add(1);
+                self.addItem(ItemList.STONE.getId(), -1);
 
-                        break;
-                    }
-
-                    usedStone++;
-                    self.addItem(ItemList.STONE.getId(), -1);
-
-                    if(random.nextDouble() < 0.25) {
-                        long itemId = RandomList.getRandomJewelry();
-                        successCount.put(itemId, successCount.getOrDefault(itemId, 0) + 1);
-                    } else {
-                        self.addItem(ItemList.COBBLE_STONE.getId(), 1, false);
-                    }
+                if(random.nextDouble() < 0.25) {
+                    long itemId = RandomList.getRandomJewelry();
+                    successCount.put(itemId, successCount.getOrDefault(itemId, 0) + 1);
+                } else {
+                    self.addItem(ItemList.COBBLE_STONE.getId(), 1, false);
                 }
+            }
+        }, 0L, 6000L);
+
+        synchronized (self) {
+            try {
+                self.wait(totalTime * 1000);
             } catch (InterruptedException e) {
                 Logger.e("Player.appraiseThread", e);
                 throw new RuntimeException(e);
             }
+
+            self.notifyAll();
+        }
+
+        boolean isAppraiseStopped = self.getObjectVariable(Variable.IS_APPRAISE_STOP, false);
+        if(isAppraiseStopped) {
+            self.removeVariable(Variable.IS_APPRAISE_STOP);
+            stopped = true;
+
+            timer.cancel();
         }
 
         Item item;

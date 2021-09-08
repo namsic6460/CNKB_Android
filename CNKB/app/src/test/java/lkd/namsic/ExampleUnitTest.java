@@ -6,8 +6,11 @@ import com.google.gson.GsonBuilder;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.Location;
@@ -35,21 +38,28 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void test() {
-        for(int i = 0; i < 100; i++) {
-            int lv = 201;
-            long exp = Math.min(30_000_000, new Random().nextInt(100_000 * lv) + 3_000_000);
+    public void test() throws InterruptedException {
+        System.out.println("start");
 
-            if(lv <= 200) {
-                exp *= 0.1;
-            } else {
-                exp *= Math.min(0.1 + ((lv - 200) / 100d), 1);
+        Timer timer1 = new Timer();
+        timer1.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("a");
             }
+        }, 5000, 1000);
 
-            exp = Math.max(500_000, exp);
+        Timer timer2 = new Timer();
+        timer2.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("b");
+            }
+        }, 0, 1000);
 
-            System.out.println(exp + ", " + (Math.min(1_000_000, new Random().nextInt(8000 * lv) + 150_000)));
-        }
+        Thread.sleep(5000);
+        timer1.cancel();
+        timer2.cancel();
     }
 
     @Test

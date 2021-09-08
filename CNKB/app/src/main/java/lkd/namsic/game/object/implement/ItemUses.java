@@ -236,7 +236,7 @@ public class ItemUses {
                     exp *= Math.min(0.2 - (lv - 200 / 100d), 1);
                 }
 
-                exp = Math.min(500_000, exp);
+                exp = Math.max(800_000, exp);
 
                 Player player = (Player) self;
                 player.addExp(exp);

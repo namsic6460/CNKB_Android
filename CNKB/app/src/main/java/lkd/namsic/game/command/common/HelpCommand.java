@@ -42,6 +42,7 @@ public class HelpCommand extends CommonCommand {
                         "\uD83C\uDFA3 ㅜ 낚시 -> 낚시를 합니다\n\n" +
                         "\uD83D\uDC7E ㅜ 전투 (번호) -> 맵 정보에서 확인한 번호로 몬스터와 사냥합니다\n\n" +
                         "\uD83D\uDC7E ㅜ 전투 (플레이어 이름) -> 플레이어와 전투합니다\n\n" +
+                        "⏳ ㅜ 리스폰 -> 10초 후 현재 맵의 몬스터를 리스폰시킵니다\n\n" +
                         "\uD83D\uDC5F ㅜ 모험 -> 모험을 합니다\n\n" +
                         "\uD83C\uDF3E ㅜ 농사 -> 농사에 대한 설명을 표시합니다\n\n" +
                         "\uD83C\uDF3E ㅜ 농사 구매 -> 농장을 구매합니다\n\n" +

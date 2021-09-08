@@ -33,6 +33,8 @@ import lombok.Setter;
 @Getter
 public class GameMap {
 
+    public static final Map<Long, Location> MONSTER_SPAWN_MAP = new HashMap<>();
+
     @Setter
     @NonNull
     String name;
@@ -456,6 +458,8 @@ public class GameMap {
         this.spawnMonster.add(monsterId);
         this.spawnPercent.get(Id.MONSTER).put(monsterId, percent);
         this.spawnMaxCount.put(monsterId, maxCount);
+
+        MONSTER_SPAWN_MAP.put(monsterId, this.location);
     }
 
     public void setSpawnBoss(long bossId, double percent) {

@@ -94,6 +94,8 @@ public abstract class AiEntity extends Entity implements Cloneable {
         Random random = new Random();
 
         double dropMultiplier = 1.0;
+
+        assert this.getKiller() != null;
         Entity killer = Config.getData(this.getKiller().getId(), this.getKiller().getObjectId());
 
         long earringId = killer.getEquipped(EquipType.EARRINGS);
