@@ -58,7 +58,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 2.48;
+    public static final double VERSION = 2.481;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -232,6 +232,7 @@ public class Config {
 
         jsonObject.add("id", idJson);
         jsonObject.add("selectableChat", gson.toJsonTree(SELECTABLE_CHAT_SET));
+        jsonObject.add("monsterSpawnMap", gson.toJsonTree(GameMap.MONSTER_SPAWN_MAP));
 
         return jsonObject;
     }
@@ -257,6 +258,12 @@ public class Config {
         Set<Double> selectableChatSet = gson.fromJson(selectableChatArray, HashSet.class);
         for(double selectableChatId : selectableChatSet) {
             SELECTABLE_CHAT_SET.add((long) selectableChatId);
+        }
+
+        JsonObject monsterSpawnObject = jsonObject.getAsJsonObject("monsterSpawnMap");
+        Map<String, String> monsterSpawnMap = gson.fromJson(monsterSpawnObject, HashMap.class);
+        for(Map.Entry<String, String> entry : monsterSpawnMap.entrySet()) {
+            GameMap.MONSTER_SPAWN_MAP.put(Long.parseLong(entry.getKey()), Location.parseLocation(entry.getValue()));
         }
     }
 

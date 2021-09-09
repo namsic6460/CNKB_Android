@@ -8,6 +8,13 @@ import lombok.Getter;
 @Getter
 public class Location {
 
+    public static Location parseLocation(@NonNull String string) {
+        String[] split = string.split("-");
+
+        return new Location(Integer.parseInt(split[0]), Integer.parseInt(split[1]),
+                Integer.parseInt(split[2]), Integer.parseInt(split[3]));
+    }
+
     int x = 0;
     int y = 0;
     int fieldX = 1;

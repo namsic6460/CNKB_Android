@@ -21,10 +21,7 @@ public class LocationAdapter implements JsonSerializer<Location>, JsonDeserializ
 
     @Override
     public Location deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
-        String[] split = jsonElement.getAsString().split("-");
-
-        return new Location(Integer.parseInt(split[0]), Integer.parseInt(split[1]),
-                Integer.parseInt(split[2]), Integer.parseInt(split[3]));
+        return Location.parseLocation(jsonElement.getAsString());
     }
 
 }

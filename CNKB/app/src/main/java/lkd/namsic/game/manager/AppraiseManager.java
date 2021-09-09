@@ -54,13 +54,18 @@ public class AppraiseManager {
             @Override
             public void run() {
                 usedStone.add(1);
-                self.addItem(ItemList.STONE.getId(), -1);
 
                 if(random.nextDouble() < 0.25) {
                     long itemId = RandomList.getRandomJewelry();
                     successCount.put(itemId, successCount.getOrDefault(itemId, 0) + 1);
                 } else {
                     self.addItem(ItemList.COBBLE_STONE.getId(), 1, false);
+                }
+
+                if(usedStone.get() == count) {
+                    synchronized (self) {
+                        self.notifyAll();
+                    }
                 }
             }
         }, 0L, 6000L);
@@ -73,15 +78,16 @@ public class AppraiseManager {
                 throw new RuntimeException(e);
             }
 
+            timer.cancel();
             self.notifyAll();
         }
+
+        self.addItem(ItemList.STONE.getId(), -1 * count);
 
         boolean isAppraiseStopped = self.getObjectVariable(Variable.IS_APPRAISE_STOP, false);
         if(isAppraiseStopped) {
             self.removeVariable(Variable.IS_APPRAISE_STOP);
             stopped = true;
-
-            timer.cancel();
         }
 
         Item item;
