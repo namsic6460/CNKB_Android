@@ -9,10 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import lkd.namsic.game.command.PlayerCommand;
-import lkd.namsic.game.enums.Doing;
-import lkd.namsic.game.exception.DoingFilterException;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.manager.AdventureManager;
 import lkd.namsic.game.manager.DisplayManager;
 import lkd.namsic.game.object.Player;
 

@@ -32,6 +32,7 @@ import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.event.EndFightEvent;
 import lkd.namsic.game.event.InjectFightEvent;
+import lkd.namsic.game.event.PreTurnEvent;
 import lkd.namsic.game.event.SelfTurnEvent;
 import lkd.namsic.game.event.StartFightEvent;
 import lkd.namsic.game.event.TurnEvent;
@@ -98,33 +99,27 @@ public class FightManager {
                 long preventTime = runPreventMap.getOrDefault(id, 0L);
                 if (preventTime > currentTime) {
                     throw new WeirdCommandException("전투에서 도주한 후 30초 동안은 전투할 수 없습니다");
-                } else if (preventTime != 0) {
-                    runPreventMap.remove(id);
                 }
 
                 preventTime = runPreventMap.getOrDefault(playerId, 0L);
                 if (preventTime > currentTime) {
                     throw new WeirdCommandException("해당 대상은 현재 전투가 불가능합니다\n(도주 성공 후 30초간 PvP 불가)");
-                } else if (preventTime != 0) {
-                    runPreventMap.remove(playerId);
-                }
-
-                preventTime = pvpPreventMap.getOrDefault(id, 0L);
-                if (preventTime != 0) {
-                    runPreventMap.remove(id);
                 }
 
                 preventTime = pvpPreventMap.getOrDefault(playerId, 0L);
                 if (preventTime > currentTime) {
                     throw new WeirdCommandException("해당 대상은 현재 전투가 불가능합니다\n(PvP 사망 후 30분간 PvP 불가)");
-                } else if (preventTime != 0) {
-                    pvpPreventMap.remove(playerId);
                 }
 
                 if (self.getLv() / 2 > player.getLv()) {
                     throw new WeirdCommandException("본인 레벨의 절반에 미치지 못하는 레벨의 플레이어는 공격할 수 없습니다\n\n" +
                             "뉴비 학살을 멈춰주세요\n-공익 봇 협의회-");
                 }
+
+                runPreventMap.remove(id);
+                runPreventMap.remove(playerId);
+                pvpPreventMap.remove(id);
+                pvpPreventMap.remove(playerId);
 
                 this.startFight(self, player, isFightOne);
             } else {
@@ -174,9 +169,6 @@ public class FightManager {
         this.setPrevDoing(self);
         this.setDoing(self, isFightOne);
 
-        String eventName;
-
-
         if (this.checkInject(self, enemy, isFightOne)) {
             return;
         }
@@ -184,6 +176,7 @@ public class FightManager {
         long fightId = self.getId().getObjectId();
         String is = " (이/가) ";
 
+        String eventName;
         Random random = new Random();
 
         Set<Entity> entitySet = this.getEntitySet(fightId);
@@ -194,6 +187,11 @@ public class FightManager {
             } catch (InterruptedException e) {
                 Logger.e("FightManager", e);
                 throw new RuntimeException(e.getMessage());
+            }
+
+            for(Entity entity : new HashSet<>(entitySet)) {
+                eventName = PreTurnEvent.getName();
+                PreTurnEvent.handleEvent(entity, entity.getEvent().get(eventName), entity.getEquipEvents(eventName));
             }
 
             Entity attacker = getAttacker(entitySet, random);
@@ -218,11 +216,11 @@ public class FightManager {
             eventName = SelfTurnEvent.getName();
             SelfTurnEvent.handleEvent(attacker, attacker.getEvent().get(eventName), attacker.getEquipEvents(eventName), wrappedAttacker);
 
-            if(!attacker.equals(wrappedAttacker.get())) {
+            while(!attacker.equals(wrappedAttacker.get())) {
                 if(attacker.getId().getId().equals(Id.PLAYER)) {
-                    ((Player) attacker).replyPlayer("턴을 빼앗겼습니다");
+                    ((Player) attacker).replyPlayer("턴을 " + wrappedAttacker.get().getFightName() + " 에게 빼앗겼습니다");
                 }
-                
+
                 attacker = wrappedAttacker.get();
                 SelfTurnEvent.handleEvent(attacker, attacker.getEvent().get(eventName),
                         attacker.getEquipEvents(eventName), wrappedAttacker);
@@ -231,7 +229,7 @@ public class FightManager {
 
                 targets = new HashMap<>();
                 this.targetMap.put(fightId, targets);
-                this.checkTarget(self, entitySet, targets, casting);
+                this.checkTarget(attacker, entitySet, targets, casting);
             }
 
             if(checkEnd(self, entitySet, playerSet, new HashSet<>())) {
@@ -557,8 +555,9 @@ public class FightManager {
 
     private void checkTarget(@NonNull Entity self, @NonNull Set<Entity> entitySet,
                              @NonNull Map<Integer, Entity> targets, boolean casting) {
-        boolean print = false;
         Player player = null;
+        boolean print = false;
+
         if(self.getId().getId().equals(Id.PLAYER)) {
             player = (Player) self;
             print = !casting;
@@ -592,6 +591,8 @@ public class FightManager {
                     .append(" (전투/fight/f) (장비/equip/e) {장비 부위[.{대상}]} - 장비를 사용합니다\n")
                     .append(Emoji.LIST)
                     .append(" (전투/fight/f) (스킬/skill/s) {스킬 이름[.{대상}]} - 스킬을 사용합니다\n")
+                    .append(Emoji.LIST)
+                    .append(" (전투/fight/f) (이동/move/m) {x좌표-y좌표} - 필드를 이동합니다\n")
                     .append(Emoji.LIST)
                     .append(" (전투/fight/f) (도망/도주/run/r) - 50% 확률로 도주합니다\n\n예시: ")
                     .append(Emoji.focus("n 전투 공격 1"))
@@ -801,6 +802,15 @@ public class FightManager {
 
             self.setVariable(Variable.FIGHT_OBJECT_ID, objectId);
             self.setVariable(Variable.FIGHT_OTHER, other);
+        } else if(response.equals(FightWaitType.RUN)) {
+            long fightId = getFightId(self.getId());
+            Set<Entity> entitySet = getEntitySet(fightId);
+
+            for(Entity entity : entitySet) {
+                if(entity.getId().getId().equals(Id.BOSS)) {
+                    throw new WeirdCommandException("보스와의 전투에서는 도주할 수 없습니다");
+                }
+            }
         }
 
         self.setVariable(Variable.FIGHT_WAIT_TYPE, response);

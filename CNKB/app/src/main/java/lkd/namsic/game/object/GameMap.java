@@ -20,13 +20,14 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
+import lkd.namsic.game.enums.object.BossList;
 import lkd.namsic.game.enums.object.MapList;
 import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdDataException;
 import lkd.namsic.game.manager.FightManager;
-import lkd.namsic.game.manager.MoveManager;
+import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,8 +56,7 @@ public class GameMap {
 
     final Set<Long> spawnMonster = new HashSet<>();
     final Map<Long, Integer> spawnMaxCount = new HashMap<>();
-    final Set<Long> spawnBoss = new HashSet<>();
-    final Map<Id, Map<Long, Double>> spawnPercent = new HashMap<>();
+    final Map<Long, Double> spawnPercent = new HashMap<>();
 
     //This part can be frequently changed
     final Map<Location, Long> money = new ConcurrentHashMap<>();
@@ -72,9 +72,6 @@ public class GameMap {
         this.entity.put(Id.MONSTER, new ConcurrentHashSet<>());
         this.entity.put(Id.BOSS, new ConcurrentHashSet<>());
         this.entity.put(Id.NPC, new ConcurrentHashSet<>());
-
-        this.spawnPercent.put(Id.MONSTER, new ConcurrentHashMap<>());
-        this.spawnPercent.put(Id.BOSS, new ConcurrentHashMap<>());
     }
 
     @NonNull
@@ -456,19 +453,10 @@ public class GameMap {
         }
 
         this.spawnMonster.add(monsterId);
-        this.spawnPercent.get(Id.MONSTER).put(monsterId, percent);
+        this.spawnPercent.put(monsterId, percent);
         this.spawnMaxCount.put(monsterId, maxCount);
 
         MONSTER_SPAWN_MAP.put(monsterId, this.location);
-    }
-
-    public void setSpawnBoss(long bossId, double percent) {
-        if(percent < 0 || percent > 1) {
-            throw new NumberRangeException(percent, 0, 1);
-        }
-
-        this.spawnBoss.add(bossId);
-        this.spawnPercent.get(Id.BOSS).put(bossId, percent);
     }
 
     public void respawn() {
@@ -490,7 +478,7 @@ public class GameMap {
                 continue;
             }
 
-            percent = this.spawnPercent.get(Id.MONSTER).get(monsterId);
+            percent = this.spawnPercent.get(monsterId);
             spawnCount = random.nextInt(this.spawnMaxCount.get(monsterId)) + 1;
 
             if(random.nextDouble() < percent || percent == 1) {
@@ -502,48 +490,42 @@ public class GameMap {
 
                     Monster monster = Config.newObject(Config.getData(Id.MONSTER, monsterId), false);
                     monster.randomLevel();
-                    monster.location = new Location();
-                    MoveManager.getInstance().setMap(monster, this.location.getX(), this.location.getY(), fieldX, fieldY);
+                    monster.location = new Location(this.location.getX(), this.location.getY(), fieldX, fieldY);
                     this.addEntity(monster);
                     Config.unloadObject(monster);
                 }
             }
         }
 
-        existSet = new HashSet<>();
-        for(long objectId : this.getEntity(Id.BOSS)) {
-            Boss boss = Config.getData(Id.BOSS, objectId);
-            existSet.add(boss.getOriginalId());
-        }
-
-        for(long bossId : spawnBoss) {
-            if(existSet.contains(bossId)) {
-                continue;
-            }
-
-            percent = this.spawnPercent.get(Id.MONSTER).get(bossId);
-
-            if(random.nextDouble() < percent || percent == 1) {
-                created = true;
-
-                int fieldX = random.nextInt(Config.MAX_FIELD_X) + 1;
-                int fieldY = random.nextInt(Config.MAX_FIELD_Y) + 1;
-
-                Boss boss = Config.newObject(Config.getData(Id.BOSS, bossId), false);
-                boss.randomLevel();
-                boss.location = new Location();
-                MoveManager.getInstance().setMap(boss, this.location.getX(), this.location.getY(), fieldX, fieldY);
-                this.addEntity(boss);
-                Config.unloadObject(boss);
-
-                //Boss must exist only one
-                break;
-            }
-        }
-
         if(created) {
             Config.saveConfig();
         }
+    }
+
+    @NonNull
+    public Boss spawnBoss(@NonNull BossList bossData) {
+        Boss boss = Config.newObject(Config.getData(Id.BOSS, bossData.getId()), true);
+        boss.location = new Location(this.location.getX(), this.location.getY(), 32, 32);
+        this.addEntity(boss);
+        Config.unloadObject(boss);
+
+        Set<Player> playerSet = new HashSet<>();
+        for(long playerId : new HashSet<>(this.getEntity(Id.PLAYER))) {
+            playerSet.add(Config.getData(Id.PLAYER, playerId));
+        }
+
+        String prefix = boss.getName() + ": ";
+        for(String msg : boss.getSpawnMsg()) {
+            Player.replyPlayers(playerSet, prefix + msg);
+
+            try {
+                Thread.sleep(Config.BOSS_SPAWN_MSG_WAIT_TIME);
+            } catch (InterruptedException e) {
+                Logger.e("GameMap.summonBoss", Config.errorString(e));
+            }
+        }
+
+        return boss;
     }
 
 }

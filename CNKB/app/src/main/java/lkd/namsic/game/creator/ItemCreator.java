@@ -2,7 +2,7 @@ package lkd.namsic.game.creator;
 
 import androidx.annotation.NonNull;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
@@ -29,7 +29,7 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.GRASS, "평범한 잡초다");
 
         item = new Item(ItemList.SMALL_GOLD_BAG, "골드가 소량 들어간 주머니다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.GOLD_FRUIT.getId(), 3);
         }});
         Config.unloadObject(item);
@@ -42,7 +42,7 @@ public class ItemCreator implements Creatable {
         for(long itemId = ItemList.RED_SPHERE.getId(); itemId < ItemList.WHITE_SPHERE.getId(); itemId++) {
             long itemId_ = itemId;
 
-            item.addRecipe(new HashMap<Long, Integer>() {{
+            item.addRecipe(new LinkedHashMap<Long, Integer>() {{
                 put(ItemList.NONE.getId(), 3);
 
                 put(itemId_, 1);
@@ -54,27 +54,27 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.SAND, "땅에서 흔히 볼 수 있는 평번한 모래다");
 
         item = new Item(ItemList.GLASS, "투명한 고체 물질이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.SAND.getId(), 3);
             put(ItemList.COAL.getId(), 1);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.GLASS_BOTTLE, "유리를 가공하여 만든 병이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.GLASS.getId(), 2);
             put(ItemList.COAL.getId(), 1);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.LOW_HP_POTION, "최대 체력의 15%를 회복시켜주는 포션이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.LEAF.getId(), 3);
             put(ItemList.HERB.getId(), 3);
             put(ItemList.GLASS_BOTTLE.getId(), 1);
             put(ItemList.COAL.getId(), 1);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 3);
 
             put(ItemList.HP_POTION.getId(), 1);
@@ -82,14 +82,14 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.HP_POTION, "최대 체력의 50%를 회복시켜주는 포션이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.HERB.getId(), 5);
             put(ItemList.LOW_HP_POTION.getId(), 1);
             put(ItemList.RED_STONE.getId(), 3);
             put(ItemList.GLOW_STONE.getId(), 1);
             put(ItemList.FIRE_QUARTZ.getId(), 3);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 2);
 
             put(ItemList.HIGH_HP_POTION.getId(), 1);
@@ -97,7 +97,7 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_HP_POTION, "체력을 모두 회복시켜주는 포션이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.HERB.getId(), 30);
             put(ItemList.HP_POTION.getId(), 1);
             put(ItemList.RED_STONE.getId(), 10);
@@ -105,20 +105,20 @@ public class ItemCreator implements Creatable {
             put(ItemList.HARD_COAL.getId(), 1);
             put(ItemList.LIQUID_STONE.getId(), 3);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.HIGH_MP_POTION.getId(), 1);
             put(ItemList.LAPIS_RED_STONE.getId(), 1);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.LOW_MP_POTION, "최대 마나의 15%를 회복시켜주는 포션이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.LEAF.getId(), 3);
             put(ItemList.PIECE_OF_MANA.getId(), 3);
             put(ItemList.GLASS_BOTTLE.getId(), 1);
             put(ItemList.COAL.getId(), 1);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 3);
 
             put(ItemList.MP_POTION.getId(), 1);
@@ -126,14 +126,14 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.MP_POTION, "최대 마나의 50%를 회복시켜주는 포션이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_MANA.getId(), 5);
             put(ItemList.LOW_MP_POTION.getId(), 1);
             put(ItemList.LAPIS.getId(), 3);
             put(ItemList.GLOW_STONE.getId(), 1);
             put(ItemList.FIRE_QUARTZ.getId(), 3);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 2);
 
             put(ItemList.HIGH_MP_POTION.getId(), 1);
@@ -141,7 +141,7 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_MP_POTION, "마나를 모두 회복시켜주는 포션이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_MANA.getId(), 30);
             put(ItemList.MP_POTION.getId(), 1);
             put(ItemList.LAPIS.getId(), 10);
@@ -149,14 +149,14 @@ public class ItemCreator implements Creatable {
             put(ItemList.HARD_COAL.getId(), 1);
             put(ItemList.LIQUID_STONE.getId(), 3);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.HIGH_HP_POTION.getId(), 1);
             put(ItemList.LAPIS_RED_STONE.getId(), 1);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.STONE, "가장 기본적인 광석이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.COBBLE_STONE.getId(), 10);
             put(ItemList.COAL.getId(), 5);
         }});
@@ -179,7 +179,7 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.SILVER, "회백색을 띄며 신비한 기운을 내뿜는 광물이다");
 
         item = new Item(ItemList.GOLD, "밝은 노란색을 띄는 보석이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 3);
 
             put(ItemList.DARK_QUARTZ.getId(), 3);
@@ -193,11 +193,11 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.DARK_QUARTZ, "주변의 빛을 흡수하는 석영이다");
 
         item = new Item(ItemList.GLOW_LAPIS, "스스로 빛을 내는 마나의 기운이 담긴 푸른 광물이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.LAPIS.getId(), 3);
             put(ItemList.GLOW_STONE.getId(), 5);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 10);
 
             put(ItemList.GLOW_STONE.getId(), 10);
@@ -206,11 +206,11 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.GLOW_RED_STONE, "스스로 빛을 내는 힘의 기운이 담긴 붉은 광물이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.RED_STONE.getId(), 3);
             put(ItemList.GLOW_STONE.getId(), 5);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 10);
 
             put(ItemList.GLOW_STONE.getId(), 10);
@@ -219,11 +219,11 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.WHITE_GOLD, "주변의 어둠을 흡수하는 보석이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.GOLD.getId(), 5);
             put(ItemList.LIQUID_STONE.getId(), 1);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 5);
 
             put(ItemList.AITUME.getId(), 1);
@@ -234,7 +234,7 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.TITANIUM, "꽤나 단단한 광물이다");
 
         item = new Item(ItemList.LIQUID_STONE, "거의 보이지 않을 정도로 투명한 보석이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.QUARTZ.getId(), 10);
             put(ItemList.GLOW_STONE.getId(), 1);
             put(ItemList.FIRE_QUARTZ.getId(), 10);
@@ -244,7 +244,7 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.DIAMOND, "매우 단단하고 아름다운 보석이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.TITANIUM.getId(), 10);
             put(ItemList.LIQUID_STONE.getId(), 3);
         }});
@@ -253,7 +253,7 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.ORICHALCON, "일반적으로 가장 단단하다고 여겨지는 광물이다");
 
         item = new Item(ItemList.LAPIS_RED_STONE, "힘과 마나, 두개의 상반된 기운을 한번에 가진 광물이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.GLOW_LAPIS.getId(), 50);
             put(ItemList.GLOW_RED_STONE.getId(), 50);
             put(ItemList.WHITE_GOLD.getId(), 20);
@@ -262,14 +262,14 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.LANDIUM, "부서질수록 단단해자고, 스스로 복구되는 광물이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.WHITE_GOLD.getId(), 10);
             put(ItemList.AITUME.getId(), 1);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.AITUME, "공기처럼 가벼우나 오리하르콘만큼 단단한 광물이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.WHITE_GOLD.getId(), 10);
             put(ItemList.LANDIUM.getId(), 1);
         }});
@@ -473,19 +473,19 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.LOW_RECIPE, "하급 아이템 또는 하급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
 
         item = new Item(ItemList.RECIPE, "중급 아이템 또는 중급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.LOW_RECIPE.getId(), 6);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.CONFIRMED_LOW_RECIPE.getId(), 2);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_RECIPE, "상급 아이템 또는 상급 장비의 제작법을 무작위로 1개 획득할 수 있다(중복 가능)");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.RECIPE.getId(), 10);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.CONFIRMED_RECIPE.getId(), 2);
         }});
         Config.unloadObject(item);
@@ -504,7 +504,7 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.WHITE_SPHERE, "빛의 기운을 담고 있는 구체다");
 
         item = new Item(ItemList.LOW_EXP_POTION, "경험치를 소량 제공해주는 포션이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.EXP_FRUIT.getId(), 10);
         }});
         Config.unloadObject(item);
@@ -521,13 +521,13 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.LOW_REINFORCE_STONE, "0~4강 무기를 강화할 수 있는 아이템이다");
 
         item = new Item(ItemList.REINFORCE_STONE, "5~9강 무기를 강화할 수 있는 아이템이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.LOW_REINFORCE_STONE.getId(), 10);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_REINFORCE_STONE, "10~14강 무기를 강화할 수 있는 아이템이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.REINFORCE_STONE.getId(), 5);
         }});
         Config.unloadObject(item);
@@ -557,19 +557,19 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.HIGH_TOKEN, "어려운 노동을 완수했다는 증표이다");
 
         item = new Item(ItemList.LOW_AMULET, "하급 부적 1개를 뽑을 수 있는 아이템이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_LOW_AMULET.getId(), 10);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.AMULET, "중급 부적 1개를 뽑을 수 있는 아이템이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_AMULET.getId(), 10);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_AMULET, "상급 부적 1개를 뽑을 수 있는 아이템이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_HIGH_AMULET.getId(), 10);
         }});
         Config.unloadObject(item);
@@ -604,7 +604,7 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.ZOMBIE_HEART, "심장이지만 좀비의 것이라 그런지 피는 나지 않는다");
 
         item = new Item(ItemList.LOW_ALLOY, "다양한 광물을 합쳐 만든 합금이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.COAL.getId(), 30);
             put(ItemList.COPPER.getId(), 20);
             put(ItemList.LEAD.getId(), 15);
@@ -614,7 +614,7 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.ALLOY, "다양한 광물을 합쳐 만든 괜찮은 합금이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.COAL.getId(), 100);
             put(ItemList.LITHIUM.getId(), 50);
             put(ItemList.SILVER.getId(), 20);
@@ -623,7 +623,7 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_ALLOY, "다양한 광물을 합쳐 만든 질 좋은 합금이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.WHITE_GOLD.getId(), 10);
             put(ItemList.TITANIUM.getId(), 30);
             put(ItemList.LIQUID_STONE.getId(), 30);
@@ -640,7 +640,7 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.SPIDER_EYE, "거미 눈이다. 반짝거려서 꽤나 예쁘다");
 
         item = new Item(ItemList.HARD_IRON, "기존의 철을 개선한 단단한 철이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.IRON.getId(), 100);
             put(ItemList.LOW_ALLOY.getId(), 3);
             put(ItemList.COAL.getId(), 100);
@@ -650,12 +650,12 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.ELIXIR_HERB, "엘프의 기운이 들어간 약초다");
 
         item = new Item(ItemList.LOW_ELIXIR, "최대 체력과 마나의 15%를 회복시켜주는 포션이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.ELIXIR_HERB.getId(), 3);
             put(ItemList.GLASS_BOTTLE.getId(), 1);
             put(ItemList.COAL.getId(), 1);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 2);
 
             put(ItemList.ELIXIR.getId(), 1);
@@ -663,13 +663,13 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.ELIXIR, "최대 체력과 마나의 50%를 회복시켜주는 포션이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.LOW_ELIXIR.getId(), 3);
             put(ItemList.HP_POTION.getId(), 1);
             put(ItemList.MP_POTION.getId(), 1);
             put(ItemList.RED_SPHERE.getId(), 3);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 2);
 
             put(ItemList.HIGH_ELIXIR.getId(), 1);
@@ -677,7 +677,7 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.HIGH_ELIXIR, "최대 체력과 마나를 모두 회복시켜주는 포션이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.ELIXIR.getId(), 5);
             put(ItemList.HIGH_HP_POTION.getId(), 1);
             put(ItemList.HIGH_MP_POTION.getId(), 1);
@@ -689,7 +689,7 @@ public class ItemCreator implements Creatable {
         for(long itemId = ItemList.COMMON_FISH1.getId(); itemId <= ItemList.COMMON_FISH5.getId(); itemId++) {
             long itemId_ = itemId;
 
-            item.addRecipe(new HashMap<Long, Integer>() {{
+            item.addRecipe(new LinkedHashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
             }});
@@ -702,7 +702,7 @@ public class ItemCreator implements Creatable {
         for(long itemId = ItemList.RARE_FISH1.getId(); itemId <= ItemList.RARE_FISH6.getId(); itemId++) {
             long itemId_ = itemId;
 
-            item.addRecipe(new HashMap<Long, Integer>() {{
+            item.addRecipe(new LinkedHashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
             }});
@@ -715,7 +715,7 @@ public class ItemCreator implements Creatable {
         for(long itemId = ItemList.SPECIAL_FISH1.getId(); itemId <= ItemList.SPECIAL_FISH10.getId(); itemId++) {
             long itemId_ = itemId;
 
-            item.addRecipe(new HashMap<Long, Integer>() {{
+            item.addRecipe(new LinkedHashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
             }});
@@ -728,7 +728,7 @@ public class ItemCreator implements Creatable {
         for(long itemId = ItemList.UNIQUE_FISH1.getId(); itemId <= ItemList.UNIQUE_FISH7.getId(); itemId++) {
             long itemId_ = itemId;
 
-            item.addRecipe(new HashMap<Long, Integer>() {{
+            item.addRecipe(new LinkedHashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
             }});
@@ -741,7 +741,7 @@ public class ItemCreator implements Creatable {
         for(long itemId = ItemList.LEGENDARY_FISH1.getId(); itemId <= ItemList.LEGENDARY_FISH4.getId(); itemId++) {
             long itemId_ = itemId;
 
-            item.addRecipe(new HashMap<Long, Integer>() {{
+            item.addRecipe(new LinkedHashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
             }});
@@ -754,7 +754,7 @@ public class ItemCreator implements Creatable {
         for(long itemId = ItemList.MYSTIC_FISH1.getId(); itemId <= ItemList.MYSTIC_FISH2.getId(); itemId++) {
             long itemId_ = itemId;
 
-            item.addRecipe(new HashMap<Long, Integer>() {{
+            item.addRecipe(new LinkedHashMap<Long, Integer>() {{
                 put(itemId_, 1);
                 put(ItemList.COAL.getId(), 5);
             }});
@@ -764,7 +764,7 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.COOKED_LAMB, "양고기를 노릇하게 익힌 음식이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.LAMB.getId(), 1);
             put(ItemList.COAL.getId(), 5);
         }});
@@ -774,7 +774,7 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.COOKED_PORT, "돼지고기를 노릇하게 익힌 음식이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.PORK.getId(), 1);
             put(ItemList.COAL.getId(), 5);
         }});
@@ -784,7 +784,7 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.COOKED_BEEF, "소고기를 살짝 익힌 음식이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.BEEF.getId(), 1);
             put(ItemList.COAL.getId(), 5);
         }});
@@ -794,7 +794,7 @@ public class ItemCreator implements Creatable {
         Config.unloadObject(item);
 
         item = new Item(ItemList.MAGIC_STONE, "어둠의 힘이 담긴 돌이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.NONE.getId(), 5);
 
             put(ItemList.CORRUPTED_MAGIC_STONE.getId(), 1);
@@ -805,7 +805,7 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.FLOWER, "아름다운 꽃이다");
         
         item = new Item(ItemList.STONE_LUMP, "돌 10개다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.STONE.getId(), 10);
         }});
         Config.unloadObject(item);
@@ -855,26 +855,26 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.PIECE_OF_MAGIC, "마법 그 자체를 담은 특이한 조각이다");
         
         item = new Item(ItemList.CONFIRMED_LOW_RECIPE, "하급 아이템 또는 하급 장비의 제작법을 1개 지정하여 확정적으로 획득할 수 있다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.LOW_RECIPE.getId(), 5);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.CONFIRMED_RECIPE, "중급 아이템 또는 중급 장비의 제작법을 1개 지정하여 확정적으로 획득할 수 있다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.RECIPE.getId(), 6);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.CONFIRMED_LOW_RECIPE.getId(), 10);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.CONFIRMED_HIGH_RECIPE,
                 "상급 아이템 또는 상급 장비의 제작법을 1개 지정하여 확정적으로 획득할 수 있다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.HIGH_RECIPE.getId(), 8);
         }});
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.CONFIRMED_RECIPE.getId(), 10);
         }});
         Config.unloadObject(item);
@@ -894,7 +894,7 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.BIG_PURIFYING_SEED, "정화의 씨앗이다(씨앗 Lv.4)\n[수확]: 2 정화의 열매/8분");
         
         item = new Item(ItemList.HARDENED_SLIME, "적당히 탱탱해진 슬라임이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_SLIME.getId(), 10);
             put(ItemList.PURIFYING_FRUIT.getId(), 1);
         }});
@@ -906,38 +906,49 @@ public class ItemCreator implements Creatable {
                 + Config.MAX_FARM_PLANT_COUNT + "칸)");
 
         item = new Item(ItemList.TITANIUM_STEEL, "티타늄에 합금을 더해 강도를 끌어올린 강철이다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.TITANIUM.getId(), 10);
             put(ItemList.ALLOY.getId(), 10);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.TRACE_OF_SKY, "하늘, 봄, 동쪽, 인(仁) 을 뜻한다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.HARPY_WING.getId(), 10);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.TRACE_OF_EARTH, "땅, 여름, 서쪽, 의(義) 를 뜻한다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.HARD_IRON.getId(), 3);
             put(ItemList.ALLOY.getId(), 3);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.TRACE_OF_WATER, "달, 겨울, 북쪽, 지(智) 를 뜻한다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.LAPIS.getId(), 30);
             put(ItemList.BLUE_SPHERE.getId(), 5);
         }});
         Config.unloadObject(item);
 
         item = new Item(ItemList.TRACE_OF_FIRE, "해, 가을, 남쪽, 예(禮) 를 뜻한다");
-        item.addRecipe(new HashMap<Long, Integer>() {{
+        item.addRecipe(new LinkedHashMap<Long, Integer>() {{
             put(ItemList.RED_STONE.getId(), 30);
             put(ItemList.RED_SPHERE.getId(), 5);
         }});
         Config.unloadObject(item);
+        
+        createItem(ItemList.LYCANTHROPE_TOOTH, "알 수 없는 살기와 강인함이 느껴지는 이빨이다");
+        createItem(ItemList.LYCANTHROPE_LEATHER, "알 수 없는 살기와 강인함이 느껴지는 가죽이다");
+        createItem(ItemList.LYCANTHROPE_HEAD, "죽었지만 그 눈은 죽지 않은 것처럼 보인다");
+        createItem(ItemList.LYCANTHROPE_HEART, "온기와 냉기가 같이 느껴지는 특이한 심장이다");
+        createItem(ItemList.LYCANTHROPE_SOUL, "늑대의 강력한 힘이 느껴지는 영혼이다");
+
+        createItem(ItemList.MOON_STONE, "라이칸스로프의 전리품이 한개씩 모인 후 사용한다면 무슨 일이 일어날까?");
+
+        createItem(ItemList.SKILL_BOOK_CUTTING_MOONLIGHT, "스킬 " +
+                Emoji.focus(SkillList.CUTTING_MOONLIGHT.getDisplayName()) + " 를 배울 수 있게 해주는 스킬 북이다");
 
         Logger.i("ObjectMaker", "Item making is done!");
     }

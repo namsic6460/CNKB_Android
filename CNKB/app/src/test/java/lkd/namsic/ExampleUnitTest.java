@@ -8,11 +8,8 @@ import org.junit.Test;
 import java.io.File;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import lkd.namsic.game.base.ChatLimit;
-import lkd.namsic.game.base.Int;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
@@ -38,33 +35,9 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void test() throws InterruptedException {
-        int count = 5;
-        Int loop = new Int();
-
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                loop.add(1);
-                System.out.println("loop = " + loop.get());
-
-                if(loop.get() == count) {
-                    synchronized (timer) {
-                        timer.notifyAll();
-                    }
-                }
-            }
-        }, 0, 1000);
-
-        synchronized (timer) {
-            timer.wait();
-
-            timer.cancel();
-            timer.notifyAll();
-        }
-
-        System.out.println("End");
+    public void test() {
+        System.out.println(Config.getDisplayPercent(0.009, 4));
+        System.out.println(Config.getDisplayPercent(32.000004, 4));
     }
 
     @Test

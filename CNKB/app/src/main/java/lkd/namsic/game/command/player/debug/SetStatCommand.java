@@ -10,9 +10,6 @@ import java.util.Objects;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
-import lkd.namsic.game.config.Config;
-import lkd.namsic.game.enums.Doing;
-import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.object.Player;
 

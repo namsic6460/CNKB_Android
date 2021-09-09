@@ -346,22 +346,41 @@ public class MonsterCreator implements Creatable {
 
         Config.unloadObject(monster);
 
-        //TODO
-//        monster = new Monster(MonsterList.LYCANTHROPE);
-//        monster.setLv(185);
-//
-//        monster.setBasicStat(StatType.MAXHP, 1000);
-//        monster.setBasicStat(StatType.HP, 1000);
-//        monster.setBasicStat(StatType.MAXMN, 10);
-//        monster.setBasicStat(StatType.MN, 10);
-//        monster.setBasicStat(StatType.ATK, 280);
-//        monster.setBasicStat(StatType.ATS, 200);
-//        monster.setBasicStat(StatType.DEF, 140);
-//        monster.setBasicStat(StatType.ACC, 100);
-//        monster.setBasicStat(StatType.EVA, 30);
 
+        monster = new Monster(MonsterList.LYCANTHROPE);
+        monster.setLv(185);
 
-        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 17L));
+        monster.setBasicStat(StatType.MAXHP, 1000);
+        monster.setBasicStat(StatType.HP, 1000);
+        monster.setBasicStat(StatType.MAXMN, 200);
+        monster.setBasicStat(StatType.MN, 200);
+        monster.setBasicStat(StatType.ATK, 150);
+        monster.setBasicStat(StatType.ATS, 150);
+        monster.setBasicStat(StatType.BRE, 100);
+        monster.setBasicStat(StatType.DEF, 140);
+        monster.setBasicStat(StatType.MDEF, 20);
+        monster.setBasicStat(StatType.ACC, 100);
+        monster.setBasicStat(StatType.EVA, 50);
+
+        monster.setItemDrop(ItemList.LYCANTHROPE_TOOTH.getId(), 0.25, 1, 1);
+        monster.setItemDrop(ItemList.LYCANTHROPE_LEATHER.getId(), 0.5, 1, 1);
+        monster.setItemDrop(ItemList.LYCANTHROPE_HEAD.getId(), 0.1, 1, 1);
+        monster.setItemDrop(ItemList.LYCANTHROPE_HEART.getId(), 0.1, 1, 1);
+        monster.setItemDrop(ItemList.LYCANTHROPE_SOUL.getId(), 0.01, 1, 1);
+        monster.setItemDrop(ItemList.SKILL_BOOK_SCAR.getId(), 0.005, 1, 1);
+        monster.setItemDrop(ItemList.SKILL_BOOK_STRINGS_OF_LIFE.getId(), 0.003, 1, 1);
+        monster.setItemDrop(ItemList.MOON_STONE.getId(), 0.005, 1, 1);
+        monster.setItemDrop(ItemList.MAGIC_STONE.getId(), 1, 3, 3);
+
+        monster.addSkill(SkillList.SCAR.getId());
+        monster.setSkillPercent(SkillList.SCAR.getId(), 0.3);
+        monster.addSkill(SkillList.STRINGS_OF_LIFE.getId());
+
+        monster.addEvent(EventList.LYCANTHROPE_PAGE_2);
+
+        Config.unloadObject(monster);
+
+        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 18L));
         Logger.i("ObjectMaker", "Monster making is done!");
     }
 

@@ -12,6 +12,7 @@ import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Player;
 
@@ -76,6 +77,18 @@ public class SettingCommand extends PlayerCommand {
             }
             
             player.replyPlayer("이제 당신의 정보는 " + Emoji.focus(msg) + " 상태입니다");
+        } else if(second.equals(SkillList.CUTTING_MOONLIGHT.getDisplayName())) {
+            boolean cuttingMoonlight = !player.getObjectVariable(Variable.CUTTING_MOONLIGHT_DAMAGE_SAME, false);
+            player.setVariable(Variable.CUTTING_MOONLIGHT_DAMAGE_SAME, cuttingMoonlight);
+
+            String msg;
+            if(cuttingMoonlight) {
+                msg = "가립니다";
+            } else {
+                msg = "가리지 않습니다";
+            }
+
+            player.replyPlayer("이제 당신의 " + Emoji.focus(SkillList.CUTTING_MOONLIGHT.getDisplayName()) + "는 피아를 " + msg);
         }
     }
 

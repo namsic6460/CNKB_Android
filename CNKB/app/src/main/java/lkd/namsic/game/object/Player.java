@@ -137,8 +137,6 @@ public class Player extends Entity {
     @NonNull
     String recentRoom;
 
-    boolean pvp = true;
-
     @Setter
     boolean isGroup = true;
 
@@ -1015,15 +1013,11 @@ public class Player extends Entity {
 
     @Override
     public boolean canFight(@NonNull Entity enemy) {
-        if(enemy.id.getId().equals(Id.PLAYER)) {
-            if(enemy.getLv() < 10) {
-                return false;
-            }
-
-            return super.canFight(enemy) && this.isPvp() && ((Player) enemy).isPvp();
-        } else {
-            return super.canFight(enemy);
+        if(enemy.id.getId().equals(Id.PLAYER) && enemy.getLv() < 10) {
+            return false;
         }
+
+        return super.canFight(enemy);
     }
 
     //[테스트 칭호] 남식(Lv.123)

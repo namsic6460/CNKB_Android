@@ -32,6 +32,7 @@ public class ObjectCreator {
                 new PlantCreator().start();
                 new EquipCreator().start();
                 new MonsterCreator().start();
+                new BossCreator().start();
                 new MapCreator().start();
                 new ChatCreator().start();
                 new QuestCreator().start();

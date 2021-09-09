@@ -3,6 +3,8 @@ package lkd.namsic.game.base;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import lkd.namsic.game.config.Config;
+import lkd.namsic.game.exception.NumberRangeException;
 import lombok.Getter;
 
 @Getter
@@ -23,14 +25,12 @@ public class Location {
     public Location() {}
 
     public Location(int x, int y) {
-        this.x = x;
-        this.y = y;
+        this.setMap(x, y);
     }
 
     public Location(int x, int y, int fieldX, int fieldY) {
         this(x, y);
-        this.fieldX = fieldX;
-        this.fieldY = fieldY;
+        this.setField(fieldX, fieldY);
     }
 
     public Location(@NonNull Location location) {
@@ -38,11 +38,23 @@ public class Location {
     }
 
     public void setMap(int x, int y) {
+        if(x < 0 || x > Config.MAX_MAP_X) {
+            throw new NumberRangeException(x, 0, Config.MAX_MAP_X);
+        } else if(y < 0 || y > Config.MAX_MAP_Y) {
+            throw new NumberRangeException(y, 0, Config.MAX_MAP_Y);
+        }
+
         this.x = x;
         this.y = y;
     }
 
     public void setField(int fieldX, int fieldY) {
+        if(fieldX < 1 || fieldX > Config.MAX_FIELD_X) {
+            throw new NumberRangeException(fieldX, 0, Config.MAX_FIELD_X);
+        } else if(fieldY < 1 || fieldY > Config.MAX_FIELD_Y) {
+            throw new NumberRangeException(fieldY, 0, Config.MAX_FIELD_Y);
+        }
+
         this.fieldX = fieldX;
         this.fieldY = fieldY;
     }

@@ -1,7 +1,8 @@
 package lkd.namsic.game.enums;
 
+import androidx.annotation.NonNull;
+
 import lombok.Getter;
-import lombok.NonNull;
 
 public enum AdventureType {
 

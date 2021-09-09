@@ -10,6 +10,7 @@ import java.util.List;
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.enums.Doing;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.exception.DoingFilterException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Player;
@@ -36,6 +37,10 @@ public class MoveCommand extends PlayerCommand {
             } catch (DoingFilterException e) {
                 if(!Doing.fightList().contains(player.getDoing())) {
                     throw e;
+                }
+                
+                if(!player.getObjectVariable(Variable.IS_TURN, false)) {
+                    throw new WeirdCommandException("자신의 턴에만 필드를 이동할 수 있습니다");
                 }
             }
 

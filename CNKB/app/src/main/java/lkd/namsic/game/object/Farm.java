@@ -1,5 +1,7 @@
 package lkd.namsic.game.object;
 
+import androidx.annotation.NonNull;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +12,6 @@ import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.object.ItemList;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
 @Getter

@@ -102,7 +102,11 @@ public enum EquipList {
     SAPPHIRE_EARRING("사파이어 귀걸이", 228L),
     OPAL_EARRING("오팔 귀걸이", 229L),
     TOPAZ_EARRING("토파즈 귀걸이", 230L),
-    TURQUOISE_EARRING("터키석 귀걸이", 231L);
+    TURQUOISE_EARRING("터키석 귀걸이", 231L),
+
+    //TODO
+    MOON_SWORD("월검", 271L),
+    MOON_GEM("달의 보석", 272L);
 
     public static final Map<String, EquipList> nameMap = new HashMap<>();
     public static final Map<Long, EquipList> idMap = new HashMap<>();

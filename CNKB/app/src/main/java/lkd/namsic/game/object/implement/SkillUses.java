@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,18 +15,23 @@ import lkd.namsic.game.base.Location;
 import lkd.namsic.game.base.SkillUse;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
+import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.EventList;
+import lkd.namsic.game.enums.object.MonsterList;
 import lkd.namsic.game.enums.object.SkillList;
+import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.manager.MoveManager;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Monster;
 import lkd.namsic.game.object.Player;
 
 public class SkillUses {
@@ -237,7 +243,7 @@ public class SkillUses {
 
                 int distance = Math.min(self.getFieldDistance(location), 20);
 
-                int physicDmg = (int) (0.1 * distance * self.getStat(StatType.ATK));
+                int physicDmg = (int) (0.12 * distance * self.getStat(StatType.ATK));
                 self.damage(target, physicDmg, 0, 0, true, false, true);
 
                 MoveManager.getInstance().setField(self, location.getFieldX(), location.getFieldY());
@@ -279,6 +285,109 @@ public class SkillUses {
                         ((Player) entity).replyPlayer(self.getFightName() + " (이/가) 사용한  스킬 " +
                                 Emoji.focus(SkillList.ROAR.getDisplayName()) + " 로 인해 공격속도가 " + stat + " 만큼 낮아졌습니다");
                     }
+                }
+            }
+        });
+
+        put(SkillList.HOWLING_OF_WOLF.getId(), new SkillUse(0, 30) {
+            @Override
+            public int getWaitTurn() {
+                return 1;
+            }
+
+            @Override
+            public int getMinTargetCount() {
+                return 0;
+            }
+
+            @Override
+            public int getMaxTargetCount() {
+                return 0;
+            }
+
+            @Override
+            public void useSkill(@NonNull Entity self, @NonNull List<Entity> targets) {
+                long fightId = FightManager.getInstance().getFightId(self.getId());
+
+                Location location = self.getLocation();
+                GameMap map = Config.loadMap(location);
+
+
+                Location spawnLocation = new Location(location);
+
+                try {
+                    spawnLocation.setField(spawnLocation.getFieldX() - 1, spawnLocation.getFieldY());
+                } catch (NumberRangeException ignore) {}
+
+                Monster monster = Config.newObject((Monster) self, true);
+                monster.randomLevel();
+                monster.setLocation(spawnLocation);
+                map.addEntity(monster);
+                Config.unloadObject(monster);
+
+                monster = Config.loadObject(Id.MONSTER, monster.getId().getObjectId());
+                monster.setDoing(Doing.FIGHT);
+                FightManager.getInstance().getEntitySet(fightId).add(monster);
+
+
+                spawnLocation = new Location(location);
+
+                try {
+                    spawnLocation.setField(spawnLocation.getFieldX() + 1, spawnLocation.getFieldY());
+                } catch (NumberRangeException ignore) {}
+
+                monster = Config.newObject((Monster) self, true);
+                monster.randomLevel();
+                monster.setLocation(spawnLocation);
+                map.addEntity(monster);
+                Config.unloadObject(monster);
+
+                monster = Config.loadObject(Id.MONSTER, monster.getId().getObjectId());
+                monster.setDoing(Doing.FIGHT);
+                FightManager.getInstance().getEntitySet(fightId).add(monster);
+
+                Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
+                Player.replyPlayers(playerSet, MonsterList.LYCANTHROPE.getDisplayName() + " 두마리가 전투에 난입했습니다!");
+
+                Config.unloadMap(map);
+            }
+        });
+
+        put(SkillList.CUTTING_MOONLIGHT.getId(), new SkillUse(0, 8) {
+            @Override
+            public int getMinTargetCount() {
+                return 0;
+            }
+
+            @Override
+            public int getMaxTargetCount() {
+                return 0;
+            }
+
+            @Override
+            public void useSkill(@NonNull Entity self, @NonNull List<Entity> targets) {
+
+                boolean damageSame = self.getObjectVariable(Variable.CUTTING_MOONLIGHT_DAMAGE_SAME, false);
+                Id id = self.getId().getId();
+
+                int physicDmg = (int) (self.getStat(StatType.ATK) * 0.9);
+                int magicDmg = (int) (self.getStat(StatType.MATK) * 0.9);
+
+                if(physicDmg >= magicDmg) {
+                    magicDmg = 0;
+                } else {
+                    physicDmg = 0;
+                }
+
+                long fightId = FightManager.getInstance().getFightId(self.getId());
+                Set<Entity> entitySet = new HashSet<>(FightManager.getInstance().getEntitySet(fightId));
+
+                for(Entity entity : entitySet) {
+                    if(!damageSame && entity.getId().getId().equals(id)) {
+                        continue;
+                    }
+
+                    self.damage(entity, physicDmg, magicDmg, 0, true, true, true);
                 }
             }
         });

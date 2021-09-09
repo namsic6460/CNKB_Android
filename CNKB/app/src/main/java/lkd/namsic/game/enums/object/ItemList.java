@@ -253,7 +253,7 @@ public enum ItemList {
     SKILL_BOOK_SCAR("스킬 북 - 할퀴기", 203L),
     SKILL_BOOK_CHARM("스킬 북 - 매혹", 204L),
     SKILL_BOOK_STRINGS_OF_LIFE("스킬 북 - 생명의 끈", 205L),
-    SKILL_BOOK_RESIST("스킬 북 - 저항", 206L),
+    SKILL_BOOK_RESIST("스킬 북 - 버티기", 206L),
     
     PIECE_OF_MAGIC("마법 파편", 207L),
 
@@ -283,7 +283,18 @@ public enum ItemList {
     TRACE_OF_SKY("건의 흔적", 223L),
     TRACE_OF_EARTH("곤의 흔적", 224L),
     TRACE_OF_WATER("감의 흔적", 225L),
-    TRACE_OF_FIRE("리의 흔적", 226L);
+    TRACE_OF_FIRE("리의 흔적", 226L),
+
+    /* --- 장비 미적용 아이템 --- */
+    LYCANTHROPE_TOOTH("라이칸스로프 이빨", 227L),
+    LYCANTHROPE_LEATHER("라이칸스로프 가죽", 228L),
+    LYCANTHROPE_HEAD("라이칸스로프 머리", 229L),
+    LYCANTHROPE_HEART("라이칸스로프 심장", 230L),
+    LYCANTHROPE_SOUL("라이칸스로프 영혼", 231L),
+
+    MOON_STONE("월석", 232L),
+
+    SKILL_BOOK_CUTTING_MOONLIGHT("스킬 북 - 달빛 베기", 233L);
 
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();

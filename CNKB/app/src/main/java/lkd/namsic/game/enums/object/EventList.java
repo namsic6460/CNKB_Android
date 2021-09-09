@@ -40,7 +40,11 @@ public enum EventList {
     ELEMENT_HEART_GEM_FIRE_TURN(27L),
     ELEMENT_HEART_GEM_FIRE_END(28L),
     RUBY_EARRING_DAMAGE(29L),
-    RUBY_EARRING_END(30L);
+    RUBY_EARRING_END(30L),
+    LYCANTHROPE_PAGE_2(31L),
+    WOLF_OF_MOON_PAGE_2(32L),
+    WOLF_OF_MOON_PAGE_3(33L),
+    WOLF_OF_MOON_END(34L);
 
     public static final Map<Long, EventList> idMap = new HashMap<>();
 

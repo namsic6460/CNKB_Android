@@ -14,15 +14,20 @@ import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object.BossList;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.manager.FarmManager;
+import lkd.namsic.game.manager.FightManager;
+import lkd.namsic.game.object.Boss;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
 import lkd.namsic.game.object.Farm;
+import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Player;
+import lkd.namsic.setting.Logger;
 
 public class ItemUses {
 
@@ -815,6 +820,65 @@ public class ItemUses {
                 Config.unloadObject(farm);
 
                 return "농장이 1칸 확장되었습니다\n" + maxPlantCount + "칸 -> " + (maxPlantCount + 1) + "칸";
+            }
+        });
+
+        put(ItemList.MOON_STONE.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+
+                if(self.getItem(ItemList.LYCANTHROPE_TOOTH.getId()) == 0 ||
+                        self.getItem(ItemList.LYCANTHROPE_LEATHER.getId()) == 0 ||
+                        self.getItem(ItemList.LYCANTHROPE_HEAD.getId()) == 0 ||
+                        self.getItem(ItemList.LYCANTHROPE_HEART.getId()) == 0 ||
+                        self.getItem(ItemList.LYCANTHROPE_SOUL.getId()) == 0) {
+                    throw new WeirdCommandException("이 아이템을 사용하기 위한 준비물이 모두 모이지 않았습니다");
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addItem(ItemList.LYCANTHROPE_TOOTH.getId(), -1);
+                self.addItem(ItemList.LYCANTHROPE_LEATHER.getId(), -1);
+                self.addItem(ItemList.LYCANTHROPE_HEAD.getId(), -1);
+                self.addItem(ItemList.LYCANTHROPE_HEART.getId(), -1);
+                self.addItem(ItemList.LYCANTHROPE_SOUL.getId(), -1);
+
+                GameMap map = Config.loadMap(self.getLocation());
+                Boss boss = map.spawnBoss(BossList.WOLF_OF_MOON);
+
+                new Thread(() -> {
+                    Config.loadObject(Id.BOSS, boss.getId().getObjectId());
+
+                    try {
+                        Thread.sleep(500);
+                        FightManager.getInstance().startFight((Player) self, boss, false);
+                    } catch (Exception e) {
+                        Logger.e("ItemUse.MOON_STONE", Config.errorString(e));
+                    }
+                }).start();
+
+                return BossList.WOLF_OF_MOON.getDisplayName() + "를 소환했습니다!";
+            }
+        });
+
+        put(ItemList.SKILL_BOOK_CUTTING_MOONLIGHT.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+
+                if (self.getSkill().contains(SkillList.CUTTING_MOONLIGHT.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.CUTTING_MOONLIGHT.getId());
+                return SKILL_BOOK;
             }
         });
     }};

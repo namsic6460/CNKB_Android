@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import lkd.namsic.game.base.Bool;
 import lkd.namsic.game.base.IdClass;
@@ -26,11 +27,13 @@ import lkd.namsic.game.event.EndFightEvent;
 import lkd.namsic.game.event.InjectFightEvent;
 import lkd.namsic.game.event.PreDamageEvent;
 import lkd.namsic.game.event.PreDamagedEvent;
+import lkd.namsic.game.event.PreTurnEvent;
 import lkd.namsic.game.event.SelfTurnEvent;
 import lkd.namsic.game.event.StartFightEvent;
 import lkd.namsic.game.event.TurnEvent;
 import lkd.namsic.game.exception.EventRemoveException;
 import lkd.namsic.game.manager.FightManager;
+import lkd.namsic.game.object.Boss;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Player;
 
@@ -160,6 +163,8 @@ public class EntityEvents {
             public void onSelfTurn(@NonNull Entity self, @NonNull WrappedObject<Entity> wrappedAttacker) {
                 Entity entity = self.getObjectVariable(Variable.CHARM_ENTITY);
                 if(entity != null) {
+                    self.removeVariable(Variable.CHARM_ENTITY);
+
                     wrappedAttacker.set(entity);
 
                     entity.addEvent(EventList.CHARM_DAMAGE);
@@ -430,6 +435,116 @@ public class EntityEvents {
             @Override
             public void onEndFight(@NonNull Entity self) {
                 self.removeEvent(EventList.RUBY_EARRING_DAMAGE);
+                throw new EventRemoveException();
+            }
+        });
+
+        put(EventList.LYCANTHROPE_PAGE_2.getId(), new PreTurnEvent() {
+            @Override
+            public void onPreTurn(@NonNull Entity self) {
+                int maxHp = self.getStat(StatType.MAXHP);
+                int hp = self.getStat(StatType.HP);
+
+                if(maxHp / 2 >= hp) {
+                    self.addBasicStat(StatType.MAXHP, (int) (maxHp * 0.3));
+                    self.addBasicStat(StatType.ATK, self.getStat(StatType.ATK) / 2);
+                    self.addBasicStat(StatType.ATS, 300);
+
+                    self.setBasicStat(StatType.HP, (int) (maxHp * 0.65));
+                    self.setBasicStat(StatType.AGI, 200);
+                    self.setBasicStat(StatType.DEF, 50);
+                    self.setBasicStat(StatType.MDEF, 0);
+                    self.setBasicStat(StatType.BRE, 200);
+                    self.setBasicStat(StatType.DRA, 50);
+                    self.setBasicStat(StatType.EVA, 0);
+                    self.setBasicStat(StatType.ACC, 200);
+
+                    long fightId = FightManager.getInstance().getFightId(self.getId());
+                    Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
+
+                    Player.replyPlayers(playerSet, self.getFightName() + " (이/가) 분노합니다!");
+
+                    throw new EventRemoveException();
+                }
+            }
+        });
+
+        put(EventList.WOLF_OF_MOON_PAGE_2.getId(), new PreTurnEvent() {
+            @Override
+            public void onPreTurn(@NonNull Entity self) {
+                int maxHp = self.getStat(StatType.MAXHP);
+                int hp = self.getStat(StatType.HP);
+
+                if(maxHp * 0.7 >= hp) {
+                    Boss boss = (Boss) self;
+
+                    boss.addBasicStat(StatType.MAXHP, maxHp / 8);
+                    boss.addBasicStat(StatType.ATK, -50);
+                    boss.addBasicStat(StatType.DEF, 100);
+                    boss.addBasicStat(StatType.EVA, 100);
+
+                    boss.addEvent(EventList.WOLF_OF_MOON_PAGE_3);
+                    boss.addSkill(SkillList.HOWLING_OF_WOLF.getId());
+                    boss.setSkillPercent(SkillList.HOWLING_OF_WOLF.getId(), 0.15);
+
+                    long fightId = FightManager.getInstance().getFightId(self.getId());
+                    Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
+
+                    Player.replyPlayers(playerSet, self.getFightName() + " (이/가) 비틀거리기 시작합니다");
+
+                    throw new EventRemoveException();
+                }
+            }
+        });
+
+        put(EventList.WOLF_OF_MOON_PAGE_3.getId(), new PreTurnEvent() {
+            @Override
+            public void onPreTurn(@NonNull Entity self) {
+                int maxHp = self.getStat(StatType.MAXHP);
+                int hp = self.getStat(StatType.HP);
+
+                if(maxHp * 0.3 >= hp) {
+                    Boss boss = (Boss) self;
+
+                    boss.addBasicStat(StatType.MAXHP, maxHp / 5);
+                    boss.addBasicStat(StatType.ATK, 150);
+                    boss.addBasicStat(StatType.ATS, 100);
+                    boss.addBasicStat(StatType.BRE, 100);
+                    boss.addBasicStat(StatType.DRA, 25);
+
+                    boss.setBasicStat(StatType.DEF, 0);
+                    boss.setBasicStat(StatType.EVA, 0);
+
+                    boss.addSkill(SkillList.CUTTING_MOONLIGHT.getId());
+                    boss.setSkillPercent(SkillList.CUTTING_MOONLIGHT.getId(), 0.5);
+
+                    long fightId = FightManager.getInstance().getFightId(self.getId());
+                    Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
+
+                    for(Player player : playerSet) {
+                        int ats = (int) (player.getStat(StatType.ATS) * 0.2);
+
+                        player.setVariable(Variable.WOLF_OF_MOON_ATS, ats);
+                        player.setBasicStat(StatType.ATS, -1 * ats);
+                        player.addEvent(EventList.WOLF_OF_MOON_END);
+                    }
+
+                    Player.replyPlayers(playerSet, self.getFightName() + " (이/가) 분노의 포효를 하며 늑대인간으로 변했습니다!\n" +
+                            "이번 전투동안 공격 속도가 20% 감소합니다");
+
+                    throw new EventRemoveException();
+                }
+            }
+        });
+
+        put(EventList.WOLF_OF_MOON_END.getId(), new EndFightEvent() {
+            @Override
+            public void onEndFight(@NonNull Entity self) {
+                int ats = self.getVariable(Variable.WOLF_OF_MOON_ATS);
+                self.removeVariable(Variable.WOLF_OF_MOON_ATS);
+
+                self.addBasicStat(StatType.ATS, ats);
+
                 throw new EventRemoveException();
             }
         });

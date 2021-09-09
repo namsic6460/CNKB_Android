@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -58,7 +59,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 2.481;
+    public static final double VERSION = 2.5;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -153,6 +154,7 @@ public class Config {
     public static final int MAX_FARM_LV = 5;
     public static final int MAX_FARM_PLANT_COUNT = 30;
     public static final long MAX_HARVEST_DAY = 5;
+    public static final int BOSS_SPAWN_MSG_WAIT_TIME = 1500;
 
     public static final String SPLIT_BAR = "------------------------------------------";
     public static final String HARD_SPLIT_BAR = "==========================================";
@@ -607,7 +609,7 @@ public class Config {
     }
 
     @NonNull
-    public synchronized static GameMap loadMap(Location location) {
+    public synchronized static GameMap loadMap(@NonNull Location location) {
         return loadMap(location.getX(), location.getY());
     }
 
@@ -619,7 +621,7 @@ public class Config {
         return t;
     }
 
-    public synchronized static GameMap getMapData(Location location) {
+    public synchronized static GameMap getMapData(@NonNull Location location) {
         return getMapData(location.getX(), location.getY());
     }
 
@@ -680,8 +682,29 @@ public class Config {
              throw new NumberRangeException(under, 0);
         }
 
-        int multiple = (int) Math.pow(10, under);
-        return (Math.floor(percent * multiple * 100) / multiple) + "%";
+        String output = String.format(Locale.KOREA, "%f", percent);
+
+        String[] split = output.split("\\.");
+        if(split.length == 2) {
+            int length = split[1].length();
+            if(under < length) {
+                output = output.substring(0, output.length() + under - length);
+            }
+        }
+
+        if(output.endsWith("0")) {
+            output = Config.replaceLast(output, "0{1,}", "");
+        }
+
+        if(output.endsWith(".")) {
+            if(under == 0) {
+                output = output.substring(0, output.length() - 1);
+            } else {
+                output += "0";
+            }
+        }
+
+        return output + "%";
     }
 
     @NonNull

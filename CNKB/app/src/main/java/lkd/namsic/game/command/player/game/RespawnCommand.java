@@ -47,12 +47,22 @@ public class RespawnCommand extends PlayerCommand {
                     throw new WeirdCommandException("전투가 진행중인 맵에서는 리스폰이 불가능합니다");
                 }
             }
+            
+            player.replyPlayer("몬스터 리스폰을 시도합니다\n10초만 기다려주세요");
 
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
                 Logger.e("RespawnCommand", e);
                 throw new RuntimeException(e.getMessage());
+            }
+
+            for (long monsterId : monsterSet) {
+                monster = Config.getData(Id.MONSTER, monsterId);
+
+                if (Doing.fightList().contains(monster.getDoing())) {
+                    throw new WeirdCommandException("전투가 진행중이어서 몬스터 리스폰에 실패했습니다");
+                }
             }
 
             IdClass idClass;

@@ -1,7 +1,8 @@
 package lkd.namsic.game.exception;
 
+import androidx.annotation.NonNull;
+
 import lombok.Getter;
-import lombok.NonNull;
 
 public class InvalidNumberException extends RuntimeException {
 

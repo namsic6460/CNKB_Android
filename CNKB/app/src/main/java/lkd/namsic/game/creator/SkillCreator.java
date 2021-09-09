@@ -43,6 +43,12 @@ public class SkillCreator implements Creatable {
         createSkill(SkillList.ROAR, "[2 마나]\n모든 적의 공격속도를 레벨 차이에 비례하여 30초간 감소시킨다\n" +
                 "(1.5레벨 차이당 1%) (최대 30%)", null);
 
+        createSkill(SkillList.HOWLING_OF_WOLF, "[30 마나] [획득 불가]\n" +
+                "주변에 라이칸스로프 두마리를 소환하여 전투에 난입시킨다", null);
+        
+        createSkill(SkillList.CUTTING_MOONLIGHT, "[8 마나]\n" + "다른 타입의(n 설정 달빛 베기) 적 전체에게 " +
+                "(공격력 * 0.9) 또는 (마법 공격력 * 0.9) 중 더 높은 스텟으로 물리 또는 마법 데미지를 가한다",null);
+
         Logger.i("ObjectMaker", "Skill making is done!");
     }
 

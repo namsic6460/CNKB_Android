@@ -21,7 +21,9 @@ public enum SkillList {
     STRINGS_OF_LIFE("생명의 끈", 6L, EventList.SKILL_STRINGS_OF_LIFE_START, EventList.SKILL_STRINGS_OF_LIFE_INJECT),
     RESIST("버티기", 7L),
     RUSH("돌진", 8L),
-    ROAR("포효", 9L);
+    ROAR("포효", 9L),
+    HOWLING_OF_WOLF("늑대의 하울링", 10L),
+    CUTTING_MOONLIGHT("달빛 베기", 11L);
 
     public static final Map<String, SkillList> nameMap = new HashMap<>();
     public static final Map<Long, SkillList> idMap = new HashMap<>();
