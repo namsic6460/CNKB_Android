@@ -724,7 +724,7 @@ public class EquipEvents {
             put(StartFightEvent.getName(), new StartFightEvent() {
                 @Override
                 public void onStartFight(@NonNull Entity self, @NonNull Entity enemy, boolean isOwner) {
-                    int shield = (int) (self.getStat(StatType.MAXHP) * 0.3);
+                    int shield = (int) (self.getStat(StatType.MAXHP) * 0.66);
 
                     self.setVariable(Variable.GOLEM_HEART_GEM_PHYSIC_SHIELD, shield);
                     self.setVariable(Variable.GOLEM_HEART_GEM_MAGIC_SHIELD, shield);
@@ -734,7 +734,7 @@ public class EquipEvents {
             put(InjectFightEvent.getName(), new InjectFightEvent() {
                 @Override
                 public void onInjectFight(@NonNull Entity self, @NonNull Entity enemy) {
-                    int shield = (int) (self.getStat(StatType.MAXHP) * 0.3);
+                    int shield = (int) (self.getStat(StatType.MAXHP) * 0.66);
 
                     self.setVariable(Variable.GOLEM_HEART_GEM_PHYSIC_SHIELD, shield);
                     self.setVariable(Variable.GOLEM_HEART_GEM_MAGIC_SHIELD, shield);
@@ -758,14 +758,13 @@ public class EquipEvents {
                         self.removeVariable(Variable.GOLEM_HEART_GEM_PHYSIC_SHIELD);
                     }
 
-                    if(physicShield >= physicDmg.get()) {
-                        magicShield -= physicDmg.get() - 1;
+                    if(magicShield >= magicDmg.get()) {
+                        magicShield -= magicDmg.get() - 1;
                         magicDmg.set(1);
 
                         self.setVariable(Variable.GOLEM_HEART_GEM_MAGIC_SHIELD, magicShield);
                     } else {
                         magicDmg.add(-1 * physicShield);
-
                         self.removeVariable(Variable.GOLEM_HEART_GEM_MAGIC_SHIELD);
                     }
                 }

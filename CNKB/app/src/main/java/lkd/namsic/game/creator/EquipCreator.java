@@ -834,8 +834,8 @@ public class EquipCreator implements Creatable {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.HEART_GEM, EquipList.GOLEM_HEART_GEM,
-                null, "전투 시작 시 최대 체력의 30% 에 해당하는 방어막과 마법 방어막을 각각 생성합니다\n" +
-                "(최소 데미지 1은 계속 적용)");
+                null, "전투 시작 시 최대 체력의 66% 에 해당하는 방어막과 마법 방어막을 각각 생성합니다\n" +
+                "(최소 데미지 1은 계속 적용) (방어력 및 마법 방어력 무시)");
         equipment.setHandleLv(6);
         equipment.setLimitLv(50);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
