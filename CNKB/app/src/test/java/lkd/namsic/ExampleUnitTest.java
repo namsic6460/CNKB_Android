@@ -6,18 +6,25 @@ import com.google.gson.GsonBuilder;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
+import lkd.namsic.game.enums.object.BossList;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.json.ChatLimitAdapter;
 import lkd.namsic.game.json.LocationAdapter;
 import lkd.namsic.game.json.NpcAdapter;
 import lkd.namsic.game.manager.FightManager;
+import lkd.namsic.game.object.Boss;
+import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
 import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
@@ -36,8 +43,16 @@ public class ExampleUnitTest {
 
     @Test
     public void test() {
-        System.out.println(Config.getDisplayPercent(0.009, 4));
-        System.out.println(Config.getDisplayPercent(32.000004, 4));
+        Map<Entity, List<Entity>> castingMap = new ConcurrentHashMap<>();
+
+        Boss boss = new Boss(BossList.WOLF_OF_MOON, "");
+        castingMap.put(boss, new ArrayList<>());
+
+        System.out.println(castingMap);
+
+        castingMap.remove(boss);
+
+        System.out.println(castingMap);
     }
 
     @Test

@@ -369,7 +369,7 @@ public class MonsterCreator implements Creatable {
         monster.setItemDrop(ItemList.LYCANTHROPE_SOUL.getId(), 0.01, 1, 1);
         monster.setItemDrop(ItemList.SKILL_BOOK_SCAR.getId(), 0.005, 1, 1);
         monster.setItemDrop(ItemList.SKILL_BOOK_STRINGS_OF_LIFE.getId(), 0.003, 1, 1);
-        monster.setItemDrop(ItemList.MOON_STONE.getId(), 0.005, 1, 1);
+        monster.setItemDrop(ItemList.MOON_STONE.getId(), 0.01, 1, 1);
         monster.setItemDrop(ItemList.MAGIC_STONE.getId(), 1, 3, 3);
 
         monster.addSkill(SkillList.SCAR.getId());

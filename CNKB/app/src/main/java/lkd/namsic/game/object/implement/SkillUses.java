@@ -312,14 +312,15 @@ public class SkillUses {
                 Location location = self.getLocation();
                 GameMap map = Config.loadMap(location);
 
-
                 Location spawnLocation = new Location(location);
 
                 try {
                     spawnLocation.setField(spawnLocation.getFieldX() - 1, spawnLocation.getFieldY());
                 } catch (NumberRangeException ignore) {}
 
-                Monster monster = Config.newObject((Monster) self, true);
+                Monster originalMonster = Config.getData(Id.MONSTER, MonsterList.LYCANTHROPE.getId());
+
+                Monster monster = Config.newObject(originalMonster, true);
                 monster.randomLevel();
                 monster.setLocation(spawnLocation);
                 map.addEntity(monster);
@@ -327,8 +328,9 @@ public class SkillUses {
 
                 monster = Config.loadObject(Id.MONSTER, monster.getId().getObjectId());
                 monster.setDoing(Doing.FIGHT);
-                FightManager.getInstance().getEntitySet(fightId).add(monster);
 
+                FightManager.getInstance().getEntitySet(fightId).add(monster);
+                FightManager.getInstance().fightId.put(monster.getId(), fightId);
 
                 spawnLocation = new Location(location);
 
@@ -336,7 +338,7 @@ public class SkillUses {
                     spawnLocation.setField(spawnLocation.getFieldX() + 1, spawnLocation.getFieldY());
                 } catch (NumberRangeException ignore) {}
 
-                monster = Config.newObject((Monster) self, true);
+                monster = Config.newObject(originalMonster, true);
                 monster.randomLevel();
                 monster.setLocation(spawnLocation);
                 map.addEntity(monster);
@@ -344,7 +346,9 @@ public class SkillUses {
 
                 monster = Config.loadObject(Id.MONSTER, monster.getId().getObjectId());
                 monster.setDoing(Doing.FIGHT);
+
                 FightManager.getInstance().getEntitySet(fightId).add(monster);
+                FightManager.getInstance().fightId.put(monster.getId(), fightId);
 
                 Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
                 Player.replyPlayers(playerSet, MonsterList.LYCANTHROPE.getDisplayName() + " 두마리가 전투에 난입했습니다!");
@@ -366,7 +370,6 @@ public class SkillUses {
 
             @Override
             public void useSkill(@NonNull Entity self, @NonNull List<Entity> targets) {
-
                 boolean damageSame = self.getObjectVariable(Variable.CUTTING_MOONLIGHT_DAMAGE_SAME, false);
                 Id id = self.getId().getId();
 

@@ -285,7 +285,6 @@ public enum ItemList {
     TRACE_OF_WATER("감의 흔적", 225L),
     TRACE_OF_FIRE("리의 흔적", 226L),
 
-    /* --- 장비 미적용 아이템 --- */
     LYCANTHROPE_TOOTH("라이칸스로프 이빨", 227L),
     LYCANTHROPE_LEATHER("라이칸스로프 가죽", 228L),
     LYCANTHROPE_HEAD("라이칸스로프 머리", 229L),

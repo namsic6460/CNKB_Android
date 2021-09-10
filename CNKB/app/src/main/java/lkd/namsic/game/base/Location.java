@@ -25,7 +25,16 @@ public class Location {
     public Location() {}
 
     public Location(int x, int y) {
-        this.setMap(x, y);
+        this(x, y, false);
+    }
+
+    public Location(int x, int y, boolean ignore) {
+        if(ignore) {
+            this.x = x;
+            this.y = y;
+        } else {
+            this.setMap(x, y);
+        }
     }
 
     public Location(int x, int y, int fieldX, int fieldY) {

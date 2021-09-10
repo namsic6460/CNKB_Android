@@ -64,17 +64,17 @@ public class SkillManager {
         SkillUse use = Objects.requireNonNull(skill.getSkillUse());
         String result = use.tryUse(self, other);
 
+        if(use.getWaitTurn() == 0) {
+            msg = skillName + " (을/를) 사용했습니다";
+        } else {
+            self.setVariable(Variable.FIGHT_CASTING_SKILL, skillId);
+            self.setVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN, use.getWaitTurn());
+
+            msg = skillName + " 캐스팅을 시작했습니다";
+        }
+
         if(self.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) self;
-
-            if(use.getWaitTurn() == 0) {
-                msg = skillName + " (을/를) 사용했습니다";
-            } else {
-                player.setVariable(Variable.FIGHT_CASTING_SKILL, skillId);
-                player.setVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN, use.getWaitTurn());
-
-                msg = skillName + " 캐스팅을 시작했습니다";
-            }
 
             if(!result.equals("")) {
                 msg = result + " 에게 " + msg;
@@ -82,10 +82,13 @@ public class SkillManager {
 
             player.addLog(LogData.TOTAL_SKILL_USE, 1);
             player.replyPlayer(msg);
+        }
 
-            if(player.getObjectVariable(Variable.RESISTED_SKILL, false)) {
-                player.removeVariable(Variable.RESISTED_SKILL);
-                player.replyPlayer(RESIST);
+        if(self.getObjectVariable(Variable.RESISTED_SKILL, false)) {
+            self.removeVariable(Variable.RESISTED_SKILL);
+
+            if(self.getId().getId().equals(Id.PLAYER)) {
+                ((Player) self).replyPlayer(RESIST);
             }
         }
 

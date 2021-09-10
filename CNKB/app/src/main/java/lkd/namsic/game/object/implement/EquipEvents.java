@@ -33,6 +33,7 @@ import lkd.namsic.game.event.InjectFightEvent;
 import lkd.namsic.game.event.MineEvent;
 import lkd.namsic.game.event.PreDamageEvent;
 import lkd.namsic.game.event.PreDamagedEvent;
+import lkd.namsic.game.event.PreEvadeEvent;
 import lkd.namsic.game.event.StartFightEvent;
 import lkd.namsic.game.event.TurnEvent;
 import lkd.namsic.game.manager.FightManager;
@@ -435,7 +436,7 @@ public class EquipEvents {
         put(EquipList.SILVER_SWORD.getId(), new HashMap<String, Event>() {{
             put(PreDamagedEvent.getName(), new PreDamagedEvent() {
                 @Override
-                public void onPreDamaged(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+                public void onPreDamaged(@NonNull Entity self, @NonNull Entity attacker, @NonNull Int physicDmg,
                                          @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
                     long helmetId = self.getEquipped(EquipType.HELMET);
                     long chestplateId = self.getEquipped(EquipType.CHESTPLATE);
@@ -460,8 +461,8 @@ public class EquipEvents {
                             leggings.getOriginalId() == EquipList.SILVER_LEGGINGS.getId() &&
                             shoes.getOriginalId() == EquipList.SILVER_SHOES.getId() &&
                             rings.getOriginalId() == EquipList.SILVER_RING.getId()) {
-                        victim.addEvent(EventList.SILVER_SET_DAMAGE);
-                        victim.addEvent(EventList.SILVER_SET_END);
+                        attacker.addEvent(EventList.SILVER_SET_DAMAGE);
+                        attacker.addEvent(EventList.SILVER_SET_END);
                     }
                 }
             });
@@ -470,7 +471,7 @@ public class EquipEvents {
         put(EquipList.SILVER_HELMET.getId(), new HashMap<String, Event>() {{
             put(PreDamagedEvent.getName(), new PreDamagedEvent() {
                 @Override
-                public void onPreDamaged(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+                public void onPreDamaged(@NonNull Entity self, @NonNull Entity attacker, @NonNull Int physicDmg,
                                          @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
                     int mdefIncreased = self.getVariable(Variable.SILVER_HELMET);
                     if(mdefIncreased < 50) {
@@ -495,7 +496,7 @@ public class EquipEvents {
         put(EquipList.SILVER_SHOES.getId(), new HashMap<String, Event>() {{
             put(PreDamagedEvent.getName(), new PreDamagedEvent() {
                 @Override
-                public void onPreDamaged(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+                public void onPreDamaged(@NonNull Entity self, @NonNull Entity attacker, @NonNull Int physicDmg,
                                          @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
                     int agiIncreased = self.getVariable(Variable.SILVER_SHOES);
                     if(agiIncreased < 50) {
@@ -734,7 +735,7 @@ public class EquipEvents {
             put(InjectFightEvent.getName(), new InjectFightEvent() {
                 @Override
                 public void onInjectFight(@NonNull Entity self, @NonNull Entity enemy) {
-                    int shield = (int) (self.getStat(StatType.MAXHP) * 0.66);
+                    int shield = (int) (self.getStat(StatType.MAXHP) * 0.8);
 
                     self.setVariable(Variable.GOLEM_HEART_GEM_PHYSIC_SHIELD, shield);
                     self.setVariable(Variable.GOLEM_HEART_GEM_MAGIC_SHIELD, shield);
@@ -743,7 +744,7 @@ public class EquipEvents {
 
             put(PreDamagedEvent.getName(), new PreDamagedEvent() {
                 @Override
-                public void onPreDamaged(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+                public void onPreDamaged(@NonNull Entity self, @NonNull Entity attacker, @NonNull Int physicDmg,
                                          @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
                     int physicShield = self.getVariable(Variable.GOLEM_HEART_GEM_PHYSIC_SHIELD);
                     int magicShield = self.getVariable(Variable.GOLEM_HEART_GEM_MAGIC_SHIELD);
@@ -792,13 +793,13 @@ public class EquipEvents {
         put(EquipList.SILVER_RING.getId(), new HashMap<String, Event>() {{
             put(PreDamagedEvent.getName(), new PreDamagedEvent() {
                 @Override
-                public void onPreDamaged(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+                public void onPreDamaged(@NonNull Entity self, @NonNull Entity attacker, @NonNull Int physicDmg,
                                          @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
                     if(Math.random() < 0.2) {
                         int reflect = (int) (magicDmg.get() * 0.2);
 
                         magicDmg.add(-1 * reflect);
-                        self.damage(victim, 0, reflect, 0, true, false, false);
+                        self.damage(attacker, 0, reflect, 0, true, false, false);
                         
                         if(reflect > 0 && self.getId().getId().equals(Id.PLAYER)) {
                             ((Player) self).replyPlayer("마법 피해의 20% 인 " + reflect + " 데미지를 반사했습니다");
@@ -949,6 +950,106 @@ public class EquipEvents {
                 public void onAddExp(@NonNull Entity self, @NonNull LoNg exp) {
                     if(Doing.fightList().contains(self.getDoing())) {
                         exp.multiple(1.08);
+                    }
+                }
+            });
+        }});
+
+        put(EquipList.MOON_SWORD.getId(), new HashMap<String, Event>() {{
+            put(DamageEvent.getName(), new DamageEvent() {
+                @Override
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
+                    double percent = ((double) self.getStat(StatType.HP)) / self.getStat(StatType.MAXHP);
+                    double increasePercent = Math.min(2 - percent, 1.35);
+
+                    long gemId = self.getEquipped(EquipType.GEM);
+
+                    if(gemId != EquipList.NONE.getId()) {
+                        Equipment gem = Config.getData(Id.EQUIPMENT, gemId);
+
+                        if(gem.getOriginalId() == EquipList.MOON_GEM.getId()) {
+                            increasePercent *= 2;
+                        }
+                    }
+
+                    totalDmg.multiple(increasePercent);
+                }
+            });
+        }});
+
+        put(EquipList.LYCANTHROPE_HELMET.getId(), new HashMap<String, Event>() {{
+            put(DamagedEvent.getName(), new DamagedEvent() {
+                @Override
+                public void onDamaged(@NonNull Entity self, @NonNull Entity attacker,
+                                      @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
+                    if(isCrit.get()) {
+                        double percent = ((double) self.getStat(StatType.HP)) / self.getStat(StatType.MAXHP) - 0.5;
+                        totalDmg.divide(percent);
+                    }
+                }
+            });
+        }});
+
+        put(EquipList.LYCANTHROPE_LEGGINGS.getId(), new HashMap<String, Event>() {{
+            put(DamageEvent.getName(), new DamageEvent() {
+                @Override
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
+                    totalDmg.multiple(1.1);
+                }
+            });
+        }});
+
+        put(EquipList.LYCANTHROPE_SHOES.getId(), new HashMap<String, Event>() {{
+            put(PreEvadeEvent.getName(), new PreEvadeEvent() {
+
+                @Override
+                public void onPreEvade(@NonNull Entity self, @NonNull Entity attacker, @NonNull Int physicDmg,
+                                       @NonNull Int magicDmg, @NonNull Int staticDmg,
+                                       @NonNull Bool evade, @NonNull Bool canCrit) {
+                    if(evade.get()) {
+                        self.addBasicStat(StatType.HP, self.getStat(StatType.MAXHP) / 10);
+                    }
+                }
+            });
+        }});
+
+        put(EquipList.LYCANTHROPE_TOOTH_NECKLACE.getId(), new HashMap<String, Event>() {{
+            put(EndFightEvent.getName(), new EndFightEvent() {
+                @Override
+                public void onEndFight(@NonNull Entity self) {
+                    if(self.getKiller() != null) {
+                        long helmetId = self.getEquipped(EquipType.HELMET);
+                        long chestplateId = self.getEquipped(EquipType.CHESTPLATE);
+                        long leggingsId = self.getEquipped(EquipType.LEGGINGS);
+                        long shoesId = self.getEquipped(EquipType.SHOES);
+
+                        if (helmetId == EquipList.NONE.getId() || chestplateId == EquipList.NONE.getId() ||
+                                leggingsId == EquipList.NONE.getId() || shoesId == EquipList.NONE.getId()) {
+                            return;
+                        }
+
+                        Equipment helmet = Config.getData(Id.EQUIPMENT, helmetId);
+                        Equipment chestplate = Config.getData(Id.EQUIPMENT, chestplateId);
+                        Equipment leggings = Config.getData(Id.EQUIPMENT, leggingsId);
+                        Equipment shoes = Config.getData(Id.EQUIPMENT, shoesId);
+
+                        if(helmet.getOriginalId() == EquipList.LYCANTHROPE_HELMET.getId() &&
+                                chestplate.getOriginalId() == EquipList.LYCANTHROPE_CHESTPLATE.getId() &&
+                                leggings.getOriginalId() == EquipList.LYCANTHROPE_LEGGINGS.getId() &&
+                                shoes.getOriginalId() == EquipList.LYCANTHROPE_SHOES.getId()) {
+                            double increased = self.getObjectVariable(Variable.LYCANTHROPE_TOOTH_NECKLACE_INCREASE, 0);
+
+                            if(increased < 30) {
+                                increased += 0.1;
+
+                                if(increased % 1 == 0) {
+                                    self.addBasicStat(StatType.ATK, 1);
+                                    self.addBasicStat(StatType.MATK, 1);
+                                }
+                            }
+                        }
                     }
                 }
             });

@@ -603,7 +603,12 @@ public class RandomList {
             EquipList.OWLBEAR_LEATHER_LEGGINGS.getId(),
             EquipList.OWLBEAR_LEATHER_SHOES.getId(),
             EquipList.ELEMENT_HEART_GEM.getId(),
-            EquipList.GOLEM_HEART_GEM.getId()
+            EquipList.GOLEM_HEART_GEM.getId(),
+            EquipList.LYCANTHROPE_HELMET.getId(),
+            EquipList.LYCANTHROPE_CHESTPLATE.getId(),
+            EquipList.LYCANTHROPE_LEGGINGS.getId(),
+            EquipList.LYCANTHROPE_SHOES.getId(),
+            EquipList.LYCANTHROPE_TOOTH_NECKLACE.getId()
     );
 
     public static final List<Long> lowAmulets = Arrays.asList(

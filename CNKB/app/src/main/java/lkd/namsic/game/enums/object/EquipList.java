@@ -103,10 +103,13 @@ public enum EquipList {
     OPAL_EARRING("오팔 귀걸이", 229L),
     TOPAZ_EARRING("토파즈 귀걸이", 230L),
     TURQUOISE_EARRING("터키석 귀걸이", 231L),
-
-    //TODO
-    MOON_SWORD("월검", 271L),
-    MOON_GEM("달의 보석", 272L);
+    MOON_SWORD("월검", 272L),
+    MOON_GEM("달의 보석", 273L),
+    LYCANTHROPE_HELMET("라이칸스로프 투구", 274L),
+    LYCANTHROPE_CHESTPLATE("라이칸스로프 갑옷", 275L),
+    LYCANTHROPE_LEGGINGS("라이칸스로프 바지", 276L),
+    LYCANTHROPE_SHOES("라이칸스로프 신발", 277L),
+    LYCANTHROPE_TOOTH_NECKLACE("라이칸스로프 이빨 목걸이", 278L);
 
     public static final Map<String, EquipList> nameMap = new HashMap<>();
     public static final Map<Long, EquipList> idMap = new HashMap<>();

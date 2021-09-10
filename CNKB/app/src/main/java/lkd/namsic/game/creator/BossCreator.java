@@ -25,10 +25,10 @@ public class BossCreator implements Creatable {
         );
         boss.setLv(200);
 
-        boss.setBasicStat(StatType.MAXHP, 5000);
-        boss.setBasicStat(StatType.HP, 5000);
-        boss.setBasicStat(StatType.MAXMN, 500);
-        boss.setBasicStat(StatType.MN, 500);
+        boss.setBasicStat(StatType.MAXHP, 10000);
+        boss.setBasicStat(StatType.HP, 10000);
+        boss.setBasicStat(StatType.MAXMN, 1000);
+        boss.setBasicStat(StatType.MN, 1000);
         boss.setBasicStat(StatType.ATK, 300);
         boss.setBasicStat(StatType.MATK, 300);
         boss.setBasicStat(StatType.AGI, 100);
@@ -50,7 +50,7 @@ public class BossCreator implements Creatable {
         boss.setEquipDropPercent(EquipType.GEM, 0.1);
 
         boss.addSkill(SkillList.SCAR.getId());
-        boss.setSkillPercent(SkillList.SCAR.getId(), 0.25);
+        boss.setSkillPercent(SkillList.SCAR.getId(), 0.2);
         boss.addSkill(SkillList.STRINGS_OF_LIFE.getId());
 
         boss.addEvent(EventList.WOLF_OF_MOON_PAGE_2);

@@ -84,10 +84,11 @@ public class EntityEvents {
                 }
 
                 long fightId = FightManager.getInstance().getFightId(self.getId());
-                FightManager.getInstance().fightId.put(nearestAllyId, fightId);
 
                 Entity entity = Config.loadObject(Id.MONSTER, nearestAllyId.getObjectId());
                 entity.setDoing(Doing.FIGHT);
+
+                FightManager.getInstance().fightId.put(nearestAllyId, fightId);
                 FightManager.getInstance().getEntitySet(fightId).add(entity);
 
                 if(enemy.getId().getId().equals(Id.PLAYER)) {
@@ -265,7 +266,7 @@ public class EntityEvents {
 
         put(EventList.RESIST_PRE_DAMAGED.getId(), new PreDamagedEvent() {
             @Override
-            public void onPreDamaged(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+            public void onPreDamaged(@NonNull Entity self, @NonNull Entity attacker, @NonNull Int physicDmg,
                                      @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
                 physicDmg.multiple(0.4);
             }
@@ -339,10 +340,10 @@ public class EntityEvents {
 
         put(EventList.SILVER_CHESTPLATE_PRE_DAMAGED.getId(), new PreDamagedEvent() {
             @Override
-            public void onPreDamaged(@NonNull Entity self, @NonNull Entity victim, @NonNull Int physicDmg,
+            public void onPreDamaged(@NonNull Entity self, @NonNull Entity attacker, @NonNull Int physicDmg,
                                      @NonNull Int magicDmg, @NonNull Int staticDmg, boolean canCrit) {
                 if(magicDmg.get() != 0) {
-                    self.damage(victim, physicDmg.get() * 0.3, magicDmg.get() * 0.3,
+                    self.damage(attacker, physicDmg.get() * 0.3, magicDmg.get() * 0.3,
                             0, true, false, false);
                     magicDmg.divide(2);
                 }
@@ -485,7 +486,7 @@ public class EntityEvents {
 
                     boss.addEvent(EventList.WOLF_OF_MOON_PAGE_3);
                     boss.addSkill(SkillList.HOWLING_OF_WOLF.getId());
-                    boss.setSkillPercent(SkillList.HOWLING_OF_WOLF.getId(), 0.15);
+                    boss.setSkillPercent(SkillList.HOWLING_OF_WOLF.getId(), 0.2);
 
                     long fightId = FightManager.getInstance().getFightId(self.getId());
                     Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
@@ -525,7 +526,7 @@ public class EntityEvents {
                         int ats = (int) (player.getStat(StatType.ATS) * 0.2);
 
                         player.setVariable(Variable.WOLF_OF_MOON_ATS, ats);
-                        player.setBasicStat(StatType.ATS, -1 * ats);
+                        player.addBasicStat(StatType.ATS, -1 * ats);
                         player.addEvent(EventList.WOLF_OF_MOON_END);
                     }
 

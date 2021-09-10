@@ -128,7 +128,9 @@ public class Monster extends AiEntity {
 
         if(output[0].equals(FightWaitType.ATTACK)) {
             for(long skillId : this.skill) {
-                if(this.getSkillPercent(skillId) >= random.nextDouble()) {
+                double percent = random.nextDouble();
+
+                if(this.getSkillPercent(skillId) >= percent) {
                     Skill skill = Config.getData(Id.SKILL, skillId);
                     SkillUse use = Objects.requireNonNull(skill.getSkillUse());
 
@@ -170,6 +172,10 @@ public class Monster extends AiEntity {
 
                     String other = otherBuilder.toString();
                     other = other.substring(0, other.length() - 1);
+
+                    if(other.equals("")) {
+                        other = null;
+                    }
 
                     this.setVariable(Variable.FIGHT_TARGET_MAX_INDEX, playerCount);
 

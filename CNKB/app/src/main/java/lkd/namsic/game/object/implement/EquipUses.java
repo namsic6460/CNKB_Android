@@ -279,6 +279,21 @@ public class EquipUses {
                 return "다음 공격의 회복량이 3배로 적용됩니다";
             }
         });
+
+        put(EquipList.LYCANTHROPE_CHESTPLATE.getId(), new EquipUse(0, 3) {
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                double percent = ((double) self.getStat(StatType.HP)) / self.getStat(StatType.MAXHP);
+                int stat = (int) ((1 - percent) * 100);
+
+                long time = System.currentTimeMillis() + 60000;
+                self.addBuff(time, StatType.ATK, stat);
+                self.addBuff(time, StatType.MATK, stat);
+
+                return "공격력과 마법 공격력 버프를 " + stat + " 만큼 받았습니다";
+            }
+        });
     }};
 
 }

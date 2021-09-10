@@ -59,7 +59,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 2.5;
+    public static final double VERSION = 3.0;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -134,6 +134,7 @@ public class Config {
     public static final double MAX_ATTACKED_PERCENT = 0.9;
 
     public static final int MAX_AGI = 400;
+    public static final int MAX_DRA = 100;
     public static final double CRIT_PER_AGI = 0.0025;
     public static final int MAX_EVADE = 80;
 

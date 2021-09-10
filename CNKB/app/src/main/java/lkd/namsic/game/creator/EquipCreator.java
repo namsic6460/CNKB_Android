@@ -736,6 +736,7 @@ public class EquipCreator implements Creatable {
             put(ItemList.OWLBEAR_LEATHER.getId(), 20);
             put(ItemList.PIECE_OF_SLIME.getId(), 20);
         }});
+        equipment.setBasicStat(StatType.MAXHP, 50);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.OWLBEAR_LEATHER_CHESTPLATE,
@@ -745,6 +746,7 @@ public class EquipCreator implements Creatable {
             put(ItemList.OWLBEAR_LEATHER.getId(), 20);
             put(ItemList.PIECE_OF_SLIME.getId(), 20);
         }});
+        equipment.setBasicStat(StatType.DEF, 15);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.OWLBEAR_LEATHER_LEGGINGS,
@@ -754,6 +756,7 @@ public class EquipCreator implements Creatable {
             put(ItemList.OWLBEAR_LEATHER.getId(), 20);
             put(ItemList.PIECE_OF_SLIME.getId(), 20);
         }});
+        equipment.setBasicStat(StatType.MDEF, 15);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.SHOES, EquipList.OWLBEAR_LEATHER_SHOES,
@@ -764,6 +767,7 @@ public class EquipCreator implements Creatable {
             put(ItemList.OWLBEAR_LEATHER.getId(), 20);
             put(ItemList.PIECE_OF_SLIME.getId(), 20);
         }});
+        equipment.setBasicStat(StatType.EVA, 30);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.HELMET, EquipList.HARDENED_SLIME_HELMET,
@@ -834,7 +838,7 @@ public class EquipCreator implements Creatable {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.HEART_GEM, EquipList.GOLEM_HEART_GEM,
-                null, "전투 시작 시 최대 체력의 66% 에 해당하는 방어막과 마법 방어막을 각각 생성합니다\n" +
+                null, "전투 시작 시 최대 체력의 80% 에 해당하는 방어막과 마법 방어막을 각각 생성합니다\n" +
                 "(최소 데미지 1은 계속 적용) (방어력 및 마법 방어력 무시)");
         equipment.setHandleLv(6);
         equipment.setLimitLv(50);
@@ -1027,7 +1031,85 @@ public class EquipCreator implements Creatable {
         equipment.setBasicStat(StatType.ATS, 10);
         Config.unloadObject(equipment);
 
-        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 232L));
+        equipment = new Equipment(EquipType.WEAPON, EquipList.MOON_SWORD,
+                null, "잃은 체력에 비례하여 가하는 모든 데미지가 증가한다(1% 당 1% 증가) (최대 35%)");
+        equipment.setHandleLv(8);
+        equipment.setBasicStat(StatType.ATK, 20);
+        equipment.setBasicStat(StatType.MATK, 20);
+        equipment.setBasicStat(StatType.ATS, 30);
+        equipment.setBasicStat(StatType.AGI, 20);
+        equipment.setBasicStat(StatType.DRA, 10);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.GEM, EquipList.MOON_GEM,
+                null, "월검을 장착하고 있을 시 월검의 패시브가 2배로 강화된다");
+        equipment.setHandleLv(8);
+        equipment.setBasicStat(StatType.MAXHP, 50);
+        equipment.setBasicStat(StatType.MAXMN, 20);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.HELMET, EquipList.LYCANTHROPE_HELMET, null,
+                "치명타 피격 시 체력이 높을수록 데미지를 감소하여 받는다(50% 부터 1% 당 1% 감소)");
+        equipment.setHandleLv(7);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.LYCANTHROPE_LEATHER.getId(), 50);
+            put(ItemList.MOON_STONE.getId(), 1);
+        }});
+        equipment.setBasicStat(StatType.MAXHP, 50);
+        equipment.setBasicStat(StatType.MAXMN, 5);
+        equipment.setBasicStat(StatType.DEF, 30);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.CHESTPLATE, EquipList.LYCANTHROPE_CHESTPLATE,
+                "[3 마나]\n잃은 체력에 비례하여 1분간 공격력과 마법 공격력을 증가시킨다(잃은 체력 1% 당 각각 1)",null);
+        equipment.setHandleLv(7);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.LYCANTHROPE_LEATHER.getId(), 50);
+            put(ItemList.MOON_STONE.getId(), 1);
+        }});
+        equipment.setBasicStat(StatType.MAXHP, 60);
+        equipment.setBasicStat(StatType.ATK, 10);
+        equipment.setBasicStat(StatType.MATK, 10);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.LEGGINGS, EquipList.LYCANTHROPE_LEGGINGS,
+                null, "치명타 데미지가 10% 증가한다");
+        equipment.setHandleLv(7);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.LYCANTHROPE_LEATHER.getId(), 50);
+            put(ItemList.MOON_STONE.getId(), 1);
+        }});
+        equipment.setBasicStat(StatType.MAXHP, 45);
+        equipment.setBasicStat(StatType.MAXMN, 5);
+        equipment.setBasicStat(StatType.AGI, 20);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.SHOES, EquipList.LYCANTHROPE_SHOES, null,
+                "회피 시 최대 체력의 10% 를 회복한다");
+        equipment.setHandleLv(7);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.LYCANTHROPE_LEATHER.getId(), 50);
+            put(ItemList.MOON_STONE.getId(), 1);
+        }});
+        equipment.setBasicStat(StatType.MAXHP, 70);
+        equipment.setBasicStat(StatType.EVA, 20);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.NECKLACE, EquipList.LYCANTHROPE_TOOTH_NECKLACE, null,
+                "모든 방어구가 라이칸스로프 방어구일 때 전투 승리 시 공격력과 마법 공격력을 영구적으로 0.1 상승시킨다(최대 30)");
+        equipment.setHandleLv(7);
+        equipment.addRecipe(new HashMap<Long, Integer>() {{
+            put(ItemList.LYCANTHROPE_TOOTH.getId(), 30);
+            put(ItemList.BRANCH.getId(), 30);
+            put(ItemList.WATER_GRASS.getId(), 30);
+            put(ItemList.HARDENED_SLIME.getId(), 50);
+        }});
+        equipment.setBasicStat(StatType.MAXHP, 30);
+        equipment.setBasicStat(StatType.ATK, 10);
+        equipment.setBasicStat(StatType.MATK, 10);
+        Config.unloadObject(equipment);
+
+        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 279L));
         Logger.i("ObjectMaker", "Equipment making is done!");
     }
 

@@ -17,6 +17,7 @@ import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object.BossList;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.enums.object.MapList;
 import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.manager.FarmManager;
@@ -835,6 +836,11 @@ public class ItemUses {
                         self.getItem(ItemList.LYCANTHROPE_SOUL.getId()) == 0) {
                     throw new WeirdCommandException("이 아이템을 사용하기 위한 준비물이 모두 모이지 않았습니다");
                 }
+                
+                GameMap map = Config.getMapData(self.getLocation());
+                if(!map.getLocation().equalsMap(MapList.ABANDONED_PLACE_OF_MOONLIGHT.getLocation())) {
+                    throw new WeirdCommandException("달빛의 힘이 부족합니다");
+                }
             }
 
             @NonNull
@@ -858,6 +864,8 @@ public class ItemUses {
                     } catch (Exception e) {
                         Logger.e("ItemUse.MOON_STONE", Config.errorString(e));
                     }
+
+                    Config.unloadObject(boss);
                 }).start();
 
                 return BossList.WOLF_OF_MOON.getDisplayName() + "를 소환했습니다!";

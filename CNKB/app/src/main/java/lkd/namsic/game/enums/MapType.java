@@ -23,7 +23,7 @@ public enum MapType {
     SEA("바다"),
     SINKHOLE("싱크홀 구역"),
     UNDERGROUND_CITY("지하도시"),
-    ABANDONED_CITY("폐허"),
+    ABANDONED_PLACE("폐허"),
     CORRUPTED_RIVER("오염된 강"),
     HUGE_CAVE("거대 동굴"),
     POISON_SWAMP("독안개 지역"),

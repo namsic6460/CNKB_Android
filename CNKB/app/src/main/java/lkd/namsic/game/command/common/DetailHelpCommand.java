@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.CommonCommand;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 
 public class DetailHelpCommand extends CommonCommand {
@@ -17,8 +18,9 @@ public class DetailHelpCommand extends CommonCommand {
                         "영어는 대소문자에 영향받지 않습니다\n" +
                         Emoji.focus("*") + " 이 붙은 명령어는 언제나 사용이 가능한 명령어입니다\n" +
                         "() : 필수 명령어, [] : 필수X 명령어, {} : 직접 입력\n" +
-                        "채팅방 링크 : https://open.kakao.com/o/gsPjUBnd\n",
-                "---전체 사용 가능 명령어---\n" +
+                        "채팅방 링크 : https://open.kakao.com/o/gsPjUBnd",
+                "[봇 버전 : " + Config.VERSION + "]\n\n" +
+                        "---전체 사용 가능 명령어---\n" +
                         Emoji.LIST + " *(도움말/명령어/?/h/help) : 도움말을 표시합니다\n\n" +
                         Emoji.LIST + " *(??/hh) : 상세 도움말을 표시합니다\n\n" +
                         Emoji.LIST + " (회원가입/가입/register) ({닉네임}) : 회원가입을 합니다\n\n" +

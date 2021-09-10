@@ -27,6 +27,7 @@ import lkd.namsic.game.command.common.DevCommand;
 import lkd.namsic.game.command.common.HelpCommand;
 import lkd.namsic.game.command.common.RuleCommand;
 import lkd.namsic.game.command.non_player.RegisterCommand;
+import lkd.namsic.game.command.player.debug.AnnounceCommand;
 import lkd.namsic.game.command.player.debug.CleanCommand;
 import lkd.namsic.game.command.player.debug.DoingCommand;
 import lkd.namsic.game.command.player.debug.EvalCommand;
@@ -74,8 +75,6 @@ import lkd.namsic.setting.Logger;
 
 public class KakaoTalk {
 
-    //TODO 공지 추가(개인톡 보낼지 말지도 선택 가능하도록)
-
     public final static Map<String, Notification.Action> groupSessions = new ConcurrentHashMap<>();
     public final static Map<String, Notification.Action> soloSessions = new ConcurrentHashMap<>();
     public final static Map<String, Notification.Action> replyAllSessions = new ConcurrentHashMap<>();
@@ -108,12 +107,13 @@ public class KakaoTalk {
 
     private static void registerPlayerCommands() {
         //Debug
-        registerPlayerCommand(new GiveCommand(),    "give");
-        registerPlayerCommand(new DoingCommand(),   "doing");
-        registerPlayerCommand(new SaveCommand(),    "save");
-        registerPlayerCommand(new EvalCommand(),    "eval");
-        registerPlayerCommand(new CleanCommand(),   "clean");
-        registerPlayerCommand(new SetStatCommand(), "set_stat");
+        registerPlayerCommand(new AnnounceCommand(),    "announce");
+        registerPlayerCommand(new GiveCommand(),        "give");
+        registerPlayerCommand(new DoingCommand(),       "doing");
+        registerPlayerCommand(new SaveCommand(),        "save");
+        registerPlayerCommand(new EvalCommand(),        "eval");
+        registerPlayerCommand(new CleanCommand(),       "clean");
+        registerPlayerCommand(new SetStatCommand(),     "set_stat");
 
         //Register
         registerPlayerCommand(new PlayerRegisterCommand(), "회원가입", "가입", "register");

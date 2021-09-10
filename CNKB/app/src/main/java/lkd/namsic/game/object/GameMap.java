@@ -66,7 +66,7 @@ public class GameMap {
 
     public GameMap(@NonNull MapList mapData) {
         this.name = mapData.getDisplayName();
-        this.location = new Location(mapData.getLocation());
+        this.location = new Location(mapData.getLocation().getX(), mapData.getLocation().getY(), true);
 
         this.entity.put(Id.PLAYER, new ConcurrentHashSet<>());
         this.entity.put(Id.MONSTER, new ConcurrentHashSet<>());

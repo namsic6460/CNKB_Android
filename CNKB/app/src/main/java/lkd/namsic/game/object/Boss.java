@@ -19,7 +19,11 @@ public class Boss extends Monster {
         super(bossData.getDisplayName(), bossData.getId());
         this.id.setId(Id.BOSS);
 
+        this.location = null;
         this.spawnMsg = Arrays.asList(spawnMsg);
     }
+
+    @Override
+    public void onKill(@NonNull Entity entity) {}
 
 }

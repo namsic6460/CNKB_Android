@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.CommonCommand;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 
 public class HelpCommand extends CommonCommand {
@@ -16,8 +17,9 @@ public class HelpCommand extends CommonCommand {
                         "모든 명령어는 앞쪽에 " + Emoji.focus("n") + " 또는 " + Emoji.focus("ㅜ") + " 를 붙여야합니다\n" +
                         "도움말에 표시되는 () 는 입력하지 않습니다.\n" +
                         "이곳에 없는 명령어는 상세 도움말로 확인해주세요\n" +
-                        "채팅방 링크 : https://open.kakao.com/o/gsPjUBnd\n",
-                "❓ ㅜ 도움말 -> 도움말을 표시합니다\n\n" +
+                        "채팅방 링크 : https://open.kakao.com/o/gsPjUBnd",
+                "[봇 버전 : " + Config.VERSION + "]\n\n" +
+                        "❓ ㅜ 도움말 -> 도움말을 표시합니다\n\n" +
                         "❓ ㅜ ?? -> 상세 도움말을 표시합니다\n\n" +
                         "\uD83D\uDC4B ㅜ 회원가입 (이름) -> 회원가입을 합니다\n\n" +
                         "\uD83D\uDCBB ㅜ 개발자 -> 개발자 정보를 표시합니다\n\n" +
@@ -62,7 +64,7 @@ public class HelpCommand extends CommonCommand {
                         "\uD83C\uDD99 ㅜ 강화 정보 -> 장착중인 장비들의 강화 상태를 표시합니다\n\n" +
                         "\uD83C\uDD99 ㅜ 강화 (장비 번호) -> 장비 인벤토리에서 확인한 번호로 장비를 강화합니다\n\n" +
                         "\uD83C\uDFEA ㅜ 상점 도움말 -> 상점 도움말을 표시합니다\n\n" +
-                        "\uD83C\uDFEA ㅜ 상점 목록 -> 이용 가능한 상점 목록을 표시합니다\n" +
+                        "\uD83C\uDFEA ㅜ 상점 목록 -> 이용 가능한 상점 목록을 표시합니다\n\n" +
                         "\uD83C\uDFEA ㅜ 상점 (Npc 이름) -> 상점을 이용합니다\n\n" +
                         "\uD83D\uDCCA ㅜ 랭킹 -> 레벨 랭킹을 표시합니다");
     }

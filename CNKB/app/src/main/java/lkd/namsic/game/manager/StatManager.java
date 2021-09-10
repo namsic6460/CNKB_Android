@@ -21,11 +21,18 @@ public class StatManager {
         int requiredSp = statType.getUseSp() * stat;
 
         if(statType.equals(StatType.AGI)) {
-            int maxRemainStat = Config.MAX_AGI - self.getStat(statType);
+            int maxRemainStat = Config.MAX_AGI - self.getBasicStat(statType);
 
             if(stat > maxRemainStat) {
-                throw new WeirdCommandException(StatType.AGI.getDisplayName() + " 스텟은 " +
-                        Config.MAX_AGI + "가 최대입니다\n증가 가능한 최대 스텟: " + maxRemainStat);
+                throw new WeirdCommandException("민첩 스텟은 " + Config.MAX_AGI +
+                        "가 최대입니다(순수 스텟)\n증가 가능한 최대 스텟: " + maxRemainStat);
+            }
+        } else if(statType.equals(StatType.DRA) || statType.equals(StatType.MDRA)) {
+            int maxRemainStat = Config.MAX_DRA - self.getBasicStat(statType);
+
+            if(stat > maxRemainStat) {
+                throw new WeirdCommandException(statType.getDisplayName() + " 스텟은 " + Config.MAX_AGI +
+                        "가 최대입니다(순수 스텟)\n증가 가능한 최대 스텟: " + maxRemainStat);
             }
         }
 

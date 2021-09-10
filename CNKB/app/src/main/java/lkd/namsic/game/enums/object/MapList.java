@@ -31,6 +31,7 @@ public enum MapList {
     OVERGROWN_FOREST("우거진 숲", 3, 1),
     OAK_MOUNTAIN("오크 산", 3, 2),
     SKY_HILL("하늘 언덕", 3, 3),
+    ABANDONED_PLACE_OF_MOONLIGHT("달빛의 폐허", 4, 0),
     ELF_FOREST("엘프의 숲", 4, 1);
 
     public static final Map<String, MapList> nameMap = new HashMap<>();
@@ -56,7 +57,7 @@ public enum MapList {
 
     MapList(@NonNull String displayName, int x, int y) {
         this.displayName = displayName;
-        this.location = new Location(x, y);
+        this.location = new Location(x, y, true);
     }
 
     @Nullable

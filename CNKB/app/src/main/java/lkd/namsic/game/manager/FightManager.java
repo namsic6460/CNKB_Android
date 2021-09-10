@@ -135,7 +135,7 @@ public class FightManager {
 
             Set<Long> set = map.getEntity(Id.MONSTER);
             int size = set.size();
-            if (size < index || index < 0) {
+            if (size < index) {
                 index -= size;
                 set = map.getEntity(Id.BOSS);
 
@@ -448,7 +448,7 @@ public class FightManager {
             Entity caster;
 
             List<Entity> targetList;
-            for (Map.Entry<Entity, List<Entity>> entry : new HashMap<>(this.castingMap).entrySet()) {
+            for (Map.Entry<Entity, List<Entity>> entry : this.castingMap.entrySet()) {
                 caster = entry.getKey();
                 waitTurn = caster.getVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN);
 
@@ -458,6 +458,9 @@ public class FightManager {
                     skillId = caster.getObjectVariable(Variable.FIGHT_CASTING_SKILL, SkillList.NONE.getId());
                     skill = Config.getData(Id.SKILL, skillId);
                     use = Objects.requireNonNull(skill.getSkillUse());
+
+                    caster.removeVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN);
+                    caster.removeVariable(Variable.FIGHT_CASTING_SKILL);
 
                     use.useSkill(caster, targetList);
 
@@ -475,11 +478,7 @@ public class FightManager {
                     Player.replyPlayersExcepts(playerSet, caster.getFightName() + is + skill.getName() +
                             " 의 캐스팅을 완료했습니다!", exceptSet);
 
-                    caster.removeVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN);
-                    caster.removeVariable(Variable.FIGHT_CASTING_SKILL);
-
                     List<Entity> castingList = this.castingMap.remove(caster);
-
                     if(castingList != null) {
                         List<Entity> castedList;
 
@@ -525,8 +524,6 @@ public class FightManager {
                 Player.replyPlayersExcepts(playerSet, entity.getFightName() + " (은/는) " +
                         killer.getFightName() + " 에 의해 사망했습니다", exceptSet);
 
-                entity.setKiller(null);
-
                 if (entity.equals(self)) {
                     Player.replyPlayersExcept(playerSet, "전투를 시작한 유저가 사망하여 전투가 종료되었습니다", self);
 
@@ -534,9 +531,11 @@ public class FightManager {
                         this.endFight(entity_);
                     }
 
+                    entity.setKiller(null);
                     return true;
                 } else {
                     this.endFight(entity);
+                    entity.setKiller(null);
                 }
             }
         }

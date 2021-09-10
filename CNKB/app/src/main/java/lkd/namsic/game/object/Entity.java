@@ -37,6 +37,7 @@ import lkd.namsic.game.event.Event;
 import lkd.namsic.game.event.MoneyChangeEvent;
 import lkd.namsic.game.event.PreDamageEvent;
 import lkd.namsic.game.event.PreDamagedEvent;
+import lkd.namsic.game.event.PreEvadeEvent;
 import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.UnhandledEnumException;
@@ -612,15 +613,23 @@ public abstract class Entity extends NamedObject {
             ((Monster) target).getAngryPlayers().add(this.id.getObjectId());
         }
 
-        boolean evade = false;
+        Bool evade = new Bool();
         if(canEvade) {
-            evade = random.nextInt(100) < Math.min(target.getStat(StatType.EVA) - this.getStat(StatType.ACC), Config.MAX_EVADE);
+            evade.set(random.nextInt(100) < Math.min(target.getStat(StatType.EVA) - this.getStat(StatType.ACC), Config.MAX_EVADE));
         }
 
-        if(!evade) {
+        Bool wrappedCrit = new Bool(canCrit);
+
+        String eventName = PreEvadeEvent.getName();
+        PreEvadeEvent.handleEvent(target, target.event.get(eventName), target.getEquipEvents(eventName),
+                this, physicDmg, magicDmg, staticDmg, evade, wrappedCrit);
+
+        canCrit = wrappedCrit.get();
+
+        if(!evade.get()) {
             lastAttackSuccess = true;
 
-            String eventName = PreDamageEvent.getName();
+            eventName = PreDamageEvent.getName();
             PreDamageEvent.handleEvent(this, this.event.get(eventName), this.getEquipEvents(eventName),
                     target, physicDmg, magicDmg, staticDmg, canCrit);
 

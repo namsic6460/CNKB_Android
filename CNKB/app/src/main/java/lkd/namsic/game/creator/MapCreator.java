@@ -114,6 +114,12 @@ public class MapCreator implements Creatable {
         map.setSpawnMonster(MonsterList.HARPY.getId(), 1, 4);
         Config.unloadMap(map);
 
+        map = new GameMap(MapList.ABANDONED_PLACE_OF_MOONLIGHT);
+        map.setMapType(MapType.ABANDONED_PLACE);
+        map.setRequireLv(160);
+        map.setSpawnMonster(MonsterList.LYCANTHROPE.getId(), 1, 8);
+        Config.unloadMap(map);
+
         map = new GameMap(MapList.ELF_FOREST);
         map.getLimitQuest().put(QuestList.HEALING_ELF2.getId(), 1);
         Config.unloadMap(map);
