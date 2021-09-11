@@ -1047,6 +1047,8 @@ public class EquipEvents {
                                 if(increased % 1 == 0) {
                                     self.addBasicStat(StatType.ATK, 1);
                                     self.addBasicStat(StatType.MATK, 1);
+
+                                    self.setVariable(Variable.LYCANTHROPE_TOOTH_NECKLACE_INCREASE, increased);
                                 }
                             }
                         }

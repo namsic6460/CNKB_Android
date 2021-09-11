@@ -77,7 +77,6 @@ public class KakaoTalk {
 
     public final static Map<String, Notification.Action> groupSessions = new ConcurrentHashMap<>();
     public final static Map<String, Notification.Action> soloSessions = new ConcurrentHashMap<>();
-    public final static Map<String, Notification.Action> replyAllSessions = new ConcurrentHashMap<>();
 
     private static String lastSender = "";
     private static String lastMsg = "";
@@ -184,17 +183,17 @@ public class KakaoTalk {
     public static void onChat(@NonNull final String sender, @NonNull final String image,
                               @NonNull final String msg, @NonNull final String room, final boolean isGroupChat,
                               @NonNull final Notification.Action session) {
-        if(isGroupChat) {
-            groupSessions.put(room, session);
-        } else {
-            soloSessions.put(room, session);
-        }
-
         boolean isCommand = msg.startsWith("N ") || msg.startsWith("n ") || msg.startsWith("ㅜ ");
         final String command = isCommand ? msg.substring(2) : null;
 
-        if(isCommand && isGroupChat) {
-            replyAllSessions.put(room, session);
+
+
+        if(isCommand) {
+            if(isGroupChat) {
+                groupSessions.put(room, session);
+            } else {
+                soloSessions.put(room, session);
+            }
         }
 
         Thread gameThread = new Thread(() -> {
@@ -358,7 +357,7 @@ public class KakaoTalk {
     }
 
     public static void replyAll(@NonNull String msg) {
-        for(Notification.Action session : replyAllSessions.values()) {
+        for(Notification.Action session : groupSessions.values()) {
             reply(session, msg);
         }
     }

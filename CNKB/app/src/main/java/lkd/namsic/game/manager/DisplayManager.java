@@ -660,7 +660,7 @@ public class DisplayManager {
                         .append(outputStr.get(index))
                         .append(": ")
                         .append(percent)
-                        .append("%");
+                        .append(".0%");
             }
         }
 

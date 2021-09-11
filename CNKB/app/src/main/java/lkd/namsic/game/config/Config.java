@@ -683,7 +683,7 @@ public class Config {
              throw new NumberRangeException(under, 0);
         }
 
-        String output = String.format(Locale.KOREA, "%f", percent);
+        String output = String.format(Locale.KOREA, "%f", percent * 100);
 
         String[] split = output.split("\\.");
         if(split.length == 2) {
