@@ -26,8 +26,8 @@ public class SkillCreator implements Creatable {
         
         createSkill(SkillList.LASER, "[10 마나] [1 턴]\n(마법 공격력 * 2.5) 에 해당하는 마법 데미지를 가한다", null);
         
-        createSkill(SkillList.SCAR, "[5 마나] [최대 3 대상]\n모든 대상에게 공격력의 10% 에 해당하는 고정 데미지를 3번 가한다\n" +
-                "만약 3번의 공격 중 치명타가 터졌다면 대상에게 3턴간 공격력의 20% 데미지를 주는 출혈을 일으킨다", null);
+        createSkill(SkillList.SCAR, "[5 마나] [최대 3 대상]\n모든 대상에게 공격력의 10% 에 해당하는 데미지를 3번 가한다\n" +
+                "만약 3번의 공격 중 치명타가 터졌다면 대상에게 3턴간 공격력의 20%의 고정 데미지를 주는 출혈을 일으킨다", null);
         
         createSkill(SkillList.CHARM, "[15 마나] [저항 가능]\n대상의 턴이 오면 턴을 강제로 빼앗고 " +
                 "해당 턴의 공격을 무조건 치명타로 만든다", null);

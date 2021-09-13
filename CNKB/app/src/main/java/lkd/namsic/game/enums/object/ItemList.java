@@ -112,8 +112,8 @@ public enum ItemList {
     PVP_DISABLE_1("전투 비활성화권(1일)", 94L),
     PVP_DISABLE_7("전투 비활성화권(7일)", 95L),
 
-    STAT_POINT("스텟 포인트", 96L),
-    ADV_STAT("모험 스텟", 97L),
+    STAT_POINT("스탯 포인트", 96L),
+    ADV_STAT("모험 스탯", 97L),
     LOW_RECIPE("하급 제작법", 98L),
     RECIPE("중급 제작법", 99L),
     HIGH_RECIPE("상급 제작법", 100L),

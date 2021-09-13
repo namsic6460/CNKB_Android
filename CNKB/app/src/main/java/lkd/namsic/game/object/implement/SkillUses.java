@@ -41,7 +41,7 @@ public class SkillUses {
             @Override
             public void useSkill(@NonNull Entity self, @NonNull List<Entity> targets) {
                 Entity target = Objects.requireNonNull(targets.get(0));
-                self.damage(target, 0, self.getBasicStat(StatType.MATK),
+                self.damage(target, 0, self.getStat(StatType.MATK),
                         5, false, false, true);
             }
         });
@@ -51,8 +51,8 @@ public class SkillUses {
             public void useSkill(@NonNull Entity self, @NonNull List<Entity> targets) {
                 Entity target = Objects.requireNonNull(targets.get(0));
 
-                int atk = self.getBasicStat(StatType.ATK);
-                int matk = self.getBasicStat(StatType.MATK);
+                int atk = self.getStat(StatType.ATK);
+                int matk = self.getStat(StatType.MATK);
                 self.damage(target, atk * 0.5, matk * 0.5, (atk + matk) * 0.1,
                         true, true, true);
             }
@@ -68,7 +68,7 @@ public class SkillUses {
             public void useSkill(@NonNull Entity self, @NonNull List<Entity> targets) {
                 Entity target = Objects.requireNonNull(targets.get(0));
 
-                self.damage(target, 0, self.getBasicStat(StatType.MATK) * 2.25, 0,
+                self.damage(target, 0, self.getStat(StatType.MATK) * 2.25, 0,
                         true, true, true);
             }
         });
@@ -81,8 +81,8 @@ public class SkillUses {
 
             @Override
             public void useSkill(@NonNull Entity self, @NonNull List<Entity> targets) {
-                int atk = self.getBasicStat(StatType.ATK);
-                int staticDmg = atk / 10;
+                int atk = self.getStat(StatType.ATK);
+                int physicDmg = atk / 10;
 
                 Player player;
                 int damage, drain, heal;
@@ -113,7 +113,7 @@ public class SkillUses {
                     }
 
                     for (int i = 0; i < attackCount; i++) {
-                        self.damage(target, 0, 0, staticDmg, true, true, false);
+                        self.damage(target, physicDmg, 0, 0, true, true, false);
 
                         damage += self.getLastDamage();
                         drain += self.getLastDrain();
@@ -147,7 +147,7 @@ public class SkillUses {
                         if(necklaceId != EquipList.NONE.getId()) {
                             Equipment necklace = Config.getData(Id.EQUIPMENT, necklaceId);
                             if(necklace.getOriginalId() == EquipList.HARPY_NAIL_NECKLACE.getId()) {
-                                bloodDamage *= 0.2;
+                                bloodDamage *= 1.2;
                             }
                         }
 
@@ -243,7 +243,7 @@ public class SkillUses {
 
                 int distance = Math.min(self.getFieldDistance(location), 20);
 
-                int physicDmg = (int) (0.12 * distance * self.getStat(StatType.ATK));
+                int physicDmg = (int) (0.08 * distance * self.getStat(StatType.ATK));
                 self.damage(target, physicDmg, 0, 0, true, false, true);
 
                 MoveManager.getInstance().setField(self, location.getFieldX(), location.getFieldY());

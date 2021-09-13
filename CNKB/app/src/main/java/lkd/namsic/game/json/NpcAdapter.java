@@ -38,7 +38,7 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
         JsonArray setArray;
 
         for(Map.Entry<ChatLimit, Set<Long>> entry : npc.getBaseChat().entrySet()) {
-            wrapArray = new JsonArray();
+            wrapArray = new JsonArray(2);
 
             chatLimitObject = gson.toJsonTree(entry.getKey()).getAsJsonObject();
             setArray = gson.toJsonTree(entry.getValue()).getAsJsonArray();
@@ -50,7 +50,7 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
         }
 
         for(Map.Entry<ChatLimit, Set<Long>> entry : npc.getChat().entrySet()) {
-            wrapArray = new JsonArray();
+            wrapArray = new JsonArray(2);
 
             chatLimitObject = gson.toJsonTree(entry.getKey()).getAsJsonObject();
             setArray = gson.toJsonTree(entry.getValue()).getAsJsonArray();
@@ -72,11 +72,8 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
     public Npc deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
-        JsonArray commonChatArray = jsonObject.getAsJsonArray("baseChat");
-        JsonArray chatArray = jsonObject.getAsJsonArray("chat");
-
-        jsonObject.add("baseChat", null);
-        jsonObject.add("chat", null);
+        JsonArray commonChatArray = jsonObject.remove("baseChat").getAsJsonArray();
+        JsonArray chatArray = jsonObject.remove("chat").getAsJsonArray();
 
         Npc npc = gson.fromJson(jsonObject, Npc.class);
 
@@ -97,8 +94,8 @@ public class NpcAdapter implements JsonSerializer<Npc>, JsonDeserializer<Npc> {
             chatLimitObject = wrapArray.get(0).getAsJsonObject();
             setArray = wrapArray.get(1).getAsJsonArray();
 
-            tempSet = gson.fromJson(setArray, HashSet.class);
             chatLimit = gson.fromJson(chatLimitObject, ChatLimit.class);
+            tempSet = gson.fromJson(setArray, HashSet.class);
 
             chatSet = new HashSet<>();
             for(Double chatId : tempSet) {

@@ -251,7 +251,7 @@ public class MoveManager {
             }
 
             this.setMap(self, location, true);
-            self.replyPlayer(moveMap.getName() + " (으)로 의 이동을 완료했습니다\n현재 좌표: " + self.getLocation().toString());
+            self.replyPlayer(moveMap.getName() + " (으/로) 의 이동을 완료했습니다\n현재 좌표: " + self.getLocation().toString());
 
             Config.unloadMap(moveMap);
         }

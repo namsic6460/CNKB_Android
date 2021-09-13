@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         Logger.saveLog();
 
         MainActivity.threadCleaner.cancel();
+        KakaoTalk.threadFlag.set(false);
 
         Config.IGNORE_FILE_LOG = true;
         Config.save();

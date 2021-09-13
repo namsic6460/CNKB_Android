@@ -27,6 +27,8 @@ public enum Variable {
     ADVENTURE_WAIT_TYPE,
     IS_APPRAISE_STOP,
     SHOP,
+    SHOP_ALL,
+    SHOP_SIMPLE,
     SHOP_ITEM_ID,
     SHOP_ITEM_COUNT,
     SHOP_PAGE,

@@ -326,7 +326,7 @@ public class ChatCreator implements Creatable {
                 "하하하 이제 이정도는 버틴다는 건가?",
                 "그래 좋군, 하지만 아직 부족하네",
                 "자네의 경험을 증명해 보게나",
-                "하급 모험의 증표 3개, 하급 낚시꾼의 증표 3개, 하급 광부의 증표 30개",
+                "하급 모험의 증표 1개, 하급 낚시꾼의 증표 3개, 하급 광부의 증표 30개",
                 "받아들이곘는가?"
         );
         chat.setResponseChat(WaitResponse.YES, 53L);

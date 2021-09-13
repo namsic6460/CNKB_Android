@@ -9,11 +9,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import lkd.namsic.game.command.PlayerCommand;
+import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
+import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Player;
 
 public class SettingCommand extends PlayerCommand {
@@ -89,6 +92,21 @@ public class SettingCommand extends PlayerCommand {
             }
 
             player.replyPlayer("이제 당신의 " + Emoji.focus(SkillList.CUTTING_MOONLIGHT.getDisplayName()) + "는 피아를 " + msg);
+        } else if(second.equals("거점") || second.equals("home")) {
+            GameMap map = Config.getMapData(player.getLocation());
+
+            if(third == null) {
+                if(!MapType.cityList().contains(map.getMapType())) {
+                    throw new WeirdCommandException("거점은 마을에서만 설정할 수 있습니다");
+                }
+
+                player.getBaseLocation().setMap(player.getLocation().getX(), player.getLocation().getY());
+                player.replyPlayer("거점이 " + map.getLocationName() + " 으로 설정되었습니다");
+            } else if(third.equals("확인") || third.equals("check")) {
+                player.replyPlayer("현재 거점은 " + map.getLocationName() + " 입니다");
+            } else {
+                throw new WeirdCommandException();
+            }
         }
     }
 

@@ -34,6 +34,10 @@ public class AdventureManager {
     }
 
     public void tryAdventure(@NonNull Player self) {
+        if(self.getTodayAdv() == Config.ADVENTURE_PER_DAY) {
+            throw new WeirdCommandException("일일 모험 횟수 제한(" + Config.ADVENTURE_PER_DAY + "회)에 도달하여 모험이 불가합니다");
+        }
+
         GameMap map = Config.getMapData(self.getLocation());
 
         MapType mapType = map.getMapType();

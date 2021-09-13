@@ -73,6 +73,11 @@ public class NotificationListener extends NotificationListenerService {
                         room = data.getString("android.summaryText");
                         sender = Objects.requireNonNull(data.getString("android.title"));
                         msg = String.valueOf(data.get("android.text"));
+
+                        if(sbn.getNotification().getLargeIcon() == null) {
+                            return;
+                        }
+
                         bitmap = ((BitmapDrawable) sbn.getNotification().getLargeIcon().loadDrawable(context)).getBitmap();
 
                         if(room == null) {

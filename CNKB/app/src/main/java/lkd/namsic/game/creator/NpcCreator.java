@@ -58,7 +58,7 @@ public class NpcCreator implements Creatable {
 
         chatLimit = new ChatLimit();
         chatLimit.getNotRunningQuest().add(QuestList.TOO_STRONG_FIRE.getId());
-        chatLimit.getLimitQuest().addMax(QuestList.TOO_STRONG_FIRE.getId(), 1);
+        chatLimit.getLimitQuest().addMax(QuestList.TOO_STRONG_FIRE.getId(), 0);
         chatLimit.getLimitQuest().addMin(QuestList.NEED_FIRE.getId(), 1);
         npc.setChat(chatLimit, 20L);
 
@@ -255,7 +255,7 @@ public class NpcCreator implements Creatable {
         chatLimit = new ChatLimit();
         chatLimit.getLimitLv().set(11, Config.MAX_LV);
         chatLimit.getNotRunningQuest().add(QuestList.PROVE_EXPERIENCE.getId());
-        chatLimit.getLimitQuest().addMin(QuestList.PROVE_EXPERIENCE.getId(), 0);
+        chatLimit.getLimitQuest().addMax(QuestList.PROVE_EXPERIENCE.getId(), 0);
         npc.setChat(chatLimit, 52L);
 
         chatLimit = new ChatLimit();

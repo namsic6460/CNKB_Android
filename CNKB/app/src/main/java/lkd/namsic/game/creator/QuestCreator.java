@@ -41,7 +41,7 @@ public class QuestCreator implements Creatable {
         Config.unloadObject(quest);
 
         quest = new Quest(QuestList.PROVE_EXPERIENCE, NpcList.MOO_MYEONG.getId(), 55L);
-        quest.setNeedItem(ItemList.LOW_ADV_TOKEN.getId(), 3);
+        quest.setNeedItem(ItemList.LOW_ADV_TOKEN.getId(), 1);
         quest.setNeedItem(ItemList.LOW_FISH_TOKEN.getId(), 3);
         quest.setNeedItem(ItemList.LOW_MINER_TOKEN.getId(), 30);
         quest.setRewardCloseRate(NpcList.MOO_MYEONG.getId(), 10);

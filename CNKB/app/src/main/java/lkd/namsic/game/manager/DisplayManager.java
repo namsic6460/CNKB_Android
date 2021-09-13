@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,8 +30,11 @@ import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.object.Boss;
+import lkd.namsic.game.object.Equipment;
 import lkd.namsic.game.object.Farm;
 import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Item;
 import lkd.namsic.game.object.Monster;
 import lkd.namsic.game.object.Npc;
 import lkd.namsic.game.object.Player;
@@ -73,13 +78,11 @@ public class DisplayManager {
                         Emoji.GOLD + " 골드: " + target.getMoney() + "G\n" +
                         Emoji.HEART + " 체력: " + target.getDisplayHp() + "\n" +
                         Emoji.MANA + " 마나: " + target.getDisplayMn() + "\n" +
-                        Emoji.WORLD + " 위치: " + Config.getMapData(target.getLocation()).getName() +
-                        "(" + target.getLocation().toString() + ")\n" +
+                        Emoji.WORLD + " 위치: " + Config.getMapData(target.getLocation()).getLocationName(true) + "\n" +
                         Emoji.LV + " 레벨: " + target.getDisplayLv() + "\n" +
                         Emoji.SP + " 스텟 포인트: " + target.getSp() + "\n" +
                         Emoji.ADV + " 모험 포인트: " + target.getAdv() + "\n" +
-                        Emoji.HOME + " 거점: " + Config.getMapData(target.getBaseLocation()).getName() +
-                        "(" + target.getBaseLocation().toString() + ")",
+                        Emoji.HOME + " 거점: " + Config.getMapData(target.getBaseLocation()).getLocationName(),
                 innerMsg.toString());
     }
 
@@ -219,10 +222,8 @@ public class DisplayManager {
                     }
 
                     builder.append("\n")
-                            .append(map.getName())
-                            .append(" (")
-                            .append(map.getLocation().toMapString())
-                            .append(") [Lv ")
+                            .append(map.getLocationName())
+                            .append(" [Lv ")
                             .append(map.getRequireLv())
                             .append("] (거리: ")
                             .append(distance)
@@ -472,7 +473,9 @@ public class DisplayManager {
                 Emoji.LIST + " (다음/next/n) - 다음 페이지의 상점 물품을 표시합니다\n" +
                 Emoji.LIST + " (이전/prev/p) - 이전 페이지의 상점 물품을 표시합니다\n" +
                 Emoji.LIST + " (구매/buy/b) ({아이템 이름}) [{아이템 개수}] - 아이템을 구매합니다\n" +
-                Emoji.LIST + " (판매/sell/s) ({아이템 이름}) [{아이템 개수}] - 아이템을 판매합니다\n\n" +
+                Emoji.LIST + " (판매/sell/s) ({아이템 이름}) [{아이템 개수}] - 아이템을 판매합니다(-1개 입력 시 전체 판매)\n\n" +
+                Emoji.LIST + " (판매/sell/s) (전체/all) - 판매 가능한 모든 아이템을 판매합니다\n\n" +
+                Emoji.LIST + " (판매/sell/s) ({단축어}) - 단축어에 지정된 모든 아이템을 판매합니다\n\n" +
                 "예시: " + Emoji.focus("n 상점 구매 하급 체력 포션 1"));
     }
 
@@ -515,6 +518,8 @@ public class DisplayManager {
     }
 
     public void displayFarm(@NonNull Player self) {
+        FarmManager.getInstance().checkFarm(self);
+
         Farm farm = Config.loadObject(Id.FARM, self.getId().getObjectId());
 
         StringBuilder innerBuilder = new StringBuilder("---")
@@ -703,10 +708,7 @@ public class DisplayManager {
                 .append("기준 레벨: ")
                 .append(monster.getLv())
                 .append("\n서식지: ")
-                .append(map.getName())
-                .append("(")
-                .append(map.getLocation().toMapString())
-                .append(")")
+                .append(map.getLocationName())
                 .append("\n\n---기본 스텟---");
 
         for(StatType statType : StatType.values()) {
@@ -750,6 +752,177 @@ public class DisplayManager {
         }
         
         self.replyPlayer("몬스터 정보는 전체보기로 확인해주세요", innerBuilder.toString());
+    }
+    
+    public void displayMap(@NonNull Player self) {
+        GameMap map = Config.getMapData(self.getLocation());
+
+        StringBuilder innerBuilder = new StringBuilder("---플레이어 목록---");
+
+        Set<Long> playerSet = map.getEntity(Id.PLAYER);
+        if(playerSet.isEmpty()) {
+            innerBuilder.append("\n플레이어 없음");
+        } else {
+            Player player;
+
+            for (long playerId : new HashSet<>(playerSet)) {
+                player = Config.getData(Id.PLAYER, playerId);
+
+                if(player.getLv() < Config.MIN_RANK_LV && !player.equals(self)) {
+                    continue;
+                }
+
+                innerBuilder.append("\n[");
+
+                if(FightManager.getInstance().fightId.containsKey(player.getId())) {
+                    innerBuilder.append("F] [");
+                }
+
+                innerBuilder.append(player.getLocation().toFieldString())
+                        .append("] ")
+                        .append(player.getName());
+            }
+        }
+
+        innerBuilder.append("\n\n---NPC 목록---");
+
+        Set<Long> npcSet = map.getEntity(Id.NPC);
+        npcSet.remove(NpcList.SECRET.getId());
+        npcSet.remove(NpcList.ABEL.getId());
+
+        if(npcSet.isEmpty()) {
+            innerBuilder.append("\nNPC 없음");
+        } else {
+            Npc npc;
+
+            for(long npcId : new HashSet<>(npcSet)) {
+                npc = Config.getData(Id.NPC, npcId);
+                innerBuilder.append("\n[")
+                        .append(npc.getLocation().toFieldString())
+                        .append("] ")
+                        .append(npc.getName());
+            }
+        }
+
+        innerBuilder.append("\n\n---떨어진 골드---");
+
+        if(map.getMoney().isEmpty()) {
+            innerBuilder.append("\n떨어진 골드 없음");
+        } else {
+            for (Map.Entry<Location, Long> entry : new HashMap<>(map.getMoney()).entrySet()) {
+                innerBuilder.append("\n[")
+                        .append(entry.getKey().toFieldString())
+                        .append("] ")
+                        .append(entry.getValue())
+                        .append("G");
+            }
+        }
+
+        int index = 1;
+
+        innerBuilder.append("\n\n---몬스터 목록---");
+
+        List<Long> monsterList = new ArrayList<>(map.getEntity(Id.MONSTER));
+        Collections.sort(monsterList);
+
+        if(monsterList.isEmpty()) {
+            innerBuilder.append("\n몬스터 없음");
+        } else {
+            Monster monster;
+            Set<Long> removeSet = new HashSet<>();
+
+            for(long monsterId : monsterList) {
+                try {
+                    monster = Config.getData(Id.MONSTER, monsterId);
+                } catch (ObjectNotFoundException e) {
+                    removeSet.add(monsterId);
+                    continue;
+                }
+
+                innerBuilder.append("\n")
+                        .append(index++)
+                        .append(". [");
+
+                if(FightManager.getInstance().fightId.containsKey(monster.getId())) {
+                    innerBuilder.append("F] [");
+                }
+
+                innerBuilder.append(monster.getLocation().toFieldString())
+                        .append("] ")
+                        .append(monster.getName());
+            }
+
+            map.getEntity(Id.MONSTER).removeAll(removeSet);
+        }
+
+        innerBuilder.append("\n\n---보스 목록---");
+
+        Set<Long> bossSet = map.getEntity(Id.BOSS);
+        if(bossSet.isEmpty()) {
+            innerBuilder.append("\n보스 없음");
+        } else {
+            Boss boss;
+
+            for(long bossId : new HashSet<>(bossSet)) {
+                boss = Config.getData(Id.BOSS, bossId);
+                innerBuilder.append("\n")
+                        .append(index++)
+                        .append(". [");
+
+                if(FightManager.getInstance().fightId.containsKey(boss.getId())) {
+                    innerBuilder.append("F] [");
+                }
+
+                innerBuilder.append(boss.getLocation().toFieldString())
+                        .append("] ")
+                        .append(boss.getName());
+            }
+        }
+
+        innerBuilder.append("\n\n---떨어진 아이템---");
+
+        if(map.getItem().isEmpty()) {
+            innerBuilder.append("\n떨어진 아이템 없음");
+        } else {
+            Item item;
+            String locationStr;
+            for (Map.Entry<Location, Map<Long, Integer>> entry : new HashMap<>(map.getItem()).entrySet()) {
+                locationStr = "\n[" + entry.getKey().toFieldString() + "] ";
+
+                for(Map.Entry<Long, Integer> itemEntry : entry.getValue().entrySet()) {
+                    item = Config.getData(Id.ITEM, itemEntry.getKey());
+                    innerBuilder.append(locationStr)
+                            .append(item.getName())
+                            .append(" ")
+                            .append(itemEntry.getValue())
+                            .append("개");
+                }
+            }
+        }
+
+        innerBuilder.append("\n\n---떨어진 장비---");
+
+        if(map.getEquip().isEmpty()) {
+            innerBuilder.append("\n떨어진 장비 없음");
+        } else {
+            Equipment equipment;
+            String locationStr;
+            for (Map.Entry<Location, Set<Long>> entry : new HashMap<>(map.getEquip()).entrySet()) {
+                locationStr = "\n[" + entry.getKey().toFieldString() + "] ";
+
+                for(long equipId : entry.getValue()) {
+                    equipment = Config.getData(Id.EQUIPMENT, equipId);
+                    innerBuilder.append(locationStr)
+                            .append(equipment.getName());
+                }
+            }
+        }
+
+        self.replyPlayer(map.getName() + "(요구 레벨: " + map.getRequireLv() + ") [" + map.getMapType().getMapName() + "]\n" +
+                Emoji.WORLD + ": " + map.getLocation().toMapString() + "\n" +
+                Emoji.MONSTER + ": " + map.getEntity(Id.MONSTER).size() + ", " +
+                Emoji.BOSS + ": " + map.getEntity(Id.BOSS).size(),
+                innerBuilder.toString());
     }
 
 }

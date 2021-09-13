@@ -110,9 +110,6 @@ public class Player extends Entity {
         }
     }
 
-    @NonNull
-    final LocalDateTime created = LocalDateTime.now();
-
     private int newDayCount = 0;
 
     @NonNull
@@ -147,6 +144,9 @@ public class Player extends Entity {
 
     @Setter
     int adv = 0;
+
+    @Setter
+    int todayAdv = 0;
 
     @Setter
     long exp = 0;
@@ -263,6 +263,7 @@ public class Player extends Entity {
         if(day != this.lastDay || year != this.lastYear) {
             this.lastDay = day;
             this.lastYear = year;
+            this.todayAdv = 0;
             this.newDay();
         }
     }
@@ -433,6 +434,10 @@ public class Player extends Entity {
 
     public void lvUp(long needExp) {
         Config.PLAYER_LV_RANK.remove(this.getName());
+
+        if(this.lv < 100) {
+            this.addMoney(10000);
+        }
 
         this.lv += 1;
         this.sp += 5;
@@ -959,6 +964,10 @@ public class Player extends Entity {
     @Override
     public void onKill(@NonNull Entity entity) {
         long killExp = this.getKillExp(entity.lv);
+        if(entity.getId().getId().equals(Id.BOSS)) {
+            killExp *= 5;
+        }
+
         this.addExp(killExp);
 
         String msg = entity.getName() + "을 ";

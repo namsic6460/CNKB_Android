@@ -30,6 +30,7 @@ import lkd.namsic.game.base.IdClass;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
@@ -37,6 +38,7 @@ import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.json.ChatLimitAdapter;
 import lkd.namsic.game.json.LocationAdapter;
 import lkd.namsic.game.json.NpcAdapter;
+import lkd.namsic.game.json.ShopAdapter;
 import lkd.namsic.game.object.Achieve;
 import lkd.namsic.game.object.AiEntity;
 import lkd.namsic.game.object.Boss;
@@ -59,10 +61,11 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 3.0;
+    public static final double VERSION = 3.02;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
+            .registerTypeAdapter(Shop.class, new ShopAdapter())
             .registerTypeAdapter(Location.class, new LocationAdapter())
             .registerTypeAdapter(ChatLimit.class, new ChatLimitAdapter())
             .setVersion(VERSION)
@@ -144,6 +147,7 @@ public class Config {
     public static final long FISH_DELAY_TIME_OFFSET = 3000;
     public static final long FISH_WAIT_TIME = 5000;
     public static final long FIGHT_WAIT_TIME = 30000;
+    public static final int ADVENTURE_PER_DAY = 100;
     public static final int ADVENTURE_COUNT = 5;
     public static final int ADVENTURE_DELAY_TIME = 5000;
     public static final long ADVENTURE_WAIT_TIME = 30000;
@@ -360,6 +364,10 @@ public class Config {
     }
 
     public synchronized static void unloadObject(@NonNull GameObject gameObject) {
+        unloadObject(gameObject, true);
+    }
+
+    public synchronized static void unloadObject(@NonNull GameObject gameObject, boolean save) {
         Id id = gameObject.getId().getId();
         long objectId = gameObject.getId().getObjectId();
 
@@ -370,18 +378,28 @@ public class Config {
         if(objectCount > 1) {
             OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
         } else {
-            String jsonString = toJson(gameObject);
+            String jsonString = null;
+            String path = null;
 
-            String path = "";
-            if(id.equals(Id.PLAYER)) {
-                if(DISCARD_LIST.contains(objectId)) {
-                    discardFlag = true;
+            boolean delete = DELETE_LIST.get(id).contains(objectId);
+
+            if(!save && delete) {
+                throw new RuntimeException("Save is false and Delete is true - [" + id + ", " + objectId + "]");
+            }
+
+            if(save) {
+                jsonString = toJson(gameObject);
+
+                if(id.equals(Id.PLAYER)) {
+                    if(DISCARD_LIST.contains(objectId)) {
+                        discardFlag = true;
+                    } else {
+                        Player player = (Player) gameObject;
+                        path = getPlayerPath(player.getSender(), player.getImage());
+                    }
                 } else {
-                    Player player = (Player) gameObject;
-                    path = getPlayerPath(player.getSender(), player.getImage());
+                    path = getPath(id, objectId);
                 }
-            } else {
-                path = getPath(id, objectId);
             }
 
             if(!discardFlag) {
@@ -389,9 +407,11 @@ public class Config {
                     OBJECT.get(id).remove(objectId);
                     OBJECT_COUNT.get(id).remove(objectId);
 
-                    Logger.i("FileManager", "Object unloaded - [" + id + ", " + objectId + "]");
+                    if(save) {
+                        Logger.i("FileManager", "Object unloaded - [" + id + ", " + objectId + "]");
+                    }
 
-                    if (DELETE_LIST.get(id).contains(objectId)) {
+                    if (delete) {
                         FileManager.delete(path);
                         DELETE_LIST.get(id).remove(objectId);
                         return;
@@ -422,7 +442,9 @@ public class Config {
                     Config.saveConfig();
                 }
 
-                FileManager.save(path, jsonString);
+                if(save) {
+                    FileManager.save(path, jsonString);
+                }
             } else if(objectCount == 1) {
                 DISCARD_LIST.remove(objectId);
             }
@@ -442,6 +464,10 @@ public class Config {
     }
 
     public synchronized static void unloadMap(@NonNull GameMap map) {
+        unloadMap(map, true);
+    }
+
+    public synchronized static void unloadMap(@NonNull GameMap map, boolean save) {
         String fileName = getMapFileName(map);
         Long mapCount = MAP_COUNT.get(fileName);
         mapCount = mapCount == null ? 0 : mapCount;
@@ -449,15 +475,17 @@ public class Config {
         if(mapCount > 1) {
             MAP_COUNT.put(fileName, mapCount - 1);
         } else {
-            String jsonString = toJson(map);
-            String path = getMapPath(fileName);
+            if(save) {
+                String jsonString = toJson(map);
+                String path = getMapPath(fileName);
+
+                FileManager.save(path, jsonString);
+            }
 
             if(mapCount == 1) {
                 MAP.remove(fileName);
                 MAP_COUNT.remove(fileName);
             }
-
-            FileManager.save(path, jsonString);
         }
     }
 
@@ -617,7 +645,7 @@ public class Config {
     @NonNull
     public synchronized static <T extends GameObject> T getData(@NonNull Id id, long objectId) {
         T t = loadObject(id, objectId);
-        unloadObject(t);
+        unloadObject(t, false);
 
         return t;
     }
@@ -629,7 +657,7 @@ public class Config {
     @NonNull
     public synchronized static GameMap getMapData(int x, int y) {
         GameMap map = loadMap(x, y);
-        unloadMap(map);
+        unloadMap(map, false);
 
         return map;
     }
@@ -767,6 +795,12 @@ public class Config {
             output.append("   ");
         }
 
+        if(percent != 10) {
+            for (double i = 1; i > percent % 1; i -= 0.3) {
+                output.append(" ");
+            }
+        }
+
         return output.toString() + "] (" + value + "/" + maxValue + ")";
     }
 
@@ -882,32 +916,9 @@ public class Config {
         if(entity.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) entity;
 
-            if(player.getVersion() < 2.46) {
-                player.addMoney(100_000);
-
-                long objectId = player.getId().getObjectId();
-
-                if(objectId == 8) {
-                    player.addTitle("결투가");
-                    player.setCurrentTitle("결투가");
-                }
-
-                if(objectId == 8 || objectId == 6 || objectId == 25 || objectId == 9 || objectId == 58) {
-                    player.addItem(ItemList.LOW_RECIPE.getId(), 100, false);
-                    player.addItem(ItemList.REINFORCE_MULTIPLIER.getId(), 10, false);
-                    player.addItem(ItemList.LOW_REINFORCE_STONE.getId(), 20, false);
-                    player.addItem(ItemList.REINFORCE_STONE.getId(), 5, false);
-                    player.addItem(ItemList.HIGH_ELIXIR.getId(), 10, false);
-
-                    if (objectId == 8) {
-                        player.addMoney(150_000);
-                    } else if(objectId == 6) {
-                        player.addMoney(100_000);
-                    } else if(objectId == 25) {
-                        player.addMoney(80_000);
-                    } else if(objectId == 9) {
-                        player.addMoney(50_000);
-                    }
+            if(player.getVersion() < 3.01) {
+                if(player.getLv() < 100) {
+                    player.addMoney(5000 * (player.getLv() - 1));
                 }
             }
 

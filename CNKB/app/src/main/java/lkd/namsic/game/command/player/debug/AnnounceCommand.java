@@ -40,7 +40,7 @@ public class AnnounceCommand extends PlayerCommand {
                     KakaoTalk.reply(replySession, msg);
                 }
             } else {
-                KakaoTalk.replyAll(msg.trim());
+                KakaoTalk.replyAll(msg);
             }
 
             KakaoTalk.reply(session, "Success");

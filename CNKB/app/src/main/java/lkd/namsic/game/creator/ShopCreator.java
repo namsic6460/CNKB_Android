@@ -1,6 +1,10 @@
 package lkd.namsic.game.creator;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.object.ItemList;
@@ -13,6 +17,7 @@ public class ShopCreator implements Creatable {
     @Override
     public void start() {
         Shop shop;
+        Set<Long> idSet;
 
 
         shop = new Shop(NpcList.NOAH);
@@ -33,6 +38,18 @@ public class ShopCreator implements Creatable {
         shop.addBuyItem(ItemList.OAK_TOOTH, 200L);
         shop.addBuyItem(ItemList.OAK_LEATHER, 175L);
         shop.addBuyItem(ItemList.PIECE_OF_BONE, 30L);
+
+        idSet = new HashSet<>(Arrays.asList(ItemList.SHEEP_LEATHER.getId(), ItemList.WOOL.getId()));
+        shop.addSimpleMap(idSet, "양", "sheep");
+
+        idSet = new HashSet<>(Arrays.asList(ItemList.ZOMBIE_HEAD.getId(), ItemList.ZOMBIE_SOUL.getId(), ItemList.ZOMBIE_HEART.getId()));
+        shop.addSimpleMap(idSet, "좀비", "zombie");
+
+        idSet = new HashSet<>(Arrays.asList(ItemList.SPIDER_LEG.getId(), ItemList.SPIDER_EYE.getId()));
+        shop.addSimpleMap(idSet, "거미", "spider");
+
+        idSet = new HashSet<>(Arrays.asList(ItemList.OAK_TOOTH.getId(), ItemList.OAK_LEATHER.getId()));
+        shop.addSimpleMap(idSet, "오크", "oak");
 
         Config.unloadObject(shop);
 
@@ -93,34 +110,67 @@ public class ShopCreator implements Creatable {
         shop.addBuyItem(ItemList.GOLD, 100L);
         shop.addBuyItem(ItemList.WHITE_GOLD, 500L);
 
+        idSet = Arrays.stream(Config.GEMS).map(ItemList::getId).collect(Collectors.toSet());
+        shop.addSimpleMap(idSet, "감정", "appraise", "apr");
+
+        idSet = new HashSet<>(idSet);
+        idSet.remove(ItemList.QUARTZ.getId());
+        idSet.remove(ItemList.GOLD.getId());
+        idSet.remove(ItemList.WHITE_GOLD.getId());
+        shop.addSimpleMap(idSet, "보석", "gem");
+
         Config.unloadObject(shop);
 
 
         shop = new Shop(NpcList.JOON_SIK);
 
+        idSet = new HashSet<>();
         for(long itemId = ItemList.COMMON_FISH1.getId(); itemId <= ItemList.COMMON_FISH5.getId(); itemId++) {
-            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 35L);
+            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 50L);
+            idSet.add(itemId);
         }
 
+        shop.addSimpleMap(idSet, "일반", "common");
+
+        idSet = new HashSet<>();
         for(long itemId = ItemList.RARE_FISH1.getId(); itemId <= ItemList.RARE_FISH6.getId(); itemId++) {
-            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 70L);
+            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 100L);
+            idSet.add(itemId);
         }
 
+        shop.addSimpleMap(idSet, "희귀", "rare");
+
+        idSet = new HashSet<>();
         for(long itemId = ItemList.SPECIAL_FISH1.getId(); itemId <= ItemList.SPECIAL_FISH10.getId(); itemId++) {
-            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 180L);
+            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 220L);
+            idSet.add(itemId);
         }
 
+        shop.addSimpleMap(idSet, "특별", "special");
+
+        idSet = new HashSet<>();
         for(long itemId = ItemList.UNIQUE_FISH1.getId(); itemId <= ItemList.UNIQUE_FISH7.getId(); itemId++) {
-            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 350L);
+            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 500L);
+            idSet.add(itemId);
         }
 
+        shop.addSimpleMap(idSet, "유일", "unique");
+
+        idSet = new HashSet<>();
         for(long itemId = ItemList.LEGENDARY_FISH1.getId(); itemId <= ItemList.LEGENDARY_FISH4.getId(); itemId++) {
-            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 700L);
+            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 1000L);
+            idSet.add(itemId);
         }
 
+        shop.addSimpleMap(idSet, "전설", "legendary", "legend");
+
+        idSet = new HashSet<>();
         for(long itemId = ItemList.MYSTIC_FISH1.getId(); itemId <= ItemList.MYSTIC_FISH2.getId(); itemId++) {
-            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 2000L);
+            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 10000L);
+            idSet.add(itemId);
         }
+
+        shop.addSimpleMap(idSet, "신화", "mystic");
 
         Config.unloadObject(shop);
 
@@ -135,9 +185,13 @@ public class ShopCreator implements Creatable {
         shop.addSellItem(ItemList.SKILL_BOOK_SMITE, 3000L);
         shop.addSellItem(ItemList.SKILL_BOOK_LASER, 10000L);
 
+        idSet = new HashSet<>();
         for(long itemId = ItemList.RED_SPHERE.getId(); itemId <= ItemList.WHITE_SPHERE.getId(); itemId++) {
             shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 90L);
+            idSet.add(itemId);
         }
+
+        shop.addSimpleMap(idSet, "구체", "sphere");
 
         Config.unloadObject(shop);
 
@@ -159,20 +213,40 @@ public class ShopCreator implements Creatable {
         shop.addBuyItem(ItemList.OWLBEAR_HEAD, 800L);
         shop.addBuyItem(ItemList.HARDENED_SLIME, 500L);
 
+        idSet = new HashSet<>();
+        idSet.add(ItemList.HORN_OF_IMP.getId());
+        idSet.add(ItemList.IMP_HEART.getId());
+        shop.addSimpleMap(idSet, "임프", "imp");
+
+        idSet = new HashSet<>();
+        idSet.add(ItemList.HORN_OF_LOW_DEVIL.getId());
+        idSet.add(ItemList.LOW_DEVIL_SOUL.getId());
+        shop.addSimpleMap(idSet, "하급 악마", "low devil");
+
+        idSet = new HashSet<>();
+        idSet.add(ItemList.HARPY_WING.getId());
+        idSet.add(ItemList.HARPY_NAIL.getId());
+        shop.addSimpleMap(idSet, "하피", "harpy");
+
+        idSet = new HashSet<>();
+        idSet.add(ItemList.OWLBEAR_LEATHER.getId());
+        idSet.add(ItemList.OWLBEAR_HEAD.getId());
+        shop.addSimpleMap(idSet, "아울베어", "owlbear");
+
         Config.unloadObject(shop);
 
 
         shop = new Shop(NpcList.FREY);
-
-        shop.addBuyItem(ItemList.HERB, 1L);
-        shop.addBuyItem(ItemList.LEAF, 1L);
-        shop.addBuyItem(ItemList.ELIXIR_HERB, 15L);
 
         shop.addSellItem(ItemList.ELIXIR_HERB, 22L);
         shop.addSellItem(ItemList.SMALL_PURIFYING_SEED, 10000L);
         shop.addSellItem(ItemList.PURIFYING_SEED, 100_000L);
         shop.addSellItem(ItemList.BIG_PURIFYING_SEED, 1_500_000L);
         shop.addSellItem(ItemList.FARM_EXPAND_DEED, 50000L);
+
+        shop.addBuyItem(ItemList.HERB, 1L);
+        shop.addBuyItem(ItemList.LEAF, 1L);
+        shop.addBuyItem(ItemList.ELIXIR_HERB, 15L);
 
         Config.unloadObject(shop);
 

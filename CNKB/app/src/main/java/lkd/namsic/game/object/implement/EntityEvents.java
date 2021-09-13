@@ -134,7 +134,7 @@ public class EntityEvents {
 
                 if(scarBlood > 0) {
                     Entity attacker = Objects.requireNonNull(self.getObjectVariable(Variable.SCAR_ENTITY));
-                    attacker.damage(self, scarBloodDmg, 0, 0, false, false, false);
+                    attacker.damage(self, 0, 0, scarBloodDmg, false, false, false);
 
                     scarBlood--;
                     if(scarBlood == 0) {
@@ -481,6 +481,7 @@ public class EntityEvents {
 
                     boss.addBasicStat(StatType.MAXHP, maxHp / 8);
                     boss.addBasicStat(StatType.ATK, -50);
+                    boss.addBasicStat(StatType.ATS, 150);
                     boss.addBasicStat(StatType.DEF, 100);
                     boss.addBasicStat(StatType.EVA, 100);
 
@@ -507,9 +508,9 @@ public class EntityEvents {
                 if(maxHp * 0.3 >= hp) {
                     Boss boss = (Boss) self;
 
-                    boss.addBasicStat(StatType.MAXHP, maxHp / 5);
-                    boss.addBasicStat(StatType.ATK, 150);
-                    boss.addBasicStat(StatType.ATS, 100);
+                    boss.addBasicStat(StatType.HP, maxHp / 5);
+                    boss.addBasicStat(StatType.ATK, 200);
+                    boss.addBasicStat(StatType.ATS, 150);
                     boss.addBasicStat(StatType.BRE, 100);
                     boss.addBasicStat(StatType.DRA, 25);
 

@@ -1109,6 +1109,26 @@ public class EquipCreator implements Creatable {
         equipment.setBasicStat(StatType.MATK, 10);
         Config.unloadObject(equipment);
 
+        equipment = new Equipment(EquipType.HELMET, EquipList.BASIC_HELMET, null, null);
+        equipment.setBasicStat(StatType.MAXHP, 5);
+        equipment.setBasicStat(StatType.DEF, 1);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.CHESTPLATE, EquipList.BASIC_CHESTPLATE, null, null);
+        equipment.setBasicStat(StatType.MAXHP, 5);
+        equipment.setBasicStat(StatType.DEF, 1);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.LEGGINGS, EquipList.BASIC_LEGGINGS, null, null);
+        equipment.setBasicStat(StatType.MAXHP, 5);
+        equipment.setBasicStat(StatType.DEF, 1);
+        Config.unloadObject(equipment);
+
+        equipment = new Equipment(EquipType.SHOES, EquipList.BASIC_SHOES, null, null);
+        equipment.setBasicStat(StatType.MAXHP, 5);
+        equipment.setBasicStat(StatType.DEF, 1);
+        Config.unloadObject(equipment);
+
         Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 279L));
         Logger.i("ObjectMaker", "Equipment making is done!");
     }

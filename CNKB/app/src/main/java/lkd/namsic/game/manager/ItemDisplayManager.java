@@ -90,7 +90,7 @@ public class ItemDisplayManager {
     }
 
     public void displayRecipes(@NonNull Player self, boolean isItem) {
-        StringBuilder msg;
+        StringBuilder innerBuilder;
 
         List<Long> sortedList;
 
@@ -98,40 +98,37 @@ public class ItemDisplayManager {
             sortedList = new ArrayList<>(self.getItemRecipe());
             Collections.sort(sortedList);
 
-            msg = new StringBuilder("---아이템 목록---");
+            innerBuilder = new StringBuilder("---아이템 목록---");
         } else {
             sortedList = new ArrayList<>(self.getEquipRecipe());
             Collections.sort(sortedList);
 
-            msg = new StringBuilder("---장비 목록---");
+            innerBuilder = new StringBuilder("---장비 목록---");
         }
 
         if(sortedList.isEmpty()) {
-            msg.append("\n제작법을 아는 장비가 없습니다");
-            self.replyPlayer(msg.toString());
+            self.replyPlayer("제작법을 아는 장비가 없습니다");
             return;
         }
-
-        StringBuilder innerMsg = new StringBuilder();
 
         boolean flag = false;
         if(isItem) {
             List<Long> highPriorityItems = self.getListVariable(Variable.HIGH_PRIORITY_ITEM);
 
             if (highPriorityItems.isEmpty()) {
-                msg.append("\n우선 표시 설정된 아이템이 없습니다");
+                innerBuilder.append("\n우선 표시 설정된 아이템이 없습니다");
             } else {
                 for (long itemId : highPriorityItems) {
                     if (self.getItemRecipe().contains(itemId)) {
                         flag = true;
-                        msg.append("\n")
+                        innerBuilder.append("\n")
                                 .append(ItemList.findById(itemId));
                     }
                 }
             }
 
             if(!flag) {
-                msg.append("\n우선 표시 설정된 제작법을 아는 아이템이 없습니다");
+                innerBuilder.append("\n우선 표시 설정된 제작법을 아는 아이템이 없습니다");
             }
 
             for(long itemId : sortedList) {
@@ -139,15 +136,19 @@ public class ItemDisplayManager {
                     continue;
                 }
 
-                innerMsg.append(ItemList.findById(itemId)).append("\n");
+                innerBuilder.append("- ")
+                        .append(ItemList.findById(itemId))
+                        .append("\n");
             }
         } else {
             for(long equipId : sortedList) {
-                innerMsg.append(EquipList.findById(equipId)).append("\n");
+                innerBuilder.append("-")
+                        .append(EquipList.findById(equipId))
+                        .append("\n");
             }
         }
 
-        self.replyPlayer(msg.toString(), innerMsg.toString());
+        self.replyPlayer("제작법 보유 현황은 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
     public void displayRecipe(@NonNull Player self, @NonNull String itemName) {

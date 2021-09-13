@@ -109,7 +109,11 @@ public enum EquipList {
     LYCANTHROPE_CHESTPLATE("라이칸스로프 갑옷", 275L),
     LYCANTHROPE_LEGGINGS("라이칸스로프 바지", 276L),
     LYCANTHROPE_SHOES("라이칸스로프 신발", 277L),
-    LYCANTHROPE_TOOTH_NECKLACE("라이칸스로프 이빨 목걸이", 278L);
+    LYCANTHROPE_TOOTH_NECKLACE("라이칸스로프 이빨 목걸이", 278L),
+    BASIC_HELMET("기본 투구", 292L),
+    BASIC_CHESTPLATE("기본 갑옷", 293L),
+    BASIC_LEGGINGS("기본 바지", 294L),
+    BASIC_SHOES("기본 신발", 295L);
 
     public static final Map<String, EquipList> nameMap = new HashMap<>();
     public static final Map<Long, EquipList> idMap = new HashMap<>();

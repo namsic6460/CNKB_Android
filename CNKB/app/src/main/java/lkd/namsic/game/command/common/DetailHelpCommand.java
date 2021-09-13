@@ -40,7 +40,7 @@ public class DetailHelpCommand extends CommonCommand {
                         Emoji.LIST + " (장비/equip) ({장비 번호}) : 장비를 착용 또는 착용 해제합니다\n\n" +
                         Emoji.LIST + " *(장비/equip) (정보/info) ({장비 번호}) : 보유중인 장비의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " (장비/equip) (사용/use) ({장비 부위[.{대상}]}) : 장비를 사용합니다\n\n" +
-                        Emoji.LIST + " (장비/equip) (분해/dcp) ({장비 번호}) ({강화 제외 장비 이름}) : 5강 이상의 장비를 분해합니다\n\n" +
+                        Emoji.LIST + " (장비/equip) (분해/dcp) ({장비 번호}) ({강화 제외 장비 이름}) : 장비를 분해합니다\n\n" +
                         Emoji.LIST + " (대화/chat) ({Npc 이름}) : Npc 와 대화합니다\n\n" +
                         Emoji.LIST + " *(맵/map) : 현재 위치의 정보를 표시합니다\n\n" +
                         Emoji.LIST + " *(맵/map) (목록/list) : 이동 가능한 맵 목록을 표시합니다\n\n" +
@@ -94,7 +94,9 @@ public class DetailHelpCommand extends CommonCommand {
                         "아이템을 인벤토리 표시 우선순위 목록에 추가합니다\n\n" +
                         Emoji.LIST + " *(설정/setting/set) (가방/인벤토리/inventory/inven) (제거/remove) ({아이템 이름}) : " +
                         "아이템을 인벤토리 표시 우선순위 목록에서 제거합니다\n\n" +
-                        Emoji.LIST + " *(설정/setting/set) (공개/public) : 자신의 정보를 공개 또는 비공개 상태로 전환합니다"
+                        Emoji.LIST + " *(설정/setting/set) (공개/public) : 자신의 정보를 공개 또는 비공개 상태로 전환합니다" +
+                        Emoji.LIST + " *(설정/setting/set) (거점/home) : 현재 위치를 거점으로 설정합니다" +
+                        Emoji.LIST + " *(설정/setting/set) (거점/home) (확인/check) : 거점을 확인합니다"
         );
     }
 

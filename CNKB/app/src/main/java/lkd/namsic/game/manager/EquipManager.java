@@ -200,10 +200,6 @@ public class EquipManager {
         if(self.getEquipped(equipment.getEquipType()) != EquipList.NONE.getId()) {
             throw new WeirdCommandException("장착중인 장비는 분해할 수 없습니다");
         }
-        
-        if(equipment.getReinforceCount() < 5) {
-            throw new WeirdCommandException("5강 미만의 장비는 분해할 수 없습니다");
-        }
 
         StringBuilder innerBuilder = new StringBuilder("골드: ");
 
@@ -212,7 +208,32 @@ public class EquipManager {
             money += equipment.getReinforceCost(reinforceCount);
         }
 
-        money *= 1.2;
+        int reinforceCount = equipment.getReinforceCount();
+
+        if(reinforceCount == 5) {
+            money *= 1.1;
+        } else if(reinforceCount < 8) {
+            money *= 1.25;
+        } else if(reinforceCount < 10) {
+            money *= 1.5;
+        } else if(reinforceCount < 12) {
+            money *= 2;
+        } else if(reinforceCount == 13) {
+            money *= 2.75;
+        } else if(reinforceCount == 14) {
+            money *= 4;
+        } else if(reinforceCount == 15) {
+            money *= 6;
+        }
+
+        int handleLv = equipment.getHandleLv();
+        double handleLvMultiplier = handleLv / 10D + 0.9;
+
+        if(money == 0) {
+            money = (long) (500 * handleLvMultiplier);
+        } else {
+            money *= handleLvMultiplier;
+        }
 
         self.addMoney(money);
         innerBuilder.append(Config.getIncrease(money))

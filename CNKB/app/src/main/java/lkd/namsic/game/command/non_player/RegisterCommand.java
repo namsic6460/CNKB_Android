@@ -11,6 +11,7 @@ import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.BossList;
+import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.MonsterList;
 import lkd.namsic.game.enums.object.NpcList;
@@ -98,6 +99,11 @@ public class RegisterCommand extends NonPlayerCommand {
         for(long itemId = ItemList.LOW_HP_POTION.getId(); itemId <= ItemList.HIGH_MP_POTION.getId(); itemId++) {
             player.getItemRecipe().add(itemId);
         }
+
+        player.addEquip(EquipList.BASIC_HELMET.getId());
+        player.addEquip(EquipList.BASIC_CHESTPLATE.getId());
+        player.addEquip(EquipList.BASIC_LEGGINGS.getId());
+        player.addEquip(EquipList.BASIC_SHOES.getId());
 
         GameMap map = Config.loadMap(0, 0);
         map.addEntity(player);

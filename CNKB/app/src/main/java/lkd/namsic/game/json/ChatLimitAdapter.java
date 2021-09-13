@@ -15,10 +15,10 @@ import lkd.namsic.game.config.Config;
 
 public class ChatLimitAdapter implements JsonSerializer<ChatLimit> {
 
+    private final Gson gson = new Gson();
+
     @Override
     public JsonElement serialize(ChatLimit chatLimit, Type typeOfSrc, JsonSerializationContext context) {
-        Gson gson = new GsonBuilder().create();
-
         JsonObject jsonObject = new JsonObject();
         JsonObject tempObject;
         JsonArray tempArray;

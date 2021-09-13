@@ -2,11 +2,8 @@ package lkd.namsic.game.object;
 
 import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -17,16 +14,12 @@ import lkd.namsic.game.base.ConcurrentHashSet;
 import lkd.namsic.game.base.IdClass;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
-import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.object.BossList;
 import lkd.namsic.game.enums.object.MapList;
-import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.exception.NumberRangeException;
-import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdDataException;
-import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.setting.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -72,175 +65,6 @@ public class GameMap {
         this.entity.put(Id.MONSTER, new ConcurrentHashSet<>());
         this.entity.put(Id.BOSS, new ConcurrentHashSet<>());
         this.entity.put(Id.NPC, new ConcurrentHashSet<>());
-    }
-
-    @NonNull
-    public String getInfo() {
-        return this.name + "(요구 레벨: " + requireLv + ") [" + this.mapType.getMapName() + "]\n" +
-                Emoji.WORLD + ": " + this.location.toMapString() + "\n" +
-                Emoji.MONSTER + ": " + this.getEntity(Id.MONSTER).size() + ", " +
-                Emoji.BOSS + ": " + this.getEntity(Id.BOSS).size();
-    }
-
-    @NonNull
-    public String getInnerInfo() {
-        StringBuilder builder = new StringBuilder("---플레이어 목록---");
-
-        Set<Long> playerSet = this.entity.get(Id.PLAYER);
-        if(playerSet.isEmpty()) {
-            builder.append("\n플레이어 없음");
-        } else {
-            Player player;
-
-            for (long playerId : new HashSet<>(playerSet)) {
-                player = Config.getData(Id.PLAYER, playerId);
-                builder.append("\n[");
-
-                if(FightManager.getInstance().fightId.containsKey(player.getId())) {
-                    builder.append("F] [");
-                }
-
-                builder.append(player.getLocation().toFieldString())
-                        .append("] ")
-                        .append(player.getName());
-            }
-        }
-
-        builder.append("\n\n---NPC 목록---");
-
-        Set<Long> npcSet = this.entity.get(Id.NPC);
-        npcSet.remove(NpcList.SECRET.getId());
-        npcSet.remove(NpcList.ABEL.getId());
-
-        if(npcSet.isEmpty()) {
-            builder.append("\nNPC 없음");
-        } else {
-            Npc npc;
-
-            for(long npcId : new HashSet<>(npcSet)) {
-                npc = Config.getData(Id.NPC, npcId);
-                builder.append("\n[")
-                        .append(npc.getLocation().toFieldString())
-                        .append("] ")
-                        .append(npc.getName());
-            }
-        }
-
-        builder.append("\n\n---떨어진 골드---");
-
-        if(this.money.isEmpty()) {
-            builder.append("\n떨어진 골드 없음");
-        } else {
-            for (Map.Entry<Location, Long> entry : new HashMap<>(this.money).entrySet()) {
-                builder.append("\n[")
-                        .append(entry.getKey().toFieldString())
-                        .append("] ")
-                        .append(entry.getValue())
-                        .append("G");
-            }
-        }
-
-        int index = 1;
-
-        builder.append("\n\n---몬스터 목록---");
-
-        List<Long> monsterList = new ArrayList<>(this.entity.get(Id.MONSTER));
-        Collections.sort(monsterList);
-
-        if(monsterList.isEmpty()) {
-            builder.append("\n몬스터 없음");
-        } else {
-            Monster monster;
-            Set<Long> removeSet = new HashSet<>();
-
-            for(long monsterId : monsterList) {
-                try {
-                    monster = Config.getData(Id.MONSTER, monsterId);
-                } catch (ObjectNotFoundException e) {
-                    removeSet.add(monsterId);
-                    continue;
-                }
-
-                builder.append("\n")
-                        .append(index++)
-                        .append(". [");
-
-                if(FightManager.getInstance().fightId.containsKey(monster.getId())) {
-                    builder.append("F] [");
-                }
-
-                builder.append(monster.getLocation().toFieldString())
-                        .append("] ")
-                        .append(monster.getName());
-            }
-
-            this.entity.get(Id.MONSTER).removeAll(removeSet);
-        }
-
-        builder.append("\n\n---보스 목록---");
-
-        Set<Long> bossSet = this.entity.get(Id.BOSS);
-        if(bossSet.isEmpty()) {
-            builder.append("\n보스 없음");
-        } else {
-            Boss boss;
-
-            for(long bossId : new HashSet<>(bossSet)) {
-                boss = Config.getData(Id.BOSS, bossId);
-                builder.append("\n")
-                        .append(index++)
-                        .append(". [");
-
-                if(FightManager.getInstance().fightId.containsKey(boss.getId())) {
-                    builder.append("F] [");
-                }
-
-                builder.append(boss.getLocation().toFieldString())
-                        .append("] ")
-                        .append(boss.getName());
-            }
-        }
-
-        builder.append("\n\n---떨어진 아이템---");
-
-        if(this.item.isEmpty()) {
-            builder.append("\n떨어진 아이템 없음");
-        } else {
-            Item item;
-            String locationStr;
-            for (Map.Entry<Location, Map<Long, Integer>> entry : new HashMap<>(this.item).entrySet()) {
-                locationStr = "\n[" + entry.getKey().toFieldString() + "] ";
-
-                for(Map.Entry<Long, Integer> itemEntry : entry.getValue().entrySet()) {
-                    item = Config.getData(Id.ITEM, itemEntry.getKey());
-                    builder.append(locationStr)
-                            .append(item.getName())
-                            .append(" ")
-                            .append(itemEntry.getValue())
-                            .append("개");
-                }
-            }
-        }
-
-        builder.append("\n\n---떨어진 장비---");
-
-        if(this.equip.isEmpty()) {
-            builder.append("\n떨어진 장비 없음");
-        } else {
-            Equipment equipment;
-            String locationStr;
-            for (Map.Entry<Location, Set<Long>> entry : new HashMap<>(this.equip).entrySet()) {
-                locationStr = "\n[" + entry.getKey().toFieldString() + "] ";
-
-                for(long equipId : entry.getValue()) {
-                    equipment = Config.getData(Id.EQUIPMENT, equipId);
-                    builder.append(locationStr)
-                            .append(equipment.getName());
-                }
-            }
-        }
-
-        return builder.toString();
     }
 
     public void setMoney(@NonNull Entity self, @NonNull Location location, long money) {
@@ -526,6 +350,20 @@ public class GameMap {
         }
 
         return boss;
+    }
+
+    @NonNull
+    public String getLocationName() {
+        return getLocationName(false);
+    }
+
+    @NonNull
+    public String getLocationName(boolean includeField) {
+        if(includeField) {
+            return this.name + "(" + this.location.toFieldString() + ")";
+        } else {
+            return this.name + "(" + this.location.toString() + ")";
+        }
     }
 
 }

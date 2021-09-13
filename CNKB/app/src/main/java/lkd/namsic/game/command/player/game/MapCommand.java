@@ -21,8 +21,7 @@ public class MapCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if (second == null) {
-            GameMap map = Config.getMapData(player.getLocation());
-            player.replyPlayer(map.getInfo(), map.getInnerInfo());
+            DisplayManager.getInstance().displayMap(player);
         } else if (second.equals("목록") || second.equals("list")) {
             DisplayManager.getInstance().displayMapList(player);
         } else {

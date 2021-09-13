@@ -14,10 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Pattern;
 
 import lkd.namsic.MainActivity;
+import lkd.namsic.game.base.Bool;
 import lkd.namsic.game.command.CommandListener;
 import lkd.namsic.game.command.CommonCommand;
 import lkd.namsic.game.command.NonPlayerCommand;
@@ -75,8 +78,11 @@ import lkd.namsic.setting.Logger;
 
 public class KakaoTalk {
 
-    public final static Map<String, Notification.Action> groupSessions = new ConcurrentHashMap<>();
-    public final static Map<String, Notification.Action> soloSessions = new ConcurrentHashMap<>();
+    private static final Queue<Message> messageQueue = new ConcurrentLinkedQueue<>();
+    public static final Bool threadFlag = new Bool(true);
+
+    public static final Map<String, Notification.Action> groupSessions = new ConcurrentHashMap<>();
+    public static final Map<String, Notification.Action> soloSessions = new ConcurrentHashMap<>();
 
     private static String lastSender = "";
     private static String lastMsg = "";
@@ -102,6 +108,28 @@ public class KakaoTalk {
         } catch (WeirdCommandException ignore) {}
 
         Logger.i("CommandRegister", "Command register complete");
+
+        new Thread(() -> {
+            Message message;
+
+            synchronized (threadFlag) {
+                while (threadFlag.get()) {
+                    try {
+                        message = messageQueue.poll();
+
+                        if (message != null) {
+                            message.actionIntent.send(NotificationListener.context, 0, message.intent);
+                            Thread.sleep(500);
+                        } else {
+                            threadFlag.wait();
+                        }
+                    } catch (Exception e) {
+                        Logger.e("MessageThread", e);
+                        return;
+                    }
+                }
+            }
+        }).start();
     }
 
     private static void registerPlayerCommands() {
@@ -233,11 +261,11 @@ public class KakaoTalk {
 
                     String cmd = command.replaceFirst(Pattern.quote(first), "").trim();
 
-                    if((listener = KakaoTalk.commonCommands.get(first)) != null) {
+                    if((listener = commonCommands.get(first)) != null) {
                         listener.execute(cmd, session);
                     } else {
                         try {
-                            if (player != null && (listener = KakaoTalk.playerCommands.get(first)) != null) {
+                            if (player != null && (listener = playerCommands.get(first)) != null) {
                                 if(!Config.RUNNING_COMMAND.containsKey(player)) {
                                     Config.RUNNING_COMMAND.put(player, command);
                                 }
@@ -248,13 +276,13 @@ public class KakaoTalk {
                                     listener.execute(player, cmd, commands, second, third, fourth, session);
                                 } catch (Exception e) {
                                     if(listener.getClass().getPackage().getName().equals("lkd.namsic.game.command.player.debug")) {
-                                        KakaoTalk.reply(session, Config.errorString(e));
+                                        reply(session, Config.errorString(e));
                                     } else {
                                         throw e;
                                     }
                                 }
                             } else if (player == null) {
-                                listener = KakaoTalk.nonPlayerCommands.get(first);
+                                listener = nonPlayerCommands.get(first);
 
                                 if (listener != null) {
                                     listener.execute(sender, image, cmd, room, isGroupChat, session);
@@ -264,7 +292,7 @@ public class KakaoTalk {
                                 }
                             }
                         } catch (WeirdCommandException | DoingFilterException e) {
-                            KakaoTalk.reply(session,"[오류]\n" + e.getMessage());
+                            reply(session,"[오류]\n" + e.getMessage());
                         } catch (NumberFormatException e) {
                             String message = e.getMessage();
                             message = message == null ? "" : "\n" + message;
@@ -316,6 +344,16 @@ public class KakaoTalk {
         }
     }
 
+    private static class Message {
+        final PendingIntent actionIntent;
+        final Intent intent;
+
+        public Message(@NonNull PendingIntent actionIntent, @NonNull Intent intent) {
+            this.actionIntent = actionIntent;
+            this.intent = intent;
+        }
+    }
+
     public static void reply(@Nullable Notification.Action session, @Nullable String msg){
         reply(session, msg == null ? "" : msg, null);
     }
@@ -348,11 +386,12 @@ public class KakaoTalk {
         }
 
         RemoteInput.addResultsToIntent(session.getRemoteInputs(), intent, bundle);
+        messageQueue.offer(new Message(session.actionIntent, intent));
 
-        try {
-            session.actionIntent.send(NotificationListener.context, 0, intent);
-        } catch (PendingIntent.CanceledException e) {
-            Logger.e("KakaoTalkListener", e);
+        synchronized (threadFlag) {
+            if(messageQueue.size() != 0) {
+                threadFlag.notifyAll();
+            }
         }
     }
 
