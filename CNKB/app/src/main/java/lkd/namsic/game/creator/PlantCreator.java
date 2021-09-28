@@ -28,14 +28,14 @@ public class PlantCreator implements Creatable {
             put(ItemList.GOLD_FRUIT.getId(), 3);
         }});
 
-        createPlant(ItemList.SMALL_EXP_SEED, 1, 120, new HashMap<Long, Integer>() {{
+        createPlant(ItemList.SMALL_EXP_SEED, 1, 30, new HashMap<Long, Integer>() {{
             put(ItemList.EXP_FRUIT.getId(), 1);
         }});
-        createPlant(ItemList.EXP_SEED, 2, 90, new HashMap<Long, Integer>() {{
+        createPlant(ItemList.EXP_SEED, 2, 15, new HashMap<Long, Integer>() {{
             put(ItemList.EXP_FRUIT.getId(), 2);
         }});
-        createPlant(ItemList.BIG_EXP_SEED, 3, 60, new HashMap<Long, Integer>() {{
-            put(ItemList.EXP_FRUIT.getId(), 3);
+        createPlant(ItemList.BIG_EXP_SEED, 3, 10, new HashMap<Long, Integer>() {{
+            put(ItemList.EXP_FRUIT.getId(), 4);
         }});
 
         createPlant(ItemList.SMALL_PURIFYING_SEED, 1, 20, new HashMap<Long, Integer>() {{

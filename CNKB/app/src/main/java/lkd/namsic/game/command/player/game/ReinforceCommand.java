@@ -9,7 +9,6 @@ import java.util.List;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
-import lkd.namsic.game.manager.DisplayManager;
 import lkd.namsic.game.manager.ItemDisplayManager;
 import lkd.namsic.game.manager.ReinforceManager;
 import lkd.namsic.game.object.Player;
@@ -21,7 +20,7 @@ public class ReinforceCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if(second == null) {
-            DisplayManager.getInstance().displayReinforceExplanation(player);
+            ReinforceManager.getInstance().displayReinforceExplanation(player);
         } else if(second.equals("정보") || second.equals("info")) {
             ItemDisplayManager.getInstance().displayReinforceInfo(player);
         } else {

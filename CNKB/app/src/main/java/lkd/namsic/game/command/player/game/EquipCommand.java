@@ -59,6 +59,18 @@ public class EquipCommand extends PlayerCommand {
             String equipName = command.replace(second, "").replace(third, "").trim();
 
             EquipManager.getInstance().decompose(player, equipIndex, equipName);
+        } else if(second.equals("전체") || second.equals("all")) {
+            if(third == null) {
+                throw new WeirdCommandException();
+            }
+
+            if(third.equals("착용") || third.equals("equip")) {
+                EquipManager.getInstance().equipAll(player);
+            } else if(third.equals("해제") || third.equals("unequip")) {
+                EquipManager.getInstance().unEquipAll(player);
+            } else {
+                throw new WeirdCommandException();
+            }
         } else {
             KakaoTalk.checkDoing(player);
             EquipManager.getInstance().equip(player, Integer.parseInt(second));

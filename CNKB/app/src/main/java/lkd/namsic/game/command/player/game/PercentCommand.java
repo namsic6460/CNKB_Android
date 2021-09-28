@@ -10,7 +10,7 @@ import java.util.List;
 
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.manager.DisplayManager;
+import lkd.namsic.game.manager.PercentManager;
 import lkd.namsic.game.object.Player;
 
 public class PercentCommand extends PlayerCommand {
@@ -24,11 +24,11 @@ public class PercentCommand extends PlayerCommand {
         }
 
         if(second.equals("광질") || second.equals("mine")) {
-            DisplayManager.getInstance().displayMinePercent(player);
+            PercentManager.getInstance().displayMinePercent(player);
         } else if(second.equals("낚시") || second.equals("fish")) {
-            DisplayManager.getInstance().displayFishPercent(player);
+            PercentManager.getInstance().displayFishPercent(player);
         } else if(Arrays.asList("모험", "adventure", "adv").contains(second)) {
-            DisplayManager.getInstance().displayAdvPercent(player);
+            PercentManager.getInstance().displayAdvPercent(player);
         } else {
             throw new WeirdCommandException();
         }

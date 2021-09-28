@@ -8,9 +8,11 @@ import java.util.Set;
 
 import lkd.namsic.game.base.SkillUse;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.LogData;
 import lkd.namsic.game.enums.Variable;
+import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Entity;
@@ -26,6 +28,31 @@ public class SkillManager {
     }
 
     private static final String RESIST = "대상이 스킬 저항에 성공했습니다";
+
+    public void displaySkillHelp(@NonNull Player self) {
+        self.replyPlayer(
+                "1. 스킬은 전투중에만 사용이 가능합니다\n" +
+                        "2. 대부분의 스킬의 액티브는 대상이 필요합니다\n" +
+                        "3. 스킬은 NPC 상점에서 스킬 북을 구매하여 사용하면 배울 수 있습니다(시작의 마을의 경우 " +
+                        Emoji.focus(NpcList.SELINA.getDisplayName()) + ")\n"
+        );
+    }
+
+    public void displaySkillList(@NonNull Player self) {
+        StringBuilder innerBuilder = new StringBuilder("---보유 스킬 목록---");
+
+        if(self.getSkill().isEmpty()) {
+            self.replyPlayer("보유중인 스킬이 없습니다");
+            return;
+        }
+
+        for(long skillId : self.getSkill()) {
+            innerBuilder.append("\n- ")
+                    .append(SkillList.findById(skillId));
+        }
+
+        self.replyPlayer("스킬 목록은 전체보기로 확인해주세요", innerBuilder.toString());
+    }
 
     public long checkUse(@NonNull Entity self, @NonNull String objectName, @Nullable String other) {
         Long skillId = SkillList.findByName(objectName);

@@ -505,7 +505,7 @@ public class ItemCreator implements Creatable {
 
         item = new Item(ItemList.LOW_EXP_POTION, "경험치를 소량 제공해주는 포션이다");
         item.addRecipe(new LinkedHashMap<Long, Integer>() {{
-            put(ItemList.EXP_FRUIT.getId(), 10);
+            put(ItemList.EXP_FRUIT.getId(), 5);
         }});
         Config.unloadObject(item);
 
@@ -810,8 +810,8 @@ public class ItemCreator implements Creatable {
         }});
         Config.unloadObject(item);
         
-        createItem(ItemList.REINFORCE_MULTIPLIER, "다음 강화 확률을 2배로 증가시켜주는 아이템이다");
-        createItem(ItemList.GLOW_REINFORCE_MULTIPLIER, "다음 강화 확률을 3배로 증가시켜주는 아이템이다");
+        createItem(ItemList.REINFORCE_MULTIPLIER, "다음 강화 확률을 2배로 증가시켜주는 아이템이다 (중첩 불가)");
+        createItem(ItemList.GLOW_REINFORCE_MULTIPLIER, "다음 강화 확률을 3배로 증가시켜주는 아이템이다 (중첩 불가)");
         
         createItem(ItemList.OAK_TOOTH, "생각보단 깨끗한 오크의 이빨이다");
         createItem(ItemList.OAK_LEATHER, "상당히 질긴 고품질의 가죽이다");
@@ -834,9 +834,9 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.SMALL_GOLD_SEED, "골드 씨앗이다\n[수확]: 1 골드 열매/120분");
         createItem(ItemList.GOLD_SEED, "골드 씨앗이다 (씨앗 Lv.2)\n[수확]: 2 골드 열매/90분");
         createItem(ItemList.BIG_GOLD_SEED, "골드 씨앗이다 (씨앗 Lv.3)\n[수확]: 3 골드 열매/60분");
-        createItem(ItemList.SMALL_EXP_SEED, "경험치 씨앗이다\n[수확]: 1 경험치 열매/120분");
-        createItem(ItemList.EXP_SEED, "경험치 씨앗이다 (씨앗 Lv.2)\n[수확]: 2 경험치 열매/90분");
-        createItem(ItemList.BIG_EXP_SEED, "경험치 씨앗이다 (씨앗 Lv.3)\n[수확]: 3 경험치 열매/60분");
+        createItem(ItemList.SMALL_EXP_SEED, "경험치 씨앗이다\n[수확]: 1 경험치 열매/30분");
+        createItem(ItemList.EXP_SEED, "경험치 씨앗이다 (씨앗 Lv.2)\n[수확]: 2 경험치 열매/15분");
+        createItem(ItemList.BIG_EXP_SEED, "경험치 씨앗이다 (씨앗 Lv.3)\n[수확]: 4 경험치 열매/10분");
         
         createItem(ItemList.HARPY_WING, "하피의 날개다. 날개치곤 상당히 단단하다");
         createItem(ItemList.HARPY_NAIL, "부서졌음에도 여전히 날카롭다");

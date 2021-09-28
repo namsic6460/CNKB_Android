@@ -9,9 +9,11 @@ import java.util.Objects;
 
 import lkd.namsic.game.base.LoNg;
 import lkd.namsic.game.config.Config;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.config.RandomList;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.object.ItemList;
+import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.event.HarvestEvent;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
@@ -24,6 +26,72 @@ public class FarmManager {
 
     public static FarmManager getInstance() {
         return instance;
+    }
+
+    public void displayFarmHelp(@NonNull Player self) {
+        self.replyPlayer(
+                "1. 농장은 인당 최대 1개 이고 " + Config.FARM_PRICE + "G 에 구매할 수 있습니다\n" +
+                        "2. 농장에 식물을 심으면 제거하지 않는 이상 영구 지속됩니다\n" +
+                        "3. 농장의 작물은 최대 5일 분량까지 수확할 수 있습니다\n" +
+                        "4. 씨앗은 NPC 에게서 구매 가능합니다(시작의 마을의 경우 NPC " +
+                        Emoji.focus(NpcList.EL.getDisplayName()) + " 에게서 구매 가능)\n" +
+                        "5. 농장 레벨을 업그레이드하면 더 많은 씨앗을 심을 수 있습니다"
+        );
+    }
+
+    public void displayFarm(@NonNull Player self) {
+        FarmManager.getInstance().checkFarm(self);
+
+        Farm farm = Config.loadObject(Id.FARM, self.getId().getObjectId());
+
+        StringBuilder innerBuilder = new StringBuilder("---")
+                .append(self.getNickName())
+                .append(" 님의 농장 정보---\n농장 레벨: ")
+                .append(farm.getLv())
+                .append("\n작물 개수: ")
+                .append(farm.getPlanted().size())
+                .append("/")
+                .append(farm.getMaxPlantCount())
+                .append("\n\n---작물 현황---");
+
+        if (farm.getPlanted().isEmpty()) {
+            innerBuilder.append("\n작물이 심어져있지 않습니다");
+        } else {
+            long currentTime = System.currentTimeMillis();
+            long diff;
+
+            int index = 1;
+            long day, hour, minute;
+            for (Farm.Plant plant : farm.getPlanted()) {
+                diff = (currentTime - plant.getLastHarvestTime()) / 1000;
+
+                day = diff / 86400;
+                diff = diff % 86400;
+                hour = diff / 3600;
+                minute = (diff % 3600) / 60;
+
+                innerBuilder.append("\n")
+                        .append(Config.SPLIT_BAR)
+                        .append("\n")
+                        .append(index++)
+                        .append(". ")
+                        .append(ItemList.findById(plant.getId().getObjectId()))
+                        .append("\n마지막 수확: ")
+                        .append(day)
+                        .append("일 ")
+                        .append(hour)
+                        .append("시간 ")
+                        .append(minute)
+                        .append("분 전");
+            }
+
+            innerBuilder.append("\n")
+                    .append(Config.SPLIT_BAR);
+
+            Config.unloadObject(farm);
+        }
+
+        self.replyPlayer("농장 정보는 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
     public void checkFarm(@NonNull Player self) {

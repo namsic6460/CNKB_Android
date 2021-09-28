@@ -9,8 +9,8 @@ import java.util.List;
 
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.manager.RankingManager;
 import lkd.namsic.game.object.Player;
-import lkd.namsic.game.manager.DisplayManager;
 
 public class RankingCommand extends PlayerCommand {
 
@@ -19,9 +19,9 @@ public class RankingCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if(second == null) {
-            DisplayManager.getInstance().displayLvRanking(player);
+            RankingManager.getInstance().displayLvRanking(player);
         } else if(second.equals("레벨") || second.equals("lv")) {
-            DisplayManager.getInstance().displayLvRanking(player);
+            RankingManager.getInstance().displayLvRanking(player);
         } else {
             throw new WeirdCommandException();
         }

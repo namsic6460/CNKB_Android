@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         Config.loadPlayers();
 
         KakaoTalk.registerCommands();
+        KakaoTalk.startMsgThread();
 
         threadCleaner = new Timer();
         threadCleaner.scheduleAtFixedRate(new TimerTask() {

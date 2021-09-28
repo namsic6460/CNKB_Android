@@ -135,7 +135,7 @@ public class EquipCreator implements Creatable {
         }});
         Config.unloadObject(equipment);
 
-        equipment = new Equipment(EquipType.CHESTPLATE, EquipList.LEATHER_SHOES, null, null);
+        equipment = new Equipment(EquipType.SHOES, EquipList.LEATHER_SHOES, null, null);
         equipment.setBasicStat(StatType.MAXHP, 8);
         equipment.setBasicStat(StatType.AGI, 8);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
@@ -289,7 +289,7 @@ public class EquipCreator implements Creatable {
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.SHOES, EquipList.MINER_SHOES,
-                null, "광질 시 돌을 채광하면 40% 확률로 돌을 추가로 1개 더 채광한다");
+                null, "광질 시 돌을 2개씩 채광한다");
         equipment.setHandleLv(1);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.STONE.getId(), 1000);

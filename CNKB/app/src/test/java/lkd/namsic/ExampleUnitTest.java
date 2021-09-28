@@ -1,36 +1,25 @@
 package lkd.namsic;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import org.junit.Test;
 
 import java.io.File;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
-import lkd.namsic.game.base.ChatLimit;
-import lkd.namsic.game.base.Location;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
+import lkd.namsic.game.enums.Id;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EquipList;
-import lkd.namsic.game.enums.object.ItemList;
-import lkd.namsic.game.enums.object.NpcList;
-import lkd.namsic.game.json.ChatLimitAdapter;
-import lkd.namsic.game.json.LocationAdapter;
-import lkd.namsic.game.json.NpcAdapter;
-import lkd.namsic.game.manager.FightManager;
+import lkd.namsic.game.enums.object.MonsterList;
+import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Equipment;
-import lkd.namsic.game.object.Npc;
+import lkd.namsic.game.object.Monster;
 import lkd.namsic.game.object.Player;
-import lkd.namsic.game.object.Shop;
 import lkd.namsic.setting.FileManager;
 
 public class ExampleUnitTest {
@@ -38,7 +27,7 @@ public class ExampleUnitTest {
     @Test
     public void evalTest() {
         try {
-            System.out.println(FightManager.class.getDeclaredMethod("getInstance").invoke(null));
+            System.out.println(Config.class.getDeclaredMethod("getBar", int.class, int.class).invoke(null, 0, 150));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,34 +35,46 @@ public class ExampleUnitTest {
 
     @Test
     public void test() {
-        Shop shop = new Shop(NpcList.PEDRO);
+        List<Entity> sortedList = new ArrayList<>();
+        sortedList.add(new Monster(MonsterList.OWLBEAR));
+        sortedList.add(new Player("a", "", "", ""));
+        sortedList.add(new Monster(MonsterList.LYCANTHROPE));
+        sortedList.add(new Player("b", "", "", ""));
+        sortedList.add(new Monster(MonsterList.GOLEM));
 
-        shop.addSellItem(ItemList.PIECE_OF_GEM, 20000L);
+        sortedList.sort((o1, o2) -> {
+            boolean isPlayer1 = o1.getId().getId().equals(Id.PLAYER);
+            boolean isPlayer2 = o2.getId().getId().equals(Id.PLAYER);
 
-        shop.addBuyItem(ItemList.STONE_LUMP, 30L);
-        shop.addBuyItem(ItemList.COAL, 5L);
+            if(isPlayer1 != isPlayer2) {
+                return isPlayer1 ? 1 : -1;
+            } else {
+                return 0;
+            }
+        });
 
-        for(ItemList gem : Config.GEMS) {
-            shop.addBuyItem(gem, 1000L);
+        for(Entity entity : sortedList) {
+            System.out.println(entity.getName());
+        }
+    }
+
+    public long getNeedExp(int lv) {
+        long needExp;
+        if (lv <= 100) {
+            needExp = 10_000 + 5_000 * lv;
+        } else if (lv <= 300) {
+            needExp = -200_000 + (long) (Math.pow(lv - 10, 2.5) * 2) + 10_000 * lv;
+        } else if (lv <= 500) {
+            needExp = -50_000_000 + 200_000 * lv;
+        } else if(lv <= 750) {
+            needExp = -50_000_000 + (long) (Math.pow(lv, 3.1) / 1.5);
+        } else if(lv <= 950) {
+            needExp = 45_000_000L * (lv - 750) + 1_000_000_000L;
+        } else {
+            needExp = -30_000_000_000L + (long) Math.pow(lv - 600, 4.2);
         }
 
-        shop.addBuyItem(ItemList.QUARTZ, 20L);
-        shop.addBuyItem(ItemList.GOLD, 100L);
-        shop.addBuyItem(ItemList.WHITE_GOLD, 500L);
-
-        Set<Long> idSet = Arrays.stream(Config.GEMS).map(ItemList::getId).collect(Collectors.toSet());
-        shop.addSimpleMap(idSet, "감정", "appraise", "apr");
-
-        idSet = new HashSet<>(idSet);
-        idSet.remove(ItemList.QUARTZ.getId());
-        idSet.remove(ItemList.GOLD.getId());
-        idSet.remove(ItemList.WHITE_GOLD.getId());
-        shop.addSimpleMap(idSet, "보석", "gem");
-
-        System.out.println(shop.getSimpleMap().toString());
-
-        String json = Config.gson.toJson(shop);
-        System.out.println(json);
+        return needExp;
     }
 
     @Test
@@ -202,17 +203,16 @@ public class ExampleUnitTest {
         String path = "C:\\Users\\user\\Downloads\\";
         File[] files = Objects.requireNonNull(new File(path + "players").listFiles());
 
-        int day = LocalDateTime.now().getDayOfYear();
-
         String json;
         Player player;
         for(File file : files) {
             json = FileManager.read(file);
             player = Config.gson.fromJson(json, Player.class);
 
-            if(player.getLastDay() + 30 < day) {
-                System.out.println(player.getName() + " - " + file.delete());
-            }
+            player.addMoney(player.getLv() * -5000);
+            player.addMoney(Math.min(player.getLv() * 5000, 500_000));
+
+            FileManager.save(file.getAbsolutePath(), Config.gson.toJson(player));
         }
 
         System.out.println("DONE");

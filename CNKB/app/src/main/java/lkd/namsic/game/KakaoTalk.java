@@ -108,7 +108,9 @@ public class KakaoTalk {
         } catch (WeirdCommandException ignore) {}
 
         Logger.i("CommandRegister", "Command register complete");
+    }
 
+    public static void startMsgThread() {
         new Thread(() -> {
             Message message;
 
@@ -130,6 +132,8 @@ public class KakaoTalk {
                 }
             }
         }).start();
+
+        Logger.i("MsgThread", "Thread started");
     }
 
     private static void registerPlayerCommands() {
@@ -389,9 +393,7 @@ public class KakaoTalk {
         messageQueue.offer(new Message(session.actionIntent, intent));
 
         synchronized (threadFlag) {
-            if(messageQueue.size() != 0) {
-                threadFlag.notifyAll();
-            }
+            threadFlag.notifyAll();
         }
     }
 

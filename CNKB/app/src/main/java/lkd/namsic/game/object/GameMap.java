@@ -360,9 +360,9 @@ public class GameMap {
     @NonNull
     public String getLocationName(boolean includeField) {
         if(includeField) {
-            return this.name + "(" + this.location.toFieldString() + ")";
-        } else {
             return this.name + "(" + this.location.toString() + ")";
+        } else {
+            return this.name + "(" + this.location.toMapString() + ")";
         }
     }
 

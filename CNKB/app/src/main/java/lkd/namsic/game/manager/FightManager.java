@@ -348,7 +348,6 @@ public class FightManager {
                         exceptSet.add((Player) target);
                     }
 
-
                     if (player != null) {
                         exceptSet.add(player);
                     }
@@ -448,6 +447,7 @@ public class FightManager {
             Entity caster;
 
             List<Entity> targetList;
+            Set<Entity> removeSet = new HashSet<>();
             for (Map.Entry<Entity, List<Entity>> entry : this.castingMap.entrySet()) {
                 caster = entry.getKey();
                 waitTurn = caster.getVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN);
@@ -478,23 +478,25 @@ public class FightManager {
                     Player.replyPlayersExcepts(playerSet, caster.getFightName() + is + skill.getName() +
                             " 의 캐스팅을 완료했습니다!", exceptSet);
 
-                    List<Entity> castingList = this.castingMap.remove(caster);
-                    if(castingList != null) {
-                        List<Entity> castedList;
+                    List<Entity> castedList;
+                    for (Entity casted : entry.getValue()) {
+                        castedList = Objects.requireNonNull(this.castedMap.get(casted));
 
-                        for (Entity casted : castingList) {
-                            castedList = Objects.requireNonNull(this.castedMap.get(casted));
-
-                            if(castedList.size() == 1) {
-                                this.castedMap.remove(casted);
-                            } else {
-                                castedList.remove(caster);
-                            }
+                        if(castedList.size() == 1) {
+                            this.castedMap.remove(casted);
+                        } else {
+                            castedList.remove(caster);
                         }
                     }
+
+                    removeSet.add(caster);
                 } else {
                     caster.setVariable(Variable.FIGHT_SKILL_CAST_WAIT_TURN, waitTurn - 1);
                 }
+            }
+
+            for(Entity entity : removeSet) {
+                this.castingMap.remove(entity);
             }
 
             if(checkEnd(self, entitySet, playerSet, exceptSet)) {
@@ -527,7 +529,19 @@ public class FightManager {
                 if (entity.equals(self)) {
                     Player.replyPlayersExcept(playerSet, "전투를 시작한 유저가 사망하여 전투가 종료되었습니다", self);
 
-                    for (Entity entity_ : new HashSet<>(entitySet)) {
+                    List<Entity> sortedList = new ArrayList<>(entitySet);
+                    sortedList.sort((o1, o2) -> {
+                        boolean isPlayer1 = o1.getId().getId().equals(Id.PLAYER);
+                        boolean isPlayer2 = o2.getId().getId().equals(Id.PLAYER);
+
+                        if(isPlayer1 != isPlayer2) {
+                            return isPlayer1 ? 1 : -1;
+                        } else {
+                            return 0;
+                        }
+                    });
+
+                    for (Entity entity_ : sortedList) {
                         this.endFight(entity_);
                     }
 

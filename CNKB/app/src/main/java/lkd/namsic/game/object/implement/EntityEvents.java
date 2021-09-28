@@ -245,10 +245,12 @@ public class EntityEvents {
         put(EventList.STRINGS_OF_LIFE_DEATH.getId(), new DeathEvent() {
             @Override
             public void onDeath(@NonNull Entity self, int beforeHp, Int afterHp) {
-                afterHp.set(1);
-                
-                if(self.getId().getId().equals(Id.PLAYER)) {
-                    ((Player) self).replyPlayer(SkillList.STRINGS_OF_LIFE.getDisplayName() + " 의 효과로 버텼습니다");
+                if(self.getStat(StatType.MAXHP) / 2 >= beforeHp) {
+                    afterHp.set(1);
+
+                    if (self.getId().getId().equals(Id.PLAYER)) {
+                        ((Player) self).replyPlayer(SkillList.STRINGS_OF_LIFE.getDisplayName() + " 의 효과로 버텼습니다");
+                    }
                 }
 
                 self.removeEvent(EventList.STRINGS_OF_LIFE_END);

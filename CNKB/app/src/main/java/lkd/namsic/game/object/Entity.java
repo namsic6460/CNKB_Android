@@ -789,11 +789,11 @@ public abstract class Entity extends NamedObject {
         this.variable.put(variable, value);
     }
 
-    public void removeVariable(Variable variable) {
+    public void removeVariable(@NonNull Variable variable) {
         this.variable.remove(variable);
     }
 
-    public int getVariable(Variable variable) {
+    public int getVariable(@NonNull Variable variable) {
         return this.getVariable(variable, 0);
     }
 

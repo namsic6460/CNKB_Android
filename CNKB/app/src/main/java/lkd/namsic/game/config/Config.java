@@ -30,7 +30,6 @@ import lkd.namsic.game.base.IdClass;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
-import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
@@ -61,7 +60,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 3.02;
+    public static final double VERSION = 3.11;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -92,7 +91,9 @@ public class Config {
             "느금", "유미없음", "창년", "창녀", "창남", "몸팔이", "니애미", "니애비", "씨발", "fuck", "씨빨", "좆", "개새");
     public static final Map<String, Long> PLAYER_ID = new ConcurrentHashMap<>();
     public static final Map<Long, String[]> PLAYER_LIST = new ConcurrentHashMap<>();
-    public static final Map<String, Integer> PLAYER_LV_RANK = new ConcurrentHashMap<>();
+
+    public static final Map<String, Integer> LV_RANK = new ConcurrentHashMap<>();
+    public static final Map<Long, Integer> TOWER_RANK = new ConcurrentHashMap<>();
 
     public static final Set<Long> SELECTABLE_CHAT_SET = new HashSet<>();
 
@@ -145,7 +146,7 @@ public class Config {
     public static final int MAX_FISH_LV = 8;
     public static final int FISH_DELAY_TIME = 3000;
     public static final long FISH_DELAY_TIME_OFFSET = 3000;
-    public static final long FISH_WAIT_TIME = 5000;
+    public static final long FISH_WAIT_TIME = 7000;
     public static final long FIGHT_WAIT_TIME = 30000;
     public static final int ADVENTURE_PER_DAY = 100;
     public static final int ADVENTURE_COUNT = 5;
@@ -216,7 +217,8 @@ public class Config {
                 PLAYER_LIST.put(objectId, new String[] {player.getSender(), player.getImage()});
 
                 if(!player.getCurrentTitle().equals("관리자") && player.getLv() >= MIN_RANK_LV) {
-                    PLAYER_LV_RANK.put(player.getName(), player.getLv());
+                    LV_RANK.put(player.getName(), player.getLv());
+                    TOWER_RANK.put(objectId, player.getTowerFloor());
                 }
             } catch (Exception e) {
                 Logger.e("Config.init(" + file.getName() + ")", e);
@@ -388,6 +390,10 @@ public class Config {
             }
 
             if(save) {
+                if(objectCount == 1 && id.equals(Id.PLAYER)) {
+                    ((Player) gameObject).setKiller(null);
+                }
+
                 jsonString = toJson(gameObject);
 
                 if(id.equals(Id.PLAYER)) {
@@ -916,10 +922,9 @@ public class Config {
         if(entity.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) entity;
 
-            if(player.getVersion() < 3.01) {
-                if(player.getLv() < 100) {
-                    player.addMoney(5000 * (player.getLv() - 1));
-                }
+            if(player.getVersion() < 3.11) {
+                player.addMoney(1000000);
+                player.addItem(ItemList.CONFIRMED_HIGH_RECIPE.getId(), 1, false);
             }
 
             if (unavailable) {

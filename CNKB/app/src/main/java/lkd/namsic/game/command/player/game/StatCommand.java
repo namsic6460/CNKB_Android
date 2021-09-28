@@ -12,7 +12,6 @@ import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.Player;
-import lkd.namsic.game.manager.DisplayManager;
 import lkd.namsic.game.manager.StatManager;
 
 public class StatCommand extends PlayerCommand {
@@ -22,7 +21,7 @@ public class StatCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if(second == null) {
-            DisplayManager.getInstance().displayStatInfo(player);
+            StatManager.getInstance().displayStatInfo(player);
         } else {
             if(third == null) {
                 throw new WeirdCommandException();

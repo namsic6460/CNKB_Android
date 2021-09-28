@@ -92,6 +92,7 @@ public class Equipment extends Item implements Cloneable {
         }
 
         this.name = equipment.getRealName();
+        this.equipType = equipment.equipType;
         this.handleLv = equipment.handleLv;
         this.limitLv = equipment.limitLv;
 

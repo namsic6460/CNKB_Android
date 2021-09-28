@@ -61,7 +61,7 @@ public class MineManager {
         }
 
         try {
-            Thread.sleep(new Random().nextInt(1000));
+            Thread.sleep(new Random().nextInt(350));
         } catch (InterruptedException e) {
             Logger.e("MineManager", e);
             throw new RuntimeException(e.getMessage());

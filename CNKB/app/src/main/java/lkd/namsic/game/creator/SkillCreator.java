@@ -33,7 +33,7 @@ public class SkillCreator implements Creatable {
                 "해당 턴의 공격을 무조건 치명타로 만든다", null);
         
         createSkill(SkillList.STRINGS_OF_LIFE, null,
-                "[전투 당 1회]\n죽음에 이르는 피해를 입을 시 체력을 1 남기고 생존한다");
+                "[전투 당 1회]\n체력이 최대 체력의 50% 이하일 때 죽음에 이르는 피해를 입을 시 체력을 1 남기고 생존한다");
         
         createSkill(SkillList.RESIST, "[10 마나]\n3턴간 받는 모든 물리 피해를 60% 줄여 받는다", null);
         

@@ -194,6 +194,9 @@ public class Player extends Entity {
     @Setter
     boolean printDeathMsg = true;
 
+    @Setter
+    int towerFloor = 1;
+
     public Player(@NonNull String sender, @NonNull String nickName, @NonNull String image, @NonNull String recentRoom) {
         super(sender);
         this.id.setId(Id.PLAYER);
@@ -237,7 +240,7 @@ public class Player extends Entity {
     public void setCurrentTitle(@NonNull String title) {
         if(this.title.contains(title)) {
             if(title.equals("관리자")) {
-                Config.PLAYER_LV_RANK.remove(this.getName());
+                Config.LV_RANK.remove(this.getName());
             }
 
             this.currentTitle = title;
@@ -433,7 +436,7 @@ public class Player extends Entity {
     }
 
     public void lvUp(long needExp) {
-        Config.PLAYER_LV_RANK.remove(this.getName());
+        Config.LV_RANK.remove(this.getName());
 
         if(this.lv < 100) {
             this.addMoney(10000);
@@ -444,7 +447,7 @@ public class Player extends Entity {
         this.exp += -1 * needExp;
 
         if(!this.currentTitle.equals("관리자") && this.lv >= Config.MIN_RANK_LV) {
-            Config.PLAYER_LV_RANK.put(this.getName(), this.lv);
+            Config.LV_RANK.put(this.getName(), this.lv);
         }
     }
 

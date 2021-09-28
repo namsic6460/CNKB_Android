@@ -12,7 +12,6 @@ import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.exception.WeirdCommandException;
-import lkd.namsic.game.manager.DisplayManager;
 import lkd.namsic.game.manager.FarmManager;
 import lkd.namsic.game.object.Player;
 
@@ -23,7 +22,7 @@ public class FarmCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if (second == null) {
-            DisplayManager.getInstance().displayFarmHelp(player);
+            FarmManager.getInstance().displayFarmHelp(player);
         } else if (Arrays.asList("구입", "구매", "buy").contains(second)) {
             KakaoTalk.checkDoing(player);
             FarmManager.getInstance().buyFarm(player);
@@ -48,7 +47,7 @@ public class FarmCommand extends PlayerCommand {
 
             FarmManager.getInstance().plant(player, seedName.trim(), seedCount);
         } else if (Arrays.asList("확인", "check", "c").contains(second)) {
-            DisplayManager.getInstance().displayFarm(player);
+            FarmManager.getInstance().displayFarm(player);
         } else if (Arrays.asList("제거", "remove", "r").contains(second)) {
             KakaoTalk.checkDoing(player);
 

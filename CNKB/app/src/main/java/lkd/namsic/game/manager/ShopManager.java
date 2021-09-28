@@ -22,6 +22,7 @@ import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.game.object.Shop;
 import lkd.namsic.setting.Logger;
@@ -32,6 +33,48 @@ public class ShopManager {
 
     public static ShopManager getInstance() {
         return instance;
+    }
+
+    public void displayShopHelp(@NonNull Player self) {
+        self.replyPlayer("---상점 도움말---\n" +
+                Emoji.LIST + " (도움말/명령어/?/help/h) - 상점 도움말을 표시합니다\n" +
+                Emoji.LIST + " (종료/end/e) - 상점 이용을 종료합니다\n" +
+                Emoji.LIST + " (변경/change/c) - 구매/판매 모드를 전환합니다\n" +
+                Emoji.LIST + " ({페이지}) - 해당 페이지의 상점 물품을 표시합니다\n" +
+                Emoji.LIST + " (다음/next/n) - 다음 페이지의 상점 물품을 표시합니다\n" +
+                Emoji.LIST + " (이전/prev/p) - 이전 페이지의 상점 물품을 표시합니다\n" +
+                Emoji.LIST + " (구매/buy/b) ({아이템 이름}) [{아이템 개수}] - 아이템을 구매합니다\n" +
+                Emoji.LIST + " (판매/sell/s) ({아이템 이름}) [{아이템 개수}] - 아이템을 판매합니다(-1개 입력 시 전체 판매)\n\n" +
+                Emoji.LIST + " (판매/sell/s) (전체/all) - 판매 가능한 모든 아이템을 판매합니다\n\n" +
+                Emoji.LIST + " (판매/sell/s) ({단축어}) - 단축어에 지정된 모든 아이템을 판매합니다\n\n" +
+                "예시: " + Emoji.focus("n 상점 구매 하급 체력 포션 1"));
+    }
+
+    public void displayShopList(@NonNull Player self) {
+        GameMap map = Config.getMapData(self.getLocation());
+
+        Set<Long> npcSet = map.getEntity(Id.NPC);
+
+        StringBuilder innerBuilder = new StringBuilder("---상점 목록---");
+
+        boolean exist = false;
+        for (long npcId : npcSet) {
+            try {
+                Config.getData(Id.SHOP, npcId);
+            } catch (ObjectNotFoundException e) {
+                continue;
+            }
+
+            exist = true;
+            innerBuilder.append("\n")
+                    .append(Objects.requireNonNull(NpcList.findById(npcId)));
+        }
+
+        if (!exist) {
+            innerBuilder.append("\n현재 맵에서 이용 가능한 상점이 없습니다");
+        }
+
+        self.replyPlayer("상점 목록은 전체보기로 확인해주세요", innerBuilder.toString());
     }
 
     public void startShopping(@NonNull Player self, @NonNull String npcName) {
@@ -144,7 +187,7 @@ public class ShopManager {
                     continue;
                 }
 
-                long price = shop.getSellPrice(self, itemId);
+                long price = shop.getSellPrice(self, itemId) * count;
 
                 long money = self.getMoney();
                 if(money < price) {
@@ -181,13 +224,13 @@ public class ShopManager {
                         itemSet = shop.getBuyPrice().keySet();
                     }
 
-                    long sellPrice;
+                    long sellPrice = 0;
                     int totalCount = 0;
                     for(long itemId : itemSet) {
                         count = self.getItem(itemId);
 
                         if(count > 0) {
-                            sellPrice = shop.getBuyPrice(self, itemId);
+                            sellPrice = shop.getBuyPrice(self, itemId) * count;
 
                             price += sellPrice;
                             totalCount += count;
@@ -212,6 +255,7 @@ public class ShopManager {
                         self.removeVariable(Variable.SHOP_ALL);
                     }
 
+                    self.addMoney(price);
                     self.replyPlayer("아이템 " + totalCount + "개의 판매가 완료되었습니다 (" +
                             Config.getIncrease(price) + "G)", innerBuilder.toString());
                 } else {
@@ -223,7 +267,7 @@ public class ShopManager {
                         continue;
                     }
 
-                    price = shop.getBuyPrice(self, itemId);
+                    price = shop.getBuyPrice(self, itemId) * count;
 
                     int currentCount = self.getItem(itemId);
                     if (currentCount < count) {

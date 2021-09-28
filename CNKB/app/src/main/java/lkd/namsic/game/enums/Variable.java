@@ -33,6 +33,7 @@ public enum Variable {
     SHOP_ITEM_COUNT,
     SHOP_PAGE,
     REST,
+    EQUIPPED,
     GHOST_SWORD_1,
     GHOST_SWORD_2,
     SLIME_CHESTPLATE,

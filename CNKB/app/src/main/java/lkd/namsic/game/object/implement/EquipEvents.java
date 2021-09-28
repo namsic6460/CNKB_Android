@@ -270,7 +270,7 @@ public class EquipEvents {
             put(MineEvent.getName(), new MineEvent() {
                 @Override
                 public void onMine(@NonNull Entity self, @NonNull Item item, @NonNull Int itemCount) {
-                    if (item.getId().getObjectId() == ItemList.STONE.getId() && Math.random() < 0.4) {
+                    if (item.getId().getObjectId() == ItemList.STONE.getId()) {
                         itemCount.add(1);
                     }
                 }

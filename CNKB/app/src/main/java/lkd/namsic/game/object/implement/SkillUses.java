@@ -201,7 +201,7 @@ public class SkillUses {
             public void checkUse(@NonNull Entity self, @Nullable String other) {
                 super.checkUse(self, other);
                 
-                if(self.getVariable(Variable.RESIST, 0) != 0) {
+                if(self.getVariable(Variable.RESIST) != 0) {
                     throw new WeirdCommandException(SkillList.RESIST.getDisplayName() + " 의 효과가 유지되는 동안 재사용이 불가능합니다");
                 }
             }
