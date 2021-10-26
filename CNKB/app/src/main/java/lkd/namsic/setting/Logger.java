@@ -40,7 +40,15 @@ public class Logger {
         log(title, text, "WARN");
         Log.w(title, text);
 
-        FileManager.save(FileManager.LOG_PATH + "/WARN_" + getTimeFileName(), title + "\n" + text);
+        String errorString;
+
+        try {
+            throw new RuntimeException();
+        } catch (RuntimeException e) {
+            errorString = Config.errorString(e);
+        }
+
+        FileManager.save(FileManager.LOG_PATH + "/WARN_" + getTimeFileName(), title + "\n" + text + "\n\n" + errorString);
     }
 
     public static synchronized void e(String title, Throwable t) {

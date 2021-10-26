@@ -545,11 +545,9 @@ public class FightManager {
                         this.endFight(entity_);
                     }
 
-                    entity.setKiller(null);
                     return true;
                 } else {
                     this.endFight(entity);
-                    entity.setKiller(null);
                 }
             }
         }
@@ -882,6 +880,7 @@ public class FightManager {
             this.targetMap.remove(fightId);
         }
 
+        self.setKiller(null);
         Config.unloadObject(self);
     }
 

@@ -17,7 +17,6 @@ import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.event.FishEvent;
-import lkd.namsic.game.event.MineEvent;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.WeirdCommandException;
 import lkd.namsic.game.object.GameMap;
@@ -192,7 +191,7 @@ public class FishManager {
             if (response.equals(FishWaitType.NONE)) {
                 if (i == 0) {
                     Int itemCount = new Int(1);
-                    String eventName = MineEvent.getName();
+                    String eventName = FishEvent.getName();
                     FishEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), itemId, itemCount);
 
                     self.addItem(itemId, itemCount.get(), false);

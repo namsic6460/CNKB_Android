@@ -60,7 +60,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
 
-    public static final double VERSION = 3.11;
+    public static final double VERSION = 3.13;
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -390,10 +390,6 @@ public class Config {
             }
 
             if(save) {
-                if(objectCount == 1 && id.equals(Id.PLAYER)) {
-                    ((Player) gameObject).setKiller(null);
-                }
-
                 jsonString = toJson(gameObject);
 
                 if(id.equals(Id.PLAYER)) {
@@ -865,12 +861,13 @@ public class Config {
 
     @NonNull
     public static String errorString(@NonNull Throwable throwable) {
-        StringBuilder builder = new StringBuilder(throwable.getClass().getName());
-        builder.append(": ");
-        builder.append(throwable.getMessage());
+        StringBuilder builder = new StringBuilder(throwable.getClass().getName())
+                .append(": ")
+                .append(throwable.getMessage());
+
         for(StackTraceElement element : throwable.getStackTrace()) {
-            builder.append("\n\tat ");
-            builder.append(element.toString());
+            builder.append("\n\tat ")
+                    .append(element.toString());
         }
 
         return builder.toString();

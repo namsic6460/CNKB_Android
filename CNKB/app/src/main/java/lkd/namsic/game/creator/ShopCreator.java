@@ -212,6 +212,11 @@ public class ShopCreator implements Creatable {
         shop.addBuyItem(ItemList.OWLBEAR_LEATHER, 400L);
         shop.addBuyItem(ItemList.OWLBEAR_HEAD, 800L);
         shop.addBuyItem(ItemList.HARDENED_SLIME, 500L);
+        shop.addBuyItem(ItemList.LYCANTHROPE_TOOTH, 300L);
+        shop.addBuyItem(ItemList.LYCANTHROPE_LEATHER, 150L);
+        shop.addBuyItem(ItemList.LYCANTHROPE_HEAD, 600L);
+        shop.addBuyItem(ItemList.LYCANTHROPE_HEART, 600L);
+        shop.addBuyItem(ItemList.LYCANTHROPE_SOUL, 1000L);
 
         idSet = new HashSet<>();
         idSet.add(ItemList.HORN_OF_IMP.getId());
@@ -232,6 +237,14 @@ public class ShopCreator implements Creatable {
         idSet.add(ItemList.OWLBEAR_LEATHER.getId());
         idSet.add(ItemList.OWLBEAR_HEAD.getId());
         shop.addSimpleMap(idSet, "아울베어", "owlbear");
+
+        idSet = new HashSet<>();
+        idSet.add(ItemList.LYCANTHROPE_TOOTH.getId());
+        idSet.add(ItemList.LYCANTHROPE_LEATHER.getId());
+        idSet.add(ItemList.LYCANTHROPE_HEAD.getId());
+        idSet.add(ItemList.LYCANTHROPE_HEART.getId());
+        idSet.add(ItemList.LYCANTHROPE_SOUL.getId());
+        shop.addSimpleMap(idSet, "라이칸스로프", "lycanthrope", "lycan");
 
         Config.unloadObject(shop);
 

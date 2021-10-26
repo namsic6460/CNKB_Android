@@ -380,8 +380,9 @@ public class EquipCreator implements Creatable {
             put(ItemList.ZOMBIE_HEAD.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MATK, 10);
+        equipment.setBasicStat(StatType.ATS, 5);
         equipment.setBasicStat(StatType.MBRE, 5);
-        equipment.setBasicStat(StatType.ATS, 10);
+        equipment.setBasicStat(StatType.MDRA, 5);
         equipment.setBasicStat(StatType.MAXMN, 3);
         Config.unloadObject(equipment);
 
@@ -902,7 +903,7 @@ public class EquipCreator implements Creatable {
                 null, "공격 시 물리 데미지와 마법 데미지의 7%가 고정 데미지로 변환된다");
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.GARNET.getId(), 10);
+            put(ItemList.GARNET.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.ATK, 5);
@@ -913,7 +914,7 @@ public class EquipCreator implements Creatable {
                 null, "농사 수확에 필요한 작물 성장 시간이 10% 감소한다");
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.AMETHYST.getId(), 10);
+            put(ItemList.AMETHYST.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.DEF, 8);
@@ -924,7 +925,7 @@ public class EquipCreator implements Creatable {
                 null, "휴식의 시간이 5분으로 변경된다");
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.AQUAMARINE.getId(), 10);
+            put(ItemList.AQUAMARINE.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.MAXHP, 40);
@@ -934,7 +935,7 @@ public class EquipCreator implements Creatable {
                 null, "공격으로 인한 회복량이 10% 증가한다");
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.DIAMOND.getId(), 10);
+            put(ItemList.DIAMOND.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.DRA, 5);
@@ -945,7 +946,7 @@ public class EquipCreator implements Creatable {
                 null, "몬스터 및 보스 전리품 확률이 15% 증가한다\n(예시: 10% -> 11.5%)");
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.EMERALD.getId(), 10);
+            put(ItemList.EMERALD.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.BRE, 10);
@@ -956,7 +957,7 @@ public class EquipCreator implements Creatable {
                 null, "전투 시작 시 현재 체력이 최대 체력이라면 해당 전투에서 공격속도가 8% 증가한다");
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.PEARL.getId(), 10);
+            put(ItemList.PEARL.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.ATS, 40);
@@ -966,7 +967,7 @@ public class EquipCreator implements Creatable {
                 "[10 마나]\n다음 공격으로 인한 회복량이 3배가 된다", null);
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.RUBY.getId(), 10);
+            put(ItemList.RUBY.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.DRA, 5);
@@ -977,7 +978,7 @@ public class EquipCreator implements Creatable {
                 null, "피격 시 전투 중인 인원이 본인 포함 2개체라면 데미지를 8% 줄여 받는다");
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.PERIDOT.getId(), 10);
+            put(ItemList.PERIDOT.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.DEF, 8);
@@ -988,7 +989,7 @@ public class EquipCreator implements Creatable {
                 null, "광질 및 낚시로 얻는 아이템의 양이 10% 확률로 2배가 된다");
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.SAPPHIRE.getId(), 10);
+            put(ItemList.SAPPHIRE.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.ACC, 20);
@@ -1000,7 +1001,7 @@ public class EquipCreator implements Creatable {
                 "(체력차 1% 당 1.5% 증가) (최대 75%)");
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.OPAL.getId(), 10);
+            put(ItemList.OPAL.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.ATK, 5);
@@ -1011,7 +1012,7 @@ public class EquipCreator implements Creatable {
                 null, "매 턴 마다 잃은 체력에 비례하여 체력을 회복한다(잃은 체력 2% 당 최대 체력의 0.18%)");
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.TOPAZ.getId(), 10);
+            put(ItemList.TOPAZ.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.MAXHP, 15);
@@ -1023,7 +1024,7 @@ public class EquipCreator implements Creatable {
                 null, "전투로 획득하는 경험치가 8% 증가한다");
         equipment.setHandleLv(3);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.TURQUOISE.getId(), 10);
+            put(ItemList.TURQUOISE.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MAXMN, 5);
         equipment.setBasicStat(StatType.ATK, 4);

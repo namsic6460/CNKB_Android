@@ -43,51 +43,54 @@ public class FarmManager {
         FarmManager.getInstance().checkFarm(self);
 
         Farm farm = Config.loadObject(Id.FARM, self.getId().getObjectId());
+        StringBuilder innerBuilder;
 
-        StringBuilder innerBuilder = new StringBuilder("---")
-                .append(self.getNickName())
-                .append(" 님의 농장 정보---\n농장 레벨: ")
-                .append(farm.getLv())
-                .append("\n작물 개수: ")
-                .append(farm.getPlanted().size())
-                .append("/")
-                .append(farm.getMaxPlantCount())
-                .append("\n\n---작물 현황---");
+        try {
+            innerBuilder = new StringBuilder("---")
+                    .append(self.getNickName())
+                    .append(" 님의 농장 정보---\n농장 레벨: ")
+                    .append(farm.getLv())
+                    .append("\n작물 개수: ")
+                    .append(farm.getPlanted().size())
+                    .append("/")
+                    .append(farm.getMaxPlantCount())
+                    .append("\n\n---작물 현황---");
 
-        if (farm.getPlanted().isEmpty()) {
-            innerBuilder.append("\n작물이 심어져있지 않습니다");
-        } else {
-            long currentTime = System.currentTimeMillis();
-            long diff;
+            if (farm.getPlanted().isEmpty()) {
+                innerBuilder.append("\n작물이 심어져있지 않습니다");
+            } else {
+                long currentTime = System.currentTimeMillis();
+                long diff;
 
-            int index = 1;
-            long day, hour, minute;
-            for (Farm.Plant plant : farm.getPlanted()) {
-                diff = (currentTime - plant.getLastHarvestTime()) / 1000;
+                int index = 1;
+                long day, hour, minute;
+                for (Farm.Plant plant : farm.getPlanted()) {
+                    diff = (currentTime - plant.getLastHarvestTime()) / 1000;
 
-                day = diff / 86400;
-                diff = diff % 86400;
-                hour = diff / 3600;
-                minute = (diff % 3600) / 60;
+                    day = diff / 86400;
+                    diff = diff % 86400;
+                    hour = diff / 3600;
+                    minute = (diff % 3600) / 60;
+
+                    innerBuilder.append("\n")
+                            .append(Config.SPLIT_BAR)
+                            .append("\n")
+                            .append(index++)
+                            .append(". ")
+                            .append(ItemList.findById(plant.getId().getObjectId()))
+                            .append("\n마지막 수확: ")
+                            .append(day)
+                            .append("일 ")
+                            .append(hour)
+                            .append("시간 ")
+                            .append(minute)
+                            .append("분 전");
+                }
 
                 innerBuilder.append("\n")
-                        .append(Config.SPLIT_BAR)
-                        .append("\n")
-                        .append(index++)
-                        .append(". ")
-                        .append(ItemList.findById(plant.getId().getObjectId()))
-                        .append("\n마지막 수확: ")
-                        .append(day)
-                        .append("일 ")
-                        .append(hour)
-                        .append("시간 ")
-                        .append(minute)
-                        .append("분 전");
+                        .append(Config.SPLIT_BAR);
             }
-
-            innerBuilder.append("\n")
-                    .append(Config.SPLIT_BAR);
-
+        } finally {
             Config.unloadObject(farm);
         }
 
@@ -137,7 +140,7 @@ public class FarmManager {
         }
 
         if(self.getItem(itemId) < count) {
-            throw new WeirdCommandException("씨앗 개수가 부족합니다\n현재 보유개수: " + self.getItem(itemId));
+            throw new WeirdCommandException("씨앗 개수가 부족합니다\n현재 보유개수: " + self.getItem(itemId) + "개");
         }
 
         Farm farm = Config.loadObject(Id.FARM, self.getId().getObjectId());
@@ -220,7 +223,11 @@ public class FarmManager {
                     harvested.put(itemId, harvested.getOrDefault(itemId, 0) + itemCount);
                 }
 
-                plant.setLastHarvestTime(plant.getLastHarvestTime() + (growTime.get() * harvestCount));
+                if(gap < Config.MAX_HARVEST_DAY * 86_400_000) {
+                    plant.setLastHarvestTime(plant.getLastHarvestTime() + (growTime.get() * harvestCount));
+                } else {
+                    plant.setLastHarvestTime(currentTime);
+                }
             }
 
             if(harvested.isEmpty()) {
@@ -245,9 +252,10 @@ public class FarmManager {
         this.checkFarm(self);
         
         Farm farm = Config.loadObject(Id.FARM, self.getId().getObjectId());
-        int farmLv = farm.getLv();
 
         try {
+            int farmLv = farm.getLv();
+
             if (farmLv == Config.MAX_FARM_LV) {
                 throw new WeirdCommandException("이미 농장이 최대 레벨입니다");
             }

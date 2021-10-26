@@ -103,7 +103,7 @@ public class ChatCreator implements Creatable {
 
         chat = createChat("낚시를 하면서 할만한 퀘스트가 있을까요?", 9L,
                 "요즘 바다나 강이 너무 더러워저셔 말일세",
-                "쓰레기가 낚이는게 있으면 3개만 구해다 줄 수 있겠나?"
+                "쓰레기가 낚이는게 있으면 1개만 구해다 줄 수 있겠나?"
         );
         chat.setResponseChat(WaitResponse.YES, 12L);
         chat.setResponseChat(WaitResponse.NO, 11L);

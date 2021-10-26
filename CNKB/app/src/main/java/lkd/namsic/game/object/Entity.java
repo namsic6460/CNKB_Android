@@ -42,6 +42,7 @@ import lkd.namsic.game.exception.InvalidNumberException;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.UnhandledEnumException;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.manager.FightManager;
 import lkd.namsic.game.object.implement.EntityEvents;
 import lombok.Getter;
 import lombok.Setter;
@@ -586,7 +587,34 @@ public abstract class Entity extends NamedObject {
 
     public boolean canFight(@NonNull Entity enemy) {
         List<Doing> fightableList = Doing.fightableList();
-        return fightableList.contains(this.doing) && fightableList.contains(enemy.doing);
+
+        if(fightableList.contains(this.doing) && fightableList.contains(enemy.doing)) {
+            if(enemy.doing.equals(Doing.FIGHT)) {
+                long fightId;
+
+                try {
+                    fightId = FightManager.getInstance().getFightId(enemy.getId());
+                } catch (NullPointerException e) {
+                    return false;
+                }
+
+                Set<Entity> entitySet = FightManager.getInstance().getEntitySet(fightId);
+
+                int count = 0;
+                for(Entity entity : new HashSet<>(entitySet)) {
+                    if(Doing.fightList().contains(entity.getDoing()) && entity.getKiller() == null &&
+                            FightManager.getInstance().fightId.containsKey(entity.getId())) {
+                        count++;
+                    }
+                }
+
+                return count >= 2;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void attack(@NonNull Entity entity, boolean print) {
@@ -797,7 +825,7 @@ public abstract class Entity extends NamedObject {
         return this.getVariable(variable, 0);
     }
 
-    public int getVariable(Variable variable, int defaultValue) {
+    public int getVariable(@NonNull Variable variable, int defaultValue) {
         Object value = this.variable.getOrDefault(variable, defaultValue);
 
         if(value instanceof Double) {
@@ -807,7 +835,7 @@ public abstract class Entity extends NamedObject {
         }
     }
 
-    public long getVariable(Variable variable, long defaultValue) {
+    public long getVariable(@NonNull Variable variable, long defaultValue) {
         Object value = this.variable.getOrDefault(variable, defaultValue);
 
         if(value instanceof Double) {
@@ -819,19 +847,19 @@ public abstract class Entity extends NamedObject {
 
     @SuppressWarnings("unchecked")
     @Nullable
-    public <T> T getObjectVariable(Variable variable) {
+    public <T> T getObjectVariable(@NonNull Variable variable) {
         return (T) this.variable.get(variable);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public <T> T getObjectVariable(Variable variable, T defaultValue) {
+    public <T> T getObjectVariable(@NonNull Variable variable, @NonNull T defaultValue) {
         return (T) this.variable.getOrDefault(variable, defaultValue);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public List<Long> getListVariable(Variable variable) {
+    public List<Long> getListVariable(@NonNull Variable variable) {
         List<?> list = this.getObjectVariable(variable);
         List<Long> outputList = new ArrayList<>();
 
@@ -853,6 +881,32 @@ public abstract class Entity extends NamedObject {
 
         this.setVariable(variable, outputList);
         return outputList;
+    }
+
+    @SuppressWarnings("unchecked")
+    @NonNull
+    public Set<Long> getSetVariable(Variable variable) {
+        Set<?> set = this.getObjectVariable(variable);
+        Set<Long> outputSet = new HashSet<>();
+
+        if(set == null) {
+            outputSet = new HashSet<>();
+            this.setVariable(variable, outputSet);
+            return outputSet;
+        }
+
+        if(!set.isEmpty()) {
+            if(set.toArray()[0] instanceof Double) {
+                for (Object element : set) {
+                    outputSet.add(((Double) element).longValue());
+                }
+            } else {
+                return (Set<Long>) set;
+            }
+        }
+
+        this.setVariable(variable, outputSet);
+        return outputSet;
     }
 
     @SuppressWarnings("unchecked")

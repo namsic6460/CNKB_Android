@@ -202,7 +202,7 @@ public class EquipManager {
                     "(예시: " + Emoji.focus("ㅜ 장비 분해 2 목검"));
         }
 
-        if(self.getEquipped(equipment.getEquipType()) != equipId) {
+        if(self.getEquipped(equipment.getEquipType()) == equipId) {
             throw new WeirdCommandException("장착중인 장비는 분해할 수 없습니다");
         }
 
@@ -286,7 +286,7 @@ public class EquipManager {
     }
 
     public void equipAll(@NonNull Player self) {
-        List<Long> equippedList = self.getListVariable(Variable.EQUIPPED);
+        Set<Long> equippedList = self.getSetVariable(Variable.EQUIPPED);
 
         Equipment equipment;
         int failCount = 0;

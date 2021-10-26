@@ -72,11 +72,15 @@ public class ChatManager {
                 if (questManager.canClearQuest(self, questId)) {
                     Long chatId = self.getQuest().get(questId);
                     if(chatId == null) {
-                        return;
+                        continue;
                     }
+
+                    //Prevents error
+                    self.setDoing(Doing.CHAT);
 
                     questManager.clearQuest(self, questId, npcId);
                     this.startChat(self, chatId, npcId);
+
                     return;
                 }
             }
