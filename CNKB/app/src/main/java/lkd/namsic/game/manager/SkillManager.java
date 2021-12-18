@@ -76,8 +76,7 @@ public class SkillManager {
         return skillId;
     }
 
-    @NonNull
-    public String use(@NonNull Entity self, long skillId, @Nullable String other, @NonNull Set<Player> playerSet) {
+    public void use(@NonNull Entity self, long skillId, @Nullable String other, @NonNull Set<Player> playerSet) {
         Skill skill = Config.getData(Id.SKILL, skillId);
         String skillName = skill.getName();
 
@@ -118,8 +117,6 @@ public class SkillManager {
                 ((Player) self).replyPlayer(RESIST);
             }
         }
-
-        return "";
     }
 
 }

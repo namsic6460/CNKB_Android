@@ -9,7 +9,7 @@ import java.util.Objects;
 import lombok.Getter;
 
 public enum EventList {
-
+    
     NONE(0L),
     ENT_DAMAGED(1L),
     OAK_START(2L),
@@ -45,27 +45,27 @@ public enum EventList {
     WOLF_OF_MOON_PAGE_2(32L),
     WOLF_OF_MOON_PAGE_3(33L),
     WOLF_OF_MOON_END(34L);
-
+    
     public static final Map<Long, EventList> idMap = new HashMap<>();
-
+    
     static {
         for(EventList value : EventList.values()) {
             idMap.put(value.id, value);
         }
-
+        
         idMap.remove(NONE.id);
     }
-
+    
     @Getter
     private final long id;
-
+    
     EventList(long id) {
         this.id = id;
     }
-
+    
     @NonNull
     public static EventList findById(long id) {
         return Objects.requireNonNull(idMap.get(id));
     }
-
+    
 }

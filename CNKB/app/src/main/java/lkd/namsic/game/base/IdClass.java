@@ -14,22 +14,23 @@ import lombok.ToString;
 @Setter
 @ToString
 public class IdClass {
-
+    
     Id id = null;
     long objectId = 0L;
-
-    public IdClass() {}
-
+    
+    public IdClass() {
+    }
+    
     public IdClass(@NonNull Id id, long objectId) {
         this.id = id;
         this.objectId = objectId;
     }
-
+    
     @Override
     public int hashCode() {
         return (id.hashCode() + "_" + objectId).hashCode();
     }
-
+    
     @Override
     public boolean equals(@Nullable Object obj) {
         if(obj instanceof IdClass) {
@@ -39,5 +40,5 @@ public class IdClass {
             return false;
         }
     }
-
+    
 }

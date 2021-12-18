@@ -15,31 +15,31 @@ import lombok.Getter;
 
 @Getter
 public class Skill extends NamedObject {
-
+    
     @Nullable
     final String activeDes;
-
+    
     @Nullable
     final String passiveDes;
-
+    
     public Skill(@NonNull SkillList skillData, @Nullable String activeDes, @Nullable String passiveDes) {
         super(skillData.getDisplayName());
-
+        
         this.id.setId(Id.SKILL);
         this.id.setObjectId(skillData.getId());
-
+        
         this.activeDes = activeDes;
         this.passiveDes = passiveDes;
     }
-
+    
     @Nullable
     public SkillUse getSkillUse() {
         return SkillUses.MAP.get(this.id.getObjectId());
     }
-
+    
     @Nullable
     public Map<String, Event> getEvent() {
         return EntityEvents.getEvent(this.id.getObjectId());
     }
-
+    
 }

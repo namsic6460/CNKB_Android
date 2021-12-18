@@ -72,7 +72,7 @@ public class AppraiseManager {
 
         synchronized (self) {
             try {
-                self.wait(totalTime * 1000);
+                self.wait(totalTime * 1000L);
             } catch (InterruptedException e) {
                 Logger.e("Player.appraiseThread", e);
                 throw new RuntimeException(e);

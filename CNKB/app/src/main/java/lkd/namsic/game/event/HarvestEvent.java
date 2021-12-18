@@ -17,21 +17,21 @@ import lkd.namsic.game.object.implement.EntityEvents;
 import lkd.namsic.game.object.implement.EquipEvents;
 
 public abstract class HarvestEvent implements Event {
-
+    
     @NonNull
     public static String getName() {
         return "HarvestEvent";
     }
-
+    
     public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events,
                                    @NonNull Set<Long> eventEquipSet, @NonNull LoNg growTime) {
-        if (events != null) {
-            for (long eventId : new ArrayList<>(events)) {
+        if(events != null) {
+            for(long eventId : new ArrayList<>(events)) {
                 HarvestEvent harvestEvent = EntityEvents.getEvent(eventId);
-
+                
                 try {
                     harvestEvent.onHarvest(self, growTime);
-                } catch (EventRemoveException e) {
+                } catch(EventRemoveException e) {
                     if(events.size() == 1) {
                         self.getEvent().remove(getName());
                     } else {
@@ -40,25 +40,25 @@ public abstract class HarvestEvent implements Event {
                 }
             }
         }
-
+        
         for(long equipId : eventEquipSet) {
             HarvestEvent harvestEvent = EquipEvents.getEvent(equipId, getName());
-
+            
             try {
                 harvestEvent.onHarvest(self, growTime);
-            } catch (EventRemoveException e) {
+            } catch(EventRemoveException e) {
                 Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
                 self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
             }
         }
     }
-
+    
     public abstract void onHarvest(@NonNull Entity self, @NonNull LoNg growTime);
-
+    
     @NonNull
     @Override
     public String getClassName() {
         return getName();
     }
-
+    
 }

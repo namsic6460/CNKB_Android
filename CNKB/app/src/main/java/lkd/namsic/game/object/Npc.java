@@ -1,7 +1,5 @@
 package lkd.namsic.game.object;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -24,21 +22,21 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Npc extends Entity {
-
+    
     final long firstChat;
-
+    
     Map<ChatLimit, Set<Long>> baseChat = new HashMap<>();
     Map<ChatLimit, Set<Long>> chat = new HashMap<>();
-
+    
     public Npc(@NonNull NpcList npcData, long firstChat) {
         super(npcData.getDisplayName());
-
+        
         this.id.setId(Id.NPC);
         this.id.setObjectId(npcData.getId());
-
+        
         this.firstChat = firstChat;
     }
-
+    
     public void setBaseChat(@NonNull ChatLimit chatLimit, long chatId) {
         Chat chat = Config.getData(Id.CHAT, chatId);
         if(chat.getQuestId() != 0) {
@@ -46,7 +44,7 @@ public class Npc extends Entity {
         } else if(!chat.isBaseMsg()) {
             throw new RuntimeException("Base chat must be base msg");
         }
-
+        
         Set<Long> chatSet = this.baseChat.get(chatLimit);
         if(chatSet == null) {
             chatSet = new HashSet<>();
@@ -56,7 +54,7 @@ public class Npc extends Entity {
             chatSet.add(chatId);
         }
     }
-
+    
     public void setChat(@NonNull ChatLimit chatLimit, long chatId) {
         Set<Long> chatSet = this.chat.get(chatLimit);
         if(chatSet == null) {
@@ -67,36 +65,35 @@ public class Npc extends Entity {
             chatSet.add(chatId);
         }
     }
-
+    
     @NonNull
     private List<Long> getAvailableBaseChat(@NonNull Player player) {
         List<Long> list = new ArrayList<>();
-
-        Log.i("namsic!", this.baseChat.toString());
+        
         for(Map.Entry<ChatLimit, Set<Long>> entry : this.baseChat.entrySet()) {
             if(entry.getKey().isAvailable(player)) {
                 list.addAll(entry.getValue());
             }
         }
-
+        
         list.sort((o1, o2) -> o1 < o2 ? -1 : 1);
         return list;
     }
-
+    
     @NonNull
     public List<Long> getAvailableChat(@NonNull Player player) {
         List<Long> list = new ArrayList<>();
-
+        
         for(Map.Entry<ChatLimit, Set<Long>> entry : this.chat.entrySet()) {
             if(entry.getKey().isAvailable(player)) {
                 list.addAll(entry.getValue());
             }
         }
-
+        
         list.sort((o1, o2) -> o1 < o2 ? -1 : 1);
         return list;
     }
-
+    
     public void startChat(@NonNull Player player) {
         List<Long> availableBaseSet = this.getAvailableBaseChat(player);
         if(availableBaseSet.isEmpty()) {
@@ -107,24 +104,24 @@ public class Npc extends Entity {
         long chatId = (long) availableBaseSet.toArray()[new Random().nextInt(availableBaseSet.size())];
         ChatManager.getInstance().startChat(player, chatId, this.getId().getObjectId());
     }
-
+    
     @Deprecated
     @Override
     public void onKill(@NonNull Entity entity) {
         throw new RuntimeException("Deprecated");
     }
-
+    
     @NonNull
     @Override
     public String getName() {
         return "[NPC] " + this.name;
     }
-
+    
     @Deprecated
     @NonNull
     @Override
     public String getFightName() {
         throw new RuntimeException("Deprecated");
     }
-
+    
 }

@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
 import lkd.namsic.game.enums.Id;
-import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.MonsterList;
 import lkd.namsic.game.object.Entity;
@@ -61,7 +60,7 @@ public class ExampleUnitTest {
     public long getNeedExp(int lv) {
         long needExp;
         if (lv <= 100) {
-            needExp = 10_000 + 5_000 * lv;
+            needExp = 10_000 + 5_000L * lv;
         } else if (lv <= 300) {
             needExp = -200_000 + (long) (Math.pow(lv - 10, 2.5) * 2) + 10_000 * lv;
         } else if (lv <= 500) {
@@ -209,7 +208,7 @@ public class ExampleUnitTest {
             json = FileManager.read(file);
             player = Config.gson.fromJson(json, Player.class);
 
-            player.addMoney(player.getLv() * -5000);
+            player.addMoney(player.getLv() * -5000L);
             player.addMoney(Math.min(player.getLv() * 5000, 500_000));
 
             FileManager.save(file.getAbsolutePath(), Config.gson.toJson(player));

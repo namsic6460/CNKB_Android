@@ -20,6 +20,7 @@ public class SetStatCommand extends PlayerCommand {
                                @Nullable String second, @Nullable String third, @Nullable String fourth,
                                @NonNull Notification.Action session) {
         if(player.getId().getObjectId() == 1) {
+            assert second != null;
             StatType statType = Objects.requireNonNull(StatType.findByName(second.toUpperCase()));
             int stat = Integer.parseInt(third);
 

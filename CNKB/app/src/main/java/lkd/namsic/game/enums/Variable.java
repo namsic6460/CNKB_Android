@@ -1,7 +1,7 @@
 package lkd.namsic.game.enums;
 
 public enum Variable {
-
+    
     IS_TUTORIAL,
     HIGH_PRIORITY_ITEM,
     INFO_PUBLIC,
@@ -62,5 +62,5 @@ public enum Variable {
     WOLF_OF_MOON_ATS,
     CUTTING_MOONLIGHT_DAMAGE_SAME,
     LYCANTHROPE_TOOTH_NECKLACE_INCREASE,
-
+    
 }

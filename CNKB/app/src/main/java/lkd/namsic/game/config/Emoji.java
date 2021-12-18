@@ -1,7 +1,7 @@
 package lkd.namsic.game.config;
 
 public class Emoji {
-
+    
     public final static String OPENER = "「";
     public final static String CLOSER = "」";
     public final static String LIST = "⚫";  //consider '-'
@@ -19,9 +19,9 @@ public class Emoji {
     public final static String MONSTER = "\uD83D\uDC3E";
     public final static String BOSS = "❗";
     public final static String STAR = "★";
-
+    
     public static String focus(String text) {
         return OPENER + text + CLOSER;
     }
-
+    
 }

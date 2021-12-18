@@ -11,7 +11,7 @@ import java.util.Map;
 import lombok.Getter;
 
 public enum SkillList {
-
+    
     NONE("NONE", 0L),
     MAGIC_BALL("매직 볼", 1L),
     SMITE("강타", 2L, EventList.SKILL_SMITE_PRE_DAMAGE),
@@ -24,56 +24,56 @@ public enum SkillList {
     ROAR("포효", 9L),
     HOWLING_OF_WOLF("늑대의 하울링", 10L),
     CUTTING_MOONLIGHT("달빛 베기", 11L);
-
+    
     public static final Map<String, SkillList> nameMap = new HashMap<>();
     public static final Map<Long, SkillList> idMap = new HashMap<>();
-
+    
     static {
         for(SkillList value : SkillList.values()) {
             nameMap.put(value.displayName, value);
             idMap.put(value.id, value);
         }
-
+        
         nameMap.remove(NONE.displayName);
         idMap.remove(NONE.id);
     }
-
+    
     @Getter
     @NonNull
     private final String displayName;
-
+    
     @Getter
     private final long id;
-
+    
     @Getter
     private final List<Long> eventList = new ArrayList<>();
-
+    
     SkillList(@NonNull String displayName, long id) {
         this.displayName = displayName;
         this.id = id;
     }
-
-    SkillList(@NonNull String displayName, long id, @Nullable EventList...eventDataList) {
+    
+    SkillList(@NonNull String displayName, long id, @Nullable EventList... eventDataList) {
         this.displayName = displayName;
         this.id = id;
-
+        
         if(eventDataList != null) {
-            for (EventList eventData : eventDataList) {
+            for(EventList eventData : eventDataList) {
                 this.eventList.add(eventData.getId());
             }
         }
     }
-
+    
     @Nullable
     public static Long findByName(@NonNull String name) {
         SkillList boss = nameMap.get(name);
         return boss == null ? null : boss.id;
     }
-
+    
     @Nullable
     public static String findById(long id) {
         SkillList skillData = idMap.get(id);
         return skillData == null ? null : skillData.displayName;
     }
-
+    
 }

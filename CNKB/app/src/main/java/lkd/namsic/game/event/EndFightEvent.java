@@ -16,20 +16,20 @@ import lkd.namsic.game.object.implement.EntityEvents;
 import lkd.namsic.game.object.implement.EquipEvents;
 
 public abstract class EndFightEvent implements Event {
-
+    
     @NonNull
     public static String getName() {
         return "FightEndEvent";
     }
-
+    
     public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events, @NonNull Set<Long> eventEquipSet) {
-        if (events != null) {
-            for (long eventId : new ArrayList<>(events)) {
+        if(events != null) {
+            for(long eventId : new ArrayList<>(events)) {
                 EndFightEvent endFightEvent = EntityEvents.getEvent(eventId);
-
+                
                 try {
                     endFightEvent.onEndFight(self);
-                } catch (EventRemoveException e) {
+                } catch(EventRemoveException e) {
                     if(events.size() == 1) {
                         self.getEvent().remove(getName());
                     } else {
@@ -38,25 +38,25 @@ public abstract class EndFightEvent implements Event {
                 }
             }
         }
-
+        
         for(long equipId : eventEquipSet) {
             EndFightEvent endFightEvent = EquipEvents.getEvent(equipId, getName());
-
+            
             try {
                 endFightEvent.onEndFight(self);
-            } catch (EventRemoveException e) {
+            } catch(EventRemoveException e) {
                 Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
                 self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
             }
         }
     }
-
+    
     public abstract void onEndFight(@NonNull Entity self);
-
+    
     @NonNull
     @Override
     public String getClassName() {
         return getName();
     }
-
+    
 }

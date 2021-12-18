@@ -224,7 +224,7 @@ public class ShopManager {
                         itemSet = shop.getBuyPrice().keySet();
                     }
 
-                    long sellPrice = 0;
+                    long sellPrice;
                     int totalCount = 0;
                     for(long itemId : itemSet) {
                         count = self.getItem(itemId);

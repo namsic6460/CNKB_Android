@@ -1,4 +1,4 @@
- package lkd.namsic.game.enums.object;
+package lkd.namsic.game.enums.object;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,7 +11,7 @@ import lkd.namsic.game.config.Config;
 import lombok.Getter;
 
 public enum MapList {
-
+    
     INCOMPLETE(Config.INCOMPLETE, -1, -1),
     START_VILLAGE("시작의 마을", 0, 0),
     QUITE_SEASHORE("조용한 바닷가", 0, 1),
@@ -33,43 +33,43 @@ public enum MapList {
     SKY_HILL("하늘 언덕", 3, 3),
     ABANDONED_PLACE_OF_MOONLIGHT("달빛의 폐허", 4, 0),
     ELF_FOREST("엘프의 숲", 4, 1);
-
+    
     public static final Map<String, MapList> nameMap = new HashMap<>();
     public static final Map<Location, MapList> locationMap = new HashMap<>();
-
+    
     static {
         for(MapList value : MapList.values()) {
             nameMap.put(value.displayName, value);
             locationMap.put(value.location, value);
         }
-
+        
         nameMap.remove(INCOMPLETE.displayName);
         locationMap.remove(INCOMPLETE.location);
     }
-
+    
     @Getter
     @NonNull
     private final String displayName;
-
+    
     @Getter
     @NonNull
     private final Location location;
-
+    
     MapList(@NonNull String displayName, int x, int y) {
         this.displayName = displayName;
         this.location = new Location(x, y, true);
     }
-
+    
     @Nullable
     public static Location findByName(@NonNull String name) {
         MapList map = nameMap.get(name);
         return map == null ? null : map.location;
     }
-
+    
     @NonNull
     public static String findByLocation(int x, int y) {
         MapList map = locationMap.get(new Location(x, y));
         return map == null ? Config.INCOMPLETE : map.displayName;
     }
-
+    
 }

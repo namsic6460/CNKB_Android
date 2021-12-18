@@ -9,7 +9,7 @@ import java.util.Map;
 import lombok.Getter;
 
 public enum StatType {
-
+    
     MAXHP("최대 체력", 1),
     HP("현재 체력", 0),
     MAXMN("최대 마나", 5),
@@ -26,39 +26,39 @@ public enum StatType {
     MDRA("마법 흡수력", 5),
     EVA("회피", 1),
     ACC("정확도", 1);
-
+    
     private static final Map<String, StatType> map = new HashMap<>();
-
+    
     static {
         for(StatType statType : StatType.values()) {
             map.put(statType.displayName, statType);
         }
     }
-
+    
     @Getter
     @NonNull
     private final String displayName;
-
+    
     @Getter
     private final int useSp;
-
+    
     StatType(@NonNull String displayName, int useSp) {
         this.displayName = displayName;
         this.useSp = useSp;
     }
-
+    
     @Nullable
     public static StatType findByName(@NonNull String name) {
         StatType statType = map.get(name);
-
+        
         if(statType == null) {
             try {
                 statType = StatType.valueOf(name);
-            } catch (IllegalArgumentException e) {
+            } catch(IllegalArgumentException e) {
                 return null;
             }
         }
-
+        
         return statType;
     }
 }

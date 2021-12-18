@@ -9,9 +9,9 @@ import java.util.Map;
 import lombok.Getter;
 
 public enum QuestList {
-
+    
     NONE("NONE", 0L),
-
+    
     WORK_OF_MINER("광부의 일", 1L),
     TRASH_COLLECTING("쓰레기 수거", 2L),
     NEED_FIRE("불이 필요해!", 3L),
@@ -51,42 +51,42 @@ public enum QuestList {
     INCREASING_ZOMBIE("불어나는 좀비들", 38L),
     BONE_IN_THE_SEA("바닷속의 뼛조각", 39L),
     SOUND_IN_THE_SINKHOLE("싱크홀에서의 소리", 40L);
-
+    
     public static final Map<String, QuestList> nameMap = new HashMap<>();
     public static final Map<Long, QuestList> idMap = new HashMap<>();
-
+    
     static {
         for(QuestList value : QuestList.values()) {
             nameMap.put(value.displayName, value);
             idMap.put(value.id, value);
         }
-
+        
         nameMap.remove(NONE.displayName);
         idMap.remove(NONE.id);
     }
-
+    
     @Getter
     @NonNull
     private final String displayName;
-
+    
     @Getter
     private final long id;
-
+    
     QuestList(@NonNull String displayName, long id) {
         this.displayName = displayName;
         this.id = id;
     }
-
+    
     @Nullable
     public static Long findByName(@NonNull String name) {
         QuestList quest = nameMap.get(name);
         return quest == null ? null : quest.id;
     }
-
+    
     @Nullable
     public static String findById(long id) {
         QuestList quest = idMap.get(id);
         return quest == null ? null : quest.displayName;
     }
-
+    
 }

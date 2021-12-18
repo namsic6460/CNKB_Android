@@ -220,9 +220,7 @@ public class ItemManager {
             recipe = new HashMap<>(recipeMap);
             recipe.remove(ItemList.NONE.getId());
 
-            for(Map.Entry<Long, Integer> entry : recipe.entrySet()) {
-                recipe.put(entry.getKey(), entry.getValue() * count);
-            }
+            recipe.replaceAll((key, value) -> value * count);
 
             if(Config.compareMap(self.getInventory(), recipe, true, false, 0)) {
                 if(flag) {

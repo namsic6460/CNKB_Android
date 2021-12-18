@@ -8,7 +8,7 @@ import java.util.List;
 import lombok.Getter;
 
 public enum Doing {
-
+    
     NONE("없음"),
     ADVENTURE("모험"),
     APPRAISE("감정"),
@@ -23,32 +23,32 @@ public enum Doing {
     REST("휴식"),
     SHOP("상점"),
     WAIT_RESPONSE("대화(대답 대기)");
-
+    
     @NonNull
     @Getter
     private final String displayName;
-
+    
     Doing(@NonNull String displayName) {
         this.displayName = displayName;
     }
-
+    
     @NonNull
     public static List<Doing> fightableList() {
         List<Doing> doingList = new ArrayList<>(3);
         doingList.add(Doing.NONE);
         doingList.add(Doing.ADVENTURE);
         doingList.add(Doing.FIGHT);
-
+        
         return doingList;
     }
-
+    
     @NonNull
     public static List<Doing> fightList() {
         List<Doing> doingList = new ArrayList<>(2);
         doingList.add(Doing.FIGHT);
         doingList.add(Doing.FIGHT_ONE);
-
+        
         return doingList;
     }
-
+    
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 import lombok.Getter;
 
 public enum EquipList {
-
+    
     NONE("NONE", 0L),
     WOODEN_SWORD("목검", 1L),
     IRON_SWORD("철검", 2L),
@@ -114,42 +114,42 @@ public enum EquipList {
     BASIC_CHESTPLATE("기본 갑옷", 293L),
     BASIC_LEGGINGS("기본 바지", 294L),
     BASIC_SHOES("기본 신발", 295L);
-
+    
     public static final Map<String, EquipList> nameMap = new HashMap<>();
     public static final Map<Long, EquipList> idMap = new HashMap<>();
-
+    
     static {
         for(EquipList value : EquipList.values()) {
             nameMap.put(value.displayName, value);
             idMap.put(value.id, value);
         }
-
+        
         nameMap.remove(NONE.displayName);
         idMap.remove(NONE.id);
     }
-
+    
     @Getter
     @NonNull
     private final String displayName;
-
+    
     @Getter
     private final long id;
-
+    
     EquipList(@NonNull String displayName, long id) {
         this.displayName = displayName;
         this.id = id;
     }
-
+    
     @Nullable
     public static Long findByName(@NonNull String name) {
         EquipList equip = nameMap.get(name);
         return equip == null ? null : equip.id;
     }
-
+    
     @Nullable
     public static String findById(long id) {
         EquipList equip = idMap.get(id);
         return equip == null ? null : equip.displayName;
     }
-
+    
 }

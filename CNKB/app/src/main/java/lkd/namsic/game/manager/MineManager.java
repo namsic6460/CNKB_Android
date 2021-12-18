@@ -73,7 +73,7 @@ public class MineManager {
 
         int count = self.getItem(itemId);
         self.addItem(itemId, itemCount.get(), false);
-        self.addExp(15 * (itemTier + 1) * itemCount.get());
+        self.addExp(15L * (itemTier + 1) * itemCount.get());
 
         StringBuilder builder = new StringBuilder();
 

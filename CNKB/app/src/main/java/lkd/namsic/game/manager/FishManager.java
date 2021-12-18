@@ -195,7 +195,7 @@ public class FishManager {
                     FishEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), itemId, itemCount);
 
                     self.addItem(itemId, itemCount.get(), false);
-                    self.addExp(50 * (itemTier + 1) * itemCount.get());
+                    self.addExp(50L * (itemTier + 1) * itemCount.get());
                     self.setDoing(Doing.NONE);
 
                     StringBuilder innerBuilder = new StringBuilder();

@@ -17,21 +17,21 @@ import lkd.namsic.game.object.implement.EntityEvents;
 import lkd.namsic.game.object.implement.EquipEvents;
 
 public abstract class AddExpEvent implements Event {
-
+    
     @NonNull
     public static String getName() {
         return "AddExpEvent";
     }
-
+    
     public static void handleEvent(@NonNull Entity self, @Nullable List<Long> events,
                                    @NonNull Set<Long> eventEquipSet, @NonNull LoNg exp) {
-        if (events != null) {
-            for (long eventId : new ArrayList<>(events)) {
+        if(events != null) {
+            for(long eventId : new ArrayList<>(events)) {
                 AddExpEvent addExpEvent = EntityEvents.getEvent(eventId);
-
+                
                 try {
                     addExpEvent.onAddExp(self, exp);
-                } catch (EventRemoveException e) {
+                } catch(EventRemoveException e) {
                     if(events.size() == 1) {
                         self.getEvent().remove(getName());
                     } else {
@@ -40,25 +40,25 @@ public abstract class AddExpEvent implements Event {
                 }
             }
         }
-
+        
         for(long equipId : eventEquipSet) {
             AddExpEvent addExpEvent = EquipEvents.getEvent(equipId, getName());
-
+            
             try {
                 addExpEvent.onAddExp(self, exp);
-            } catch (EventRemoveException e) {
+            } catch(EventRemoveException e) {
                 Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
                 self.getRemovedEquipEvent(equipment.getEquipType()).add(getName());
             }
         }
     }
-
+    
     public abstract void onAddExp(@NonNull Entity self, @NonNull LoNg exp);
-
+    
     @NonNull
     @Override
     public String getClassName() {
         return getName();
     }
-
+    
 }

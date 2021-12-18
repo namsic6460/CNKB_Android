@@ -1,7 +1,7 @@
 package lkd.namsic.game.enums;
 
 public enum LogData {
-
+    
     BUY,
     SELL,
     BUFF_RECEIVE,
@@ -30,5 +30,5 @@ public enum LogData {
     TOTAL_ITEM_EAT,
     TOTAL_MONEY,
     TOTAL_SKILL_USE
-
+    
 }
