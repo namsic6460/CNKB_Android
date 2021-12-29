@@ -61,6 +61,7 @@ import lkd.namsic.game.command.player.game.SettingCommand;
 import lkd.namsic.game.command.player.game.ShopCommand;
 import lkd.namsic.game.command.player.game.SkillCommand;
 import lkd.namsic.game.command.player.game.StatCommand;
+import lkd.namsic.game.command.player.game.TowerCommand;
 import lkd.namsic.game.command.player.game.UseCommand;
 import lkd.namsic.game.command.player.register.PlayerRegisterCommand;
 import lkd.namsic.game.config.Config;
@@ -121,7 +122,7 @@ public class KakaoTalk {
 
                         if (message != null) {
                             message.actionIntent.send(NotificationListener.context, 0, message.intent);
-                            Thread.sleep(500);
+//                            Thread.sleep(500);
                         } else {
                             threadFlag.wait();
                         }
@@ -174,6 +175,7 @@ public class KakaoTalk {
         registerPlayerCommand(new SkillCommand(),       "스킬", "skill");
         registerPlayerCommand(new ShopCommand(),        "상점", "shop");
         registerPlayerCommand(new StatCommand(),        "스텟", "stat");
+        registerPlayerCommand(new TowerCommand(),       "탑", "타워", "tower");
         registerPlayerCommand(new UseCommand(),         "사용", "use");
     }
 
@@ -389,9 +391,13 @@ public class KakaoTalk {
             bundle.putCharSequence(input.getResultKey(), msg);
         }
 
-        RemoteInput.addResultsToIntent(session.getRemoteInputs(), intent, bundle);
-        messageQueue.offer(new Message(session.actionIntent, intent));
-
+        try {
+            RemoteInput.addResultsToIntent(session.getRemoteInputs(), intent, bundle);
+            session.actionIntent.send(NotificationListener.context, 0, intent);
+        } catch(Exception e) {
+            Logger.e("Send", e);
+        }
+    
         synchronized (threadFlag) {
             threadFlag.notifyAll();
         }

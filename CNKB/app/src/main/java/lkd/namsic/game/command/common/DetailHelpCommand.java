@@ -86,7 +86,8 @@ public class DetailHelpCommand extends CommonCommand {
                 Emoji.LIST + " *(상점/shop) (도움말/명령어/?/help/h) : 상점 도움말을 표시합니다\n\n" +
                 Emoji.LIST + " *(상점/shop) (목록/list) : 현재 위치에서 이용 가능한 상점 목록을 표시합니다\n\n" +
                 Emoji.LIST + " (상점/shop) ({Npc 이름}) : 상점을 이용합니다\n\n" +
-                Emoji.LIST + " *(랭킹/랭크/ranking/rank) [레벨] : 레벨 랭킹을 표시합니다\n\n" +
+                Emoji.LIST + " *(랭킹/랭크/ranking/rank) [레벨/lv] : 레벨 랭킹을 표시합니다\n\n" +
+                Emoji.LIST + " *(랭킹/랭크/ranking/rank) [탑/타워/tower] : 탑 랭킹을 표시합니다\n\n" +
                 Emoji.LIST + " *(확률/percent) (광질/mine) : 광질 확률을 표시합니다\n\n" +
                 Emoji.LIST + " *(확률/percent) (낚시/fish) : 낚시 확률을 표시합니다\n\n" +
                 Emoji.LIST + " *(확률/percent) (모험/adventure/adv) : 모험 보상 확률을 표시합니다\n\n" +

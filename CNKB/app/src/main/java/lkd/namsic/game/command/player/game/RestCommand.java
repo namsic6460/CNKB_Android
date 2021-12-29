@@ -5,7 +5,13 @@ import android.app.Notification;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import lkd.namsic.game.KakaoTalk;
 import lkd.namsic.game.command.PlayerCommand;
@@ -18,9 +24,10 @@ import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.object.Equipment;
 import lkd.namsic.game.object.Player;
-import lkd.namsic.setting.Logger;
 
 public class RestCommand extends PlayerCommand {
+    
+    public static Map<Player, ExecutorService> executorMap = new HashMap<>();
 
     @Override
     public void executeCommand(@NonNull final Player player, @NonNull String command, @NonNull List<String> commands,
@@ -42,15 +49,12 @@ public class RestCommand extends PlayerCommand {
                 restTime /= 2;
             }
         }
-
-        try {
-            Thread.sleep(restTime);
-        } catch (InterruptedException e) {
-            Logger.e("Rest", Config.errorString(e));
-        }
-
-        endRest(player);
-        player.replyPlayer("휴식으로 체력과 마나가 모두 채워졌습니다!");
+    
+        Config.loadPlayer(player.getSender(), player.getImage());
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        service.schedule(() -> endRest(player), restTime, TimeUnit.MILLISECONDS);
+        
+        executorMap.put(player, service);
     }
 
     public static void endRest(@NonNull Player player) {
@@ -59,6 +63,14 @@ public class RestCommand extends PlayerCommand {
         player.setBasicStat(StatType.MN, player.getStat(StatType.MAXMN));
 
         player.removeVariable(Variable.REST);
+        player.replyPlayer("휴식으로 체력과 마나가 모두 채워졌습니다!");
+    
+        ExecutorService service = executorMap.remove(player);
+        if(service != null) {
+            service.shutdown();
+        }
+        
+        Config.unloadObject(player);
     }
 
 }

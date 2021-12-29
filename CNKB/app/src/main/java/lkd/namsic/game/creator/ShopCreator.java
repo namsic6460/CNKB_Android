@@ -18,11 +18,11 @@ public class ShopCreator implements Creatable {
     public void start() {
         Shop shop;
         Set<Long> idSet;
-
-
+        
+        
         shop = new Shop(NpcList.NOAH);
 
-        shop.addSellItem(ItemList.LOW_RECIPE, 800L);
+        shop.addSellItem(ItemList.LOW_RECIPE, 1000L);
 
         shop.addBuyItem(ItemList.SHEEP_LEATHER, 10L);
         shop.addBuyItem(ItemList.WOOL, 5L);
@@ -32,12 +32,12 @@ public class ShopCreator implements Creatable {
         shop.addBuyItem(ItemList.ZOMBIE_SOUL, 500L);
         shop.addBuyItem(ItemList.ZOMBIE_HEART, 100L);
         shop.addBuyItem(ItemList.PIECE_OF_SLIME, 65L);
-        shop.addBuyItem(ItemList.SPIDER_LEG, 125L);
+        shop.addBuyItem(ItemList.SPIDER_LEG, 120L);
         shop.addBuyItem(ItemList.SPIDER_EYE, 150L);
-        shop.addBuyItem(ItemList.MAGIC_STONE, 110L);
-        shop.addBuyItem(ItemList.OAK_TOOTH, 200L);
-        shop.addBuyItem(ItemList.OAK_LEATHER, 175L);
-        shop.addBuyItem(ItemList.PIECE_OF_BONE, 30L);
+        shop.addBuyItem(ItemList.MAGIC_STONE, 100L);
+        shop.addBuyItem(ItemList.OAK_TOOTH, 175L);
+        shop.addBuyItem(ItemList.OAK_LEATHER, 150L);
+        shop.addBuyItem(ItemList.PIECE_OF_BONE, 25L);
 
         idSet = new HashSet<>(Arrays.asList(ItemList.SHEEP_LEATHER.getId(), ItemList.WOOL.getId()));
         shop.addSimpleMap(idSet, "양", "sheep");
@@ -200,23 +200,23 @@ public class ShopCreator implements Creatable {
 
         shop.addSellItem(ItemList.CONFIRMED_LOW_RECIPE, 750L);
 
-        shop.addBuyItem(ItemList.MAGIC_STONE, 120L);
-        shop.addBuyItem(ItemList.HORN_OF_IMP, 150L);
-        shop.addBuyItem(ItemList.IMP_HEART, 300L);
-        shop.addBuyItem(ItemList.HORN_OF_LOW_DEVIL, 250L);
-        shop.addBuyItem(ItemList.LOW_DEVIL_SOUL, 1500L);
-        shop.addBuyItem(ItemList.HARPY_WING, 200L);
-        shop.addBuyItem(ItemList.HARPY_NAIL, 200L);
-        shop.addBuyItem(ItemList.GOLEM_CORE, 500L);
-        shop.addBuyItem(ItemList.PIECE_OF_MAGIC, 150L);
-        shop.addBuyItem(ItemList.OWLBEAR_LEATHER, 400L);
-        shop.addBuyItem(ItemList.OWLBEAR_HEAD, 800L);
+        shop.addBuyItem(ItemList.MAGIC_STONE, 108L);
+        shop.addBuyItem(ItemList.HORN_OF_IMP, 140L);
+        shop.addBuyItem(ItemList.IMP_HEART, 280L);
+        shop.addBuyItem(ItemList.HORN_OF_LOW_DEVIL, 235L);
+        shop.addBuyItem(ItemList.LOW_DEVIL_SOUL, 1400L);
+        shop.addBuyItem(ItemList.HARPY_WING, 180L);
+        shop.addBuyItem(ItemList.HARPY_NAIL, 180L);
+        shop.addBuyItem(ItemList.GOLEM_CORE, 450L);
+        shop.addBuyItem(ItemList.PIECE_OF_MAGIC, 130L);
+        shop.addBuyItem(ItemList.OWLBEAR_LEATHER, 350L);
+        shop.addBuyItem(ItemList.OWLBEAR_HEAD, 700L);
         shop.addBuyItem(ItemList.HARDENED_SLIME, 500L);
-        shop.addBuyItem(ItemList.LYCANTHROPE_TOOTH, 300L);
-        shop.addBuyItem(ItemList.LYCANTHROPE_LEATHER, 150L);
-        shop.addBuyItem(ItemList.LYCANTHROPE_HEAD, 600L);
-        shop.addBuyItem(ItemList.LYCANTHROPE_HEART, 600L);
-        shop.addBuyItem(ItemList.LYCANTHROPE_SOUL, 1000L);
+        shop.addBuyItem(ItemList.LYCANTHROPE_TOOTH, 250L);
+        shop.addBuyItem(ItemList.LYCANTHROPE_LEATHER, 125L);
+        shop.addBuyItem(ItemList.LYCANTHROPE_HEAD, 500L);
+        shop.addBuyItem(ItemList.LYCANTHROPE_HEART, 500L);
+        shop.addBuyItem(ItemList.LYCANTHROPE_SOUL, 850L);
 
         idSet = new HashSet<>();
         idSet.add(ItemList.HORN_OF_IMP.getId());

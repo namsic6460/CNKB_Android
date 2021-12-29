@@ -98,7 +98,7 @@ public class ItemUses {
             @NonNull
             @Override
             public String use(@NonNull Entity self, @Nullable String other) {
-                self.setBasicStat(StatType.MN, self.getStat(StatType.MAXMN) / 2);
+                self.addBasicStat(StatType.MN, self.getStat(StatType.MAXMN) / 2);
                 return "최대 마나의 50%를 회복했습니다\n현재 마나: " + self.getDisplayMn();
             }
         });

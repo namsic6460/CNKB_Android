@@ -193,10 +193,10 @@ public class MonsterCreator implements Creatable {
         monster = new Monster(MonsterList.OAK);
         monster.setLv(90);
 
-        monster.setBasicStat(StatType.MAXHP, 400);
-        monster.setBasicStat(StatType.HP, 400);
-        monster.setBasicStat(StatType.ATK, 40);
-        monster.setBasicStat(StatType.ATS, 150);
+        monster.setBasicStat(StatType.MAXHP, 500);
+        monster.setBasicStat(StatType.HP, 500);
+        monster.setBasicStat(StatType.ATK, 50);
+        monster.setBasicStat(StatType.ATS, 180);
         monster.setBasicStat(StatType.DEF, 30);
         monster.setBasicStat(StatType.MDEF, 15);
         monster.setBasicStat(StatType.BRE, 50);
@@ -217,14 +217,14 @@ public class MonsterCreator implements Creatable {
 
         monster.setBasicStat(StatType.MAXHP, 450);
         monster.setBasicStat(StatType.HP, 450);
-        monster.setBasicStat(StatType.ATK, 60);
+        monster.setBasicStat(StatType.ATK, 70);
         monster.setBasicStat(StatType.ATS, 150);
         monster.setBasicStat(StatType.BRE, 15);
         monster.setBasicStat(StatType.DEF, 20);
         monster.setBasicStat(StatType.MDEF, 10);
         monster.setBasicStat(StatType.DRA, 40);
         monster.setBasicStat(StatType.ACC, 50);
-        monster.setBasicStat(StatType.EVA, 30);
+        monster.setBasicStat(StatType.EVA, 35);
 
         monster.setItemDrop(ItemList.HORN_OF_LOW_DEVIL.getId(), 0.1, 1, 1);
         monster.setItemDrop(ItemList.LOW_DEVIL_SOUL.getId(), 0.01, 1, 1);
@@ -239,13 +239,13 @@ public class MonsterCreator implements Creatable {
         monster = new Monster(MonsterList.HARPY);
         monster.setLv(125);
 
-        monster.setBasicStat(StatType.MAXHP, 500);
-        monster.setBasicStat(StatType.HP, 500);
+        monster.setBasicStat(StatType.MAXHP, 600);
+        monster.setBasicStat(StatType.HP, 600);
         monster.setBasicStat(StatType.MAXMN, 50);
         monster.setBasicStat(StatType.MN, 50);
-        monster.setBasicStat(StatType.ATK, 85);
-        monster.setBasicStat(StatType.MATK, 80);
-        monster.setBasicStat(StatType.ATS, 160);
+        monster.setBasicStat(StatType.ATK, 90);
+        monster.setBasicStat(StatType.MATK, 85);
+        monster.setBasicStat(StatType.ATS, 200);
         monster.setBasicStat(StatType.DEF, 20);
         monster.setBasicStat(StatType.MDEF, 40);
         monster.setBasicStat(StatType.AGI, 100);
@@ -269,10 +269,10 @@ public class MonsterCreator implements Creatable {
         monster = new Monster(MonsterList.GOLEM);
         monster.setLv(140);
 
-        monster.setBasicStat(StatType.MAXHP, 1100);
-        monster.setBasicStat(StatType.HP, 1100);
-        monster.setBasicStat(StatType.ATK, 160);
-        monster.setBasicStat(StatType.ATS, 60);
+        monster.setBasicStat(StatType.MAXHP, 1250);
+        monster.setBasicStat(StatType.HP, 1250);
+        monster.setBasicStat(StatType.ATK, 250);
+        monster.setBasicStat(StatType.ATS, 100);
         monster.setBasicStat(StatType.DEF, 110);
         monster.setBasicStat(StatType.ACC, 100);
 
@@ -287,19 +287,19 @@ public class MonsterCreator implements Creatable {
         monster = new Monster(MonsterList.GARGOYLE);
         monster.setLv(155);
 
-        monster.setBasicStat(StatType.MAXHP, 900);
-        monster.setBasicStat(StatType.HP, 900);
+        monster.setBasicStat(StatType.MAXHP, 1100);
+        monster.setBasicStat(StatType.HP, 1100);
         monster.setBasicStat(StatType.MAXMN, 40);
         monster.setBasicStat(StatType.MN, 40);
-        monster.setBasicStat(StatType.ATK, 100);
-        monster.setBasicStat(StatType.MATK, 110);
+        monster.setBasicStat(StatType.ATK, 120);
+        monster.setBasicStat(StatType.MATK, 130);
         monster.setBasicStat(StatType.ATS, 200);
         monster.setBasicStat(StatType.DEF, 110);
         monster.setBasicStat(StatType.MDEF, 110);
         monster.setBasicStat(StatType.BRE, 100);
         monster.setBasicStat(StatType.MBRE, 100);
         monster.setBasicStat(StatType.ACC, 200);
-        monster.setBasicStat(StatType.EVA, 20);
+        monster.setBasicStat(StatType.EVA, 25);
 
         monster.setItemDrop(ItemList.STONE.getId(), 1, 1, 10);
         monster.setItemDrop(ItemList.IRON.getId(), 1, 1, 10);
@@ -318,13 +318,13 @@ public class MonsterCreator implements Creatable {
         monster = new Monster(MonsterList.OWLBEAR);
         monster.setLv(170);
 
-        monster.setBasicStat(StatType.MAXHP, 1500);
-        monster.setBasicStat(StatType.HP, 1500);
+        monster.setBasicStat(StatType.MAXHP, 2000);
+        monster.setBasicStat(StatType.HP, 2000);
         monster.setBasicStat(StatType.MAXMN, 30);
         monster.setBasicStat(StatType.MN, 30);
         monster.setBasicStat(StatType.ATK, 250);
         monster.setBasicStat(StatType.MATK, 100);
-        monster.setBasicStat(StatType.ATS, 200);
+        monster.setBasicStat(StatType.ATS, 300);
         monster.setBasicStat(StatType.AGI, 80);
         monster.setBasicStat(StatType.DEF, 115);
         monster.setBasicStat(StatType.MDEF, 50);
@@ -350,17 +350,17 @@ public class MonsterCreator implements Creatable {
         monster = new Monster(MonsterList.LYCANTHROPE);
         monster.setLv(185);
 
-        monster.setBasicStat(StatType.MAXHP, 1000);
-        monster.setBasicStat(StatType.HP, 1000);
+        monster.setBasicStat(StatType.MAXHP, 2000);
+        monster.setBasicStat(StatType.HP, 2000);
         monster.setBasicStat(StatType.MAXMN, 200);
         monster.setBasicStat(StatType.MN, 200);
-        monster.setBasicStat(StatType.ATK, 150);
-        monster.setBasicStat(StatType.ATS, 150);
+        monster.setBasicStat(StatType.ATK, 300);
+        monster.setBasicStat(StatType.ATS, 200);
         monster.setBasicStat(StatType.BRE, 100);
         monster.setBasicStat(StatType.DEF, 140);
         monster.setBasicStat(StatType.MDEF, 20);
         monster.setBasicStat(StatType.ACC, 100);
-        monster.setBasicStat(StatType.EVA, 50);
+        monster.setBasicStat(StatType.EVA, 70);
 
         monster.setItemDrop(ItemList.LYCANTHROPE_TOOTH.getId(), 0.25, 1, 1);
         monster.setItemDrop(ItemList.LYCANTHROPE_LEATHER.getId(), 0.5, 1, 1);

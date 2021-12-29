@@ -8,7 +8,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.enums.EquipType;
@@ -246,6 +252,34 @@ public class ExampleUnitTest {
         }
 
         System.out.println(total);
+    }
+    
+    @Test
+    public void scheduleTest() throws InterruptedException {
+        Timer timer = new Timer();
+        
+        long startTime = System.currentTimeMillis();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("A: " + (System.currentTimeMillis() - startTime));
+                timer.cancel();
+            }
+        }, 1000, 1000);
+    
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        service.schedule(
+            () -> System.out.println("B: " + (System.currentTimeMillis() - startTime)),
+            1000,
+            TimeUnit.MILLISECONDS
+        );
+        
+        Thread.sleep(3000);
+    }
+    
+    @Test
+    public void regexTest() {
+        System.out.println(Config.replaceLast("음양검1 +5", Pattern.quote("+5"), ""));
     }
 
 }

@@ -3,9 +3,11 @@ package lkd.namsic.service;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Base64;
@@ -19,12 +21,29 @@ import lkd.namsic.setting.Logger;
 import lkd.namsic.MainActivity;
 
 public class NotificationListener extends NotificationListenerService {
-
-    private static boolean isCreated = false;
-
+    
+    @SuppressLint("StaticFieldLeak")
+    private static NotificationListener instance = null;
+    
+    public static NotificationListener getInstance() {
+        return instance;
+    }
+    
     @SuppressLint("StaticFieldLeak")
     public static Context context;
-
+    
+    private static boolean isCreated = false;
+    
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+    
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_REDELIVER_INTENT;
+    }
+    
     @Override
     public void onCreate() {
         if(isCreated) {
@@ -33,6 +52,7 @@ public class NotificationListener extends NotificationListenerService {
             MainActivity.toast("Noti Service Already Started");
             return;
         } else {
+            instance = this;
             super.onCreate();
 
             isCreated = true;

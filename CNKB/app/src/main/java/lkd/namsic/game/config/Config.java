@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import lkd.namsic.game.base.ChatLimit;
 import lkd.namsic.game.base.ConcurrentHashSet;
@@ -60,7 +61,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
     
-    public static final double VERSION = 3.13;
+    public static final double VERSION = 4.0;
     
     public static final Gson gson = new GsonBuilder()
         .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -115,17 +116,17 @@ public class Config {
     public static final long DEFAULT_DELAY_TIME = 500;
     public static final long DEFAULT_PAUSE_TIME = 2000;
     
-    public static final double REINFORCE_EFFICIENCY = 0.18;
-    public static final double REINFORCE_EFFICIENCY_PER_HANDLE_LV = 0.01;
+    public static final double REINFORCE_EFFICIENCY = 0.135;
+    public static final double REINFORCE_EFFICIENCY_PER_HANDLE_LV = 0.015;
     public static final long REINFORCE_BASE_COST = 1000;
     public static final long REINFORCE_COST_PER_HANDLE_LV = 500;
-    public static final double REINFORCE_COST_MULTIPLIER = 0.12;
+    public static final double REINFORCE_COST_MULTIPLIER = 0.135;
     public static final long REINFORCE_DELAY_TIME = 2000;
     
-    public static final double TOTAL_MONEY_LOSE_RANDOM = 0.1;
-    public static final double TOTAL_MONEY_LOSE_MIN = 0.05;
+    public static final double TOTAL_MONEY_LOSE_RANDOM = 0.07;
+    public static final double TOTAL_MONEY_LOSE_MIN = 0.03;
     public static final double MONEY_DROP_RANDOM = 0.5;
-    public static final double MONEY_DROP_MIN = 0.2;
+    public static final double MONEY_DROP_MIN = 0.25;
     public static final int ITEM_DROP_COUNT = 4;
     public static final int MAX_ITEM_DROP_COUNT = 5;
     public static final double ITEM_DROP_LOSE_PERCENT = 0.95;
@@ -884,6 +885,7 @@ public class Config {
     
     @NonNull
     public static String replaceLast(@NonNull String text, @NonNull String regex, @NonNull String replacement) {
+        regex = Pattern.quote(regex);
         return text.replaceFirst("(?s)" + regex + "(?!.*?" + regex + ")", replacement).trim();
     }
     

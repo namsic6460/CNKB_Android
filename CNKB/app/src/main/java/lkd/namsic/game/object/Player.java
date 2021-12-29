@@ -873,9 +873,9 @@ public class Player extends Entity {
         this.getBuffStat().clear();
         
         Random random = new Random();
-        double loseMoneyPercent = random.nextDouble() * Config.TOTAL_MONEY_LOSE_RANDOM + Config.TOTAL_MONEY_LOSE_MIN;   //10~15%
-        double dropPercent = random.nextDouble() * Config.MONEY_DROP_RANDOM + Config.MONEY_DROP_MIN;                    //50~70%
-        int dropItemCount = random.nextInt(Config.ITEM_DROP_COUNT);                                                     //0~3
+        double loseMoneyPercent = random.nextDouble() * Config.TOTAL_MONEY_LOSE_RANDOM + Config.TOTAL_MONEY_LOSE_MIN;
+        double dropPercent = random.nextDouble() * Config.MONEY_DROP_RANDOM + Config.MONEY_DROP_MIN;
+        int dropItemCount = random.nextInt(Config.ITEM_DROP_COUNT);
         
         long totalLoseMoney = Math.min(10000, (long) (this.getMoney() * loseMoneyPercent));
         long dropMoney = (long) (totalLoseMoney * dropPercent);

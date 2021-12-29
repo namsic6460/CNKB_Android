@@ -25,19 +25,19 @@ public class BossCreator implements Creatable {
         );
         boss.setLv(200);
 
-        boss.setBasicStat(StatType.MAXHP, 10000);
-        boss.setBasicStat(StatType.HP, 10000);
+        boss.setBasicStat(StatType.MAXHP, 20000);
+        boss.setBasicStat(StatType.HP, 20000);
         boss.setBasicStat(StatType.MAXMN, 1000);
         boss.setBasicStat(StatType.MN, 1000);
-        boss.setBasicStat(StatType.ATK, 300);
+        boss.setBasicStat(StatType.ATK, 400);
         boss.setBasicStat(StatType.MATK, 300);
-        boss.setBasicStat(StatType.AGI, 100);
-        boss.setBasicStat(StatType.ATS, 500);
+        boss.setBasicStat(StatType.AGI, 120);
+        boss.setBasicStat(StatType.ATS, 550);
         boss.setBasicStat(StatType.DEF, 500);
         boss.setBasicStat(StatType.BRE, 150);
-        boss.setBasicStat(StatType.DRA, 50);
-        boss.setBasicStat(StatType.EVA, 150);
-        boss.setBasicStat(StatType.ACC, 500);
+        boss.setBasicStat(StatType.DRA, 60);
+        boss.setBasicStat(StatType.EVA, 100);
+        boss.setBasicStat(StatType.ACC, 700);
 
         boss.setItemDrop(ItemList.GOLD_BAG.getId(), 1, 10, 20);
         boss.setItemDrop(ItemList.MAGIC_STONE.getId(), 1, 30, 50);

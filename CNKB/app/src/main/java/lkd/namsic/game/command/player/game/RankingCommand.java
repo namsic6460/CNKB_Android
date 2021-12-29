@@ -5,6 +5,7 @@ import android.app.Notification;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 
 import lkd.namsic.game.command.PlayerCommand;
@@ -22,6 +23,8 @@ public class RankingCommand extends PlayerCommand {
             RankingManager.getInstance().displayLvRanking(player);
         } else if(second.equals("레벨") || second.equals("lv")) {
             RankingManager.getInstance().displayLvRanking(player);
+        } else if(Arrays.asList("탑", "타워", "tower").contains(second)) {
+            RankingManager.getInstance().displayTowerRanking(player);
         } else {
             throw new WeirdCommandException();
         }

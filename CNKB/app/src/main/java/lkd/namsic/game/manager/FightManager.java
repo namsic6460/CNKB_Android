@@ -837,8 +837,15 @@ public class FightManager {
         EndFightEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName));
 
         long fightId = this.getFightId(self.getId());
-        Set<Entity> entitySet = this.getEntitySet(fightId);
-        Set<Player> playerSet = this.getPlayerSet(fightId);
+        Set<Entity> entitySet;
+        Set<Player> playerSet;
+        
+        try {
+            entitySet = this.getEntitySet(fightId);
+            playerSet = this.getPlayerSet(fightId);
+        } catch(NullPointerException e) {
+            return;
+        }
 
         this.fightId.remove(self.getId());
         entitySet.remove(self);

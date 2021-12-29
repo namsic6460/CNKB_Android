@@ -24,13 +24,16 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lkd.namsic.game.KakaoTalk;
+import lkd.namsic.game.base.ConcurrentArrayList;
+import lkd.namsic.game.command.player.game.RestCommand;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.creator.ObjectCreator;
-import lkd.namsic.game.base.ConcurrentArrayList;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.GameObject;
+import lkd.namsic.game.object.Player;
 import lkd.namsic.service.ForcedTerminationService;
+import lkd.namsic.service.NotificationListener;
 import lkd.namsic.setting.FileManager;
 import lkd.namsic.setting.Logger;
 
@@ -62,13 +65,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mainActivity = this;
 
-        String[] permissions = { Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                                 Manifest.permission.ACCESS_COARSE_LOCATION,
-                                 Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                                 Manifest.permission.ACCESS_FINE_LOCATION,
-                                 Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE };
+        String[] permissions = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE,
+        };
         ActivityCompat.requestPermissions(this, permissions, 1);
+    
+//        if (!Environment.isExternalStorageManager()) {
+//            startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
+//        }
 
         if(Logger.logCount != 0) {
             Logger.saveLog();
@@ -137,11 +146,16 @@ public class MainActivity extends AppCompatActivity {
         Logger.saveLog();
 
         MainActivity.threadCleaner.cancel();
+        NotificationListener.getInstance().stopSelf();
         KakaoTalk.threadFlag.set(false);
 
         Config.IGNORE_FILE_LOG = true;
         Config.save();
         Config.IGNORE_FILE_LOG = false;
+        
+        for(Player player : RestCommand.executorMap.keySet()) {
+            RestCommand.endRest(player);
+        }
 
         GameObject object;
         for(Map.Entry<Id, ConcurrentHashMap<Long, Long>> entry : Config.OBJECT_COUNT.entrySet()) {
@@ -159,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
             map = Config.MAP.get(entry.getKey());
 
             for(long i = 0; i < entry.getValue(); i++) {
+                assert map != null;
                 Config.unloadMap(map);
             }
         }

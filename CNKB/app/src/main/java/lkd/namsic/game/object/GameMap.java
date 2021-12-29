@@ -19,6 +19,7 @@ import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.enums.object.BossList;
 import lkd.namsic.game.enums.object.MapList;
 import lkd.namsic.game.exception.NumberRangeException;
+import lkd.namsic.game.exception.ObjectNotFoundException;
 import lkd.namsic.game.exception.WeirdDataException;
 import lkd.namsic.setting.Logger;
 import lombok.Getter;
@@ -290,10 +291,17 @@ public class GameMap {
         int spawnCount;
         
         Set<Long> existSet = new HashSet<>();
+        Set<Long> removeSet = new HashSet<>();
         for(long objectId : this.getEntity(Id.MONSTER)) {
-            Monster monster = Config.getData(Id.MONSTER, objectId);
-            existSet.add(monster.getOriginalId());
+            try {
+                Monster monster = Config.getData(Id.MONSTER, objectId);
+                existSet.add(monster.getOriginalId());
+            } catch(ObjectNotFoundException e) {
+                removeSet.add(objectId);
+            }
         }
+    
+        this.getEntity(Id.MONSTER).removeAll(removeSet);
         
         boolean created = false;
         

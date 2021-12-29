@@ -418,7 +418,18 @@ public class EquipEvents {
                     boolean isFirst = self.getObjectVariable(Variable.YIN_YANG_SWORD_1, true);
                     self.setVariable(Variable.YIN_YANG_SWORD_1, !isFirst);
                     
-                    FightWaitType response = self.getObjectVariable(Variable.FIGHT_WAIT_TYPE, FightWaitType.NONE);
+                    FightWaitType response;
+                    
+                    Object object = self.getObjectVariable(Variable.FIGHT_WAIT_TYPE);
+                    if(object == null) {
+                        object = FightWaitType.NONE;
+                    }
+                    
+                    if(object instanceof FightWaitType) {
+                        response = (FightWaitType) object;
+                    } else {
+                        response = FightWaitType.parseWaitType(((String) object).toLowerCase());
+                    }
                     
                     if(isFirst) {
                         if(response.equals(FightWaitType.SKILL)) {

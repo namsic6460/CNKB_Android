@@ -60,8 +60,16 @@ public class CraftCommand extends PlayerCommand {
                             throw new WeirdCommandException("레시피 번호는 1 이상이어야 합니다");
                         }
 
-                        ItemManager.getInstance().craft(player, Config.replaceLast(Config.replaceLast(
-                                command, lastStr, ""), frontStr, ""), frontNumber, lastNumber);
+                        ItemManager.getInstance().craft(
+                            player,
+                            Config.replaceLast(
+                                Config.replaceLast(command, lastStr, ""),
+                                frontStr,
+                                ""
+                            ),
+                            frontNumber,
+                            lastNumber
+                        );
                         return;
                     } catch (NumberFormatException ignore) {}
                 }

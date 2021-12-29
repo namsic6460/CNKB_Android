@@ -17,6 +17,7 @@ import lkd.namsic.game.enums.Doing;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.MapType;
 import lkd.namsic.game.exception.WeirdCommandException;
+import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.GameMap;
 import lkd.namsic.game.object.Monster;
 import lkd.namsic.game.object.Player;
@@ -49,7 +50,8 @@ public class RespawnCommand extends PlayerCommand {
             }
             
             player.replyPlayer("몬스터 리스폰을 시도합니다\n10초만 기다려주세요");
-
+            
+            
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
@@ -64,13 +66,19 @@ public class RespawnCommand extends PlayerCommand {
                     throw new WeirdCommandException("전투가 진행중이어서 몬스터 리스폰에 실패했습니다");
                 }
             }
-
+    
+            Entity entity;
             IdClass idClass;
             for (long monsterId : monsterSet) {
                 idClass = new IdClass(Id.MONSTER, monsterId);
+                entity = Config.loadObject(idClass.getId(), idClass.getObjectId());
 
-                map.removeEntity(idClass);
-                Config.deleteGameObject(idClass);
+                try {
+                    map.removeEntity(idClass);
+                    Config.deleteGameObject(idClass);
+                } finally {
+                    Config.unloadObject(entity);
+                }
             }
 
             map.respawn();

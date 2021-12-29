@@ -194,83 +194,87 @@ public class EquipManager {
 
     public void decompose(@NonNull Player self, int equipIndex, @NonNull String equipName) {
         long equipId = self.getEquipIdByIndex(equipIndex);
-        Equipment equipment = Config.getData(Id.EQUIPMENT, equipId);
+        Equipment equipment = Config.loadObject(Id.EQUIPMENT, equipId);
 
-        if(!equipment.getRealName().equals(equipName)) {
-            throw new WeirdCommandException("정확한 장비 이름을 입력하세요(강화 제외)(실수 방지)\n" +
+        try {
+            if(!equipment.getRealName().equals(equipName)) {
+                throw new WeirdCommandException("정확한 장비 이름을 입력하세요(강화 제외)(실수 방지)\n" +
                     "(예시: " + Emoji.focus("ㅜ 장비 분해 2 목검"));
-        }
-
-        if(self.getEquipped(equipment.getEquipType()) == equipId) {
-            throw new WeirdCommandException("장착중인 장비는 분해할 수 없습니다");
-        }
-
-        StringBuilder innerBuilder = new StringBuilder("골드: ");
-
-        long money = 0;
-        for(int reinforceCount = 0; reinforceCount < equipment.getReinforceCount(); reinforceCount++) {
-            money += equipment.getReinforceCost(reinforceCount);
-        }
-
-        int reinforceCount = equipment.getReinforceCount();
-
-        if(reinforceCount == 5) {
-            money *= 1.1;
-        } else if(reinforceCount < 8) {
-            money *= 1.25;
-        } else if(reinforceCount < 10) {
-            money *= 1.5;
-        } else if(reinforceCount < 12) {
-            money *= 2;
-        } else if(reinforceCount == 13) {
-            money *= 2.75;
-        } else if(reinforceCount == 14) {
-            money *= 4;
-        } else if(reinforceCount == 15) {
-            money *= 6;
-        }
-
-        int handleLv = equipment.getHandleLv();
-        double handleLvMultiplier = handleLv / 10D + 0.9;
-
-        if(money == 0) {
-            money = (long) (500 * handleLvMultiplier);
-        } else {
-            money *= handleLvMultiplier;
-        }
-
-        self.addMoney(money);
-        innerBuilder.append(Config.getIncrease(money))
-                .append("\n\n---아이템 현황---");
-
-        if(!equipment.getRecipe().isEmpty()) {
-            long itemId;
-            int itemCount;
-
-            Optional<Map<Long, Integer>> first = equipment.getRecipe().stream().findFirst();
-            if (!first.isPresent()) {
-                throw new NullPointerException("Recipe is null");
             }
-
-            Map<Long, Integer> recipeMap = first.get();
-            for(Map.Entry<Long, Integer> entry : recipeMap.entrySet()) {
-                itemId = entry.getKey();
-                itemCount = Math.max(entry.getValue() / 2, 1);
-
-                self.addItem(itemId, itemCount, false);
-                innerBuilder.append("\n")
+    
+            if(self.getEquipped(equipment.getEquipType()) == equipId) {
+                throw new WeirdCommandException("장착중인 장비는 분해할 수 없습니다");
+            }
+    
+            StringBuilder innerBuilder = new StringBuilder("골드: ");
+    
+            long money = 0;
+            for(int reinforceCount = 0; reinforceCount < equipment.getReinforceCount(); reinforceCount++) {
+                money += equipment.getReinforceCost(reinforceCount);
+            }
+    
+            int reinforceCount = equipment.getReinforceCount();
+    
+            if(reinforceCount == 5) {
+                money *= 1.1;
+            } else if(reinforceCount < 8) {
+                money *= 1.25;
+            } else if(reinforceCount < 10) {
+                money *= 1.5;
+            } else if(reinforceCount < 12) {
+                money *= 2;
+            } else if(reinforceCount == 13) {
+                money *= 2.75;
+            } else if(reinforceCount == 14) {
+                money *= 4;
+            } else if(reinforceCount == 15) {
+                money *= 6;
+            }
+    
+            int handleLv = equipment.getHandleLv();
+            double handleLvMultiplier = handleLv / 10D + 0.9;
+    
+            if(money == 0) {
+                money = 100;
+            } else {
+                money *= handleLvMultiplier;
+            }
+    
+            self.addMoney(money);
+            innerBuilder.append(Config.getIncrease(money))
+                .append("\n\n---아이템 현황---");
+    
+            if(!equipment.getRecipe().isEmpty()) {
+                long itemId;
+                int itemCount;
+        
+                Optional<Map<Long, Integer>> first = equipment.getRecipe().stream().findFirst();
+                if (!first.isPresent()) {
+                    throw new NullPointerException("Recipe is null");
+                }
+        
+                Map<Long, Integer> recipeMap = first.get();
+                for(Map.Entry<Long, Integer> entry : recipeMap.entrySet()) {
+                    itemId = entry.getKey();
+                    itemCount = Math.max(entry.getValue() / 2, 1);
+            
+                    self.addItem(itemId, itemCount, false);
+                    innerBuilder.append("\n")
                         .append(ItemList.findById(itemId))
                         .append(": ")
                         .append(Config.getIncrease(itemCount));
+                }
+            } else {
+                innerBuilder.append("\n획득한 아이템이 없습니다");
             }
-        } else {
-            innerBuilder.append("\n획득한 아이템이 없습니다");
+    
+            self.removeEquip(equipId);
+            Config.deleteEquipment(equipment);
+            
+            self.replyPlayer(equipment.getName() + " 의 분해를 완료했습니다", innerBuilder.toString());
+        } finally {
+            Config.unloadObject(equipment);
         }
-
-        self.removeEquip(equipId);
-        Config.deleteEquipment(equipment);
-
-        self.replyPlayer(equipment.getName() + " 의 분해를 완료했습니다", innerBuilder.toString());
     }
 
     public void unEquipAll(@NonNull Player self) {
