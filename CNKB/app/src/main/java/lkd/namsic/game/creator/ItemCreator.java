@@ -949,6 +949,13 @@ public class ItemCreator implements Creatable {
 
         createItem(ItemList.SKILL_BOOK_CUTTING_MOONLIGHT, "스킬 " +
                 Emoji.focus(SkillList.CUTTING_MOONLIGHT.getDisplayName()) + " 를 배울 수 있게 해주는 스킬 북이다");
+        
+        createItem(ItemList.SKILL_BOOK_ESSENCE_DRAIN, "스킬 " +
+            Emoji.focus(SkillList.ESSENCE_DRAIN.getDisplayName()) + " 를 배울 수 있게 해주는 스킬 북이다");
+        createItem(ItemList.SKILL_BOOK_MAGIC_DRAIN, "스킬 " +
+            Emoji.focus(SkillList.MAGIC_DRAIN.getDisplayName()) + " 를 배울 수 있게 해주는 스킬 북이다");
+        createItem(ItemList.SKILL_BOOK_MANA_EXPLOSION, "스킬 " +
+            Emoji.focus(SkillList.MANA_EXPLOSION.getDisplayName()) + " 를 배울 수 있게 해주는 스킬 북이다");
 
         Logger.i("ObjectMaker", "Item making is done!");
     }

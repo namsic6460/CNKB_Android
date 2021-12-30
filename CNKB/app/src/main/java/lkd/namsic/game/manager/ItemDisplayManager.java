@@ -142,9 +142,8 @@ public class ItemDisplayManager {
             }
         } else {
             for(long equipId : sortedList) {
-                innerBuilder.append("-")
-                        .append(EquipList.findById(equipId))
-                        .append("\n");
+                innerBuilder.append("\n- ")
+                        .append(EquipList.findById(equipId));
             }
         }
 

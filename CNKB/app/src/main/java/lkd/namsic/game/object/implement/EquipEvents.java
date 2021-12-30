@@ -1067,6 +1067,46 @@ public class EquipEvents {
                 }
             });
         }});
+        
+        put(EquipList.SUCCUBUS_GEM.getId(), new HashMap<String, Event>() {{
+            put(DamagedEvent.getName(), new DamagedEvent() {
+                @Override
+                public void onDamaged(@NonNull Entity self, @NonNull Entity attacker,
+                                      @NonNull Int totalDmg, @NonNull Int totalDra, @NonNull Bool isCrit) {
+                    int maxMn = self.getStat(StatType.MAXMN);
+                    
+                    if(self.getStat(StatType.MN) >= maxMn * 0.3) {
+                        self.addBasicStat(StatType.MN, (int) (maxMn * 0.1));
+                        totalDmg.multiple(0.8);
+                    }
+                }
+            });
+        }});
+        
+        put(EquipList.CHARM_WHIP.getId(), new HashMap<String, Event>() {{
+            put(DamageEvent.getName(), new DamageEvent() {
+                @Override
+                public void onDamage(@NonNull Entity self, @NonNull Entity victim, @NonNull Int totalDmg,
+                                     @NonNull Int totalDra, @NonNull Bool isCrit, boolean canCrit) {
+                    FightWaitType response;
+    
+                    Object object = self.getObjectVariable(Variable.FIGHT_WAIT_TYPE);
+                    if(object == null) {
+                        object = FightWaitType.NONE;
+                    }
+    
+                    if(object instanceof FightWaitType) {
+                        response = (FightWaitType) object;
+                    } else {
+                        response = FightWaitType.parseWaitType(((String) object).toLowerCase());
+                    }
+                    
+                    if(response.equals(FightWaitType.SKILL)) {
+                        totalDmg.add(victim.getStat(StatType.ATK) / 3);
+                    }
+                }
+            });
+        }});
     }};
     
     @SuppressWarnings("unchecked")

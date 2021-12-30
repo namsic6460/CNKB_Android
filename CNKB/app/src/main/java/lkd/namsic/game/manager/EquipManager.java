@@ -256,7 +256,7 @@ public class EquipManager {
                 Map<Long, Integer> recipeMap = first.get();
                 for(Map.Entry<Long, Integer> entry : recipeMap.entrySet()) {
                     itemId = entry.getKey();
-                    itemCount = Math.max(entry.getValue() / 2, 1);
+                    itemCount = entry.getValue() / 4;
             
                     self.addItem(itemId, itemCount, false);
                     innerBuilder.append("\n")

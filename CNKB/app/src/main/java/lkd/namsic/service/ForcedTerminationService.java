@@ -17,11 +17,6 @@ public class ForcedTerminationService extends Service {
     }
     
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_REDELIVER_INTENT;
-    }
-    
-    @Override
     public void onTaskRemoved(Intent rootIntent) {
         MainActivity.endProgram();
         this.stopSelf();

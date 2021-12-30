@@ -23,7 +23,11 @@ public enum SkillList {
     RUSH("돌진", 8L),
     ROAR("포효", 9L),
     HOWLING_OF_WOLF("늑대의 하울링", 10L),
-    CUTTING_MOONLIGHT("달빛 베기", 11L);
+    CUTTING_MOONLIGHT("달빛 베기", 11L),
+    SPAWN_IMP("임프 소환", 12L),
+    ESSENCE_DRAIN("정기 흡수", 13L),
+    MAGIC_DRAIN("마기 흡수", 14L),
+    MANA_EXPLOSION("마나 폭발", 15L);
     
     public static final Map<String, SkillList> nameMap = new HashMap<>();
     public static final Map<Long, SkillList> idMap = new HashMap<>();

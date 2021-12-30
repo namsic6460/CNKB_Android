@@ -3,11 +3,9 @@ package lkd.namsic.service;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Base64;
@@ -15,10 +13,10 @@ import android.util.Base64;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
-import lkd.namsic.game.config.Config;
-import lkd.namsic.game.KakaoTalk;
-import lkd.namsic.setting.Logger;
 import lkd.namsic.MainActivity;
+import lkd.namsic.game.KakaoTalk;
+import lkd.namsic.game.config.Config;
+import lkd.namsic.setting.Logger;
 
 public class NotificationListener extends NotificationListenerService {
     
@@ -33,16 +31,6 @@ public class NotificationListener extends NotificationListenerService {
     public static Context context;
     
     private static boolean isCreated = false;
-    
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-    
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_REDELIVER_INTENT;
-    }
     
     @Override
     public void onCreate() {

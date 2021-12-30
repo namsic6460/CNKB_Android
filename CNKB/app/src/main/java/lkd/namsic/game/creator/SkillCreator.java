@@ -44,10 +44,22 @@ public class SkillCreator implements Creatable {
                 "(1.5레벨 차이당 1%) (최대 30%)", null);
 
         createSkill(SkillList.HOWLING_OF_WOLF, "[30 마나] [획득 불가]\n" +
-                "주변에 라이칸스로프 두마리를 소환하여 전투에 난입시킨다", null);
+                "주변에 라이칸스로프 두 마리를 소환하여 전투에 난입시킨다", null);
         
         createSkill(SkillList.CUTTING_MOONLIGHT, "[8 마나]\n" + "다른 타입의(n 설정 달빛 베기) 적 전체에게 " +
                 "(공격력 * 0.9) 또는 (마법 공격력 * 0.9) 중 더 높은 스텟으로 물리 또는 마법 데미지를 가한다",null);
+        
+        createSkill(SkillList.SPAWN_IMP, "[50 마나] [획득 불가]\n" +
+            "주변에 임프 세 마리를 소환하여 전투에 난입시킨다", null);
+        
+        createSkill(SkillList.ESSENCE_DRAIN, "[10 마나] [회피 불가] [치명타 불가]\n" +
+            "대상에게 (마법 공격력 * 1) 에 해당하는 마법 데미지를 가하고 그 데미지만큼 회복한다", null);
+        
+        createSkill(SkillList.MAGIC_DRAIN, "[회피 불가]\n대상의 최대 마나의 10% 에 해당하는 " +
+            "마나를 없애고, 자신의 최대 마나의 10% 에 해당하는 마나를 회복한다", null);
+        
+        createSkill(SkillList.MANA_EXPLOSION, "[50 마나] [회피 불가] [3 턴]\n필드 거리 16 내의 " +
+            "모든 대상에게 (마법 공격력 * 5) 에 해당하는 마법 데미지를 가한다", null);
 
         Logger.i("ObjectMaker", "Skill making is done!");
     }

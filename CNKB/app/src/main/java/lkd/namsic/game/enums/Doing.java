@@ -20,6 +20,7 @@ public enum Doing {
     HARVEST("농사"),
     MINE("광질"),
     REINFORCE("강화"),
+    RESPAWN("리스폰"),
     REST("휴식"),
     SHOP("상점"),
     WAIT_RESPONSE("대화(대답 대기)");

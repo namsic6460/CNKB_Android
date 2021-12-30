@@ -16,7 +16,6 @@ import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.object.EquipList;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.event.Event;
-import lkd.namsic.game.manager.EquipManager;
 import lkd.namsic.game.object.implement.EquipEvents;
 import lkd.namsic.game.object.implement.EquipUses;
 import lombok.Getter;
@@ -72,9 +71,7 @@ public class Equipment extends Item implements Cloneable {
         this.equipType = equipType;
     }
     
-    public boolean revalidateStat(boolean checkBasic, @Nullable Entity entity) {
-        boolean available = true;
-        
+    public void revalidateStat(boolean checkBasic, @Nullable Entity entity) {
         Equipment equipment = Config.loadObject(Id.EQUIPMENT, this.originalId);
         
         if(checkBasic) {
@@ -82,11 +79,6 @@ public class Equipment extends Item implements Cloneable {
             
             this.limitStat.clear();
             this.limitStat.putAll(equipment.limitStat);
-            
-            if(entity.getId().getId().equals(Id.PLAYER) && entity.isEquipped(equipType, this.id.getObjectId())) {
-                available = EquipManager.getInstance().canEquip((Player) entity, this.id.getObjectId());
-            }
-            
             this.basicStat.clear();
             this.basicStat.putAll(equipment.basicStat);
         }
@@ -116,8 +108,6 @@ public class Equipment extends Item implements Cloneable {
         }
         
         Config.unloadObject(equipment);
-        
-        return available;
     }
     
     public double getReinforcePercent(double multiplier) {

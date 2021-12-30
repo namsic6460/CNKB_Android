@@ -44,7 +44,9 @@ public enum EventList {
     LYCANTHROPE_PAGE_2(31L),
     WOLF_OF_MOON_PAGE_2(32L),
     WOLF_OF_MOON_PAGE_3(33L),
-    WOLF_OF_MOON_END(34L);
+    WOLF_OF_MOON_END(34L),
+    SUCCUBUS_START(35L),
+    SUCCUBUS_PAGE2(36L);
     
     public static final Map<Long, EventList> idMap = new HashMap<>();
     

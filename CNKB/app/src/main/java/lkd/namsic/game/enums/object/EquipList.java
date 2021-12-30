@@ -113,7 +113,9 @@ public enum EquipList {
     BASIC_HELMET("기본 투구", 292L),
     BASIC_CHESTPLATE("기본 갑옷", 293L),
     BASIC_LEGGINGS("기본 바지", 294L),
-    BASIC_SHOES("기본 신발", 295L);
+    BASIC_SHOES("기본 신발", 295L),
+    SUCCUBUS_GEM("서큐버스의 정수", 510L),
+    CHARM_WHIP("매혹의 채찍", 511L);
     
     public static final Map<String, EquipList> nameMap = new HashMap<>();
     public static final Map<Long, EquipList> idMap = new HashMap<>();

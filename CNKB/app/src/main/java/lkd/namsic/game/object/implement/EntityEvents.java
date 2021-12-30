@@ -33,9 +33,11 @@ import lkd.namsic.game.event.StartFightEvent;
 import lkd.namsic.game.event.TurnEvent;
 import lkd.namsic.game.exception.EventRemoveException;
 import lkd.namsic.game.manager.FightManager;
+import lkd.namsic.game.manager.SkillManager;
 import lkd.namsic.game.object.Boss;
 import lkd.namsic.game.object.Entity;
 import lkd.namsic.game.object.Player;
+import lkd.namsic.setting.Logger;
 
 public class EntityEvents {
     
@@ -533,7 +535,7 @@ public class EntityEvents {
                         player.addEvent(EventList.WOLF_OF_MOON_END);
                     }
                     
-                    Player.replyPlayers(playerSet, self.getFightName() + " (이/가) 분노의 포효를 하며 늑대인간으로 변했습니다!\n" +
+                    Player.replyPlayers(playerSet, "달의 늑대가 분노의 포효를 하며 늑대인간으로 변했습니다!\n" +
                         "이번 전투동안 공격 속도가 20% 감소합니다");
                     
                     throw new EventRemoveException();
@@ -550,6 +552,47 @@ public class EntityEvents {
                 self.addBasicStat(StatType.ATS, ats);
                 
                 throw new EventRemoveException();
+            }
+        });
+        
+        put(EventList.SUCCUBUS_START.getId(), new StartFightEvent() {
+            @Override
+            public void onStartFight(@NonNull Entity self, @NonNull Entity enemy, boolean isOwner) {
+                long fightId = FightManager.getInstance().getFightId(self.getId());
+                Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
+                SkillManager.getInstance().use(self, SkillList.SPAWN_IMP.getId(), null, playerSet);
+                
+                try {
+                    Thread.sleep(1000);
+                } catch(InterruptedException e) {
+                    Logger.e("Event.SUCCUBUS_START", e);
+                }
+            }
+        });
+        
+        put(EventList.SUCCUBUS_PAGE2.getId(), new PreTurnEvent() {
+            @Override
+            public void onPreTurn(@NonNull Entity self) {
+                if(self.getStat(StatType.MAXHP) * 0.5 >= self.getStat(StatType.HP)) {
+                    long fightId = FightManager.getInstance().getFightId(self.getId());
+                    Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
+    
+                    Player.replyPlayers(playerSet, "서큐버스를 바라보니 갑자기 정신이 몽롱해집니다\n" +
+                        "당신은 갑자기 자신을 공격하고 싶은 욕구가 듭니다");
+    
+                    for(Player player : playerSet) {
+                        player.damage(player, player.getStat(StatType.ATK), 0, 0, false, true, false);
+                        player.printDamagedMsg(player);
+                    }
+    
+                    try {
+                        Thread.sleep(1000);
+                    } catch(InterruptedException e) {
+                        Logger.e("Event.SUCCUBUS_PAGE2", e);
+                    }
+    
+                    throw new EventRemoveException();
+                }
             }
         });
     }};

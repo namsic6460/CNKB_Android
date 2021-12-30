@@ -61,7 +61,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
     
-    public static final double VERSION = 4.0;
+    public static final double VERSION = 4.1;
     
     public static final Gson gson = new GsonBuilder()
         .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -905,16 +905,9 @@ public class Config {
     public static void update(@NonNull Entity entity) {
         Equipment equipment;
         
-        boolean unavailable = false;
-        List<String> unavailableEquipList = new ArrayList<>();
         for(long equipId : entity.getEquipInventory()) {
             equipment = Config.loadObject(Id.EQUIPMENT, equipId);
-            
-            if(!equipment.revalidateStat(true, entity)) {
-                unavailable = true;
-                unavailableEquipList.add(equipment.getName());
-            }
-            
+            equipment.revalidateStat(true, entity);
             Config.unloadObject(equipment);
         }
         
@@ -926,20 +919,6 @@ public class Config {
             if(player.getVersion() < 3.11) {
                 player.addMoney(1000000);
                 player.addItem(ItemList.CONFIRMED_HIGH_RECIPE.getId(), 1, false);
-            }
-            
-            if(unavailable) {
-                StringBuilder innerBuilder = new StringBuilder("---장비 업데이트 경고---\n(장착 해제할 경우 재장착이 불가능한 장비 목록)");
-                for(String string : unavailableEquipList) {
-                    innerBuilder.append(Emoji.LIST)
-                        .append(" ")
-                        .append(string);
-                }
-                
-                player.replyPlayer("업데이트가 완료되었습니다\nv" + player.getVersion() + " -> v" + Config.VERSION,
-                    innerBuilder.toString());
-            } else {
-                player.replyPlayer("업데이트가 완료되었습니다\nv" + player.getVersion() + " -> v" + Config.VERSION);
             }
         }
         

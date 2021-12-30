@@ -49,8 +49,8 @@ public class RespawnCommand extends PlayerCommand {
                 }
             }
             
+            player.setDoing(Doing.RESPAWN);
             player.replyPlayer("몬스터 리스폰을 시도합니다\n10초만 기다려주세요");
-            
             
             try {
                 Thread.sleep(10000);
@@ -84,6 +84,7 @@ public class RespawnCommand extends PlayerCommand {
             map.respawn();
             player.replyPlayer("몬스터가 리스폰 되었습니다");
         } finally {
+            player.setDoing(Doing.RESPAWN);
             Config.unloadMap(map);
         }
     }

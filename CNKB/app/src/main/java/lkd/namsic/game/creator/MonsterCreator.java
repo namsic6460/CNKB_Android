@@ -380,7 +380,7 @@ public class MonsterCreator implements Creatable {
 
         Config.unloadObject(monster);
 
-        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 18L));
+        Config.ID_COUNT.put(Id.MONSTER, Math.max(Config.ID_COUNT.get(Id.MONSTER), 1000000L));
         Logger.i("ObjectMaker", "Monster making is done!");
     }
 

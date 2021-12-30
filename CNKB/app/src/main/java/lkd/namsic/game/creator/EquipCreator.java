@@ -33,7 +33,7 @@ public class EquipCreator implements Creatable {
             put(ItemList.LAPIS.getId(), 10);
             put(ItemList.IRON.getId(), 20);
         }});
-        equipment.setBasicStat(StatType.ATK, 3);
+        equipment.setBasicStat(StatType.ATK, 5);
         equipment.setBasicStat(StatType.ATS, 5);
         equipment.setBasicStat(StatType.ACC, 8);
         Config.unloadObject(equipment);
@@ -46,20 +46,20 @@ public class EquipCreator implements Creatable {
             put(ItemList.LOW_ALLOY.getId(), 3);
             put(ItemList.QUARTZ.getId(), 4);
         }});
-        equipment.setBasicStat(StatType.ATK, 7);
-        equipment.setBasicStat(StatType.ATS, 7);
+        equipment.setBasicStat(StatType.ATK, 8);
+        equipment.setBasicStat(StatType.ATS, 8);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.HEART_BREAKER_1,
                 null, "공격 시 체력이 10% 미만인 적을 처형시킨다");
         equipment.setHandleLv(4);
+        equipment.setLimitLv(40);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.IRON.getId(), 30);
             put(ItemList.ZOMBIE_HEART.getId(), 10);
         }});
         equipment.setBasicStat(StatType.ATK, 15);
-        equipment.setBasicStat(StatType.ATS, 30);
-        equipment.setLimitLv(40);
+        equipment.setBasicStat(StatType.ATS, 20);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.HEAD_HUNTER_1,
@@ -70,10 +70,10 @@ public class EquipCreator implements Creatable {
             put(ItemList.PIG_HEAD.getId(), 10);
             put(ItemList.ZOMBIE_HEAD.getId(), 5);
         }});
-        equipment.setBasicStat(StatType.ATK, 10);
-        equipment.setBasicStat(StatType.ATS, 10);
-        equipment.setBasicStat(StatType.ACC, 10);
-        equipment.setBasicStat(StatType.AGI, 10);
+        equipment.setBasicStat(StatType.ATK, 12);
+        equipment.setBasicStat(StatType.ATS, 12);
+        equipment.setBasicStat(StatType.ACC, 12);
+        equipment.setBasicStat(StatType.AGI, 12);
         equipment.setLimitLv(40);
         Config.unloadObject(equipment);
 
@@ -85,7 +85,7 @@ public class EquipCreator implements Creatable {
             put(ItemList.ZOMBIE_SOUL.getId(), 1);
             put(ItemList.SILVER.getId(), 20);
         }});
-        equipment.setBasicStat(StatType.ATS, 60);
+        equipment.setBasicStat(StatType.ATS, 55);
         equipment.setLimitLv(40);
         Config.unloadObject(equipment);
 
@@ -110,7 +110,7 @@ public class EquipCreator implements Creatable {
 
         equipment = new Equipment(EquipType.HELMET, EquipList.LEATHER_HELMET,
                 null, "치명타 데미지를 15% 감소시킨다");
-        equipment.setBasicStat(StatType.MAXHP, 10);
+        equipment.setBasicStat(StatType.MAXHP, 16);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.SHEEP_LEATHER.getId(), 10);
             put(ItemList.LEATHER.getId(), 5);
@@ -278,8 +278,8 @@ public class EquipCreator implements Creatable {
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.WEIRD_LEGGINGS,
                 null, "피격 시 10% 확률로 데미지를 50% 감소시키고 다음 자신의 공격 데미지를 1.5배로 준다");
         equipment.setHandleLv(3);
-        equipment.setBasicStat(StatType.MAXHP, 30);
-        equipment.setBasicStat(StatType.ATS, 30);
+        equipment.setBasicStat(StatType.MAXHP, 25);
+        equipment.setBasicStat(StatType.ATS, 25);
         equipment.setBasicStat(StatType.DEF, 5);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.PIECE_OF_SLIME.getId(), 10);
@@ -292,8 +292,8 @@ public class EquipCreator implements Creatable {
                 null, "광질 시 돌을 2개씩 채광한다");
         equipment.setHandleLv(1);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
-            put(ItemList.STONE.getId(), 1000);
-            put(ItemList.COAL.getId(), 1000);
+            put(ItemList.STONE.getId(), 500);
+            put(ItemList.COAL.getId(), 500);
         }});
         Config.unloadObject(equipment);
 
@@ -340,8 +340,8 @@ public class EquipCreator implements Creatable {
             put(ItemList.COAL.getId(), 10);
         }});
         equipment.setBasicStat(StatType.ATK, 5);
-        equipment.setBasicStat(StatType.AGI, 5);
-        equipment.setBasicStat(StatType.ACC, 5);
+        equipment.setBasicStat(StatType.AGI, 7);
+        equipment.setBasicStat(StatType.ACC, 7);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.BASIC_STAFF, null, null);
@@ -363,8 +363,8 @@ public class EquipCreator implements Creatable {
             put(ItemList.RED_STONE.getId(), 10);
             put(ItemList.BLUE_SPHERE.getId(), 1);
         }});
-        equipment.setBasicStat(StatType.MATK, 8);
-        equipment.setBasicStat(StatType.MBRE, 3);
+        equipment.setBasicStat(StatType.MATK, 10);
+        equipment.setBasicStat(StatType.MBRE, 5);
         equipment.setBasicStat(StatType.MDRA, 5);
         equipment.setBasicStat(StatType.MAXMN, 2);
         Config.unloadObject(equipment);
@@ -380,7 +380,7 @@ public class EquipCreator implements Creatable {
             put(ItemList.ZOMBIE_HEAD.getId(), 5);
         }});
         equipment.setBasicStat(StatType.MATK, 10);
-        equipment.setBasicStat(StatType.ATS, 5);
+        equipment.setBasicStat(StatType.ATS, 10);
         equipment.setBasicStat(StatType.MBRE, 5);
         equipment.setBasicStat(StatType.MDRA, 5);
         equipment.setBasicStat(StatType.MAXMN, 3);
@@ -393,8 +393,8 @@ public class EquipCreator implements Creatable {
             put(ItemList.COAL.getId(), 10);
         }});
         equipment.setBasicStat(StatType.MAXHP, 10);
-        equipment.setBasicStat(StatType.DEF, 3);
-        equipment.setBasicStat(StatType.MDEF, 3);
+        equipment.setBasicStat(StatType.DEF, 5);
+        equipment.setBasicStat(StatType.MDEF, 5);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.BONE_CHESTPLATE, null, null);
@@ -403,8 +403,8 @@ public class EquipCreator implements Creatable {
             put(ItemList.PIECE_OF_BONE.getId(), 100);
             put(ItemList.COAL.getId(), 10);
         }});
-        equipment.setBasicStat(StatType.DEF, 6);
-        equipment.setBasicStat(StatType.MDEF, 6);
+        equipment.setBasicStat(StatType.DEF, 7);
+        equipment.setBasicStat(StatType.MDEF, 7);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.BONE_LEGGINGS, null, null);
@@ -413,7 +413,7 @@ public class EquipCreator implements Creatable {
             put(ItemList.PIECE_OF_BONE.getId(), 90);
             put(ItemList.COAL.getId(), 10);
         }});
-        equipment.setBasicStat(StatType.MAXHP, 20);
+        equipment.setBasicStat(StatType.MAXHP, 35);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.SHOES, EquipList.BONE_SHOES, null, null);
@@ -423,8 +423,8 @@ public class EquipCreator implements Creatable {
             put(ItemList.COAL.getId(), 10);
         }});
         equipment.setBasicStat(StatType.MAXHP, 5);
-        equipment.setBasicStat(StatType.DEF, 3);
-        equipment.setBasicStat(StatType.MDEF, 3);
+        equipment.setBasicStat(StatType.DEF, 5);
+        equipment.setBasicStat(StatType.MDEF, 5);
         equipment.setBasicStat(StatType.EVA, 5);
         Config.unloadObject(equipment);
 
@@ -444,7 +444,7 @@ public class EquipCreator implements Creatable {
             put(ItemList.HARD_COAL.getId(), 10);
             put(ItemList.IMP_HEART.getId(), 10);
         }});
-        equipment.setBasicStat(StatType.ATK, 30);
+        equipment.setBasicStat(StatType.ATK, 25);
         equipment.setBasicStat(StatType.ATS, 40);
         equipment.setBasicStat(StatType.ACC, 20);
         Config.unloadObject(equipment);
@@ -470,9 +470,9 @@ public class EquipCreator implements Creatable {
             put(ItemList.HORN_OF_LOW_DEVIL.getId(), 5);
             put(ItemList.COAL.getId(), 80);
         }});
-        equipment.setBasicStat(StatType.MAXHP, 20);
-        equipment.setBasicStat(StatType.DEF, 5);
-        equipment.setBasicStat(StatType.MDEF, 5);
+        equipment.setBasicStat(StatType.MAXHP, 30);
+        equipment.setBasicStat(StatType.DEF, 7);
+        equipment.setBasicStat(StatType.MDEF, 7);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.DEMON_BONE_CHESTPLATE, null, null);
@@ -482,8 +482,8 @@ public class EquipCreator implements Creatable {
             put(ItemList.HORN_OF_LOW_DEVIL.getId(), 5);
             put(ItemList.COAL.getId(), 100);
         }});
-        equipment.setBasicStat(StatType.DEF, 10);
-        equipment.setBasicStat(StatType.MDEF, 10);
+        equipment.setBasicStat(StatType.DEF, 12);
+        equipment.setBasicStat(StatType.MDEF, 12);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.DEMON_BONE_LEGGINGS, null, null);
@@ -493,7 +493,7 @@ public class EquipCreator implements Creatable {
             put(ItemList.HORN_OF_LOW_DEVIL.getId(), 5);
             put(ItemList.COAL.getId(), 90);
         }});
-        equipment.setBasicStat(StatType.MAXHP, 30);
+        equipment.setBasicStat(StatType.MAXHP, 60);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.SHOES, EquipList.DEMON_BONE_SHOES, null, null);
@@ -504,8 +504,8 @@ public class EquipCreator implements Creatable {
             put(ItemList.COAL.getId(), 70);
         }});
         equipment.setBasicStat(StatType.MAXHP, 10);
-        equipment.setBasicStat(StatType.DEF, 5);
-        equipment.setBasicStat(StatType.MDEF, 5);
+        equipment.setBasicStat(StatType.DEF, 8);
+        equipment.setBasicStat(StatType.MDEF, 8);
         equipment.setBasicStat(StatType.EVA, 10);
         Config.unloadObject(equipment);
 
@@ -528,14 +528,14 @@ public class EquipCreator implements Creatable {
                         "음: 스킬 사용 시 적 최대 체력의 5% 고정데미지\n" +
                         "양: 일반 공격 시 최대 체력의 5% 회복");
         equipment.setHandleLv(3);
-        equipment.setLimitLv(20);
+        equipment.setLimitLv(25);
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.LAPIS.getId(), 30);
             put(ItemList.RED_STONE.getId(), 30);
             put(ItemList.EMPTY_SPHERE.getId(), 5);
         }});
-        equipment.setBasicStat(StatType.ATK, 10);
-        equipment.setBasicStat(StatType.MATK, 10);
+        equipment.setBasicStat(StatType.ATK, 8);
+        equipment.setBasicStat(StatType.MATK, 8);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.SILVER_SWORD,
@@ -561,8 +561,8 @@ public class EquipCreator implements Creatable {
         }});
         equipment.setBasicStat(StatType.MAXHP, 20);
         equipment.setBasicStat(StatType.MAXMN, 5);
-        equipment.setBasicStat(StatType.DEF, 10);
-        equipment.setBasicStat(StatType.MDEF, 20);
+        equipment.setBasicStat(StatType.DEF, 8);
+        equipment.setBasicStat(StatType.MDEF, 16);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.CHESTPLATE, EquipList.SILVER_CHESTPLATE,
@@ -573,7 +573,7 @@ public class EquipCreator implements Creatable {
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.SILVER.getId(), 50);
         }});
-        equipment.setBasicStat(StatType.MAXHP, 50);
+        equipment.setBasicStat(StatType.MAXHP, 45);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.LEGGINGS, EquipList.SILVER_LEGGINGS, null, null);
@@ -583,7 +583,7 @@ public class EquipCreator implements Creatable {
             put(ItemList.SILVER.getId(), 40);
         }});
         equipment.setBasicStat(StatType.MAXHP, 30);
-        equipment.setBasicStat(StatType.MDEF, 10);
+        equipment.setBasicStat(StatType.MDEF, 8);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.SHOES, EquipList.SILVER_SHOES,
@@ -593,9 +593,9 @@ public class EquipCreator implements Creatable {
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.SILVER.getId(), 30);
         }});
-        equipment.setBasicStat(StatType.MAXHP, 30);
+        equipment.setBasicStat(StatType.MAXHP, 25);
         equipment.setBasicStat(StatType.MDEF, 5);
-        equipment.setBasicStat(StatType.AGI, 10);
+        equipment.setBasicStat(StatType.AGI, 8);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.YIN_YANG_SWORD_2, null,
@@ -610,8 +610,8 @@ public class EquipCreator implements Creatable {
             put(ItemList.EMPTY_SPHERE.getId(), 20);
             put(ItemList.HARD_COAL.getId(), 10);
         }});
-        equipment.setBasicStat(StatType.ATK, 30);
-        equipment.setBasicStat(StatType.MATK, 30);
+        equipment.setBasicStat(StatType.ATK, 25);
+        equipment.setBasicStat(StatType.MATK, 25);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.WEAPON, EquipList.MIX_SWORD_2,
@@ -883,8 +883,8 @@ public class EquipCreator implements Creatable {
         equipment.addRecipe(new HashMap<Long, Integer>() {{
             put(ItemList.SILVER.getId(), 20);
         }});
-        equipment.setBasicStat(StatType.DEF, 25);
-        equipment.setBasicStat(StatType.MDEF, 25);
+        equipment.setBasicStat(StatType.DEF, 16);
+        equipment.setBasicStat(StatType.MDEF, 16);
         Config.unloadObject(equipment);
 
         equipment = new Equipment(EquipType.NECKLACE, EquipList.HARPY_NAIL_NECKLACE,
@@ -1129,8 +1129,29 @@ public class EquipCreator implements Creatable {
         equipment.setBasicStat(StatType.MAXHP, 5);
         equipment.setBasicStat(StatType.DEF, 1);
         Config.unloadObject(equipment);
+        
+        equipment = new Equipment(EquipType.GEM, EquipList.SUCCUBUS_GEM, null,
+            "피격 시 현재 마나가 최대 마나의 30% 이상이라면, 최대 마나의 10%를 소모하여 데미지를 20% 감소시킨다"
+        );
+        equipment.setHandleLv(5);
+        equipment.setLimitLv(50);
+        equipment.setBasicStat(StatType.MAXMN, 10);
+        equipment.setBasicStat(StatType.EVA, 30);
+        Config.unloadObject(equipment);
+        
+        equipment = new Equipment(EquipType.WEAPON, EquipList.CHARM_WHIP, null,
+            "스킬 적중 시 대상의 공격력의 33%에 해당하는 데미지를 추가로 부여한다"
+        );
+        equipment.setHandleLv(5);
+        equipment.setLimitLv(50);
+        equipment.setBasicStat(StatType.MAXMN, 10);
+        equipment.setBasicStat(StatType.ATK, 5);
+        equipment.setBasicStat(StatType.MATK, 27);
+        equipment.setBasicStat(StatType.MDRA, 10);
+        Config.unloadObject(equipment);
+        
 
-        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 279L));
+        Config.ID_COUNT.put(Id.EQUIPMENT, Math.max(Config.ID_COUNT.get(Id.EQUIPMENT), 1000000L));
         Logger.i("ObjectMaker", "Equipment making is done!");
     }
 

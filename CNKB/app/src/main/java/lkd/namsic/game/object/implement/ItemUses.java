@@ -889,6 +889,100 @@ public class ItemUses {
                 return SKILL_BOOK;
             }
         });
+        
+        put(ItemList.HORN_OF_IMP.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+    
+                if(self.getItem(ItemList.IMP_HEART.getId()) < 10) {
+                    throw new WeirdCommandException("이 아이템을 사용하기 위한 준비물이 모두 모이지 않았습니다");
+                }
+    
+                GameMap map = Config.getMapData(self.getLocation());
+                if(!map.getLocation().equalsMap(MapList.ENTRANCE_OF_SINKHOLE.getLocation())) {
+                    throw new WeirdCommandException("마기의 성질이 다릅니다");
+                }
+            }
+    
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addItem(ItemList.IMP_HEART.getId(), -10);
+    
+                GameMap map = Config.loadMap(self.getLocation());
+                Boss boss = map.spawnBoss(BossList.SUCCUBUS);
+    
+                new Thread(() -> {
+                    Config.loadObject(Id.BOSS, boss.getId().getObjectId());
+        
+                    try {
+                        Thread.sleep(500);
+                        FightManager.getInstance().startFight((Player) self, boss, false);
+                    } catch(Exception e) {
+                        Logger.e("ItemUse.HORN_OF_IMP", Config.errorString(e));
+                    }
+        
+                    Config.unloadObject(boss);
+                }).start();
+    
+                return BossList.SUCCUBUS.getDisplayName() + "를 소환했습니다!";
+            }
+        });
+    
+        put(ItemList.SKILL_BOOK_ESSENCE_DRAIN.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+            
+                if(self.getSkill().contains(SkillList.ESSENCE_DRAIN.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+        
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.ESSENCE_DRAIN.getId());
+                return SKILL_BOOK;
+            }
+        });
+    
+        put(ItemList.SKILL_BOOK_MAGIC_DRAIN.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+            
+                if(self.getSkill().contains(SkillList.MAGIC_DRAIN.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+        
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.MAGIC_DRAIN.getId());
+                return SKILL_BOOK;
+            }
+        });
+    
+        put(ItemList.SKILL_BOOK_MANA_EXPLOSION.getId(), new Use() {
+            @Override
+            public void checkUse(@NonNull Entity self, @Nullable String other) {
+                super.checkUse(self, other);
+            
+                if(self.getSkill().contains(SkillList.MANA_EXPLOSION.getId())) {
+                    throw new WeirdCommandException(SKILL_ALREADY_EXIST);
+                }
+            }
+        
+            @NonNull
+            @Override
+            public String use(@NonNull Entity self, @Nullable String other) {
+                self.addSkill(SkillList.MANA_EXPLOSION.getId());
+                return SKILL_BOOK;
+            }
+        });
     }};
     
 }

@@ -314,41 +314,6 @@ public abstract class Entity extends NamedObject {
         return true;
     }
     
-    public boolean checkStatRange(@NonNull Map<StatType, Integer> min, @NonNull Map<StatType, Integer> max) {
-        this.revalidateBuff();
-        
-        Integer minValue, maxValue;
-        int value;
-        
-        for(StatType statType : StatType.values()) {
-            try {
-                Config.checkStatType(statType);
-            } catch(UnhandledEnumException e) {
-                continue;
-            }
-            
-            minValue = min.get(statType);
-            maxValue = max.get(statType);
-            value = this.getStat(statType);
-            
-            if(minValue != null && maxValue != null) {
-                if(value > maxValue || value < minValue) {
-                    return false;
-                }
-            } else if(minValue == null && maxValue != null) {
-                if(value > maxValue) {
-                    return false;
-                }
-            } else if(minValue != null) {
-                if(value < minValue) {
-                    return false;
-                }
-            }
-        }
-        
-        return true;
-    }
-    
     public void onDeath() {
         this.lastDeathLoc.set(this.location);
         this.lastDropMoney = 0L;
@@ -769,6 +734,43 @@ public abstract class Entity extends NamedObject {
                 }
                 
                 distantMap.put(objectId, getFieldDistance(entity.getLocation()));
+            }
+        }
+        
+        return output;
+    }
+    
+    public Map<Integer, Set<IdClass>> getDistantEntity(@Nullable Integer limitDistant) {
+        Map<Integer, Set<IdClass>> output = new HashMap<>();
+        
+        GameMap map = Config.getMapData(this.location);
+        
+        Id id;
+        Entity entity;
+        int distant;
+        for(Map.Entry<Id, Set<Long>> entry : map.getEntity().entrySet()) {
+            id = entry.getKey();
+            
+            for(long objectId : entry.getValue()) {
+                entity = Config.getData(id, objectId);
+                if(entity.equals(this)) {
+                    continue;
+                }
+                
+                distant = getFieldDistance(entity.getLocation());
+                if(limitDistant != null && distant > limitDistant) {
+                    continue;
+                }
+                
+                Set<IdClass> entitySet = output.get(distant);
+                
+                if(entitySet == null) {
+                    entitySet = new HashSet<>();
+                    entitySet.add(entity.getId());
+                    output.put(distant, entitySet);
+                } else {
+                    entitySet.add(entity.getId());
+                }
             }
         }
         

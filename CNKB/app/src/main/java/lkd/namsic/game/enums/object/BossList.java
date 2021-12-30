@@ -11,7 +11,8 @@ import lombok.Getter;
 public enum BossList {
     
     NONE("NONE", 0L),
-    WOLF_OF_MOON("달의 늑대", 1L);
+    WOLF_OF_MOON("달의 늑대", 1L),
+    SUCCUBUS("서큐버스", 2L);
     
     public static final Map<String, BossList> nameMap = new HashMap<>();
     public static final Map<Long, BossList> idMap = new HashMap<>();

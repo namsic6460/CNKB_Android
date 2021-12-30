@@ -292,8 +292,11 @@ public enum ItemList {
     LYCANTHROPE_SOUL("라이칸스로프 영혼", 231L),
     
     MOON_STONE("월석", 232L),
+    SKILL_BOOK_CUTTING_MOONLIGHT("스킬 북 - 달빛 베기", 233L),
     
-    SKILL_BOOK_CUTTING_MOONLIGHT("스킬 북 - 달빛 베기", 233L);
+    SKILL_BOOK_ESSENCE_DRAIN("스킬 북 - 정기 흡수", 234L),
+    SKILL_BOOK_MAGIC_DRAIN("스킬 북 - 마기 흡수", 235L),
+    SKILL_BOOK_MANA_EXPLOSION("스킬 북 - 마나 폭발", 236L);
     
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();

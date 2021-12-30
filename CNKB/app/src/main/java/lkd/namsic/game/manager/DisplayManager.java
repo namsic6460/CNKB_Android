@@ -437,11 +437,20 @@ public class DisplayManager {
                     .append(ItemList.findById(itemId))
                     .append("(")
                     .append(Config.getDisplayPercent(entry.getValue()))
-                    .append(")(")
-                    .append(monster.getItemDropMinCount(itemId))
+                    .append(")(");
+            
+            int minDrop = monster.getItemDropMinCount(itemId);
+            int maxDrop = monster.getItem(itemId);
+            
+            if(minDrop == maxDrop) {
+                innerBuilder.append(minDrop);
+            } else {
+                innerBuilder.append(monster.getItemDropMinCount(itemId))
                     .append(" ~ ")
-                    .append(monster.getItem(itemId))
-                    .append("개)");
+                    .append(monster.getItem(itemId));
+            }
+            
+            innerBuilder.append("개)");
         }
 
         innerBuilder.append("\n\n--사용 스킬 목록---");

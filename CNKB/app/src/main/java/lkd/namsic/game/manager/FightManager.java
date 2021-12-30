@@ -717,12 +717,12 @@ public class FightManager {
 
             this.setDoing(enemy, isFightOne);
             this.playerMap.put(objectId, playerSet);
+    
+            self.replyPlayer(enemy.getName() + " (와/과) 의 전투가 시작되었습니다");
 
             String eventName = StartFightEvent.getName();
             StartFightEvent.handleEvent(self, self.getEvent().get(eventName), self.getEquipEvents(eventName), enemy, true);
             StartFightEvent.handleEvent(enemy, enemy.getEvent().get(eventName), enemy.getEquipEvents(eventName), self, false);
-
-            self.replyPlayer(enemy.getName() + " (와/과) 의 전투가 시작되었습니다");
 
             return false;
         }
