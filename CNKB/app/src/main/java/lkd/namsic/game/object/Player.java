@@ -1004,7 +1004,7 @@ public class Player extends Entity {
             if(LocalDateTime.now().getDayOfYear() == 1) {
                 if(entity.getLv() - this.lv >= -20) {
                     int killed = this.getVariable(Variable.NEW_YEAR_KILL_EVENT) + 1;
-                    entity.setVariable(Variable.NEW_YEAR_KILL_EVENT, killed);
+                    this.setVariable(Variable.NEW_YEAR_KILL_EVENT, killed);
                     
                     msg += "\n새해 킬 이벤트: " + killed + " 마리";
                 }

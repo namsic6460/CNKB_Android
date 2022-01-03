@@ -79,7 +79,7 @@ public class BossCreator implements Creatable {
         boss.setBasicStat(StatType.MDEF, 150);
         boss.setBasicStat(StatType.MBRE, 50);
         boss.setBasicStat(StatType.MDRA, 40);
-        boss.setBasicStat(StatType.EVA, 200);
+        boss.setBasicStat(StatType.EVA, 150);
         boss.setBasicStat(StatType.ACC, 300);
     
         boss.setItemDrop(ItemList.SMALL_GOLD_BAG.getId(), 1, 20, 40);

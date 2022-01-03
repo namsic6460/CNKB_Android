@@ -853,7 +853,7 @@ public class ItemUses {
                 self.addItem(ItemList.LYCANTHROPE_SOUL.getId(), -1);
                 
                 GameMap map = Config.loadMap(self.getLocation());
-                Boss boss = map.spawnBoss(BossList.WOLF_OF_MOON);
+                Boss boss = map.spawnBoss(BossList.WOLF_OF_MOON, 32, 32);
                 
                 new Thread(() -> {
                     Config.loadObject(Id.BOSS, boss.getId().getObjectId());
@@ -868,7 +868,7 @@ public class ItemUses {
                     Config.unloadObject(boss);
                 }).start();
                 
-                return BossList.WOLF_OF_MOON.getDisplayName() + "를 소환했습니다!";
+                return "달의 늑대가 32-32에 소환되었습니다!";
             }
         });
         
@@ -911,7 +911,7 @@ public class ItemUses {
                 self.addItem(ItemList.IMP_HEART.getId(), -10);
     
                 GameMap map = Config.loadMap(self.getLocation());
-                Boss boss = map.spawnBoss(BossList.SUCCUBUS);
+                Boss boss = map.spawnBoss(BossList.SUCCUBUS, 16, 16);
     
                 new Thread(() -> {
                     Config.loadObject(Id.BOSS, boss.getId().getObjectId());
@@ -926,7 +926,7 @@ public class ItemUses {
                     Config.unloadObject(boss);
                 }).start();
     
-                return BossList.SUCCUBUS.getDisplayName() + "를 소환했습니다!";
+                return "서큐버스가 16-16 필드 좌표에 스폰되었습니다!";
             }
         });
     

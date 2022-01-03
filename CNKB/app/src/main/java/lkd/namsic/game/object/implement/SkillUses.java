@@ -397,55 +397,6 @@ public class SkillUses {
             }
         });
         
-        put(SkillList.SPAWN_IMP.getId(), new SkillUse(0, 50) {
-            @Override
-            public int getMinTargetCount() {
-                return 0;
-            }
-    
-            @Override
-            public int getMaxTargetCount() {
-                return 0;
-            }
-    
-            @Override
-            public void useSkill(@NonNull Entity self, @NonNull List<Entity> targets) {
-                long fightId = FightManager.getInstance().getFightId(self.getId());
-    
-                Location location = self.getLocation();
-                GameMap map = Config.loadMap(location);
-                
-                Location spawnLocation;
-                for(int i = 1; i <= 3; i++) {
-                    spawnLocation = new Location(location);
-    
-                    try {
-                        spawnLocation.setField(spawnLocation.getFieldX() + i, spawnLocation.getFieldY());
-                    } catch(NumberRangeException ignore) {
-                    }
-    
-                    Monster originalMonster = Config.getData(Id.MONSTER, MonsterList.IMP.getId());
-    
-                    Monster monster = Config.newObject(originalMonster, true);
-                    monster.randomLevel();
-                    monster.setLocation(spawnLocation);
-                    map.addEntity(monster);
-                    Config.unloadObject(monster);
-    
-                    monster = Config.loadObject(Id.MONSTER, monster.getId().getObjectId());
-                    monster.setDoing(Doing.FIGHT);
-    
-                    FightManager.getInstance().getEntitySet(fightId).add(monster);
-                    FightManager.getInstance().fightId.put(monster.getId(), fightId);
-                }
-    
-                Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
-                Player.replyPlayers(playerSet, MonsterList.IMP.getDisplayName() + " 세 마리가 전투에 난입했습니다!");
-    
-                Config.unloadMap(map);
-            }
-        });
-        
         put(SkillList.ESSENCE_DRAIN.getId(), new SkillUse(0, 10) {
             @Override
             public void checkUse(@NonNull Entity self, @Nullable String other) {

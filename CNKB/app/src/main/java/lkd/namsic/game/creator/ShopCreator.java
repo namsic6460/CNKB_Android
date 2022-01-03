@@ -126,7 +126,7 @@ public class ShopCreator implements Creatable {
 
         idSet = new HashSet<>();
         for(long itemId = ItemList.COMMON_FISH1.getId(); itemId <= ItemList.COMMON_FISH5.getId(); itemId++) {
-            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 50L);
+            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 75L);
             idSet.add(itemId);
         }
 
@@ -134,7 +134,7 @@ public class ShopCreator implements Creatable {
 
         idSet = new HashSet<>();
         for(long itemId = ItemList.RARE_FISH1.getId(); itemId <= ItemList.RARE_FISH6.getId(); itemId++) {
-            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 100L);
+            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 150L);
             idSet.add(itemId);
         }
 
@@ -142,7 +142,7 @@ public class ShopCreator implements Creatable {
 
         idSet = new HashSet<>();
         for(long itemId = ItemList.SPECIAL_FISH1.getId(); itemId <= ItemList.SPECIAL_FISH10.getId(); itemId++) {
-            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 220L);
+            shop.addBuyItem(Objects.requireNonNull(ItemList.idMap.get(itemId)), 250L);
             idSet.add(itemId);
         }
 

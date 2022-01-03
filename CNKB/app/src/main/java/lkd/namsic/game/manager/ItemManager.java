@@ -98,7 +98,7 @@ public class ItemManager {
 
         Item item = Config.getData(Id.ITEM, itemId);
         if(!item.isCanEat()) {
-            if(Math.random() >= 0.001) {
+            if(Math.random() >= 0.01) {
                 throw new WeirdCommandException("먹는것이 불가능한 아이템입니다");
             } else {
                 throw new WeirdCommandException("먹는것이 불가능한 아이템입니다\n왜 그걸 먹으려고 하는거야...");
@@ -120,10 +120,9 @@ public class ItemManager {
         self.addLog(LogData.TOTAL_ITEM_EAT, 1);
 
         Item item = Config.getData(Id.ITEM, itemId);
-
         StringBuilder innerBuilder = new StringBuilder("---획득한 버프---");
-
         Map<Long, HashMap<StatType, Integer>> eatBuff = item.getEatBuff();
+        
         if(eatBuff.isEmpty()) {
             innerBuilder.append("\n획득한 버프가 없습니다");
         } else {

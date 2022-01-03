@@ -576,8 +576,8 @@ public class ItemCreator implements Creatable {
 
         item = new Item(ItemList.LAMB, "양에서 나온 고기다");
         item.setCanEat(true);
-        item.setEatBuff(100000, StatType.ATS, 20);
-        item.setEatBuff(100000, StatType.ATK, 1);
+        item.setEatBuff(50000, StatType.ATS, 5);
+        item.setEatBuff(50000, StatType.ATK, 1);
         Config.unloadObject(item);
 
         createItem(ItemList.SHEEP_LEATHER, "양에서 나온 가죽이다");
@@ -585,15 +585,15 @@ public class ItemCreator implements Creatable {
 
         item = new Item(ItemList.PORK, "돼지에서 나온 고기다");
         item.setCanEat(true);
-        item.setEatBuff(100000, StatType.ACC, 10);
-        item.setEatBuff(100000, StatType.ATS, 10);
+        item.setEatBuff(50000, StatType.ACC, 8);
+        item.setEatBuff(50000, StatType.ATS, 8);
         Config.unloadObject(item);
 
         createItem(ItemList.PIG_HEAD, "행운의 상징으로 자주 쓰이는 아이템이다");
 
         item = new Item(ItemList.BEEF, "소에게서 나온 고기다");
         item.setCanEat(true);
-        item.setEatBuff(50000, StatType.DEF, 3);
+        item.setEatBuff(50000, StatType.DEF, 5);
         item.setEatBuff(50000, StatType.AGI, 10);
         Config.unloadObject(item);
 
@@ -768,8 +768,8 @@ public class ItemCreator implements Creatable {
             put(ItemList.LAMB.getId(), 1);
             put(ItemList.COAL.getId(), 5);
         }});
-        item.setEatBuff(100000, StatType.ATS, 30);
-        item.setEatBuff(100000, StatType.ATK, 1);
+        item.setEatBuff(50000, StatType.ATS, 10);
+        item.setEatBuff(50000, StatType.ATK, 2);
         item.setCanEat(true);
         Config.unloadObject(item);
 
@@ -778,8 +778,8 @@ public class ItemCreator implements Creatable {
             put(ItemList.PORK.getId(), 1);
             put(ItemList.COAL.getId(), 5);
         }});
-        item.setEatBuff(100000, StatType.ACC, 15);
-        item.setEatBuff(100000, StatType.ATS, 15);
+        item.setEatBuff(50000, StatType.ACC, 15);
+        item.setEatBuff(50000, StatType.ATS, 15);
         item.setCanEat(true);
         Config.unloadObject(item);
 
@@ -788,8 +788,8 @@ public class ItemCreator implements Creatable {
             put(ItemList.BEEF.getId(), 1);
             put(ItemList.COAL.getId(), 5);
         }});
-        item.setEatBuff(50000, StatType.DEF, 4);
-        item.setEatBuff(50000, StatType.AGI, 15);
+        item.setEatBuff(50000, StatType.DEF, 10);
+        item.setEatBuff(50000, StatType.AGI, 20);
         item.setCanEat(true);
         Config.unloadObject(item);
 

@@ -10,6 +10,7 @@ import java.util.Set;
 import lkd.namsic.game.base.Bool;
 import lkd.namsic.game.base.IdClass;
 import lkd.namsic.game.base.Int;
+import lkd.namsic.game.base.Location;
 import lkd.namsic.game.base.WrappedObject;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
@@ -18,6 +19,7 @@ import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.EventList;
+import lkd.namsic.game.enums.object.MonsterList;
 import lkd.namsic.game.enums.object.SkillList;
 import lkd.namsic.game.event.DamageEvent;
 import lkd.namsic.game.event.DamagedEvent;
@@ -32,10 +34,12 @@ import lkd.namsic.game.event.SelfTurnEvent;
 import lkd.namsic.game.event.StartFightEvent;
 import lkd.namsic.game.event.TurnEvent;
 import lkd.namsic.game.exception.EventRemoveException;
+import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.manager.FightManager;
-import lkd.namsic.game.manager.SkillManager;
 import lkd.namsic.game.object.Boss;
 import lkd.namsic.game.object.Entity;
+import lkd.namsic.game.object.GameMap;
+import lkd.namsic.game.object.Monster;
 import lkd.namsic.game.object.Player;
 import lkd.namsic.setting.Logger;
 
@@ -559,14 +563,46 @@ public class EntityEvents {
             @Override
             public void onStartFight(@NonNull Entity self, @NonNull Entity enemy, boolean isOwner) {
                 long fightId = FightManager.getInstance().getFightId(self.getId());
+    
+                Location location = self.getLocation();
+                GameMap map = Config.loadMap(location);
+    
+                Location spawnLocation;
+                for(int i = 1; i <= 3; i++) {
+                    spawnLocation = new Location(location);
+        
+                    try {
+                        spawnLocation.setField(spawnLocation.getFieldX() + i, spawnLocation.getFieldY());
+                    } catch(NumberRangeException ignore) {
+                    }
+        
+                    Monster originalMonster = Config.getData(Id.MONSTER, MonsterList.IMP.getId());
+        
+                    Monster monster = Config.newObject(originalMonster, true);
+                    monster.randomLevel();
+                    monster.setLocation(spawnLocation);
+                    map.addEntity(monster);
+                    Config.unloadObject(monster);
+        
+                    monster = Config.loadObject(Id.MONSTER, monster.getId().getObjectId());
+                    monster.setDoing(Doing.FIGHT);
+        
+                    FightManager.getInstance().getEntitySet(fightId).add(monster);
+                    FightManager.getInstance().fightId.put(monster.getId(), fightId);
+                }
+    
                 Set<Player> playerSet = FightManager.getInstance().getPlayerSet(fightId);
-                SkillManager.getInstance().use(self, SkillList.SPAWN_IMP.getId(), null, playerSet);
+                Player.replyPlayers(playerSet, MonsterList.IMP.getDisplayName() + " 세 마리가 전투에 난입했습니다!");
+    
+                Config.unloadMap(map);
                 
                 try {
                     Thread.sleep(1000);
                 } catch(InterruptedException e) {
                     Logger.e("Event.SUCCUBUS_START", e);
                 }
+                
+                throw new EventRemoveException();
             }
         });
         

@@ -84,7 +84,7 @@ public class RespawnCommand extends PlayerCommand {
             map.respawn();
             player.replyPlayer("몬스터가 리스폰 되었습니다");
         } finally {
-            player.setDoing(Doing.RESPAWN);
+            player.setDoing(Doing.NONE);
             Config.unloadMap(map);
         }
     }

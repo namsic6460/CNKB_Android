@@ -662,6 +662,11 @@ public class FightManager {
     }
 
     private boolean checkInject(@NonNull Player self, @NonNull Entity enemy, boolean isFightOne) {
+        if(enemy.getId().getId().equals(Id.BOSS)) {
+            self.getBuff().clear();
+            self.getBuffStat().clear();
+        }
+        
         if (Doing.fightList().contains(enemy.getDoing())) {
             StringBuilder innerBuilder = new StringBuilder("---적 목록---");
 
@@ -672,6 +677,11 @@ public class FightManager {
             this.fightId.put(self.getId(), fightId);
 
             for (Entity entity : entitySet) {
+                if(entity.getId().getId().equals(Id.BOSS)) {
+                    self.getBuff().clear();
+                    self.getBuffStat().clear();
+                }
+                
                 innerBuilder.append("\n")
                         .append(Emoji.LIST)
                         .append(" ")

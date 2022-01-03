@@ -335,7 +335,7 @@ public class GameMap {
     }
     
     @NonNull
-    public Boss spawnBoss(@NonNull BossList bossData) {
+    public Boss spawnBoss(@NonNull BossList bossData, int fieldX, int fieldY) {
         Boss boss = Config.newObject(Config.getData(Id.BOSS, bossData.getId()), true);
         boss.location = new Location(this.location.getX(), this.location.getY(), 32, 32);
         this.addEntity(boss);
