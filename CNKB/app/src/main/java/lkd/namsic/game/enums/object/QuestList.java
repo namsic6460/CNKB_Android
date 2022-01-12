@@ -50,7 +50,14 @@ public enum QuestList {
     LEATHER_COLLECTING3("가죽 모으기3", 37L),
     INCREASING_ZOMBIE("불어나는 좀비들", 38L),
     BONE_IN_THE_SEA("바닷속의 뼛조각", 39L),
-    SOUND_IN_THE_SINKHOLE("싱크홀에서의 소리", 40L);
+    SOUND_IN_THE_SINKHOLE("싱크홀에서의 소리", 40L),
+    HEALTHY_DEVIL_HORN("몸에 좋은 악마의 뿔", 41L),
+    WORK_TO_KILL_DEVIL1("악마를 죽이는 일1", 42L),
+    WORK_TO_KILL_DEVIL2("악마를 죽이는 일2", 43L),
+    WORK_TO_KILL_DEVIL3("악마를 죽이는 일3", 44L),
+    SECRET_REQUEST1("비밀스런 의뢰1", 45L),
+    SECRET_REQUEST2("비밀스런 의뢰2", 46L),
+    SECRET_REQUEST3("비밀스런 의뢰3", 47L);
     
     public static final Map<String, QuestList> nameMap = new HashMap<>();
     public static final Map<Long, QuestList> idMap = new HashMap<>();

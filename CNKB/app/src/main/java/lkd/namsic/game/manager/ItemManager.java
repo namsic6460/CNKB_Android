@@ -39,6 +39,14 @@ public class ItemManager {
         if(itemId == null) {
             throw new WeirdCommandException("알 수 없는 아이템입니다\n아이템의 이름을 다시 확인해주세요");
         }
+    
+        Item item = Config.getData(Id.ITEM, itemId);
+        Use use = item.getUse();
+        if(use == null) {
+            throw new WeirdCommandException("사용이 불가능한 아이템입니다");
+        }
+    
+        use.checkUse(self, other);
 
         int currentCount = self.getItem(itemId);
         if(currentCount < count) {
@@ -49,13 +57,6 @@ public class ItemManager {
             }
         }
 
-        Item item = Config.getData(Id.ITEM, itemId);
-        Use use = item.getUse();
-        if(use == null) {
-            throw new WeirdCommandException("사용이 불가능한 아이템입니다");
-        }
-
-        use.checkUse(self, other);
         return itemId;
     }
 

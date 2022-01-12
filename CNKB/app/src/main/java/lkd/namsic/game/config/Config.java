@@ -31,6 +31,7 @@ import lkd.namsic.game.base.IdClass;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Id;
 import lkd.namsic.game.enums.StatType;
+import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.exception.NumberRangeException;
 import lkd.namsic.game.exception.ObjectNotFoundException;
@@ -61,7 +62,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
     
-    public static final double VERSION = 4.1;
+    public static final double VERSION = 4.2;
     
     public static final Gson gson = new GsonBuilder()
         .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -79,7 +80,6 @@ public class Config {
     public static final Map<Id, ConcurrentHashMap<Long, GameObject>> OBJECT = new ConcurrentHashMap<>();
     public static final Map<Id, ConcurrentHashMap<Long, Long>> OBJECT_COUNT = new ConcurrentHashMap<>();
     public static final Map<Id, ConcurrentHashSet<Long>> DELETE_LIST = new ConcurrentHashMap<>();
-    public static final Set<Long> DISCARD_LIST = new ConcurrentHashSet<>();
     
     public static boolean IGNORE_FILE_LOG = false;
     
@@ -376,7 +376,6 @@ public class Config {
         
         Long objectCount = OBJECT_COUNT.get(id).get(objectId);
         objectCount = objectCount == null ? 0 : objectCount;
-        boolean discardFlag = false;
         
         if(objectCount > 1) {
             OBJECT_COUNT.get(id).put(objectId, objectCount - 1);
@@ -394,62 +393,54 @@ public class Config {
                 jsonString = toJson(gameObject);
                 
                 if(id.equals(Id.PLAYER)) {
-                    if(DISCARD_LIST.contains(objectId)) {
-                        discardFlag = true;
-                    } else {
-                        Player player = (Player) gameObject;
-                        path = getPlayerPath(player.getSender(), player.getImage());
-                    }
+                    Player player = (Player) gameObject;
+                    path = getPlayerPath(player.getSender(), player.getImage());
                 } else {
                     path = getPath(id, objectId);
                 }
             }
             
-            if(!discardFlag) {
-                if(objectCount == 1) {
-                    OBJECT.get(id).remove(objectId);
-                    OBJECT_COUNT.get(id).remove(objectId);
-                    
-                    if(save) {
-                        Logger.i("FileManager", "Object unloaded - [" + id + ", " + objectId + "]");
-                    }
-                    
-                    if(delete) {
-                        FileManager.delete(path);
-                        DELETE_LIST.get(id).remove(objectId);
-                        return;
-                    }
-                } else if(objectCount == 0) {
-                    if(id.equals(Id.CHAT)) {
-                        if(((Chat) gameObject).getName() != null) {
-                            SELECTABLE_CHAT_SET.add(objectId);
-                        }
-                    }
-                    
-                    if(gameObject instanceof Entity) {
-                        Entity entity = (Entity) gameObject;
-                        
-                        if(entity.getLocation() != null) {
-                            GameMap map = Config.loadMap(entity.getLocation());
-                            map.addEntity(entity);
-                            Config.unloadMap(map);
-                        }
-                        
-                        if(id.equals(Id.PLAYER)) {
-                            Player player = (Player) entity;
-                            PLAYER_LIST.put(player.getId().getObjectId(), new String[]{player.getSender(), player.getImage()});
-                        }
-                    }
-                    
-                    Logger.i("FileManager", "New object unloaded - [" + id + ", " + objectId + "]");
-                    Config.saveConfig();
-                }
+            if(objectCount == 1) {
+                OBJECT.get(id).remove(objectId);
+                OBJECT_COUNT.get(id).remove(objectId);
                 
                 if(save) {
-                    FileManager.save(path, jsonString);
+                    Logger.i("FileManager", "Object unloaded - [" + id + ", " + objectId + "]");
                 }
-            } else if(objectCount == 1) {
-                DISCARD_LIST.remove(objectId);
+                
+                if(delete) {
+                    FileManager.delete(path);
+                    DELETE_LIST.get(id).remove(objectId);
+                    return;
+                }
+            } else if(objectCount == 0) {
+                if(id.equals(Id.CHAT)) {
+                    if(((Chat) gameObject).getName() != null) {
+                        SELECTABLE_CHAT_SET.add(objectId);
+                    }
+                }
+                
+                if(gameObject instanceof Entity) {
+                    Entity entity = (Entity) gameObject;
+                    
+                    if(entity.getLocation() != null) {
+                        GameMap map = Config.loadMap(entity.getLocation());
+                        map.addEntity(entity);
+                        Config.unloadMap(map);
+                    }
+                    
+                    if(id.equals(Id.PLAYER)) {
+                        Player player = (Player) entity;
+                        PLAYER_LIST.put(player.getId().getObjectId(), new String[]{player.getSender(), player.getImage()});
+                    }
+                }
+                
+                Logger.i("FileManager", "New object unloaded - [" + id + ", " + objectId + "]");
+                Config.saveConfig();
+            }
+            
+            if(save) {
+                FileManager.save(path, jsonString);
             }
         }
     }
@@ -459,9 +450,9 @@ public class Config {
         String jsonString = FileManager.read(path);
         
         Player originalPlayer = fromJson(jsonString, Player.class);
+        OBJECT_COUNT.get(Id.PLAYER).put(player.getId().getObjectId(), 1L);
         OBJECT.get(Id.PLAYER).put(player.getId().getObjectId(), originalPlayer);
         unloadObject(originalPlayer);
-        DISCARD_LIST.add(player.getId().getObjectId());
         
         Logger.w("discardPlayer", "Player discarded - " + player.getName());
     }
@@ -916,9 +907,12 @@ public class Config {
         if(entity.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) entity;
             
-            if(player.getVersion() < 3.11) {
-                player.addMoney(1000000);
-                player.addItem(ItemList.CONFIRMED_HIGH_RECIPE.getId(), 1, false);
+            if(player.getVersion() < 3.2) {
+                int eventKill = player.getVariable(Variable.NEW_YEAR_KILL_EVENT);
+                
+                if(eventKill > 0) {
+                    player.addMoney((int) (Math.atan(eventKill / 100D) * 2_000_000));
+                }
             }
         }
         

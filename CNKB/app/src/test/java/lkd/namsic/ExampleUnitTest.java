@@ -281,5 +281,12 @@ public class ExampleUnitTest {
     public void regexTest() {
         System.out.println(Config.replaceLast("음양검1 +5", Pattern.quote("+5"), ""));
     }
+    
+    @Test
+    public void killEventTest() {
+        for(int i = 1; i <= 500; i++) {
+            System.out.println(i + ": " + ((int) (Math.atan(i / 100D) * 2_000_000)));
+        }
+    }
 
 }

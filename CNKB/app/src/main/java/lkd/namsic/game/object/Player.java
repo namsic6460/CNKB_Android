@@ -264,17 +264,6 @@ public class Player extends Entity {
         int year = now.getYear();
         
         if(day != this.lastDay || year != this.lastYear) {
-            //EVENT
-            if(day == 1) {
-                this.replyPlayer("새해 이벤트가 시작되었습니다!\n" +
-                    "+-20 레벨의 몹을 잡고 점수를 쌓아 골드를 획득하세요!\n" +
-                    "그리고 새해 복 많이 받으세요!!");
-            } else if(day == 2) {
-                this.replyPlayer("새해 이벤트가 종료되었습니다!\n" +
-                    "이벤트 점수: " + this.getVariable(Variable.NEW_YEAR_KILL_EVENT, 0) +
-                    "\n골드는 다음 패치에 적용됩니다!");
-            }
-            
             this.lastDay = day;
             this.lastYear = year;
             this.todayAdv = 0;
@@ -364,11 +353,6 @@ public class Player extends Entity {
         }
         
         exp *= Config.EXP_BOOST;
-        
-        //EVENT
-        if(LocalDateTime.now().getDayOfYear() == 1) {
-            exp *= 1.5;
-        }
         
         LoNg wrappedExp = new LoNg(exp);
         String eventName = AddExpEvent.getName();
@@ -1000,16 +984,6 @@ public class Player extends Entity {
             Emoji.LV + " 레벨: " + this.getDisplayLv();
         
         if(!entity.id.getId().equals(Id.PLAYER)) {
-            //EVENT
-            if(LocalDateTime.now().getDayOfYear() == 1) {
-                if(entity.getLv() - this.lv >= -20) {
-                    int killed = this.getVariable(Variable.NEW_YEAR_KILL_EVENT) + 1;
-                    this.setVariable(Variable.NEW_YEAR_KILL_EVENT, killed);
-                    
-                    msg += "\n새해 킬 이벤트: " + killed + " 마리";
-                }
-            }
-            
             int token = Config.randomToken(ItemList.LOW_HUNTER_TOKEN.getId(), RandomList.HUNTER_TOKEN, entity.getLv() / 50, this);
             if(token >= 0) {
                 msg += "\n\n" + Config.TIERS[token] + "급 사냥꾼의 증표 1개를 획득하였습니다";

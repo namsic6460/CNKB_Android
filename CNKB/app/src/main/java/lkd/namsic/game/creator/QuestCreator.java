@@ -196,6 +196,13 @@ public class QuestCreator implements Creatable {
         quest.setNeedItem(ItemList.HORN_OF_IMP.getId(), 1);
         quest.setRewardExp(300000L);
         Config.unloadObject(quest);
+        
+        quest = new Quest(QuestList.HEALTHY_DEVIL_HORN, NpcList.NOAH.getId(), 183L);
+        quest.setNeedItem(ItemList.HORN_OF_LOW_DEVIL.getId(), 10);
+        quest.setRewardCloseRate(NpcList.NOAH.getId(), 10);
+        Config.unloadObject(quest);
+        
+        //TODO
 
         Logger.i("ObjectMaker", "Quest making is done!");
     }
