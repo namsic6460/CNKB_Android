@@ -8,6 +8,7 @@ import java.util.Arrays;
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.WaitResponse;
+import lkd.namsic.game.enums.object.ItemList;
 import lkd.namsic.game.enums.object.NpcList;
 import lkd.namsic.game.enums.object.QuestList;
 import lkd.namsic.game.object.Chat;
@@ -758,7 +759,6 @@ public class ChatCreator implements Creatable {
             "그.. 들려오는 소문에 악마의 뿔을 달여 먹으면 그렇게 좋다던데...",
             "거 한 10개 정도만 좀 구해줄 수 있겠나?"
         );
-        
         createQuestChat(181L, QuestList.HEALTHY_DEVIL_HORN, "크흠크흠... 고맙네");
         createCommonChat(null, 182L, "에잉 자네도 이 나이가 되면 이해할걸세...");
         createCommonChat(null, 183L,
@@ -766,7 +766,123 @@ public class ChatCreator implements Creatable {
             "커험.. 고맙네 거 이만 가게나"
         );
         
-        //TODO
+        createAskingChat("혹시 도울만한 일이 있을까요?", 184L, 185L, 186L,
+            "흠... 네놈이 못미덥긴 하지만 일단 지금은 일이 급하니 맡겨보지",
+            "최근 임프가 우거진 숲까지도 나타난다는 소문이 있다",
+            "주 서식지와는 엄청나게 떨어져있는데도 말이지",
+            "일단 임프의 뿔을 세 개 구해와라"
+        );
+        createQuestChat(185L, QuestList.WORK_TO_KILL_DEVIL1, "빨리 구해오도록");
+        createCommonChat(null, 186L, "역시 네놈한테 기대를 한 내가 바보로군");
+        createCommonChat(null, 187L, "일단 이 뿔을 좀 분석해야겠군...");
+        
+        createAskingChat("뿔 분석은 다 됬나요?", 188L, 189L, 190L,
+            "그래 마침 다 됬군",
+            "아무래도 임프를 소환하는 숙주가 있는 것 같다",
+            "일단 개체수 조절부터 해보지",
+            "임프의 심장 두 개를 구해오도록"
+        );
+        createQuestChat(189L, QuestList.WORK_TO_KILL_DEVIL2, "빨리 구해오도록");
+        createCommonChat(null, 190L, "하... 이래서 인간이란... " + Emoji.CARROT);
+        createCommonChat(null, 191L, "흠... 역시 그년인가...");
+        
+        createAskingChat("뭐가 원인인건가요?", 192L, 193L, 194L,
+            "아무래도 서큐버스가 그 원인인 것 같다",
+            "서큐버스정도는 잡을 수 있겠지?",
+            "임프의 심장 10개를 구하고 임프의 뿔을 사용하면 서큐버스가 나타날거다",
+            "서큐버스의 영혼 한 개를 구해와라"
+        );
+        createQuestChat(193L, QuestList.WORK_TO_KILL_DEVIL3, "빨리 구해오도록");
+        createCommonChat(null, 194L, "역시 네놈 실력에 서큐버스까지 바란건 무리였나... 어쩔 수 없군");
+        createCommonChat(null, 195L, "다시 봤군");
+    
+        chat = createChat("저기 찌가 흔들리는데..!", 196L,
+            "잠깐만... 낚시보다 중요한게 있어서...",
+            "아! 마침 잘 왔어",
+            "몇가지 부탁을 좀 들어줄 수 있을까?"
+        );
+        chat.setAnyResponseChat("부탁?", 197L);
+        chat.setResponseChat(WaitResponse.YES, 198L);
+        chat.setResponseChat(WaitResponse.NO, 199L);
+        Config.unloadObject(chat);
+        
+        createAskingChat(null, 197L, 198L, 199L,
+            "아니 뭐... 급하게 구할게 있는데 나한텐 좀 버거워서",
+            "그래서 안될까?"
+        );
+        createQuestChat(198L, QuestList.SECRET_REQUEST1,
+            "고마워 역시 믿을만하네",
+            "일단, 마정석 30개 정도면 될 것 같아"
+        );
+        createCommonChat(null, 199L, "음... 나중에 혹여나 마음이 바뀌면 다시 찾아와줘");
+        
+        createQuestChat(200L, QuestList.SECRET_REQUEST2,
+            "빨리 구해왔네",
+            "보자... 이번엔 하피의 날개랑 손톱 각각 5개씩을 구해와줘"
+        );
+    
+        createQuestChat(201L, QuestList.SECRET_REQUEST3,
+            "음... 이번엔 골렘 코어가 3개정도 필요할 것 같아"
+        );
+        
+        createQuestChat(202L, QuestList.SECRET_REQUEST4,
+            "드디어 마지막이네",
+            "마지막으로 마법 파편을 15개 구해와줘"
+        );
+        
+        createQuestChat(203L, QuestList.SECRET_REQUEST5,
+            "고마워! 이제 전부 다 구해졌네",
+            "응? 어디에 쓸거냐고?",
+            "어... 나중에 다 완성하면 알려줄게",
+            "구해와줘서 고마워",
+            "아 맞다, 내가 이걸 구해달라고 한건 아무한테도 말하지 말아줘"
+        );
+        
+        chat = createChat(null, 204L,
+            "마침 궁금한 것이 있었는데 잘됬군",
+            "네가 계속 이상한 장소를 뛰어다닌다는 소문이 돌아서 말이지",
+            "흠... 네놈이 원인인 것 같지는 않은데...",
+            "혹시 최근 이상한 의뢰를 받은 적이 있나?"
+        );
+        chat.setAnyResponseChat("왜 묻는거죠?", 205L);
+        chat.setResponseChat(WaitResponse.YES, 207L);
+        chat.setResponseChat(WaitResponse.NO, 206L);
+        Config.unloadObject(chat);
+        
+        createAskingChat(null, 205L, 207L, 206L,
+            "이 마을에 악마가 날뛰는 광경을 보기 싫다면 말해야할거다",
+            "마지막으로 다시 한번 묻지",
+            "최근 이상한 의뢰를 받은 적이 있나?",
+            "신중히 답하는게 좋을거야"
+        );
+        
+        chat = createChat(null, 206L,
+            "흠... 넌 큰 실수를 하고 있는거야"
+        );
+        chat.setItem(ItemList.TRUST_OF_JOON_SIK.getId(), 1);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 207L,
+            "의뢰라...",
+            "그 의뢰를 맡긴 사람이 누구지?"
+        );
+        chat.setAnyResponseChat("...", 208L);
+        chat.setAnyResponseChat("준식", 209L);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 208L,
+            "이미 말한거 쉽게쉽게 가자고",
+            "그 의뢰를 맡긴 사람이 누구지?"
+        );
+        chat.setAnyResponseChat("준식", 209L);
+        Config.unloadObject(chat);
+        
+        chat = createChat(null, 209L,
+            "역시 그런건가...",
+            "많은 도움이 됬군. 고맙다"
+        );
+        chat.setItem(ItemList.TRUST_OF_TAE_GONG.getId(), 1);
+        Config.unloadObject(chat);
 
         Logger.i("ObjectMaker", "Chat making is done!");
     }

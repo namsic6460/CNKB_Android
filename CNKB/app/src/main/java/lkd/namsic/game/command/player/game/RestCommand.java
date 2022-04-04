@@ -27,7 +27,7 @@ import lkd.namsic.game.object.Player;
 
 public class RestCommand extends PlayerCommand {
     
-    public static Map<Player, ExecutorService> executorMap = new HashMap<>();
+    public static final Map<Player, ExecutorService> executorMap = new HashMap<>();
 
     @Override
     public void executeCommand(@NonNull final Player player, @NonNull String command, @NonNull List<String> commands,

@@ -957,6 +957,8 @@ public class ItemCreator implements Creatable {
         createItem(ItemList.SKILL_BOOK_MANA_EXPLOSION, "스킬 " +
             Emoji.focus(SkillList.MANA_EXPLOSION.getDisplayName()) + " 를 배울 수 있게 해주는 스킬 북이다");
 
+        createItem(ItemList.SUCCUBUS_SOUL, "마기가 남아있는 서큐버스의 영혼이다");
+        
         Logger.i("ObjectMaker", "Item making is done!");
     }
 

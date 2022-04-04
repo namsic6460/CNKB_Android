@@ -62,7 +62,7 @@ import lkd.namsic.setting.Logger;
 
 public class Config {
     
-    public static final double VERSION = 4.2;
+    public static final double VERSION = 4.21;
     
     public static final Gson gson = new GsonBuilder()
         .registerTypeAdapter(Npc.class, new NpcAdapter())
@@ -907,7 +907,7 @@ public class Config {
         if(entity.getId().getId().equals(Id.PLAYER)) {
             Player player = (Player) entity;
             
-            if(player.getVersion() < 3.2) {
+            if(player.getVersion() < 4.21) {
                 int eventKill = player.getVariable(Variable.NEW_YEAR_KILL_EVENT);
                 
                 if(eventKill > 0) {

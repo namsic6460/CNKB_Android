@@ -199,6 +199,12 @@ public class NpcCreator implements Creatable {
         chatLimit.getLimitQuest().addMax(QuestList.MEMORIAL_CEREMONY.getId(), 0);
         chatLimit.getLimitQuest().addMin(QuestList.NEED_FISHING_ROD_ITEM.getId(), 1);
         npc.setChat(chatLimit, 81L);
+        
+        chatLimit = new ChatLimit();
+        chatLimit.getNotRunningQuest().add(QuestList.SECRET_REQUEST1.getId());
+        chatLimit.getLimitQuest().addMax(QuestList.SECRET_REQUEST1.getId(), 0);
+        chatLimit.getLimitQuest().addMin(QuestList.NEED_FISHING_ROD_ITEM.getId(), 1);
+        npc.setChat(chatLimit, 196L);
 
         Config.unloadObject(npc);
 
@@ -329,7 +335,24 @@ public class NpcCreator implements Creatable {
         npc.setBaseChat(chatLimit, 164L);
 
         npc.setChat(chatLimit, 165L);
-
+        
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitQuest().addMax(QuestList.WORK_TO_KILL_DEVIL1.getId(), 0);
+        chatLimit.getNotRunningQuest().add(QuestList.WORK_TO_KILL_DEVIL1.getId());
+        npc.setChat(chatLimit, 184L);
+        
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitQuest().addMin(QuestList.WORK_TO_KILL_DEVIL1.getId(), 1);
+        chatLimit.getLimitQuest().addMax(QuestList.WORK_TO_KILL_DEVIL2.getId(), 0);
+        chatLimit.getNotRunningQuest().add(QuestList.WORK_TO_KILL_DEVIL2.getId());
+        npc.setChat(chatLimit, 188L);
+    
+        chatLimit = new ChatLimit();
+        chatLimit.getLimitQuest().addMin(QuestList.WORK_TO_KILL_DEVIL2.getId(), 1);
+        chatLimit.getLimitQuest().addMax(QuestList.WORK_TO_KILL_DEVIL3.getId(), 0);
+        chatLimit.getNotRunningQuest().add(QuestList.WORK_TO_KILL_DEVIL3.getId());
+        npc.setChat(chatLimit, 192L);
+        
         Config.unloadObject(npc);
 
 

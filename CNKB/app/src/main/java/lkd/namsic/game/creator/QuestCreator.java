@@ -202,8 +202,66 @@ public class QuestCreator implements Creatable {
         quest.setRewardCloseRate(NpcList.NOAH.getId(), 10);
         Config.unloadObject(quest);
         
-        //TODO
-
+        quest = new Quest(QuestList.WORK_TO_KILL_DEVIL1, NpcList.LONGSILVER.getId(), 187L);
+        quest.setNeedItem(ItemList.HORN_OF_IMP.getId(), 3);
+        quest.setRewardCloseRate(NpcList.ELWOOD.getId(), 5);
+        quest.setRewardCloseRate(NpcList.LONGSILVER.getId(), 5);
+        quest.setRewardMoney(100000L);
+        Config.unloadObject(quest);
+        
+        quest = new Quest(QuestList.WORK_TO_KILL_DEVIL2, NpcList.LONGSILVER.getId(), 191L);
+        quest.setNeedItem(ItemList.IMP_HEART.getId(), 2);
+        quest.setRewardCloseRate(NpcList.ELWOOD.getId(), 5);
+        quest.setRewardCloseRate(NpcList.LONGSILVER.getId(), 5);
+        quest.setRewardMoney(100000L);
+        quest.setRewardItem(ItemList.STAT_POINT.getId(), 20);
+        Config.unloadObject(quest);
+        
+        quest = new Quest(QuestList.WORK_TO_KILL_DEVIL3, NpcList.LONGSILVER.getId(), 195L);
+        quest.setNeedItem(ItemList.SUCCUBUS_SOUL.getId(), 1);
+        quest.setRewardCloseRate(NpcList.ELWOOD.getId(), 10);
+        quest.setRewardCloseRate(NpcList.LONGSILVER.getId(), 10);
+        quest.setRewardCloseRate(NpcList.FREY.getId(), 5);
+        quest.setRewardCloseRate(NpcList.HIBIS.getId(), 5);
+        quest.setRewardCloseRate(NpcList.SHADOW_BACK.getId(), 5);
+        quest.setRewardMoney(500000L);
+        quest.setRewardItem(ItemList.STAT_POINT.getId(), 50);
+        quest.setRewardItem(ItemList.ADV_STAT.getId(), 30);
+        quest.setRewardItem(ItemList.HIGH_ELIXIR.getId(), 3);
+        Config.unloadObject(quest);
+        
+        quest = new Quest(QuestList.SECRET_REQUEST1, NpcList.JOON_SIK.getId(), 200L);
+        quest.setNeedItem(ItemList.MAGIC_STONE.getId(), 30);
+        quest.setRewardCloseRate(NpcList.JOON_SIK.getId(), 5);
+        quest.setRewardExp(500000L);
+        quest.setRewardMoney(200000L);
+        Config.unloadObject(quest);
+        
+        quest = new Quest(QuestList.SECRET_REQUEST2, NpcList.JOON_SIK.getId(), 201L);
+        quest.setNeedItem(ItemList.HARPY_WING.getId(), 5);
+        quest.setNeedItem(ItemList.HARPY_NAIL.getId(), 5);
+        quest.setRewardCloseRate(NpcList.JOON_SIK.getId(), 5);
+        quest.setRewardExp(500000L);
+        quest.setRewardMoney(200000L);
+        Config.unloadObject(quest);
+    
+        quest = new Quest(QuestList.SECRET_REQUEST3, NpcList.JOON_SIK.getId(), 202L);
+        quest.setNeedItem(ItemList.GOLEM_CORE.getId(), 3);
+        quest.setRewardCloseRate(NpcList.JOON_SIK.getId(), 5);
+        quest.setRewardExp(500000L);
+        quest.setRewardMoney(200000L);
+        Config.unloadObject(quest);
+    
+        quest = new Quest(QuestList.SECRET_REQUEST4, NpcList.JOON_SIK.getId(), 203L);
+        quest.setNeedItem(ItemList.PIECE_OF_MAGIC.getId(), 15);
+        quest.setRewardCloseRate(NpcList.JOON_SIK.getId(), 5);
+        quest.setRewardExp(500000L);
+        quest.setRewardMoney(200000L);
+        Config.unloadObject(quest);
+        
+        quest = new Quest(QuestList.SECRET_REQUEST5, NpcList.KANG_TAE_GONG.getId(), 204L);
+        Config.unloadObject(quest);
+        
         Logger.i("ObjectMaker", "Quest making is done!");
     }
 

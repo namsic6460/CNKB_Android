@@ -63,7 +63,7 @@ public class NotificationListener extends NotificationListenerService {
         if(!MainActivity.isOn) {
             return;
         }
-
+    
         if (sbn.getPackageName().equals("com.kakao.talk")) {
             try {
                 Notification.WearableExtender extender = new Notification.WearableExtender(sbn.getNotification());
@@ -121,7 +121,7 @@ public class NotificationListener extends NotificationListenerService {
                             image = image + "+" + image.hashCode() + "+" + imageLength;
                         }
 
-                        this.cancelNotification(sbn.getKey());
+//                        this.cancelNotification(sbn.getKey());
                         KakaoTalk.onChat(sender, image, msg.trim(), room, isGroupChat, action);
                     }
                 }

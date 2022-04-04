@@ -88,6 +88,7 @@ public class BossCreator implements Creatable {
         boss.setItemDrop(ItemList.SKILL_BOOK_ESSENCE_DRAIN.getId(), 0.1, 1, 1);
         boss.setItemDrop(ItemList.SKILL_BOOK_MAGIC_DRAIN.getId(), 0.1, 1, 1);
         boss.setItemDrop(ItemList.SKILL_BOOK_MANA_EXPLOSION.getId(), 0.1, 1, 1);
+        boss.setItemDrop(ItemList.SUCCUBUS_SOUL.getId(), 1, 1, 1);
     
         boss.addEquip(EquipList.SUCCUBUS_GEM.getId());
         boss.setEquipDropPercent(EquipType.GEM, 0.1);

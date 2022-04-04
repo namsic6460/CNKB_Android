@@ -57,7 +57,9 @@ public enum QuestList {
     WORK_TO_KILL_DEVIL3("악마를 죽이는 일3", 44L),
     SECRET_REQUEST1("비밀스런 의뢰1", 45L),
     SECRET_REQUEST2("비밀스런 의뢰2", 46L),
-    SECRET_REQUEST3("비밀스런 의뢰3", 47L);
+    SECRET_REQUEST3("비밀스런 의뢰3", 47L),
+    SECRET_REQUEST4("비밀스런 의뢰4", 48L),
+    SECRET_REQUEST5("비밀스런 의뢰5", 49L);
     
     public static final Map<String, QuestList> nameMap = new HashMap<>();
     public static final Map<Long, QuestList> idMap = new HashMap<>();

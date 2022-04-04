@@ -10,6 +10,7 @@ import java.util.Set;
 
 import lkd.namsic.game.config.Config;
 import lkd.namsic.game.KakaoTalk;
+import lkd.namsic.game.config.Emoji;
 import lkd.namsic.game.enums.Variable;
 import lkd.namsic.game.base.Location;
 import lkd.namsic.game.enums.Doing;
@@ -149,7 +150,7 @@ public class ChatManager {
         long questId = chat.getQuestId();
         if (questId != 0) {
             self.addQuest(chat.getQuestId());
-            self.replyPlayer("퀘스트 \"" + QuestList.findById(questId) + "\" (을/를) 수락하였습니다");
+            self.replyPlayer("퀘스트 " + Emoji.focus(QuestList.findById(questId)) + " (을/를) 수락하였습니다");
         }
 
         Location tpLocation = chat.getTpLocation();

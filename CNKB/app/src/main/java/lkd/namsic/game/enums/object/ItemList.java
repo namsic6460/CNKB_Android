@@ -296,7 +296,12 @@ public enum ItemList {
     
     SKILL_BOOK_ESSENCE_DRAIN("스킬 북 - 정기 흡수", 234L),
     SKILL_BOOK_MAGIC_DRAIN("스킬 북 - 마기 흡수", 235L),
-    SKILL_BOOK_MANA_EXPLOSION("스킬 북 - 마나 폭발", 236L);
+    SKILL_BOOK_MANA_EXPLOSION("스킬 북 - 마나 폭발", 236L),
+    
+    SUCCUBUS_SOUL("서큐버스의 영혼", 237L),
+    
+    TRUST_OF_JOON_SIK("준식의 신뢰", 238L),
+    TRUST_OF_TAE_GONG("태공의 신뢰", 239L);
     
     public static final Map<String, ItemList> nameMap = new HashMap<>();
     public static final Map<Long, ItemList> idMap = new HashMap<>();
