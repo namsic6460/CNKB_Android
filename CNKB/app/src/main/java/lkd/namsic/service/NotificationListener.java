@@ -66,9 +66,12 @@ public class NotificationListener extends NotificationListenerService {
     
         if (sbn.getPackageName().equals("com.kakao.talk")) {
             try {
-                Notification.WearableExtender extender = new Notification.WearableExtender(sbn.getNotification());
-
-                for (Notification.Action action : extender.getActions()) {
+                Notification.Action[] actions = sbn.getNotification().actions;
+                if(actions == null) {
+                    return;
+                }
+                
+                for (Notification.Action action : actions) {
                     if (action.getRemoteInputs() != null && action.getRemoteInputs().length > 0 &&
                             action.title.toString().toLowerCase().contains("reply") ||
                             action.title.toString().toLowerCase().contains("답장")) {
