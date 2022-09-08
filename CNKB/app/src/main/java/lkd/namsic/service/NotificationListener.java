@@ -2,6 +2,7 @@ package lkd.namsic.service;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -124,8 +125,8 @@ public class NotificationListener extends NotificationListenerService {
                             image = image + "+" + image.hashCode() + "+" + imageLength;
                         }
 
-//                        this.cancelNotification(sbn.getKey());
                         KakaoTalk.onChat(sender, image, msg.trim(), room, isGroupChat, action);
+                        ((NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE)).cancel(sbn.getId());
                     }
                 }
             } catch(Exception e) {
