@@ -12,7 +12,12 @@ import android.service.notification.StatusBarNotification;
 import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import lkd.namsic.MainActivity;
 import lkd.namsic.game.KakaoTalk;
@@ -67,8 +72,16 @@ public class NotificationListener extends NotificationListenerService {
     
         if (sbn.getPackageName().equals("com.kakao.talk")) {
             try {
-                Notification.Action[] actions = sbn.getNotification().actions;
-                if(actions == null) {
+                List<Notification.Action> actions = new ArrayList<>();
+                Notification.Action[] immutableList = sbn.getNotification().actions;
+                if(immutableList != null) {
+                    actions.addAll(Arrays.asList(immutableList));
+                }
+
+                Notification.WearableExtender extender = new Notification.WearableExtender(sbn.getNotification());
+                actions.addAll(Optional.ofNullable(extender.getActions()).orElse(Collections.emptyList()));
+
+                if(actions.isEmpty()) {
                     return;
                 }
                 
@@ -98,10 +111,6 @@ public class NotificationListener extends NotificationListenerService {
                             isGroupChat = true;
                         }
 
-                        if(room.equals("CNKB") || sender.equals("CNKB")) {
-                            return;
-                        }
-
                         if (msg.equals("null")) {
                             msg = "";
                         }
@@ -127,6 +136,8 @@ public class NotificationListener extends NotificationListenerService {
 
                         KakaoTalk.onChat(sender, image, msg.trim(), room, isGroupChat, action);
                         ((NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE)).cancel(sbn.getId());
+
+                        return;
                     }
                 }
             } catch(Exception e) {
