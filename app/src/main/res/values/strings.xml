@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">NotiListener</string>
+    <string name="init_btn">Refresh</string>
+</resources>

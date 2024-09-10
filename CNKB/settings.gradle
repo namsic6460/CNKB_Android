@@ -1,3 +1,0 @@
-include ':lombok'
-include ':app'
-rootProject.name = "CNKB"
